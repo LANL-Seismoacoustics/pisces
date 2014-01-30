@@ -1,0 +1,10 @@
+*.egg-info/
+*.pyc
+.DS_Store
+*.so
+*.dylib
+*.pdf
+*.ai
+*.vim
+build/
+dist/
