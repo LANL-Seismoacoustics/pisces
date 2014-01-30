@@ -2,7 +2,6 @@
 """ 
 Pisces: A Practical Seismological Database Framework in Python
 
-Long description.
 
 """
 try:
@@ -15,10 +14,7 @@ import inspect
 import glob
 from numpy.distutils.core import setup, Extension
 
-import pisces
-
 doclines = __doc__.split("\n")
-version = open('VERSION.txt').read().split()[0]
 
 # also stolen from ObsPy
 SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
@@ -38,7 +34,7 @@ def find_packages():
     return [_i.replace(os.sep, ".") for _i in modules]
 
 setup(name='pisces-db',
-    version=pisces.__version__,
+    version='0.2',
     description=doclines[0],
     long_description="\n".join(doclines[2:]),
     author='Jonathan MacCarthy',
