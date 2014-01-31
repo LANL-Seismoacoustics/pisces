@@ -1,10 +1,39 @@
-*.egg-info/
-*.pyc
 .DS_Store
-*.so
-*.dylib
+*.egg-info/
 *.pdf
 *.ai
 *.vim
-build/
-dist/
+
+
+*.py[cod]
+
+# C extensions
+*.so
+*.dylib
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Sphinx
+docs/_build
+

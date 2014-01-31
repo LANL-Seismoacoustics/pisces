@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """ 
 Pisces: A Practical Seismological Database Framework in Python
 

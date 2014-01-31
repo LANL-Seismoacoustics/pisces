@@ -42,7 +42,8 @@ Import and query them in a script:
 ```python
 import pisces as ps
 import pisces.request as req
-from mytables import Affiliation, Site, Origin
+from mytables import Site, Origin
+from mytables import Affiliation as Affil
 
 # connect with an existing SQLite database file
 session = ps.db_connect('sqlite:///mydb.sqlite')
@@ -104,17 +105,5 @@ We introduce Pisces, with the following design goals in mind:
   Python and SQLAlchemy make it possible to write code that will will not eventually have to be abandoned due to any one of these concerns. 
   Code written for a small project that uses [SQLite](www.sqlite.org) on a Mac will also work for a large project using a remote Oracle database on a Linux system.
 
-
-
-<!---
-.. image:: https://badge.fury.io/py/pisces.png
-    :target: http://badge.fury.io/py/pisces
-    
-.. image:: https://travis-ci.org/jkmacc-LANL/pisces.png?branch=master
-        :target: https://travis-ci.org/jkmacc-LANL/pisces
-
-.. image:: https://pypip.in/d/pisces/badge.png
-        :target: https://crate.io/packages/pisces?version=latest
--->
 
 
