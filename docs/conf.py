@@ -39,7 +39,7 @@ class Mock(object):
             return Mock()
 
 #MOCK_MODULES = ['numpy','scipy','pisces.io.lib','obspy.taup','obspy.core.util.geodetics']
-MOCK_MODULES = ['obspy.taup', 'numpy', 'sqlalchemy']
+MOCK_MODULES = ['pisces.io.lib']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
