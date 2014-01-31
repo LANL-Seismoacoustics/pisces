@@ -16,7 +16,8 @@ Documentation: [http://pisces.rtfd.org]()
 
 ## What does it look like?
 
-Name your Center for Seismic Studies (CSS) 3.0 tables in a module:
+Name your Center for Seismic Studies (CSS) 3.0 tables in a module.  
+This just needs to be done once per table name.
 
 ```python
 # mytables.py
@@ -46,9 +47,6 @@ from mytables import Affiliation, Site, Origin
 # connect with an existing SQLite database file
 session = ps.db_connect('sqlite:///mydb.sqlite')
 
-# load the SQL internals of Affiliation from the database itself
-Affiliation.prepare(session.bind)
-
 # query all stations from the CREST seismic deployment, using SQLAlchemy
 q = session.query(Site).filter(Site.ondate.between(2008001, 2008365))
 csites = q.filter(Site.sta == Affil.sta).filter(Affil.net == 'XP').all()
@@ -73,12 +71,13 @@ session.close()
 Get a waveform (as an ObsPy [Trace object](http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace)).
 
 ```python
+from mytables import Wfdisc
 wf = session.query(Wfdisc).filter(Wfdisc.sta == 'ANMO').first()
 tr = wf.to_trace()
 tr.plot()
 ```
 
-![ANMO waveform](https://github.com/jkmacc-LANL/pisces/blob/master/ANMO.png "ANMO waveform")
+![ANMO waveform](https://raw.github.com/jkmacc-LANL/pisces/master/ANMO.png "ANMO waveform")
 
 ## Motivation
 
@@ -117,6 +116,5 @@ We introduce Pisces, with the following design goals in mind:
 .. image:: https://pypip.in/d/pisces/badge.png
         :target: https://crate.io/packages/pisces?version=latest
 -->
-
 
 
