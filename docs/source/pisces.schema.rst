@@ -1,0 +1,35 @@
+schema Package
+==============
+
+:mod:`css3` Module
+------------------
+
+.. automodule:: pisces.schema.css3
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`doc` Module
+-----------------
+
+.. automodule:: pisces.schema.doc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`kbcore` Module
+--------------------
+
+.. automodule:: pisces.schema.kbcore
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`util` Module
+------------------
+
+.. automodule:: pisces.schema.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
