@@ -21,18 +21,18 @@ doclines = __doc__.split("\n")
 SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
     inspect.currentframe())))
 
-def find_packages():
-    """
-    Simple function to find all modules under the current folder.
-
-    Stolen from ObsPy.
-    """
-    modules = []
-    for dirpath, _, filenames in os.walk(os.path.join(SETUP_DIRECTORY,
-            "pisces")):
-        if "__init__.py" in filenames:
-            modules.append(os.path.relpath(dirpath, SETUP_DIRECTORY))
-    return [_i.replace(os.sep, ".") for _i in modules]
+# def find_packages():
+#     """
+#     Simple function to find all modules under the current folder.
+# 
+#     Stolen from ObsPy.
+#     """
+#     modules = []
+#     for dirpath, _, filenames in os.walk(os.path.join(SETUP_DIRECTORY,
+#             "pisces")):
+#         if "__init__.py" in filenames:
+#             modules.append(os.path.relpath(dirpath, SETUP_DIRECTORY))
+#     return [_i.replace(os.sep, ".") for _i in modules]
 
 setup(name='pisces-db',
     version='0.2',
@@ -40,7 +40,7 @@ setup(name='pisces-db',
     long_description="\n".join(doclines[2:]),
     author='Jonathan MacCarthy',
     author_email='jkmacc@lanl.gov',
-    packages=find_packages(),
+    packages=['pisces','pisces.schema','pisces.io'],
     url='https://github.com/jkmacc-LANL/pisces',
     install_requires=['obspy>=0.8','sqlalchemy>=0.7'],
     ext_package='pisces.io.lib',
