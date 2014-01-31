@@ -9,14 +9,6 @@ schema Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`doc` Module
------------------
-
-.. automodule:: pisces.schema.doc
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`kbcore` Module
 --------------------
 

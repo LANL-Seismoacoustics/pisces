@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # pisces documentation build configuration file, created by
 # sphinx-quickstart on Tue Nov  5 13:56:18 2013.
 #
@@ -12,6 +10,8 @@
 # serve to show the default.
 
 import sys, os
+
+sys.path.insert(0, os.path.abspath('..'))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -38,7 +38,7 @@ class Mock(object):
         else:
             return Mock()
 
-MOCK_MODULES = ['doc','pisces.io.lib']
+MOCK_MODULES = ['numpy','scipy','pisces.io.lib','obspy.taup']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
@@ -50,7 +50,7 @@ for mod_name in MOCK_MODULES:
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'numpydoc', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc','sphinx.ext.autosummary','numpydoc','sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
