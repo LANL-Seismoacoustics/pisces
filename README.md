@@ -46,9 +46,6 @@ from mytables import Affiliation, Site, Origin
 # connect with an existing SQLite database file
 session = ps.db_connect('sqlite:///mydb.sqlite')
 
-# load the SQL internals of Affiliation from the database itself
-Affiliation.prepare(session.bind)
-
 # query all stations from the CREST seismic deployment, using SQLAlchemy
 q = session.query(Site).filter(Site.ondate.between(2008001, 2008365))
 csites = q.filter(Site.sta == Affil.sta).filter(Affil.net == 'XP').all()
