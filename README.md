@@ -16,7 +16,8 @@ Documentation: [http://pisces.rtfd.org]()
 
 ## What does it look like?
 
-Name your Center for Seismic Studies (CSS) 3.0 tables in a module:
+Name your Center for Seismic Studies (CSS) 3.0 tables in a module.  
+This just needs to be done once per table name.
 
 ```python
 # mytables.py
