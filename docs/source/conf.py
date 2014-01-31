@@ -19,8 +19,7 @@ import sys, os
 #sys.path.insert(0, os.path.abspath('.'))
 
 
-import sys
-
+# Mock imports for C/Fortran extensions
 class Mock(object):
     def __init__(self, *args, **kwargs):
         pass
@@ -39,7 +38,7 @@ class Mock(object):
         else:
             return Mock()
 
-MOCK_MODULES = ['pisces.io.lib']
+MOCK_MODULES = ['numpy','obspy', 'pisces']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
