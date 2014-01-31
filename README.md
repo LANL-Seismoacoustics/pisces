@@ -70,6 +70,7 @@ session.close()
 Get a waveform (as an ObsPy [Trace object](http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace)).
 
 ```python
+from mytables import Wfdisc
 wf = session.query(Wfdisc).filter(Wfdisc.sta == 'ANMO').first()
 tr = wf.to_trace()
 tr.plot()
@@ -114,6 +115,5 @@ We introduce Pisces, with the following design goals in mind:
 .. image:: https://pypip.in/d/pisces/badge.png
         :target: https://crate.io/packages/pisces?version=latest
 -->
-
 
 
