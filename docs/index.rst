@@ -1,5 +1,5 @@
 .. pisces documentation master file, created by
-   sphinx-quickstart on Tue Nov  5 13:56:18 2013.
+   sphinx-quickstart on Fri Jan 31 15:46:44 2014.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
