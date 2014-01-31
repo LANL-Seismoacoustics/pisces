@@ -38,7 +38,7 @@ class Mock(object):
         else:
             return Mock()
 
-MOCK_MODULES = ['numpy','obspy', 'pisces.io.lib','pisces.io.readwaveform']
+MOCK_MODULES = ['doc','pisces.io.lib']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
