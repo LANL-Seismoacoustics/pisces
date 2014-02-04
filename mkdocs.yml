@@ -21,4 +21,4 @@ pages:
 
 docs_dir: 'docs/source'
 site_dir: 'docs/build'
-theme_dir: 'docs/bootstrap'
+theme: 'cosmo'
