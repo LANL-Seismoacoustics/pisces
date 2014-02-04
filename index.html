@@ -83,6 +83,15 @@
                             <a href="pisces">pisces</a>
                         </li>
                     
+                    </ul>
+                </li>
+            
+            
+            
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
                         <li >
                             <a href="pisces.request">pisces.request</a>
                         </li>
@@ -158,6 +167,7 @@
 
 <h1 id="pisces">Pisces</h1>
 <p>A practical seismological database library in Python.</p>
+<p>Repository: https://github.com/jkmacc-LANL/pisces</p>
 <h3 id="motivation">Motivation</h3>
 <p>Relational databases can help seismologists manage data and facilitate research, but ...</p>
 <ul>
@@ -238,7 +248,8 @@ session.close()
 </code></pre>
 <h3 id="get-a-waveform">Get a waveform</h3>
 <p>...as an ObsPy <a href="http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace">Trace object</a>.</p>
-<pre class="prettyprint well"><code>from mytables import Wfdisc  
+<pre class="prettyprint well"><code>from mytables import Wfdisc
+
 wf = session.query(Wfdisc).filter(Wfdisc.sta == 'ANMO').first()  
 tr = wf.to_trace()  
 tr.plot()
