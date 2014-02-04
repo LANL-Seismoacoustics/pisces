@@ -2,7 +2,7 @@
 
 A practical seismological database library in Python.
 
-Repository: [https://github.com/jkmacc-LANL/pisces]()
+[Repository: ](https://github.com/jkmacc-LANL/pisces)
 
 ### Motivation
 
