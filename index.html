@@ -80,43 +80,43 @@
                     <ul class="dropdown-menu">
                     
                         <li >
-                            <a href="api/pisces">pisces</a>
+                            <a href="pisces">pisces</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.request">pisces.request</a>
+                            <a href="pisces.request">pisces.request</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.client">pisces.client</a>
+                            <a href="pisces.client">pisces.client</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.schema">pisces.schema</a>
+                            <a href="pisces.schema">pisces.schema</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.schema.css3">pisces.schema.css3</a>
+                            <a href="pisces.schema.css3">pisces.schema.css3</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.schema.kbcore">pisces.schema.kbcore</a>
+                            <a href="pisces.schema.kbcore">pisces.schema.kbcore</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.io">pisces.io</a>
+                            <a href="pisces.io">pisces.io</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.io.readwaveform">pisces.io.readwaveform</a>
+                            <a href="pisces.io.readwaveform">pisces.io.readwaveform</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.io.sac">pisces.io.sac</a>
+                            <a href="pisces.io.sac">pisces.io.sac</a>
                         </li>
                     
                         <li >
-                            <a href="api/pisces.io.mseed">pisces.io.mseed</a>
+                            <a href="pisces.io.mseed">pisces.io.mseed</a>
                         </li>
                     
                     </ul>
@@ -244,34 +244,6 @@ tr = wf.to_trace()
 tr.plot()
 </code></pre>
 <p><img alt="ANMO waveform" src="https://raw.github.com/jkmacc-LANL/pisces/master/ANMO.png" title="ANMO waveform" /></p>
-<!--
-## Motivation
-
-As the volume of seismological data grows, data management becomes more important, and has the potential to hinder research.
-Relational databases have long existed to help with this problem, but they have not been widely adopted for several broad reasons:
-
-* **Researchers don't want to learn a separate data management language, like SQL.**  
-  They are more likely to string together tools they already know, like shell scripts and file-based "databases."
-* **Existing seismological database solutions are difficult to learn.**  
-  Some existing solutions have expensive or restrictive licenses, do not expose source code, and/or have a small/niche user base.  
-
-## Design Goals
-
-We introduce Pisces, with the following design goals in mind:
-
-* **Let users manage and analyze data in a single language.**  
-  Python and scientific Python ecosystem (the "[SciPy stack](http://www.scipy.org/about.html)") are an increasingly desirable research environment.
-  We wish to more seamlessly integrate good data management (relational databases) and data analysis.
-* **Take advantage of existing widely-used open-source technologies.**  
-  These include [Python](http://www.python.org), [SQLAlchemy](http://www.sqlalchemy.org), the SciPy stack, and SQL relational databases.
-  These are free and widely-used technologies, allowing researchers to leverage a wide knowledge base for writing and troubleshooting data management code.
-* **Make data management code extensible, portable, and scalable.**  
-  Even in the span of just a few years, a researcher may encounter many different projects, system architectures, or budgetary and licensing concerns.
-  Python and SQLAlchemy make it possible to write code that will will not eventually have to be abandoned due to any one of these concerns. 
-  Code written for a small project that uses [SQLite](http://www.sqlite.org) on a Mac will also work for a large project using a remote Oracle database on a Linux system.
-
--->
-
 </div>
         </div>
 
