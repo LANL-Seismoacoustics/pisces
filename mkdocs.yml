@@ -8,7 +8,7 @@ pages:
 - ['querying.md', 'Queries and Joins']
 - ['io.md', 'Import/Export']
 - ['roadmap.md', 'Roadmap']
-- ['pisces.md', 'API Documentation', 'pisces']
+- ['pisces.md', 'Documentation', 'pisces']
 - ['pisces.request.md', 'Documentation', 'pisces.request']
 - ['pisces.client.md', 'Documentation', 'pisces.client']
 - ['pisces.schema.md', 'Documentation', 'pisces.schema']
