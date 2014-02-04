@@ -2,6 +2,8 @@
 
 A practical seismological database library in Python.
 
+Repository: https://github.com/jkmacc-LANL/pisces
+
 ### Motivation
 
 Relational databases can help seismologists manage data and facilitate research, but ...
@@ -90,9 +92,9 @@ This just needs to be done once per table name.
 ...as an ObsPy [Trace object](http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace).
 
     from mytables import Wfdisc  
+
     wf = session.query(Wfdisc).filter(Wfdisc.sta == 'ANMO').first()  
     tr = wf.to_trace()  
     tr.plot()  
 
 ![ANMO waveform](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/ANMO.png "ANMO waveform")
-
