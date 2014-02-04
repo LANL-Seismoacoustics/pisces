@@ -33,21 +33,21 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
 
     Parameters
     ----------
-    DATAFILE: string
+    DATAFILE : string
         Path and name of data file.
-    DATATYPE: string 
+    DATATYPE : string 
         {'f4', 'i1', 'i2', 'i4', 'p4', 't8', 's2', 'p8', 's4', 'f8', 'u4', 't4',
          's1', 'sd', 'e1', 'sc', 'sy'} 
         Data type string (from wfdisc.datatype).
         'sd', 'sc', and 'sy' are SEED/miniSEED, SAC, and SEGY
-    BYTEOFFSET: int
+    BYTEOFFSET : int
         Number of bytes from beginning of file.
-    NUM: int
+    NUM : int
         Number of samples to read.
 
     Returns
     -------
-    data: numpy.array
+    data : numpy.array
         Vector of NUM samples of type DATATYPE.
 
     Raises

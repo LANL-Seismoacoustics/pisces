@@ -1,14 +1,6 @@
 io Package
 ==========
 
-:mod:`flatfile` Module
-----------------------
-
-.. automodule:: pisces.io.flatfile
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`readwaveform` Module
 --------------------------
 

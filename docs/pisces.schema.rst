@@ -17,14 +17,6 @@ schema Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`test` Module
-------------------
-
-.. automodule:: pisces.schema.test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`util` Module
 ------------------
 

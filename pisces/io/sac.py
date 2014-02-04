@@ -232,7 +232,8 @@ def tr2instrument(tr):
 
 
 def tr2origin(tr):
-    """Provide a sac header dictionary, get a filled origin table instance.
+    """
+    Provide a sac header dictionary, get a filled origin table instance.
     A few things:
     1) If sac reference time isn't event-based, origin time is unknown
     2) magnitude is taken first from hdr['mag'], hdr['imagtyp'] if defined,
@@ -241,11 +242,12 @@ def tr2origin(tr):
        put into the origin table
     4) origin.auth is taken first from hdr['imagsrc'], then replaced by
        hdr['kuser1'] if defined.  the imagsrc->auth translations are:
-     INEIC -> ISC:NEIC
-     IPDE -> PDE
-     IISC -> ISC
-     IBRK -> ISC:BERK
-     IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -> unchanged 
+
+     * INEIC -> ISC:NEIC
+     * IPDE -> PDE
+     * IISC -> ISC
+     * IBRK -> ISC:BERK
+     * IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -> unchanged 
     
     """
     # simple SAC translations
@@ -348,19 +350,20 @@ def tr2event(tr):
 
 
 def tr2assoc(tr, pickmap=None):
-    """Takes a sac header dictionary, and produces a list of up to 10 
+    """
+    Takes a sac header dictionary, and produces a list of up to 10 
     Assoc instances. Header->phase mappings follow SAC2000, i.e.:
 
-    t0: P
-    t1: Pn
-    t2: Pg
-    t3: S
-    t4: Sn
-    t5: Sg
-    t6: Lg
-    t7: LR
-    t8: Rg
-    t9: pP
+    * t0: P
+    * t1: Pn
+    * t2: Pg
+    * t3: S
+    * t4: Sn
+    * t5: Sg
+    * t6: Lg
+    * t7: LR
+    * t8: Rg
+    * t9: pP
 
     An alternate mapping for some or all picks can be supplied, however, 
     as a dictionary of strings in the above form.  

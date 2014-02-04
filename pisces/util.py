@@ -103,6 +103,9 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     """
     Reflect/load an arbitrary database table as a mapped class.
 
+    This is a shortcut for SQLAlchemy's declarative mapping using __table__.
+    See http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html#using-a-hybrid-approach-with-table.
+
     Parameters
     ----------
     bind : sqlalchemy.engine.base.Engine instance
@@ -145,8 +148,13 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     For core tables in a Pisces schema, this function isn't recommended.  
     Instead, subclass from the known abstract table.  
 
-    e.g.
+    Examples
+    --------
+    # for unknown table
     >>> import pisces.schema.css3 as css
+    >>> RandomTable = get_tables(engine, ['randomtable'])
+
+    # for a known/prototype table
     >>> class Site(css.Site):
             __tablename__ = 'myaccount.my_site_tablename'
 
