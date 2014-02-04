@@ -10,7 +10,7 @@ A practical seismological database library in Python.
 * Free software: LANL-MIT license
 * Easy importing/exporting of text "flat-file" data tables.
 
-Documentation: http://pisces.readthedocs.org
+Documentation: http://jkmacc-LANL.github.io/pisces
 
 
 ## What does it look like?
