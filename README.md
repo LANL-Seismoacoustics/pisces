@@ -77,7 +77,7 @@ tr = wf.to_trace()
 tr.plot()
 ```
 
-![ANMO waveform](https://raw.github.com/jkmacc-LANL/pisces/master/ANMO.png "ANMO waveform")
+![ANMO waveform](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/ANMO.png "ANMO waveform")
 
 ## Motivation
 
