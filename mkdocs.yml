@@ -1,0 +1,24 @@
+site_name: Pisces
+site_url: http://www.jkmacc-LANL.github.io/pisces
+site_description: A practical seismological database library in Python.
+
+pages:
+- ['index.md', 'Introduction']
+- ['database.md', 'Core Tables']
+- ['querying.md', 'Queries and Joins']
+- ['io.md', 'Import/Export']
+- ['roadmap.md', 'Roadmap']
+- ['pisces.md', 'API Documentation', 'pisces']
+- ['pisces.request.md', 'API Documentation', 'pisces.request']
+- ['pisces.client.md', 'API Documentation', 'pisces.client']
+- ['pisces.schema.md', 'API Documentation', 'pisces.schema']
+- ['pisces.schema.css3.md', 'API Documentation', 'pisces.schema.css3']
+- ['pisces.schema.kbcore.md', 'API Documentation', 'pisces.schema.kbcore']
+- ['pisces.io.md', 'API Documentation', 'pisces.io']
+- ['pisces.io.readwaveform.md', 'API Documentation', 'pisces.io.readwaveform']
+- ['pisces.io.sac.md', 'API Documentation', 'pisces.io.sac']
+- ['pisces.io.mseed.md', 'API Documentation', 'pisces.io.mseed']
+
+docs_dir: 'docs'
+site_dir: 'docs/build'
+theme_dir: 'docs/bootstrap'
