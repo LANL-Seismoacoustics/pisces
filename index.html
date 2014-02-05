@@ -12,6 +12,7 @@
         <title>Pisces</title>
 
         <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
         <link href="./css/prettify-1.0.css" rel="stylesheet">
         <link href="./css/base.css" rel="stylesheet">
 
@@ -20,6 +21,20 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
+
+        
+        <style>
+            div.col-md-9 h1:first-of-type {
+                text-align: center;
+                font-size: 60px;
+                font-weight: 300;
+            }
+
+            div.col-md-9 p:first-of-type {
+                text-align: center;
+            }
+        </style>
+        
     </head>
 
     <body>
@@ -27,8 +42,9 @@
         <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
 
+        <!-- Collapsed navigation -->
         <div class="navbar-header">
-            <!-- Collapsed navigation button -->
+            <!-- Expander button -->
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
@@ -40,37 +56,37 @@
             <a class="navbar-brand" href=".">Pisces</a>
         </div>
 
+        <!-- Expanded navigation -->
         <div class="navbar-collapse collapse">
             <!-- Main navigation -->
             <ul class="nav navbar-nav">
             
             
                 <li class="active">
-                    <a href=".">Introduction</a>
+                    <a href=".">Home</a>
                 </li>
             
             
             
-                <li >
-                    <a href="database">Core Tables</a>
-                </li>
-            
-            
-            
-                <li >
-                    <a href="querying">Queries and Joins</a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Database <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        <li >
+                            <a href="database">Core Tables</a>
+                        </li>
+                    
+                        <li >
+                            <a href="querying">Queries and Joins</a>
+                        </li>
+                    
+                    </ul>
                 </li>
             
             
             
                 <li >
                     <a href="io">Import/Export</a>
-                </li>
-            
-            
-            
-                <li >
-                    <a href="roadmap">Roadmap</a>
                 </li>
             
             
@@ -123,33 +139,64 @@
                 </li>
             
             
+            
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        <li >
+                            <a href="roadmap">Roadmap</a>
+                        </li>
+                    
+                        <li >
+                            <a href="license">License</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+            
             </ul>
 
-            <!-- Additional navigation items -->
+            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
+                
                 <li class="disabled">
-                    <a rel="next" >Previous</a>
+                    <a rel="next" >
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
                 </li>
                 <li >
-                    <a rel="prev" href="database">Next</a>
+                    <a rel="prev" href="database">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
                 </li>
+                
+                <li>
+                    <a href="https://github.com/jkmacc-lanl/pisces">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
             </ul>
         </div>
     </div>
 </div>
+
         <div class="container">
             <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
         <li class="main active"><a href="#pisces">Pisces</a></li>
         
-            <li><a href="#motivation">Motivation</a></li>
-        
-            <li><a href="#goals">Goals</a></li>
-        
-            <li><a href="#features">Features</a></li>
+            <li><a href="#overview">Overview</a></li>
         
             <li><a href="#what-does-it-look-like">What does it look like?</a></li>
+        
+            <li><a href="#installation">Installation</a></li>
         
     
     </ul>
@@ -158,41 +205,30 @@
 
 <h1 id="pisces">Pisces</h1>
 <p>A practical seismological database library in Python.</p>
-<p>Repository: <a href="https://github.com/jkmacc-LANL/pisces">https://github.com/jkmacc-LANL/pisces</a></p>
-<h3 id="motivation">Motivation</h3>
-<p>Relational databases can help seismologists manage data and facilitate research, but ...</p>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>Pisces connects seismological databases to your Python analysis environment.</p>
+<h4 id="manage-and-analyze-data-in-the-same-language">Manage and analyze data in the same language</h4>
+<p>Don't use separate data-management language, like SQL or shell scripts. Just use Python.</p>
+<h4 id="use-common-open-source-technologies-and-standards">Use common open-source technologies and standards.</h4>
+<p>SQL relational databases, <a href="http://www.python.org">Python</a>, <a href="http://www.sqlalchemy.org">SQLAlchemy</a>, and the <a href="http://www.scipy.org/about.html">SciPy stack</a> are widely-used, free, and open-source technologies.</p>
+<h4 id="write-portable-extensible-and-scalable-code">Write portable, extensible, and scalable code.</h4>
+<p>Write code that will not eventually have to be abandoned due to project size, system architecture, or budgetary or licensing concerns.</p>
+<h3 id="features">Features</h3>
 <ul>
-<li>Researchers don't want to learn a separate data-management language, like SQL.  </li>
-<li>Existing seismological database solutions are closed-source, cost money, or have a small/niche user base.</li>
-</ul>
-<h3 id="goals">Goals</h3>
-<ul>
-<li><strong>Let users manage and analyze data in a single language: Python.</strong>  </li>
-<li><strong>Take advantage of existing widely-used open-source technologies.</strong>  <ul>
-<li>SQL relational databases</li>
-<li><a href="http://www.python.org">Python</a></li>
-<li><a href="http://www.sqlalchemy.org">SQLAlchemy</a></li>
-<li>The <a href="http://www.scipy.org/about.html">SciPy stack</a> and <a href="http://www.obspy.org">ObsPy</a></li>
-</ul>
-</li>
-<li><strong>Make data management code extensible, portable, and scalable.</strong><br />
-  Write code that will not eventually have to be abandoned due to project size, system architecture, or budgetary or licensing concerns.</li>
-</ul>
-<h2 id="features">Features</h2>
-<ul>
-<li>Get waveforms directly from your database.</li>
-<li>Integration with <a href="www.obspy.org">ObsPy</a>.</li>
-<li>Build database queries using Pythonic syntax.</li>
-<li>Free software: LANL-MIT license</li>
+<li>Import/export waveform files directly to/from your database.</li>
 <li>Easy importing/exporting of text "flat-file" data tables.</li>
+<li>Build database queries with Python objects, not SQL string concatenation.</li>
+<li>Integration with <a href="www.obspy.org">ObsPy</a>.</li>
 </ul>
+<hr />
 <h2 id="what-does-it-look-like">What does it look like?</h2>
 <h3 id="define-tables">Define tables</h3>
 <p>Name your Center for Seismic Studies (CSS) 3.0 tables in a module (e.g. mytables.py),
 inheriting structure and constraints.
 This just needs to be done once per table name.</p>
-<pre class="prettyprint well"><code># mytables.py 
-import pisces.schema.css3 as css
+<h4 id="mytablespy">mytables.py</h4>
+<pre class="prettyprint well"><code>import pisces.schema.css3 as css
 
 class Affiliation(css.Affiliation):
     __tablename__ = 'affiliation'
@@ -206,33 +242,35 @@ class Origin(css.Origin):
 class Wfdisc(css.Wfdisc):
     __tablename__ = 'Wfdisc'
 </code></pre>
-<h3 id="import-and-query-tables">Import and query tables</h3>
-<pre class="prettyprint well"><code>import pisces as ps
-import pisces.request as req
-
-# import your tables
-from mytables import Site, Origin
+<h3 id="importing-tables">Importing tables</h3>
+<p>Import your tables.</p>
+<pre class="prettyprint well"><code>from mytables import Site, Origin
 from mytables import Affiliation as Affil
+</code></pre>
+<p>Import/reflect arbitrary database tables.</p>
+<pre class="prettyprint well"><code>import pisces as ps
 
 # connect with an existing SQLite database file
 session = ps.db_connect('sqlite:///mydb.sqlite')
-
-# query all stations from the CREST seismic deployment, using SQLAlchemy
-q = session.query(Site).filter(Site.ondate.between(2008001, 2008365))
+sometable, othertable = ps.get_tables(session.bind, ['sometable','othertable'])
+</code></pre>
+<h3 id="querying-tables">Querying tables</h3>
+<p>Query all stations from the CREST seismic deployment, using SQLAlchemy</p>
+<pre class="prettyprint well"><code>q = session.query(Site).filter(Site.ondate.between(2008001, 2008365))
 csites = q.filter(Site.sta == Affil.sta).filter(Affil.net == 'XP').all()
-
-# query for western US earthquakes, using a Pisces query builder
+</code></pre>
+<p>Query for western US earthquakes, using a Pisces query builder</p>
+<pre class="prettyprint well"><code>import pisces.request as req
 wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)})
-
-# add Albuquerque ANMO to the site table, 
-# and the Chelyabinsk bolide to the origin table
-ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
+</code></pre>
+<p>Add Albuquerque ANMO to the site table, and the Chelyabinsk bolide to the origin table.</p>
+<pre class="prettyprint well"><code>ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
 bolide = Origin(orid=1, lat=55.15, lon=61.41, mb=2.7, etype='xm')
 session.add_all([ANMO, bolide])
 session.commit()
-
-# edit a Site, delete an Origin
-session.query(Site).filter(Site.sta == 'MK31').update({'lat': 42.5})
+</code></pre>
+<p>Edit a Site, delete an Origin.</p>
+<pre class="prettyprint well"><code>session.query(Site).filter(Site.sta == 'MK31').update({'lat': 42.5})
 session.query(Origin).filter(Origin.orid = 1001).delete()
 session.commit()
 session.close()
@@ -246,8 +284,25 @@ tr = wf.to_trace()
 tr.plot()
 </code></pre>
 <p><img alt="ANMO waveform" src="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/ANMO.png" title="ANMO waveform" /></p>
+<hr />
+<h2 id="installation">Installation</h2>
+<p>Requires:</p>
+<ul>
+<li>NumPy</li>
+<li>ObsPy</li>
+<li>SQLAlchemy&gt;0.7</li>
+<li>C compiler</li>
+</ul>
+<p>Install from <a href="https://pypi.python.org/pypi">PyPI</a>:</p>
+<pre class="prettyprint well"><code>pip install pisces-db
+</code></pre>
+<p>Install current master from GitHub:</p>
+<pre class="prettyprint well"><code>pip install git+https://github.com/jkmacc-LANL/pisces
+</code></pre>
 </div>
         </div>
+
+        
 
         <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
         <script src="./js/bootstrap-3.0.3.min.js"></script>
