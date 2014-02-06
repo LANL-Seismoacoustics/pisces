@@ -69,24 +69,26 @@
             
             
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Database <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tutorial <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                     
                         <li >
-                            <a href="database">Core Tables</a>
+                            <a href="tutorial.tables">Database Tables</a>
                         </li>
                     
                         <li >
-                            <a href="querying">Queries and Joins</a>
+                            <a href="tutorial.queries">Queries and Joins</a>
+                        </li>
+                    
+                        <li >
+                            <a href="tutorial.waveforms">Import/Export Waveforms</a>
+                        </li>
+                    
+                        <li >
+                            <a href="tutorial.flatfiles">Import/Export Flat Files</a>
                         </li>
                     
                     </ul>
-                </li>
-            
-            
-            
-                <li >
-                    <a href="io">Import/Export</a>
                 </li>
             
             
@@ -145,11 +147,11 @@
                     <ul class="dropdown-menu">
                     
                         <li >
-                            <a href="roadmap">Roadmap</a>
+                            <a href="about.roadmap">Roadmap</a>
                         </li>
                     
                         <li >
-                            <a href="license">License</a>
+                            <a href="about.license">License</a>
                         </li>
                     
                     </ul>
@@ -167,7 +169,7 @@
                     </a>
                 </li>
                 <li >
-                    <a rel="prev" href="database">
+                    <a rel="prev" href="tutorial.tables">
                         Next <i class="fa fa-arrow-right"></i>
                     </a>
                 </li>
@@ -207,19 +209,21 @@
 <p>A practical seismological database library in Python.</p>
 <hr />
 <h2 id="overview">Overview</h2>
-<p>Pisces connects seismological databases to your Python analysis environment.</p>
-<h4 id="manage-and-analyze-data-in-the-same-language">Manage and analyze data in the same language</h4>
-<p>Don't use separate data-management language, like SQL or shell scripts. Just use Python.</p>
-<h4 id="use-common-open-source-technologies-and-standards">Use common open-source technologies and standards.</h4>
-<p>SQL relational databases, <a href="http://www.python.org">Python</a>, <a href="http://www.sqlalchemy.org">SQLAlchemy</a>, and the <a href="http://www.scipy.org/about.html">SciPy stack</a> are widely-used, free, and open-source technologies.</p>
-<h4 id="write-portable-extensible-and-scalable-code">Write portable, extensible, and scalable code.</h4>
-<p>Write code that will not eventually have to be abandoned due to project size, system architecture, or budgetary or licensing concerns.</p>
+<p>Pisces connects your Python analysis environment to a seismological database.</p>
+<h4 id="manage-and-analyze-data-in-the-same-language"><strong>Manage and analyze data in the same language</strong></h4>
+<p>Don't use separate data-management language, like SQL or shell scripts. Just use Python, and connect to <a href="http://www.scipy.org/about.html">SciPy</a>, <a href="http://www.obspy.org">ObsPy</a>, <a href="http://www.earth.northwestern.edu/~xlou/aimbat.html">AIMBAT</a>, <a href="http://webservices.rm.ingv.it/pyTDMT/">pyTDMT</a>, <a href="https://github.com/miili/StreamPick">StreamPick</a>, or one of the many other useful analysis packages in the scientific Python ecosystem.</p>
+<h4 id="use-common-open-source-technologies-and-standards"><strong>Use common open-source technologies and standards</strong></h4>
+<p>SQL relational databases, <a href="http://www.python.org">Python</a>, <a href="http://www.sqlalchemy.org">SQLAlchemy</a>, and the <a href="http://www.scipy.org/about.html">SciPy stack</a> are widely-used, free, and open-source technologies.
+Because of this, you can leverage knowledge from sites, like StackOverflow, and other disciplines, like web development, for database examples, troubleshooting, or tricks.</p>
+<h4 id="write-portable-extensible-and-scalable-code"><strong>Write portable, extensible, and scalable code</strong></h4>
+<p>Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack is free and open-source.  Write code that will not eventually have to be abandoned due to project size, system architecture, or budgetary or licensing concerns.</p>
 <h3 id="features">Features</h3>
 <ul>
-<li>Import/export waveform files directly to/from your database.</li>
+<li>Import/export waveforms directly to/from your database.</li>
 <li>Easy importing/exporting of text "flat-file" data tables.</li>
-<li>Build database queries with Python objects, not SQL string concatenation.</li>
-<li>Integration with <a href="www.obspy.org">ObsPy</a>.</li>
+<li>Build database queries using Python objects and methods (<a href="http:/www.sqlalchemy.org">SQLAlchemy</a>), not by concatenating SQL strings.</li>
+<li>Integration with <a href="http://www.obspy.org">ObsPy</a>.</li>
+<li>Geographic filtering of results.</li>
 </ul>
 <hr />
 <h2 id="what-does-it-look-like">What does it look like?</h2>
@@ -247,10 +251,9 @@ class Wfdisc(css.Wfdisc):
 <pre class="prettyprint well"><code>from mytables import Site, Origin
 from mytables import Affiliation as Affil
 </code></pre>
-<p>Import/reflect arbitrary database tables.</p>
+<p>Import/reflect arbitrary existing database tables.</p>
 <pre class="prettyprint well"><code>import pisces as ps
 
-# connect with an existing SQLite database file
 session = ps.db_connect('sqlite:///mydb.sqlite')
 sometable, othertable = ps.get_tables(session.bind, ['sometable','othertable'])
 </code></pre>
@@ -276,7 +279,7 @@ session.commit()
 session.close()
 </code></pre>
 <h3 id="get-a-waveform">Get a waveform</h3>
-<p>...as an ObsPy <a href="http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace">Trace object</a>.</p>
+<p>Get an ObsPy <a href="http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace">Trace</a> object from your waveform description (wfdisc) table.</p>
 <pre class="prettyprint well"><code>from mytables import Wfdisc
 
 wf = session.query(Wfdisc).filter(Wfdisc.sta == 'ANMO').first()  
@@ -291,7 +294,7 @@ tr.plot()
 <li>NumPy</li>
 <li>ObsPy</li>
 <li>SQLAlchemy&gt;0.7</li>
-<li>C compiler</li>
+<li>C, Fortran compiler</li>
 </ul>
 <p>Install from <a href="https://pypi.python.org/pypi">PyPI</a>:</p>
 <pre class="prettyprint well"><code>pip install pisces-db
