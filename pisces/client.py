@@ -66,7 +66,7 @@ class Client(object):
         """
         #XXX: fails for no primary key.  use get_tables syntax.
         for coretable, tablename in tables.iteritems():
-            self.tables[coretable] = db.get_tables(self.session.bind, 
+            self.tables[coretable] = ps.get_tables(self.session.bind, 
                                                    [tablename], 
                                                    metadata=self.metadata)[0]
         
