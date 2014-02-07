@@ -3,6 +3,9 @@ Pisces
 
 A practical seismological database library in Python.
 
+Documentation: http://jkmacc-lanl.github.io/pisces
+Repository: https://github.com/jkmacc-LANL/pisces
+
 --------------
 
 Overview
@@ -20,8 +23,8 @@ Just use Python, and connect to
 `ObsPy <http://www.obspy.org>`__,
 `AIMBAT <http://www.earth.northwestern.edu/~xlou/aimbat.html>`__,
 `pyTDMT <http://webservices.rm.ingv.it/pyTDMT/>`__,
-`StreamPick <https://github.com/miili/StreamPick>`__, or one of the many
-other useful analysis packages in the scientific Python ecosystem.
+`StreamPick <https://github.com/miili/StreamPick>`__, and the rest of
+the scientific Python ecosystem.
 
 **Use common open-source technologies and standards**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -31,8 +34,9 @@ other useful analysis packages in the scientific Python ecosystem.
 stack <http://www.scipy.org/about.html>`__ are widely-used, free, and
 open-source technologies.
 | Because of this, you can leverage knowledge from sites, like
-StackOverflow, and other disciplines, like web development, for database
-examples, troubleshooting, or tricks.
+`StackOverflow <http://stackoverflow.com/search?q=sqlalchemy>`__, and
+other disciplines, like web development, for database examples,
+troubleshooting, or tricks.
 
 **Write portable, extensible, and scalable code**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -53,11 +57,6 @@ Features
 -  Integration with `ObsPy <http://www.obspy.org>`__.
 -  Geographic filtering of results.
 
---------------
-
-Documentation: http://jkmacc-LANL.github.io/pisces
-
-Repository: http://github.com/jkmacc-LANL/pisces
 
 --------------
 
