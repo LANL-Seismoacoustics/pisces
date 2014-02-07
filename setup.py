@@ -35,7 +35,7 @@ SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
 #     return [_i.replace(os.sep, ".") for _i in modules]
 
 setup(name='pisces-db',
-    version='0.2.1',
+    version='0.2',
     description=doclines[0],
     long_description=open('README.rst').read(),
     author='Jonathan MacCarthy',
