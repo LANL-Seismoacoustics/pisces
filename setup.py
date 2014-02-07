@@ -35,14 +35,14 @@ SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
 #     return [_i.replace(os.sep, ".") for _i in modules]
 
 setup(name='pisces-db',
-    version='0.2',
+    version='0.2.1',
     description=doclines[0],
     long_description=open('README.rst').read(),
     author='Jonathan MacCarthy',
     author_email='jkmacc@lanl.gov',
     packages=['pisces','pisces.schema','pisces.io'],
     url='https://github.com/jkmacc-LANL/pisces',
-    download_url = 'http://github.com/jkmacc-lanl/pisces/tarbal/0.2',
+    download_url = 'http://github.com/jkmacc-lanl/pisces/tarball/0.2',
     keywords = ['seismology', 'geophysics', 'database'],
     install_requires=['numpy','obspy>=0.8','sqlalchemy>=0.7'],
     ext_package='pisces.io.lib',
