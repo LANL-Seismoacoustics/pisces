@@ -55,9 +55,9 @@ Features
 
 --------------
 
-`Documentation: <http://jkmacc-LANL.github.io/pisces>`__
+Documentation: http://jkmacc-LANL.github.io/pisces
 
-`Repository: <http://github.com/jkmacc-LANL/pisces>`__
+Repository: http://github.com/jkmacc-LANL/pisces
 
 --------------
 
