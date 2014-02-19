@@ -76,3 +76,8 @@ Install current master from GitHub:
 
     pip install git+https://github.com/jkmacc-LANL/pisces
 
+
+|Analytics|
+
+.. |Analytics| image:: https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme
+   :target: https://github.com/igrigorik/ga-beacon
