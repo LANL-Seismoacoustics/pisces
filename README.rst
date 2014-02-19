@@ -79,5 +79,5 @@ Install current master from GitHub:
 
 |Analytics|
 
-.. |Analytics| image:: https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme
+.. |Analytics| image:: https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme?pixel
    :target: https://github.com/igrigorik/ga-beacon
