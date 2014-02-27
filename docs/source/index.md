@@ -123,3 +123,6 @@ Install from [PyPI](https://pypi.python.org/pypi):
 Install current master from GitHub:
 
     pip install git+https://github.com/jkmacc-LANL/pisces
+
+
+[![Analytics](https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme?pixel)](https://github.com/igrigorik/ga-beacon)
