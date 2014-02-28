@@ -1,4 +1,4 @@
-# Importing and Exporting Flat Files
+# Importing/Exporting Flat Files
 
 Pisces tables/classes integrate well with their external flat file representations.  
 
@@ -23,6 +23,7 @@ We'll import the following KB Core Site flat file, "TA.site".  Each line in the 
 Read a flat file Site table into a database
 
     from pisces.schema.css3 import Base
+
     session = sa.orm.Session(engine)
     Site, = ps.get_tables(session.bind, ['TA_site'], base=Base)
     
@@ -50,5 +51,60 @@ Here, we write 30 origins to a flat file.
       39.195900   24.608700    0.0000   954974602.21000    620220    316319  2000096   16   15   -1      365       30 qp      -999.0000 g    3.80    299801    3.20    299802    3.80    299800 man:inversion   REB-IDC                     -1 2002-06-11 00:00:00
       22.291000  143.776500  115.8000   954732444.39000    620221    316167  2000094   15   13   -1      213       18 qp      -999.0000 f    3.50    299803 -999.00        -1 -999.00        -1 man:inversion   REB-IDC                     -1 2002-06-11 00:00:00
       -9.797000   66.893100    0.0000   954980391.62000    620222    316324  2000097   19   11   -1      429       33 qp      -999.0000 g    4.20    299804    4.10    299805 -999.00        -1 man:inversion   REB-IDC                     -1 2002-06-11 00:00:00
+
+
+### Write flat files from ad-hoc queries
+
+Ad-hoc collections of columns can be also written to well-formed flat files, with the right schema-specific format.
+Queries on specific columns return a list of tuple-like objects called a [KeyedTuple](http://docs.sqlalchemy.org/en/rel_0_9/orm/query.html#sqlalchemy.util.KeyedTuple), 
+where values in individual records can be indexed into like a tuple, e.g. `record[0]`, 
+or accessed via attributes, e.g. `record.lat, record.lon`. 
+
+Let's write some network-station records to a text file.  First, get the string formatter for the columns you'll be using. 
+`string_formatter` returns the correct format string from the [Python format specification mini-language](http://docs.python.org/2/library/string.html#format-specification-mini-language) for the columns you'll be writing. 
+The columns must be known to `Base`.  That is, each column must have been defined in at least one table that inherited from `Base`.
+
+
+
+    fmt = ps.string_formatter(Base.metadata, ['net', 'sta', 'lat', 'lon', 'elev'])
+    print fmt
+    
+It looks like this:
+
+    {0:9d} {1:11.6f} {2:11.6f} {3:9.4f} {4:17.5f} {5:6.6s} {6:11.6f} {7:11.6f} {8:9.4f}
+
+Now, get the records and write them to file.
+
+    q = session.query(Affiliation.net, Site.sta, Site.lat, Site.lon, Site.elev)
+    q = q.filter(Site.sta == Affiliation.sta)
+    
+    import os
+    with open('adhoc.txt', 'w') as f:
+        for netsta in q:
+            f.write(fmt.format(*netsta) + os.linesep)
+
+#### adhoc.txt
+
+    TA       Y53A     33.855400  -83.583600    0.2340
+    TA       Y54A     33.862100  -82.688000    0.1760
+    TA       Z38A     33.259900  -94.985100    0.1160
+    TA       Z49A     33.194200  -86.531100    0.1340
+    TA       Z50A     33.254000  -85.922600    0.3700
+    TA       Z51A     33.316700  -85.174700    0.2490
+    TA       Z52A     33.189300  -84.417600    0.2520
+    TA       Z53A     33.280100  -83.571300    0.1440
+    TA       Z54A     33.236200  -82.841700    0.1340
+    TA       Z55A     33.221100  -82.135900    0.1000
+    UU       EOCU     40.777000 -111.899100    1.3560
+    UU       QJMH     40.703500 -111.866100    1.3120
+    UU       QJOT     40.741600 -111.493900    1.9770
+    UU       QKSL     40.377100 -111.861000    1.3790
+    UU       QLIN     40.347200 -111.694700    1.5380
+    UU       QMDS     40.729000 -111.816100    1.4050
+    UU       QNRL     41.740700 -111.824900    1.4070
+    UU       QPAY     40.053000 -111.728400    1.4040
+    UU       QPML     40.057800 -111.953900    1.3340
+    UU       QRJG     40.260900 -111.632700    1.5300
+    ...
 
 
