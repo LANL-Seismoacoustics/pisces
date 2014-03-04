@@ -1,10 +1,21 @@
-# Importing/Exporting Flat Files
+# Import/Export Flat Files
 
-Pisces tables/classes integrate well with their external flat file representations.  
+Easily go between database objects and text files.
+
+---
+
 
 ## Import
 
-We'll import the following KB Core Site flat file, "TA.site".  Each line in the text file is passed to `Site.from_string`, which is a Pisces-specific method that uses the underlying column descriptions to interpret fields in the flat file row string into a Site row instance.  Finally, `session.add(isite)` and `session.commit()` add and write rows to the database.
+Many times, database tables are represented as fixed-format text files. 
+Pisces makes it easy to go between database objects and these external flat file representations.
+
+Here, we'll import the following KB Core Site flat file, "TA.site".
+Each line in the text file is passed to `Site.from_string`, which is a 
+Pisces-specific method that uses the underlying column descriptions to interpret 
+fields in the flat file row string into a Site row instance. 
+Finally, `session.add(isite)` and `session.commit()` add and write rows to the 
+database.
 
 #### TA.site
 

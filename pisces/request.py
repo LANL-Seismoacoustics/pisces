@@ -8,22 +8,23 @@ import math
 
 import numpy as np
 from sqlalchemy import func, or_
+from obspy.core import UTCDateTime
 import obspy.core.util.geodetics as geod
 
 from pisces.util import db_connect, make_same_size
 from pisces.io.trace import wfdisc2trace
 
 
-def get_wfdisc_rows(wfdisc, session, sta=None, chan=None, t1=None, t2=None, 
-                    wfids=None, daylong=False, asquery=False):
+def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None, 
+                    wfids=None, daylong=False, asquery=False, verbose=False):
     """
     Returns a list of wfdisc records from provided SQLAlchemy ORM mapped
     wfdisc table, for given station, channel, and time window combination.
 
     Parameters
     ----------
-    wfdisc: SQLAlchemy mapped wfdisc table
     session: bound session instance
+    wfdisc: SQLAlchemy mapped wfdisc table
     sta, chan, : str, optional
         station, channel strings, 
     t1, t2 : int, optional
@@ -38,6 +39,8 @@ def get_wfdisc_rows(wfdisc, session, sta=None, chan=None, t1=None, t2=None,
     asquery : bool, optional
         Return the query object instead of the results.  Default, False.
         Useful if additional you desire additional sorting of filtering.
+    verbose : bool, optional
+        Print request to the stdout. Not used with asquery=True.
 
     Returns
     -------
@@ -65,6 +68,8 @@ def get_wfdisc_rows(wfdisc, session, sta=None, chan=None, t1=None, t2=None,
     if asquery:
         res = q
     else:
+        if verbose:
+            print("Requesting sta={}, chan={}, time=[{}, {}], wfids={}".format(sta, chan, UTCDateTime(t1), UTCDateTime(t2), wfids))
         res = q.all()
 
     return res
