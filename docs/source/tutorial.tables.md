@@ -125,18 +125,18 @@ These are described in detail in the original specification, but here is a brief
 
 
 
-Below are entity-relationship diagrams for the CSS 3.0 schema from [Anderson et al., (1990)](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf).
+Below are entity-relationship diagrams for the CSS 3.0 schema from [Anderson et al., (1990)](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/Anderson1990.pdf).
 
 #### Primary tables
 
-![primary tables](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/css3_primary.png "primary tables")
+![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png "primary tables")
 
 
 #### Lookup tables
 
-![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/css3_lookup.png "lookup tables")
+![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png "lookup tables")
 
-Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. [PDF](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf)
+Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. [PDF](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/Anderson1990.pdf)
 
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
