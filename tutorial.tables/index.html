@@ -252,7 +252,7 @@ Further questions about SQL and relational databases are directed to our [FAQ](h
 <hr />
 <h2 id="the-core-tables">The core tables</h2>
 <p>Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
-These are described in detail in the original specification, but here is a brief summary <a href="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf">(Anderson et al., 1990)</a>:</p>
+These are described in detail in the original specification, but here is a brief summary (Anderson et al., 1990)</p>
 <p><strong>affiliation</strong>
 :   Network station affiliations</p>
 <p><strong>arrival</strong>
@@ -293,12 +293,12 @@ These are described in detail in the original specification, but here is a brief
 :   Waveform mapping file</p>
 <p><strong>wftape</strong>
 :   Waveform tape file header and descriptive information (not generally used)</p>
-<p>Below are entity-relationship diagrams for the CSS 3.0 schema from <a href="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf">Anderson et al., (1990)</a>.</p>
+<p>Below are entity-relationship diagrams for the CSS 3.0 schema from Anderson et al., (1990).</p>
 <h4 id="primary-tables">Primary tables</h4>
-<p><img alt="primary tables" src="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/css3_primary.png" title="primary tables" /></p>
+<p><img alt="primary tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png" title="primary tables" /></p>
 <h4 id="lookup-tables">Lookup tables</h4>
-<p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/css3_lookup.png" title="lookup tables" /></p>
-<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf">PDF</a></p>
+<p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png" title="lookup tables" /></p>
+<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. </p>
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
 -->
@@ -307,8 +307,8 @@ In the ORM, **Python classes represent database tables, and instances of that cl
 <h2 id="extending-the-schema">Extending the schema</h2>
 <h3 id="defining-new-tables">Defining new tables</h3>
 <p>The core tables don't describe everything you might care about, such as stacked cross-correlation functions.
-Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <a href="http://www.iris.edu/dms/products/ancc-ciei/">http://www.iris.edu/dms/products/ancc-ciei/</a>, which looks like this:</p>
-<p><img alt="ccwfdisc table" src="https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/ancc-ciei_table.png" title="ccwfdisc table" /></p>
+Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <a href="http://www.iris.edu/dms/products/ancc-ciei/">http://www.iris.edu/dms/products/ancc-ciei/</a>, which looks like this <em>(sic)</em>:</p>
+<p><img alt="ccwfdisc table" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/ancc-ciei_table.png" title="ccwfdisc table" /></p>
 <p>We'll define our new table in a file "mytables.py" by doing the following:</p>
 <ul>
 <li>Import our css3 prototypes into the <code>css</code> namespace.</li>
