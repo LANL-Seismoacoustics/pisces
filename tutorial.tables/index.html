@@ -67,7 +67,7 @@
                         </li>
                     
                         <li >
-                            <a href="../tutorial.queries/">Queries and Joins</a>
+                            <a href="../tutorial.queries/">Using the Database</a>
                         </li>
                     
                         <li >
@@ -220,7 +220,7 @@ You should still understand the concepts, you just don't have to write and manag
 <p><strong>You don't have to install a relational database management system.</strong>  </p>
 <p>You already have one.
 <a href="http://www.sqlite.org">SQLite</a> is part of the vast Python Standard Library, and SQLAlchemy is compatible with SQLite.
-SQLA is also compatible with <a href="http://docs.sqlalchemy.org/en/rel_0_9/dialects/">many</a> other database backends, so you could scale up and buy an Oracle license or download PostgreSQL if it makes sense for your project, <em>and you wouldn't have to change your code</em>.</p>
+SQLA is also compatible with <a href="http://docs.sqlalchemy.org/en/rel_0_9/dialects/">many</a> other database backends, so you could scale up and use Oracle or PostgreSQL if it makes sense for your project, <em>and you wouldn't have to change your code</em>.</p>
 </li>
 </ol>
 <!--
@@ -253,52 +253,84 @@ Further questions about SQL and relational databases are directed to our [FAQ](h
 <h2 id="the-core-tables">The core tables</h2>
 <p>Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
 These are described in detail in the original specification, but here is a brief summary (Anderson et al., 1990)</p>
-<p><strong>affiliation</strong>
-:   Network station affiliations</p>
-<p><strong>arrival</strong>
-:   Summary information on a seismic arrival</p>
-<p><strong>assoc</strong>
-:   Data associating arrivals with origins</p>
-<p><strong>event</strong>
-:   Event identification</p>
-<p><strong>instrument</strong>
-:   Generic (default) calibration information about a station</p>
-<p><strong>lastid</strong>
-:   Counter values (Last value used for keys)</p>
-<p><strong>netmag</strong>
-:   Network magnitude</p>
-<p><strong>network</strong>
-:   Network description and identification</p>
-<p><strong>origerr</strong>
-:   Summary of errors in origin estimations</p>
-<p><strong>origin</strong>
-:   Data on event location and confidence bounds</p>
-<p><strong>remark</strong>
-:   Comments</p>
-<p><strong>sensor</strong>
-:   Specific calibration information for physical channels</p>
-<p><strong>site</strong>
-:   Station location information</p>
-<p><strong>sitechan</strong>
-:   Station-channel information</p>
-<p><strong>sregion</strong>
-:   Seismic region</p>
-<p><strong>stamag</strong>
-:   Station magnitude</p>
-<p><strong>stassoc</strong>
-:   Arrivals from a single station grouped into an event</p>
-<p><strong>wfdisc</strong>
-:   Waveform file header and descriptive information</p>
-<p><strong>wftag</strong>
-:   Waveform mapping file</p>
-<p><strong>wftape</strong>
-:   Waveform tape file header and descriptive information (not generally used)</p>
-<p>Below are entity-relationship diagrams for the CSS 3.0 schema from Anderson et al., (1990).</p>
+<!--
+**affiliation**
+:   Network station affiliations
+
+**arrival**
+:   Summary information on a seismic arrival
+
+**assoc**
+:   Data associating arrivals with origins
+
+**event**
+:   Event identification
+
+**instrument**
+:   Generic (default) calibration information about a station
+
+**lastid**
+:   Counter values (Last value used for keys)
+
+**netmag**
+:   Network magnitude
+
+**network**
+:   Network description and identification
+
+**origerr**
+:   Summary of errors in origin estimations
+
+**origin**
+:   Data on event location and confidence bounds
+
+**remark**
+:   Comments
+
+**sensor**
+:   Specific calibration information for physical channels
+
+**site**
+:   Station location information
+
+**sitechan**
+:   Station-channel information
+
+**sregion**
+:   Seismic region
+
+**stamag**
+:   Station magnitude
+
+**stassoc**
+:   Arrivals from a single station grouped into an event
+
+**wfdisc**
+:   Waveform file header and descriptive information
+
+**wftag**
+:   Waveform mapping file
+
+**wftape**
+:   Waveform tape file header and descriptive information (not generally used)
+-->
+
+<p>Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).</p>
 <h4 id="primary-tables">Primary tables</h4>
+<p>(only primary and unique keys are shown)</p>
 <p><img alt="primary tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png" title="primary tables" /></p>
 <h4 id="lookup-tables">Lookup tables</h4>
+<p>(only primary and unique keys are shown)</p>
 <p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png" title="lookup tables" /></p>
 <p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. </p>
+<h3 id="the-pisces-implementation">The Pisces implementation</h3>
+<p>In order to maximize flexibility, Pisces implements CSS 3.0 schema with relatively few constraints.</p>
+<ul>
+<li>Primary keys and unique keys are defined.</li>
+<li>Foreign keys are not defined, and all joins must be explicit.</li>
+<li>Ids (e.g. orid, wfid) are not automatically incremented, you must use a counter.</li>
+<li>There are no indexes (internal database structures that speed up queries on certain columns or sets of columns).</li>
+</ul>
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
 -->
@@ -369,10 +401,10 @@ engine = sa.create_engine('sqlite:///mydatabase.sqlite')
 Ccwfdisc.__table__.create(engine)
 </code></pre>
 <p>For every ORM class, there is a hidden <code>__table__</code> object that has a <code>create</code> method.
-This method accepts an engine that pointing to a specific database, where it will be created.</p>
+This method accepts an <a href="http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html">Engine</a> instance that points to a specific database, where it will be created.</p>
 <h3 id="defining-new-prototype-tables">Defining new prototype tables</h3>
 <p>You can use the previous table with any database, as long as the table will be called "ccwfdisc".
-If you want to use two or more tables with the same structure but different names, but want to avoid having to repeat the previous definition each time, you'll need to define a new <em>prototype table</em> (<a href="http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html">abstract table</a> in SQLAlchemy).</p>
+If you want to use two or more tables with the same structure but different names, but want to avoid having to repeat the previous definition each time, you'll need to define a new <em>prototype table</em> (<a href="http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract">abstract table</a> in SQLAlchemy).</p>
 <p>This is how the "ccwfdisc" table would be defined, as an new prototype.</p>
 <h4 id="mytables_abspy">mytables_abs.py</h4>
 <pre class="prettyprint well"><code>import sqlalchemy as sa
