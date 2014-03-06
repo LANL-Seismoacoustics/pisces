@@ -64,10 +64,10 @@ Here, we write 30 origins to a flat file.
       -9.797000   66.893100    0.0000   954980391.62000    620222    316324  2000097   19   11   -1      429       33 qp      -999.0000 g    4.20    299804    4.10    299805 -999.00        -1 man:inversion   REB-IDC                     -1 2002-06-11 00:00:00
 
 
-### Write flat files from ad-hoc queries
+### Write flat files from any combination of columns
 
 Ad-hoc collections of columns can be also written to well-formed flat files, with the right schema-specific format.
-Queries on specific columns return a list of tuple-like objects called a [KeyedTuple](http://docs.sqlalchemy.org/en/rel_0_9/orm/query.html#sqlalchemy.util.KeyedTuple), 
+Queries on specific columns return a list of tuple-like objects called [KeyedTuples](http://docs.sqlalchemy.org/en/rel_0_9/orm/query.html#sqlalchemy.util.KeyedTuple), 
 where values in individual records can be indexed into like a tuple, e.g. `record[0]`, 
 or accessed via attributes, e.g. `record.lat, record.lon`. 
 
@@ -80,14 +80,15 @@ The columns must be known to `Base`.  That is, each column must have been define
     fmt = ps.string_formatter(Base.metadata, ['net', 'sta', 'lat', 'lon', 'elev'])
     print fmt
     
-It looks like this:
+`fmt` looks like this:
 
-    {0:9d} {1:11.6f} {2:11.6f} {3:9.4f} {4:17.5f} {5:6.6s} {6:11.6f} {7:11.6f} {8:9.4f}
+    "{0:8.8s} {1:6.6s} {2:11.6f} {3:11.6f} {4:9.4f}"
 
 Now, get the records and write them to file.
 
     q = session.query(Affiliation.net, Site.sta, Site.lat, Site.lon, Site.elev)
     q = q.filter(Site.sta == Affiliation.sta)
+    q = q.filter(Affiliation.net.in_(['TA', 'UU']))
     
     import os
     with open('adhoc.txt', 'w') as f:

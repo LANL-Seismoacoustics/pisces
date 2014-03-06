@@ -26,4 +26,4 @@ pages:
 docs_dir: 'docs/source'
 site_dir: 'docs/build'
 theme: 'mkdocs'
-theme_center_lead: true
+# theme_center_lead: true
