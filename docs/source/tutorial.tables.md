@@ -61,7 +61,7 @@ Further questions about SQL and relational databases are directed to our [FAQ](h
 ## The core tables
 
 Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
-These are described in detail in the original specification, but here is a brief summary [(Anderson et al., 1990)](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/Anderson1990.pdf):
+These are described in detail in the original specification, but here is a brief summary (Anderson et al., 1990)
 
 **affiliation**
 :   Network station affiliations
@@ -125,7 +125,7 @@ These are described in detail in the original specification, but here is a brief
 
 
 
-Below are entity-relationship diagrams for the CSS 3.0 schema from [Anderson et al., (1990)](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/Anderson1990.pdf).
+Below are entity-relationship diagrams for the CSS 3.0 schema from Anderson et al., (1990).
 
 #### Primary tables
 
@@ -136,7 +136,7 @@ Below are entity-relationship diagrams for the CSS 3.0 schema from [Anderson et 
 
 ![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png "lookup tables")
 
-Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. [PDF](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/Anderson1990.pdf)
+Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. 
 
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
@@ -149,9 +149,9 @@ In the ORM, **Python classes represent database tables, and instances of that cl
 ### Defining new tables
 
 The core tables don't describe everything you might care about, such as stacked cross-correlation functions.
-Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <http://www.iris.edu/dms/products/ancc-ciei/>, which looks like this:
+Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <http://www.iris.edu/dms/products/ancc-ciei/>, which looks like this _(sic)_:
 
-![ccwfdisc table](https://raw.github.com/jkmacc-LANL/pisces/master/docs/data/ancc-ciei_table.png "ccwfdisc table")
+![ccwfdisc table](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/ancc-ciei_table.png "ccwfdisc table")
 
 We'll define our new table in a file "mytables.py" by doing the following:
 
