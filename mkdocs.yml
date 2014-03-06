@@ -7,7 +7,7 @@ repo_url: https://github.com/jkmacc-lanl/pisces
 pages:
 - ['index.md', 'Home']
 - ['tutorial.tables.md', 'Tutorial', 'Database Tables']
-- ['tutorial.queries.md', 'Tutorial', 'Queries and Joins']
+- ['tutorial.queries.md', 'Tutorial', 'Using the Database']
 - ['tutorial.waveforms.md', 'Tutorial', 'Import/Export Waveforms']
 - ['tutorial.flatfiles.md', 'Tutorial', 'Import/Export Flat Files']
 - ['pisces.md', 'Documentation', 'pisces']

@@ -28,7 +28,7 @@ Before continuing, however, here are two things to remember:
 
     You already have one.
 [SQLite](http://www.sqlite.org) is part of the vast Python Standard Library, and SQLAlchemy is compatible with SQLite.
-SQLA is also compatible with [many](http://docs.sqlalchemy.org/en/rel_0_9/dialects/) other database backends, so you could scale up and buy an Oracle license or download PostgreSQL if it makes sense for your project, _and you wouldn't have to change your code_.
+SQLA is also compatible with [many](http://docs.sqlalchemy.org/en/rel_0_9/dialects/) other database backends, so you could scale up and use Oracle or PostgreSQL if it makes sense for your project, _and you wouldn't have to change your code_.
 
 <!--
 Here are some definitions, if you're not familiar with databases.
@@ -63,6 +63,7 @@ Further questions about SQL and relational databases are directed to our [FAQ](h
 Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
 These are described in detail in the original specification, but here is a brief summary (Anderson et al., 1990)
 
+<!--
 **affiliation**
 :   Network station affiliations
 
@@ -122,21 +123,36 @@ These are described in detail in the original specification, but here is a brief
 
 **wftape**
 :   Waveform tape file header and descriptive information (not generally used)
+-->
 
 
-
-Below are entity-relationship diagrams for the CSS 3.0 schema from Anderson et al., (1990).
+Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).
 
 #### Primary tables
+
+(only primary and unique keys are shown)
 
 ![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png "primary tables")
 
 
 #### Lookup tables
 
+(only primary and unique keys are shown)
+
 ![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png "lookup tables")
 
 Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. 
+
+### The Pisces implementation
+
+In order to maximize flexibility, Pisces implements CSS 3.0 schema with relatively few constraints.
+
+* Primary keys and unique keys are defined.
+* Foreign keys are not defined, and all joins must be explicit.
+* Ids (e.g. orid, wfid) are not automatically incremented, you must use a counter.
+* There are no indexes (internal database structures that speed up queries on certain columns or sets of columns).
+
+
 
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
@@ -216,12 +232,12 @@ To create the table in an existing database, just use SQLAlchemy syntax:
     Ccwfdisc.__table__.create(engine)
 
 For every ORM class, there is a hidden `__table__` object that has a `create` method.
-This method accepts an engine that pointing to a specific database, where it will be created.
+This method accepts an [Engine](http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html) instance that points to a specific database, where it will be created.
 
 ### Defining new prototype tables
 
 You can use the previous table with any database, as long as the table will be called "ccwfdisc".
-If you want to use two or more tables with the same structure but different names, but want to avoid having to repeat the previous definition each time, you'll need to define a new *prototype table* ([abstract table](http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html) in SQLAlchemy).
+If you want to use two or more tables with the same structure but different names, but want to avoid having to repeat the previous definition each time, you'll need to define a new *prototype table* ([abstract table](http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract) in SQLAlchemy).
 
 This is how the "ccwfdisc" table would be defined, as an new prototype.
 
