@@ -14,20 +14,20 @@ SQL databases are ubiquitous, and describing them in detail is beyond the scope 
 For further guidance or tutorials, please consult the [web](https://www.google.com/search?client=opera&q=sql+databases&sourceid=opera&ie=UTF-8&oe=UTF-8).
 Before continuing, however, here are two things to remember:
 
-1. **You don't have to use SQL.**
+1. **You don't have to write SQL.**
 
-    Pisces uses the [SQLAlchemy](http://www.sqlalchemy.org) (SQLA) package and its [Object Relational Mapper](http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html) to represent database tables.
+    Pisces uses the [SQLAlchemy](http://www.sqlalchemy.org) package (SQLA) and its [Object Relational Mapper](http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html) to represent database tables.
 
     > The SQLAlchemy Object Relational Mapper presents a method of associating user-defined Python classes with database tables, and instances of those classes (objects) with rows in their corresponding tables. --<cite>Mike Beyer</cite>, creator SQLAlchemy
 
     In other words, we can work with familiar Python concepts (classes, instances, and methods) instead of writing SQL (though you can still write SQL if you want).
     This doesn't mean you can _ignore_ the SQL-ness of your database.
-    You should still understand the concepts, you just don't have to write and manage SQL strings.
+    You should understand the concepts, you just don't have to write and manage SQL strings.
 
-2. **You don't have to install a relational database management system.**  
+2. **You don't have to install a relational database management system (DBMS).**  
 
     You already have one.
-[SQLite](http://www.sqlite.org) is part of the vast Python Standard Library, and SQLAlchemy is compatible with SQLite.
+[SQLite](http://www.sqlite.org) is part of the Python Standard Library, and SQLAlchemy is compatible with SQLite.
 SQLA is also compatible with [many](http://docs.sqlalchemy.org/en/rel_0_9/dialects/) other database backends, so you could scale up and use Oracle or PostgreSQL if it makes sense for your project, _and you wouldn't have to change your code_.
 
 <!--
@@ -61,7 +61,8 @@ Further questions about SQL and relational databases are directed to our [FAQ](h
 ## The core tables
 
 Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
-These are described in detail in the original specification, but here is a brief summary (Anderson et al., 1990)
+These are described in detail in the original specification (Anderson et al., 1990).
+Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).
 
 <!--
 **affiliation**
@@ -126,8 +127,6 @@ These are described in detail in the original specification, but here is a brief
 -->
 
 
-Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).
-
 #### Primary tables
 
 (only primary and unique keys are shown)
@@ -141,18 +140,21 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 
 ![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png "lookup tables")
 
-Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. 
+Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. ![PDF](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/Anderson1990.pdf "original document")
 
 ### The Pisces implementation
 
-In order to maximize flexibility, Pisces implements CSS 3.0 schema with relatively few constraints.
+Pisces implements CSS 3.0 schema with relatively few constraints:
 
-* Primary keys and unique keys are defined.
-* Foreign keys are not defined, and all joins must be explicit.
-* Ids (e.g. orid, wfid) are not automatically incremented, you must use a counter.
+* Primary keys and unique keys are defined, but foreign keys are not. All joins must be explicit.
+* ids (e.g. orid, wfid) are not automatically incremented. You must use a counter and the "lastid" table.
 * There are no indexes (internal database structures that speed up queries on certain columns or sets of columns).
+* Any column can take an NA value, which will be assigned if not otherwise specified.
 
-
+This is done to offer users the flexibility to maintain a database to a level of rigor commensurate with the project.
+A single-user with a 2-year project database may only ever use the origin, wfdisc, arrival, and assoc tables, and doesn't want to deal foreign keys,
+whereas a multi-user global database may need to populate most/all tables and use consistent ids.
+Both are possible.
 
 <!--
 In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
@@ -178,7 +180,8 @@ We'll define our new table in a file "mytables.py" by doing the following:
 * Specify the primary and unique constraints with `__table_args__`.
   Each table needs at least a primary key constraint.
 * Re-use a number of known columns with `.copy()`
-* Define new columns, including the `info` dictionary for Pisces
+* Define new columns, including the `info` dictionary for Pisces.
+
 
 #### mytables.py
 
@@ -221,8 +224,26 @@ We'll define our new table in a file "mytables.py" by doing the following:
         foff = css.foff.copy()
         lddate = css.lddate.copy()
 
+### Column info
 
-To create the table in an existing database, just use SQLAlchemy syntax:
+The `info` dictionary for each column needs the following entries, at minimum:
+
+* `default`: The value used for the column when it is otherwise not specified.
+* `parse`: A callable that accepts the fixed-width string and returns the right type for the database.
+* `format`: The column's external format, from the Python [string format specification mini-language](http://docs.python.org/2/library/string.html#format-specification-mini-language).
+
+There are some differences between the Fortran-style "external format" and those used by Python.
+In Python, the type characters may be different from Fortran, and they always follow the width.
+See the following table for a few examples:
+
+Description        | Fortran   | Python
+:----------------- | :-------: | :------:
+6-character string | `a6`      | `6.6s`
+8-digit integer    | `i8`      | `8d`
+
+
+### Create a table
+To create the table in a database, just use SQLAlchemy syntax:
 
     import sqlalchemy as sa
     from mytables import Ccwfdisc
@@ -237,9 +258,9 @@ This method accepts an [Engine](http://docs.sqlalchemy.org/en/rel_0_9/core/engin
 ### Defining new prototype tables
 
 You can use the previous table with any database, as long as the table will be called "ccwfdisc".
-If you want to use two or more tables with the same structure but different names, but want to avoid having to repeat the previous definition each time, you'll need to define a new *prototype table* ([abstract table](http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract) in SQLAlchemy).
+If you want to re-use this table structure across multiple table names without having to repeat the previous definition each time, you'll need to define a new *prototype table* ([abstract table](http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract) in SQLAlchemy).
 
-This is how the "ccwfdisc" table would be defined, as an new prototype.
+This is how the "ccwfdisc" table would be defined, as a new prototype.
 
 #### mytables_abs.py
 
@@ -286,17 +307,22 @@ This is how the "ccwfdisc" table would be defined, as an new prototype.
         foff = css.foff.copy()
         lddate = css.lddate.copy()
 
-And this is how it would be implemented and re-used in two different tables, a generic 'ccwfdisc' and a 'TA_ccwfdisc'.
+The differences are minor:
+
+* use `__abstract__ = True` instead of assigning a `__tablename__`
+* use the `@declared_attr` decorator with a `__table_args__` _function_ that _returns_ the constraint tuple.
+
+And this is how the prototype would be implemented and re-used in two different tables, 'ccwfdisc' and 'TA_ccwfdisc'.
 
 #### mytables2.py
 
-    import mytables_abs as myabs
+    import mytables_abs as ab
 
-    class Ccwfdisc(myabs.Ccwfdisc):
+    class Ccwfdisc(ab.Ccwfdisc):
         __tablename__ = 'ccwfdisc'
 
-    class TA_Ccwfdisc(myabs.Ccwfdisc):
+    class TA_Ccwfdisc(ab.Ccwfdisc):
         __tablename__ = 'TA_ccwfdisc'
 
 
-Now, you have two tables that look the same, but have different names and can reside in the same database.
+These two tables look the same, have different names, and can reside in the same database.

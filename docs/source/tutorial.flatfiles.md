@@ -12,8 +12,8 @@ Pisces makes it easy to go between database objects and these external flat file
 
 Here, we'll import the following KB Core Site flat file, "TA.site".
 Each line in the text file is passed to `Site.from_string`, which is a 
-Pisces-specific method that uses the underlying column descriptions to interpret 
-fields in the flat file row string into a Site row instance. 
+Pisces-specific method that uses the underlying column descriptions in the class
+to interpret lines in the flat file and to populate a Site row instance. 
 Finally, `session.add(isite)` and `session.commit()` add and write rows to the 
 database.
 
