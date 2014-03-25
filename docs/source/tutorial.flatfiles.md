@@ -33,10 +33,12 @@ database.
 
 Read a flat file Site table into a database
 
-    from pisces.schema.css3 import Base
+    import pisces.schema.css3 as css
+
+    class Site(css.Site):
+        __tablename__ = 'site'
 
     session = sa.orm.Session(engine)
-    Site, = ps.get_tables(session.bind, ['TA_site'], base=Base)
     
     with open('TA.site') as ffsite:
         for line in ffsite:

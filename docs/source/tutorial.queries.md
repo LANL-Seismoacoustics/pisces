@@ -92,20 +92,18 @@ This may happen if you're loading a table that's actually a view of other tables
 
 ### Arbitrary enhanced tables
 
-When the `base=` option is used with a [Declarative Base](http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html) class that comes with Pisces, class the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.
+When the `base=` option is used with a [Declarative Base](http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html) class that comes with Pisces, the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.
 
 The class is integrated with its correctly-formatted text file (flat file) representation.
 Instances of the class can iterate over values, and in the correct order.
 
     # load table classes, matching column names with those of a known schema
 
-    from pisces.schema.kbcore import Base as KBBase
+    from pisces.schema.css3 import Base
 
-    Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=KBBase)
+    Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=Base)
 
-`KBBase` is the parent class for all pre-defined KB Core tables that come with Pisces. 
-Through Python’s class inheritance, this functionality is easy.
-
+`Base` is the parent class for all pre-defined table prototypes that come with Pisces. 
 
 ---
 
@@ -140,7 +138,7 @@ learn more about how this works.
 
     plt.title("{} TA stations and {} quakes mb > 4".format(len(ta_sites), len(wus_quakes)))
 
-![](wUS.png)
+![](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US")
 
 ### Query-builders
 
@@ -155,33 +153,18 @@ seismic queries in `pisces.request`.
     # to sort by mb, ask for the query back and do your sort
     wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)}, asquery=True).order_by(Origin.mb).all()
 
-Pisces uses NumPy/ObsPy to do distance subsets, which are done
-out-of-database and can be memory intensive. They can be done
-in-database, if you have that capability.
+Pisces uses NumPy/ObsPy to do distance subsets, which are done out-of-database and can be memory intensive. 
+They can be done in-database, if you have a stored function "xkm_distance", for example, that calculates lateral distances.
 
-    # stations <= 200 km from a point, out-of-database
+    # stations <= 200 km from lat 42, lon -110, out-of-database
     sites = req.get_stations(session, Site, km=(42, -110, 0, 200))
 
     # in-database "xkm_distance(lat1, lon1, lat2, lon2)" function
     from sqlalchemy import func
     sites = req.get_stations(session, Site, asquery=True).filter(func.xkm_distance(Site.lat, Site.lon, 42, -110).between(0, 200)).all()
 
-With our Oracle database, you can use the project:pisces\_gndd module:
-
-    from pisces_gndd.request import distaz_query
-
-    q = req.get_stations(session, Site, asquery=True)
-    sites = distaz_query(q, Site, km=(42, -110, 0, 200))
-
-    # or stations teleseismic distances from (40, 80)
-    telesites = distaz_query(q, Site, deg=(40, 80, 30, 90))
-
 
 ### Editing tables
-
-The following examples **will not work** unless you have write
-permission to global tables. Especially if you have write permission,
-**don’t try to do this**.
 
     # add Albuquerque ANMO and the Chelyabinsk bolide
     ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
