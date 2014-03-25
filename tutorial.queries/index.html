@@ -271,17 +271,16 @@ except ArgumentError:
                               primary_keys={'user.sitechan': ['chanid']})
 </code></pre>
 <h3 id="arbitrary-enhanced-tables">Arbitrary enhanced tables</h3>
-<p>When the <code>base=</code> option is used with a <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> class that comes with Pisces, class the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.</p>
+<p>When the <code>base=</code> option is used with a <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> class that comes with Pisces, the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.</p>
 <p>The class is integrated with its correctly-formatted text file (flat file) representation.
 Instances of the class can iterate over values, and in the correct order.</p>
 <pre class="prettyprint well"><code># load table classes, matching column names with those of a known schema
 
-from pisces.schema.kbcore import Base as KBBase
+from pisces.schema.css3 import Base
 
-Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=KBBase)
+Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=Base)
 </code></pre>
-<p><code>KBBase</code> is the parent class for all pre-defined KB Core tables that come with Pisces. 
-Through Python’s class inheritance, this functionality is easy.</p>
+<p><code>Base</code> is the parent class for all pre-defined table prototypes that come with Pisces. </p>
 <hr />
 <h2 id="querying-tables">Querying Tables</h2>
 <p>Querying and editing tables in Pisces is the same as using SQLAlchemy’s
@@ -312,7 +311,7 @@ for io in wus_quakes:
 
 plt.title("{} TA stations and {} quakes mb &gt; 4".format(len(ta_sites), len(wus_quakes)))
 </code></pre>
-<p><img alt="" src="wUS.png" /></p>
+<p><img alt="" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png" title="western US" /></p>
 <h3 id="query-builders">Query-builders</h3>
 <p>Pisces has a set of intuitive query-building functions for common
 seismic queries in <code>pisces.request</code>.</p>
@@ -324,29 +323,16 @@ wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'
 # to sort by mb, ask for the query back and do your sort
 wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)}, asquery=True).order_by(Origin.mb).all()
 </code></pre>
-<p>Pisces uses NumPy/ObsPy to do distance subsets, which are done
-out-of-database and can be memory intensive. They can be done
-in-database, if you have that capability.</p>
-<pre class="prettyprint well"><code># stations &lt;= 200 km from a point, out-of-database
+<p>Pisces uses NumPy/ObsPy to do distance subsets, which are done out-of-database and can be memory intensive. 
+They can be done in-database, if you have a stored function "xkm_distance", for example, that calculates lateral distances.</p>
+<pre class="prettyprint well"><code># stations &lt;= 200 km from lat 42, lon -110, out-of-database
 sites = req.get_stations(session, Site, km=(42, -110, 0, 200))
 
 # in-database "xkm_distance(lat1, lon1, lat2, lon2)" function
 from sqlalchemy import func
 sites = req.get_stations(session, Site, asquery=True).filter(func.xkm_distance(Site.lat, Site.lon, 42, -110).between(0, 200)).all()
 </code></pre>
-<p>With our Oracle database, you can use the project:pisces_gndd module:</p>
-<pre class="prettyprint well"><code>from pisces_gndd.request import distaz_query
-
-q = req.get_stations(session, Site, asquery=True)
-sites = distaz_query(q, Site, km=(42, -110, 0, 200))
-
-# or stations teleseismic distances from (40, 80)
-telesites = distaz_query(q, Site, deg=(40, 80, 30, 90))
-</code></pre>
 <h3 id="editing-tables">Editing tables</h3>
-<p>The following examples <strong>will not work</strong> unless you have write
-permission to global tables. Especially if you have write permission,
-<strong>don’t try to do this</strong>.</p>
 <pre class="prettyprint well"><code># add Albuquerque ANMO and the Chelyabinsk bolide
 ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
 bolide = Origin(orid=1, lat=55.15, lon=61.41, mb=2.7, etype='xm')

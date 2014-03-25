@@ -218,10 +218,12 @@ D03D    2010237  2286324   47.534700 -123.089400    0.2620 Eldon, WA, USA       
 F04D    2009318  2286324   46.082900 -123.010800    0.2360 Rainier, OR, USA                                   ss   F04D      0.0000    0.0000 2011-10-11 13:07:17
 </code></pre>
 <p>Read a flat file Site table into a database</p>
-<pre class="prettyprint well"><code>from pisces.schema.css3 import Base
+<pre class="prettyprint well"><code>import pisces.schema.css3 as css
+
+class Site(css.Site):
+    __tablename__ = 'site'
 
 session = sa.orm.Session(engine)
-Site, = ps.get_tables(session.bind, ['TA_site'], base=Base)
 
 with open('TA.site') as ffsite:
     for line in ffsite:
