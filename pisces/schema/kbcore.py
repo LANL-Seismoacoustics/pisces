@@ -94,12 +94,18 @@ Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 
 # specialized string parsing functions 
 def strip(s):
-    return str(s).strip()
+    return str(s).strip() or None
 
 # TODO: use dateutil module to handle wildcard characters, etc.?
+# https://docs.python.org/2.7/library/datetime.html#strftime-strptime-behavior
+# https://docs.python.org/2/library/string.html#format-specification-mini-language
 DATEFMT = '%Y-%m-%d %H:%M:%S'
 def dtfn(s):
-    return datetime.strptime(s, DATEFMT)
+    try:
+        val = datetime.strptime(s, DATEFMT)
+    except ValueError:
+        val = None
+    return val
 
 algorithm = Column(String(15), info={'default': '-', 'parse': strip, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
 amp = Column(Float(24), 
@@ -677,7 +683,6 @@ class Remark(Base):
     commid = commid.copy()
     lineno = lineno.copy()
     remark = remark.copy()
-    auth = auth.copy()
     lddate = lddate.copy()
 
 
