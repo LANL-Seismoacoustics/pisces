@@ -1,3 +1,4 @@
+import logging
 import math
 from getpass import getpass
 
@@ -97,6 +98,27 @@ def db_connect(*args, **kwargs):
 def table_contains_all(itable, keys):
      all([key in itable.columns for key in keys])
 
+#def ormtable(fulltablename, base=None):
+#    """
+#    For known schema-qualified tables, use:
+#    Origin = ormtable('global.origin', base=kb.Origin)
+#    For arbitrary tables, use:
+#    MyTable = ormtable('jkmacc.sometable')
+#    For arbitrary tables without Pisces-specific method, use:
+#    MyTable = ormtable('jkmacc.sometable', base=declarative_base())
+#    """
+#
+#    ORMBase = base if base else declarative_base(metaclass=PiscesMeta,
+#                                                 constructor=None)
+#    parents = (ORMBase,)
+#    try:
+#        owner, tablename = fulltable.split('.')
+#    except ValueError:
+#        owner, tablename = None, fulltable
+#    if owner:
+#        parents += declarative_base(metadata=MetaData(schema=owner)),
+#
+#    return type(fulltable.capitalize(), parents, {})
 
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None, 
                base=None):
@@ -325,3 +347,45 @@ def travel_times(ref, deg=None, km=None, depth=0.):
 
     return times
 
+
+def add_rows(session, rows, recurse=False):
+    """Handle common errors with logging in SQLAlchemy add_all.
+
+    Tries to add in bulk.  Failing that, it will rollback.
+
+    Parameters
+    ----------
+    session : sqlalchemy.orm.Session 
+    rows : list of mapped table instances
+    recurse : bool
+        After failure, try to add records individually.
+
+    Returns
+    -------
+    e: exception or None
+    
+    """
+    e = None
+    try:
+        session.add_all(rows)
+        session.commit()
+    except IntegrityError as e:
+        session.rollback()
+        logging.exception("Duplicate row(s)?")
+        #print " Duplicate row(s)."
+    except ProgrammingError as e:
+        session.rollback()
+        logging.exception("String encoding problem?")
+        #print " Possible problem with string encoding."
+    except UnmappedInstanceError as e:
+        #tableval was something that isn't a table, like a list or None
+        session.rollback()
+        logging.exception("Tried persist a list or None.")
+    finally:
+        # always executed
+        if e and recurse:
+            # if an exception was thrown and recursion was requested
+            for row in rows:
+                e = add_rows(session, [row], recurse=False)
+
+    return e
