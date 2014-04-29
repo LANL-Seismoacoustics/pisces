@@ -40,14 +40,23 @@ location and drivers.
 
 Tables can be loaded in one of three ways: 
 
-1. Arbitrary tables reflected from the database
-2. Arbitrary tables reflected from the database, with enhancements
-3. Imported from your own table definition modules
+1. Imported from your own table definition modules
+2. Arbitrary tables reflected from the database
+3. Arbitrary tables reflected from the database, with enhancements
 
-Number 3 is the recommended way, as it returns a class with useful methods like `to_trace` for waveform tables, default value instantiation, and easy flat file conversion.
-Number 2 returns a class with default value instantiation and easy flat file _writing_, but none of the useful Pisces class methods.
-Number 1 returns a class with none of the above enhancements.
+Number 1 is the recommended way, as it returns a class with useful methods like `to_trace` for waveform tables, default value instantiation, and easy flat file conversion.
+Number 2 returns a class with none of the above enhancements.
 It is good for quick table loading when you have no prior knowledge of the table or you don't have a table prototype to use for it.
+Number 3 returns a class with default value instantiation and easy flat file _writing_, but no other Pisces-specific class methods.
+
+### Import your defined tables
+
+Import tables/classes from modules where you previously defined them, as in the [previous tutorial page](Using the Database).
+This is the preferred way to load tables, as it offers the most flexibility and functionality.
+
+    import from mytables import Site, Wfdisc, Origin
+    
+
 
 ### Arbitrary tables
 
