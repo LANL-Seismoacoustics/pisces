@@ -16,6 +16,8 @@ def wfdisc2obspyhdr(wf):
     obshdr['starttime'] = UTCDateTime(float(wf.time))
     obshdr['delta'] = 1./wf.samprate
 
+    #endtime?
+
     return Stats(header=obshdr)
 
 

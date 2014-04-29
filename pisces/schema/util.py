@@ -194,6 +194,7 @@ def _init(self, *args, **kwargs):
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
+                    #handle callables, like datetime.datetime.now
                     setattr(self, c.name, dflt())
                 else:
                     setattr(self, c.name, dflt)
@@ -207,7 +208,6 @@ def _init(self, *args, **kwargs):
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
-                    #handle callables, like datetime.datetime.now
                     setattr(self, c.name, dflt())
                 else:
                     setattr(self, c.name, dflt)
@@ -248,6 +248,8 @@ def from_string(cls, line, default_on_error=None):
     """
     Construct a mapped table instance from correctly formatted flat file line.
 
+    Works with fixed-length fields, separated by a single whitespace.
+
     Parameters
     ----------
     line: str
@@ -287,11 +289,15 @@ def from_string(cls, line, default_on_error=None):
     for col, w, parser in [(c.name, c.info['width'], c.info['parse']) for c in cls.__table__.columns]:
         try:
             val = parser(line[pos:pos+w])
-        #XXX: only works for ValueError.  accept any error?
+            #print "{} '{}'".format(col, line[pos:pos+w])
         except:
+            #XXX: ValueError? any error?
+            # remove this clause, in favor or error handling inside info['parse']
             if default_on_error and col in default_on_error:
                 # None are converted to defaults during __init__
+                # XXX: no it doesn't.  that'd be nice, though.
                 val = None
+                #val = c.info['default']
             else:
                 raise 
         vals.append(val)
