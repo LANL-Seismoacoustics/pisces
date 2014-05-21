@@ -6,6 +6,10 @@ import numpy as np
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
+from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
+
 import obspy.core.util.geodetics as geod
 from obspy.taup import taup
 
@@ -351,41 +355,45 @@ def travel_times(ref, deg=None, km=None, depth=0.):
 def add_rows(session, rows, recurse=False):
     """Handle common errors with logging in SQLAlchemy add_all.
 
-    Tries to add in bulk.  Failing that, it will rollback.
+    Tries to add in bulk.  Failing that, it will rollback and optionally try
+    to add one at a time.
 
     Parameters
     ----------
     session : sqlalchemy.orm.Session 
-    rows : list of mapped table instances
-    recurse : bool
+    rows : list
+        Mapped table instances.
+    recurse : bool, optional
         After failure, try to add records individually.
 
     Returns
     -------
-    e: exception or None
+    num : int
+        Number of objects added.  0 if none.
+    e : exception or None
     
     """
     e = None
+    num = 0
     try:
         session.add_all(rows)
         session.commit()
-    except IntegrityError as e:
+        num = len(rows)
+    except (ProgrammingError, UnmappedInstanceError) as e:
+        # IntegrityError: duplicate row(s)
+        # ProgrammingError: string encoding problem
+        # UnmappedInstanceError: tried to add something like a list or None
         session.rollback()
-        logging.exception("Duplicate row(s)?")
-        #print " Duplicate row(s)."
-    except ProgrammingError as e:
+        logging.warning(str(e))
+    except IntegrityError:
+        print str(e)
         session.rollback()
-        logging.exception("String encoding problem?")
-        #print " Possible problem with string encoding."
-    except UnmappedInstanceError as e:
-        #tableval was something that isn't a table, like a list or None
-        session.rollback()
-        logging.exception("Tried persist a list or None.")
     finally:
         # always executed
         if e and recurse:
             # if an exception was thrown and recursion was requested
             for row in rows:
-                e = add_rows(session, [row], recurse=False)
+                i, e = add_rows(session, [row], recurse=False)
+                num += i
 
-    return e
+    return num, e
