@@ -412,6 +412,22 @@ class PiscesMeta(DeclarativeMeta):
                     pass
 
 
+# common parser functions for info['parser']
+# these return None upon exception, which is later converted to info['default']
+def parse_str(s):
+    return str(s).strip() or None
+
+def parse_utf(s):
+    """ Decode a utf-8 encoded string. """
+    return s.strip().decode('utf-8') or None
+
+def parse_float(s):
+    return float(s) or None
+
+def parse_int(s):
+    return int(s) or None
+
+
 #@event.listens_for(DeferredReflection, "instrument_class", propagate=True)
 #def process_primary_keys(mapper, cls):
 #    """Enforce __primary_keys__.
