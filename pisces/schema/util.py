@@ -1,3 +1,4 @@
+import sys
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 #from sqlalchemy.ext.declarative import DeferredReflection
@@ -290,7 +291,7 @@ def from_string(cls, line, default_on_error=None):
         try:
             val = parser(line[pos:pos+w])
             #print "{} '{}'".format(col, line[pos:pos+w])
-        except:
+        except ValueError as e:
             #XXX: ValueError? any error?
             # remove this clause, in favor or error handling inside info['parse']
             if default_on_error and col in default_on_error:
@@ -299,7 +300,12 @@ def from_string(cls, line, default_on_error=None):
                 val = None
                 #val = c.info['default']
             else:
-                raise 
+                msg = ", column {}: '{}', positions [{}:{}]".format(col, line[pos:pos+w], pos, pos+w)
+                #XXX: breaks for Python 3
+                raise type(e)(str(e) + msg)
+
+                #print("column: {}, value '{}'".format(c.name, line[pos:pos+w]))
+                #raise e
         vals.append(val)
         pos += w+1
 
@@ -319,6 +325,10 @@ def _len(self):
     # needed for _getitem__, i think
     return len(self.__table__.columns)
 
+def _eq(self):
+    """ True if primary key values are all equal. """
+    return all([getattr(self, c.name) == getattr(inst, c.name ) 
+                for attr in self.__table__.primary_key.columns])
 
 def _update_schema(targs, schema):
     """Put schema dict into __table_args__[-1].
@@ -369,6 +379,7 @@ class PiscesMeta(DeclarativeMeta):
         dct['__getitem__'] = _getitem
         dct['__setitem__'] = _setitem
         dct['__len__'] = _len
+        dct['__eq__'] = _eq
         dct['from_string'] = classmethod(from_string)
         dct['_column_info_registry'] = {}
 
