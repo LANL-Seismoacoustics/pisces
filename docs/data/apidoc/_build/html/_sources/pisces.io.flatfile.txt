@@ -1,7 +1,0 @@
-pisces.io.flatfile module
-=========================
-
-.. automodule:: pisces.io.flatfile
-    :members:
-    :undoc-members:
-    :show-inheritance:
