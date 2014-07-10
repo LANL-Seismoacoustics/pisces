@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.schema.util module &mdash; pisces 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2 documentation" href="index.html" />
+    <link rel="up" title="pisces.schema package" href="pisces.schema.html" />
+    <link rel="next" title="pisces.client module" href="pisces.client.html" />
+    <link rel="prev" title="pisces.schema.kbcore module" href="pisces.schema.kbcore.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.client.html" title="pisces.client module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.kbcore.html" title="pisces.schema.kbcore module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pisces 0.2 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.schema.html" accesskey="U">pisces.schema package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pisces.schema.util">
+<span id="pisces-schema-util-module"></span><h1>pisces.schema.util module<a class="headerlink" href="#module-pisces.schema.util" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pisces.schema.util.PiscesMeta">
+<em class="property">class </em><tt class="descclassname">pisces.schema.util.</tt><tt class="descname">PiscesMeta</tt><big>(</big><em>clsname</em>, <em>parents</em>, <em>dct</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#PiscesMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.PiscesMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.DeclarativeMeta</span></tt></p>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.attr_generate">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">attr_generate</tt><big>(</big><em>cls</em>, <em>attr='keyvalue'</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#attr_generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.attr_generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate a class that contains integer &#8216;keyvalue&#8217; id attribute with 
+a next() integer incrementing method.</p>
+<p class="rubric">Notes</p>
+<p>If your ID instance is in a session, using .next() modifies it, and thus
+stages it for updating upon the next session transaction (flush or commit).
+This is bad if it is an existing table you don&#8217;t have write privileges on.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Lastid</span><span class="p">,</span> <span class="o">=</span> <span class="n">pisces</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;lastid&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Lastid</span> <span class="o">=</span> <span class="n">attr_generate</span><span class="p">(</span><span class="n">Lastid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span> <span class="o">=</span> <span class="n">Lastid</span><span class="p">(</span><span class="n">keyname</span><span class="o">=</span><span class="s">&#39;orid&#39;</span><span class="p">,</span> <span class="n">keyvalue</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="go">1001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span><span class="o">.</span><span class="n">keyvalue</span>
+<span class="go">1001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c">#does nothing b/c orid wasn&#39;t added</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Lastid</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Lastid</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="s">&#39;orid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span><span class="o">.</span><span class="n">keyvalue</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orid</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="go">11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c">#updates orid in the database</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.copy_metadata">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">copy_metadata</tt><big>(</big><em>metadata</em>, <em>prefix=''</em>, <em>schema=None</em>, <em>metadata_out=None</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#copy_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.copy_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies tables to new metadata with new schema and/or name prefix.</p>
+<p>To make a new database with the result, use metadata.create_all(engine).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.from_string">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">from_string</tt><big>(</big><em>cls</em>, <em>line</em>, <em>default_on_error=None</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#from_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.get_infovals">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">get_infovals</tt><big>(</big><em>meta</em>, <em>structure</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#get_infovals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.get_infovals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get flattened values from column info dictionary for given metadata and 
+desired structure.</p>
+<p>If key is not in column info, None is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">colnames: list</p>
+<blockquote>
+<div><p>Flattened column names.</p>
+</div></blockquote>
+<p class="last">vals: list</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pisces.schema.kbcore</span> <span class="kn">import</span> <span class="n">Base</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fields</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;site&#39;</span><span class="p">],</span> <span class="s">&#39;default&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">defaults</span>
+<span class="go">[&#39;-&#39;, -1, 2286324, -999.0, -999.0, -999.0, &#39;-&#39;, &#39;-&#39;, &#39;-&#39;, -99999, -99999, &lt;built-in method now of type object at 0x100601060&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">fields</span>
+<span class="go">[&#39;sta&#39;, &#39;ondate&#39;, &#39;offdate&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;staname&#39;, &#39;statype&#39;, &#39;refsta&#39;, &#39;dnorth&#39;, &#39;deast&#39;, &#39;lddate&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.parse_float">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">parse_float</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#parse_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.parse_float" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.parse_int">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">parse_int</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#parse_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.parse_int" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.parse_str">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">parse_str</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#parse_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.parse_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.parse_utf">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">parse_utf</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#parse_utf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.parse_utf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a utf-8 encoded string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.util.string_formatter">
+<tt class="descclassname">pisces.schema.util.</tt><tt class="descname">string_formatter</tt><big>(</big><em>meta</em>, <em>structure</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/util.html#string_formatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.util.string_formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get string substitution formatter for given structure and schema.</p>
+<p>If you&#8217;re looking for a write_flatfile function, this is it.  It takes
+advantage of native python string formatting and file writing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>meta: sqlalchemy.MetaData</strong></p>
+<blockquote>
+<div><p>Columns in tables must have info={&#8216;format&#8217;: ?}</p>
+</div></blockquote>
+<p><strong>structure: iterable of str</strong></p>
+<blockquote>
+<div><p>Strings are known schema objects (tables, columns).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">fmt: str</p>
+<blockquote class="last">
+<div><p>String substitution formatter for provided structure within provided
+schema.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">recs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">,</span> <span class="n">sta</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">sta</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fmt</span> <span class="o">=</span> <span class="n">string_formatter</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="p">[</span><span class="s">&#39;origin&#39;</span><span class="p">,</span> <span class="s">&#39;lat&#39;</span><span class="p">,</span> <span class="s">&#39;lon&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;origin_lat_lon.txt&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="go">        for rec in recs:</span>
+<span class="go">            f.write(fmt.format(rec))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pisces.schema.kbcore.html"
+                        title="previous chapter">pisces.schema.kbcore module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pisces.client.html"
+                        title="next chapter">pisces.client module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pisces.schema.util.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.client.html" title="pisces.client module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.kbcore.html" title="pisces.schema.kbcore module"
+             >previous</a> |</li>
+        <li><a href="index.html">pisces 0.2 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.schema.html" >pisces.schema package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

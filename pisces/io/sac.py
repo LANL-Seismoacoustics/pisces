@@ -15,7 +15,7 @@ import obspy.core.util.geodetics as geod
 
 import pisces.schema.kbcore as kb
 from pisces.io.readwaveform import read_waveform
-from pisces.io.util import _map_header
+from pisces.io.util import _map_header, _buildhdr
 
 # ObsPy default values
 OBSPYDEFAULT = {'network': '',
