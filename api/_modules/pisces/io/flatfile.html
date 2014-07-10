@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.io.flatfile &mdash; pisces 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pisces 0.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pisces.io.flatfile</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">pisces.schema.util</span> <span class="kn">import</span> <span class="n">get_infovals</span>
+
+
+<span class="c"># TODO: replace numpy.genfromtxt with pandas.read_fwf ?</span>
+
+<div class="viewcode-block" id="format_records"><a class="viewcode-back" href="../../../pisces.io.flatfile.html#pisces.io.flatfile.format_records">[docs]</a><span class="k">def</span> <span class="nf">format_records</span><span class="p">(</span><span class="n">recs</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a well-formatted rec.array of records with requested structure.</span>
+
+<span class="sd">    Returned array has the desired field order with any missing values.</span>
+
+<span class="sd">    recs: numpy structured array</span>
+<span class="sd">    meta: sqlalchemy.MetaData </span>
+<span class="sd">        Columns in tables must have info[&#39;dtype&#39;] and info[&#39;width&#39;]</span>
+<span class="sd">    structure: iterable of str</span>
+<span class="sd">        The structure of the text file.  Strings are known schema objects </span>
+<span class="sd">        (tables, columns).  Duplicate column names will be overwritten!</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># The Plan:</span>
+    <span class="c"># 1) Make 2 new intermediate record arrays.  1 contains missing values for</span>
+    <span class="c">#    all expected columns not in the incoming array, the other is empty and</span>
+    <span class="c">#    has the requested output structure.</span>
+    <span class="c"># 2) Fill in the empty recarray with either values from the incoming array,</span>
+    <span class="c">#    or, if not present, pull from the missing value array. Return it.</span>
+
+    <span class="c"># get flat expected field names and defaults from structure</span>
+    <span class="n">fields</span><span class="p">,</span> <span class="n">dflts</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">,</span> <span class="s">&#39;default&#39;</span><span class="p">)</span>
+    <span class="n">mdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">dflts</span><span class="p">))</span>
+
+    <span class="c"># initialize output array</span>
+    <span class="n">fields</span><span class="p">,</span> <span class="n">dtypes</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">,</span> <span class="s">&#39;dtype&#39;</span><span class="p">)</span>
+    <span class="n">dtp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">))</span>
+    <span class="n">newrecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">(</span><span class="n">recs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtp</span><span class="p">)</span>
+
+    <span class="c"># fill in any missing values</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">newrecs</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">recs</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c">#field name not found in recs.  must be a missing value</span>
+            <span class="n">newrecs</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">newrecs</span>
+
+
+</div>
+<div class="viewcode-block" id="read_flatfile"><a class="viewcode-back" href="../../../pisces.io.flatfile.html#pisces.io.flatfile.read_flatfile">[docs]</a><span class="k">def</span> <span class="nf">read_flatfile</span><span class="p">(</span><span class="n">file_ish</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read formatted flat file with known schema objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_ish: str of file-like object</span>
+<span class="sd">        Fixed-width text file.</span>
+<span class="sd">    meta: sqlalchemy.MetaData </span>
+<span class="sd">        Columns in tables must have info[&#39;dtype&#39;] and info[&#39;width&#39;]</span>
+<span class="sd">    structure: iterable of str</span>
+<span class="sd">        The structure of the text file.  Strings are known schema objects </span>
+<span class="sd">        (tables, columns).  Duplicate column names will be overwritten!</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.rec.array of np.records</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">isFileString</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_ish</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+    <span class="c">#prepare for numpy.genfromtxt</span>
+    <span class="n">fields</span><span class="p">,</span> <span class="n">dtypes</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">,</span> <span class="s">&#39;dtype&#39;</span><span class="p">)</span>
+    <span class="n">dtp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">))</span>
+
+    <span class="n">fields</span><span class="p">,</span> <span class="n">widths</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">)</span>
+    <span class="n">widths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">widths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="c"># read the file into a record array</span>
+    <span class="c"># try a series of lddate converters</span>
+    <span class="c">#1) Anything UTCDateTime can chomp on (which is a lot)</span>
+    <span class="c">#2) e.g. &#39;07-JUL-10&#39;</span>
+    <span class="c"># TODO: this is kinda hackish</span>
+    <span class="k">for</span> <span class="n">conv</span> <span class="ow">in</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> 
+                 <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">UTCDateTime</span><span class="p">()</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">-%b-%y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">file_ish</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">autostrip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                    <span class="n">names</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtp</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">widths</span><span class="p">,</span> 
+                    <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;lddate&#39;</span><span class="p">:</span> <span class="n">conv</span><span class="p">})</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c">#wrong lddate converter</span>
+            <span class="k">pass</span>
+
+    <span class="c">#make sure you return a numpy.recarray of records (i.e. type(rec[0]) is numpy.rec.record)</span>
+    <span class="c">#rec = np.rec.array(rec.copy()) #works with genfromtxt, unless fields are objects (e.g. datetime)</span>
+    <span class="n">rec</span> <span class="o">=</span> <span class="n">format_records</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">)</span> 
+    
+    <span class="k">return</span> <span class="n">rec</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pisces 0.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
