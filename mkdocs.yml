@@ -10,6 +10,7 @@ pages:
 - ['tutorial.queries.md', 'Tutorial', 'Using the Database']
 - ['tutorial.waveforms.md', 'Tutorial', 'Import/Export Waveforms']
 - ['tutorial.flatfiles.md', 'Tutorial', 'Import/Export Flat Files']
+#- ['api.md', 'API Documentation']
 - ['pisces.md', 'Documentation', 'pisces']
 - ['pisces.request.md', 'Documentation', 'pisces.request']
 - ['pisces.client.md', 'Documentation', 'pisces.client']
