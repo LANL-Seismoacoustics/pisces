@@ -88,8 +88,8 @@ Tables present in your MetaData can be seen in its `.tables` dictionary:
 
 #### Tables must have a primary key
 
-SQLAlchemy’s ORM needs a primary key for the `session` to keep track of rows, so we specify the primary key in a dictionary and the `primary_keys=` keyword.
-This may happen if you're loading a table that's actually a view of other tables.
+SQLAlchemy’s ORM needs a primary key for the `session` to keep track of rows. If a database table is actually just a view of other tables, or a primary key was never specified,
+we can specify the primary key in a dictionary and the `primary_keys=` keyword.
 
     try:
         Sitechan, = ps.get_tables(session.bind, ['user.sitechan'])
@@ -101,10 +101,14 @@ This may happen if you're loading a table that's actually a view of other tables
 
 ### Arbitrary enhanced tables
 
-When the `base=` option is used with a [Declarative Base](http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html) class that comes with Pisces, the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.
+When the `base=` option is used with a [Declarative Base](http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html) class that comes with Pisces,
+loaded classes get the following enhancements:
 
-The class is integrated with its correctly-formatted text file (flat file) representation.
-Instances of the class can iterate over values, and in the correct order.
+* The default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.
+* The class can form its own string representation (flat file row).
+* Instances of the class can iterate over values, and in the correct order.
+
+Note: this will only work if the field names in the table being loaded have been used with this base before.
 
     # load table classes, matching column names with those of a known schema
 
@@ -112,7 +116,7 @@ Instances of the class can iterate over values, and in the correct order.
 
     Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=Base)
 
-`Base` is the parent class for all pre-defined table prototypes that come with Pisces. 
+`Base` is the parent class for all pre-defined table prototypes in a given schema that comes with Pisces. 
 
 ---
 
@@ -147,7 +151,9 @@ learn more about how this works.
 
     plt.title("{} TA stations and {} quakes mb > 4".format(len(ta_sites), len(wus_quakes)))
 
-![](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US")
+<!-- ![](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US") -->
+![western US](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US")
+<!-- ![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png "primary tables") -->
 
 ### Query-builders
 

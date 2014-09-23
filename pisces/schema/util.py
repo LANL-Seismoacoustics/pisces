@@ -149,7 +149,6 @@ def string_formatter(meta, structure):
                 f.write(fmt.format(rec))
     
     """
-    # TODO: could be more efficient
     # TODO: rewrite to use get_infovals
     # XXX: fails with some structures
     # o = session.query(Origin).first()
