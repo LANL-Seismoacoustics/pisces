@@ -37,7 +37,7 @@ SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
 # download_url = 'http://github.com/jkmacc-lanl/pisces/tarball/0.2',
 
 setup(name='pisces-db',
-    version='0.2',
+    version='0.2.1',
     description='A Practical Seismological Database Library in Python.',
     long_description=open('README.rst').read(),
     author='Jonathan MacCarthy',
