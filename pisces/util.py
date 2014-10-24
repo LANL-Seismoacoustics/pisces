@@ -1,3 +1,4 @@
+import logging
 import math
 from getpass import getpass
 
@@ -5,6 +6,10 @@ import numpy as np
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
+from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
+
 import obspy.core.util.geodetics as geod
 from obspy.taup import taup
 
@@ -97,6 +102,27 @@ def db_connect(*args, **kwargs):
 def table_contains_all(itable, keys):
      all([key in itable.columns for key in keys])
 
+#def ormtable(fulltablename, base=None):
+#    """
+#    For known schema-qualified tables, use:
+#    Origin = ormtable('global.origin', base=kb.Origin)
+#    For arbitrary tables, use:
+#    MyTable = ormtable('jkmacc.sometable')
+#    For arbitrary tables without Pisces-specific method, use:
+#    MyTable = ormtable('jkmacc.sometable', base=declarative_base())
+#    """
+#
+#    ORMBase = base if base else declarative_base(metaclass=PiscesMeta,
+#                                                 constructor=None)
+#    parents = (ORMBase,)
+#    try:
+#        owner, tablename = fulltable.split('.')
+#    except ValueError:
+#        owner, tablename = None, fulltable
+#    if owner:
+#        parents += declarative_base(metadata=MetaData(schema=owner)),
+#
+#    return type(fulltable.capitalize(), parents, {})
 
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None, 
                base=None):
@@ -325,3 +351,49 @@ def travel_times(ref, deg=None, km=None, depth=0.):
 
     return times
 
+
+def add_rows(session, rows, recurse=False):
+    """Handle common errors with logging in SQLAlchemy add_all.
+
+    Tries to add in bulk.  Failing that, it will rollback and optionally try
+    to add one at a time.
+
+    Parameters
+    ----------
+    session : sqlalchemy.orm.Session 
+    rows : list
+        Mapped table instances.
+    recurse : bool, optional
+        After failure, try to add records individually.
+
+    Returns
+    -------
+    num : int
+        Number of objects added.  0 if none.
+    e : exception or None
+    
+    """
+    e = None
+    num = 0
+    try:
+        session.add_all(rows)
+        session.commit()
+        num = len(rows)
+    except (ProgrammingError, UnmappedInstanceError) as e:
+        # IntegrityError: duplicate row(s)
+        # ProgrammingError: string encoding problem
+        # UnmappedInstanceError: tried to add something like a list or None
+        session.rollback()
+        logging.warning(str(e))
+    except IntegrityError:
+        print str(e)
+        session.rollback()
+    finally:
+        # always executed
+        if e and recurse:
+            # if an exception was thrown and recursion was requested
+            for row in rows:
+                i, e = add_rows(session, [row], recurse=False)
+                num += i
+
+    return num, e

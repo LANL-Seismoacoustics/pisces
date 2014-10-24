@@ -8,14 +8,14 @@ A practical seismological database library in Python.
 
 Pisces connects your Python analysis environment to a seismological database.
 
-#### *Manage and analyze data in the same language*  
+**Manage and analyze data in the same language**  
 Don't use separate data-management language, like SQL or shell scripts. Just use Python, and connect to [SciPy](http://www.scipy.org/about.html), [ObsPy](http://www.obspy.org), [AIMBAT](http://www.earth.northwestern.edu/~xlou/aimbat.html), [pyTDMT](http://webservices.rm.ingv.it/pyTDMT/), [StreamPick](https://github.com/miili/StreamPick), and the rest of the scientific Python ecosystem.
 
-#### *Use common open-source technologies and standards*  
+**Use common open-source technologies and standards**  
 SQL relational databases, [Python](http://www.python.org), [SQLAlchemy](http://www.sqlalchemy.org), and the [SciPy stack](http://www.scipy.org/about.html) are widely-used, free, and open-source technologies.
 Because of this, you can leverage knowledge from sites, like [StackOverflow](http://stackoverflow.com/search?q=sqlalchemy), and other disciplines, like web development, for database examples, troubleshooting, or tricks.
 
-#### *Write portable, extensible, and scalable code*  
+**Write portable, extensible, and scalable code**  
 Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack is free and open-source.  Write code that will not eventually have to be abandoned due to project size, system architecture, or budgetary or licensing concerns.
 
 
@@ -123,3 +123,6 @@ Install from [PyPI](https://pypi.python.org/pypi):
 Install current master from GitHub:
 
     pip install git+https://github.com/jkmacc-LANL/pisces
+
+
+[![Analytics](https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme?pixel)](https://github.com/igrigorik/ga-beacon)

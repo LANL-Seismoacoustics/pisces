@@ -1,6 +1,5 @@
 .DS_Store
 *.egg-info/
-*.pdf
 *.ai
 *.vim
 
@@ -35,5 +34,4 @@ pip-log.txt
 nosetests.xml
 
 # Sphinx
-docs/_build
-_build
+docs/build

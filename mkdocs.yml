@@ -7,9 +7,10 @@ repo_url: https://github.com/jkmacc-lanl/pisces
 pages:
 - ['index.md', 'Home']
 - ['tutorial.tables.md', 'Tutorial', 'Database Tables']
-- ['tutorial.queries.md', 'Tutorial', 'Queries and Joins']
+- ['tutorial.queries.md', 'Tutorial', 'Using the Database']
 - ['tutorial.waveforms.md', 'Tutorial', 'Import/Export Waveforms']
 - ['tutorial.flatfiles.md', 'Tutorial', 'Import/Export Flat Files']
+#- ['api.md', 'API Documentation']
 - ['pisces.md', 'Documentation', 'pisces']
 - ['pisces.request.md', 'Documentation', 'pisces.request']
 - ['pisces.client.md', 'Documentation', 'pisces.client']
@@ -22,8 +23,9 @@ pages:
 - ['pisces.io.mseed.md', 'Documentation', 'pisces.io.mseed']
 - ['about.roadmap.md', 'About', 'Roadmap']
 - ['about.license.md', 'About', 'License']
+- ['about.group.md', 'About', "User's Group"]
 
 docs_dir: 'docs/source'
 site_dir: 'docs/build'
 theme: 'mkdocs'
-theme_center_lead: true
+# theme_center_lead: true

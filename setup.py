@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ 
-Pisces: A Practical Seismological Database Framework in Python
+Pisces: A Practical Seismological Database Library in Python
 
 
 """
@@ -37,8 +37,8 @@ SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
 # download_url = 'http://github.com/jkmacc-lanl/pisces/tarball/0.2',
 
 setup(name='pisces-db',
-    version='0.2',
-    description='A Practical Seismological Database Framework in Python.',
+    version='0.2.1',
+    description='A Practical Seismological Database Library in Python.',
     long_description=open('README.rst').read(),
     author='Jonathan MacCarthy',
     author_email='jkmacc@lanl.gov',

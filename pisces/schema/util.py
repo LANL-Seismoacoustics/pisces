@@ -1,3 +1,4 @@
+import sys
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 #from sqlalchemy.ext.declarative import DeferredReflection
@@ -148,7 +149,6 @@ def string_formatter(meta, structure):
                 f.write(fmt.format(rec))
     
     """
-    # TODO: could be more efficient
     # TODO: rewrite to use get_infovals
     # XXX: fails with some structures
     # o = session.query(Origin).first()
@@ -194,6 +194,7 @@ def _init(self, *args, **kwargs):
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
+                    #handle callables, like datetime.datetime.now
                     setattr(self, c.name, dflt())
                 else:
                     setattr(self, c.name, dflt)
@@ -207,7 +208,6 @@ def _init(self, *args, **kwargs):
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
-                    #handle callables, like datetime.datetime.now
                     setattr(self, c.name, dflt())
                 else:
                     setattr(self, c.name, dflt)
@@ -248,6 +248,8 @@ def from_string(cls, line, default_on_error=None):
     """
     Construct a mapped table instance from correctly formatted flat file line.
 
+    Works with fixed-length fields, separated by a single whitespace.
+
     Parameters
     ----------
     line: str
@@ -287,13 +289,22 @@ def from_string(cls, line, default_on_error=None):
     for col, w, parser in [(c.name, c.info['width'], c.info['parse']) for c in cls.__table__.columns]:
         try:
             val = parser(line[pos:pos+w])
-        #XXX: only works for ValueError.  accept any error?
-        except:
+            #print "{} '{}'".format(col, line[pos:pos+w])
+        except ValueError as e:
+            #XXX: ValueError? any error?
+            # remove this clause, in favor or error handling inside info['parse']
             if default_on_error and col in default_on_error:
                 # None are converted to defaults during __init__
+                # XXX: no it doesn't.  that'd be nice, though.
                 val = None
+                #val = c.info['default']
             else:
-                raise 
+                msg = ", column {}: '{}', positions [{}:{}]".format(col, line[pos:pos+w], pos, pos+w)
+                #XXX: breaks for Python 3
+                raise type(e)(str(e) + msg)
+
+                #print("column: {}, value '{}'".format(c.name, line[pos:pos+w]))
+                #raise e
         vals.append(val)
         pos += w+1
 
@@ -313,6 +324,10 @@ def _len(self):
     # needed for _getitem__, i think
     return len(self.__table__.columns)
 
+def _eq(self):
+    """ True if primary key values are all equal. """
+    return all([getattr(self, c.name) == getattr(inst, c.name ) 
+                for attr in self.__table__.primary_key.columns])
 
 def _update_schema(targs, schema):
     """Put schema dict into __table_args__[-1].
@@ -363,6 +378,7 @@ class PiscesMeta(DeclarativeMeta):
         dct['__getitem__'] = _getitem
         dct['__setitem__'] = _setitem
         dct['__len__'] = _len
+        dct['__eq__'] = _eq
         dct['from_string'] = classmethod(from_string)
         dct['_column_info_registry'] = {}
 
@@ -404,6 +420,22 @@ class PiscesMeta(DeclarativeMeta):
                     cls.__base__.__dict__['_column_info_registry'][key] = val.info
                 except KeyError:
                     pass
+
+
+# common parser functions for info['parser']
+# these return None upon exception, which is later converted to info['default']
+def parse_str(s):
+    return str(s).strip() or None
+
+def parse_utf(s):
+    """ Decode a utf-8 encoded string. """
+    return s.strip().decode('utf-8') or None
+
+def parse_float(s):
+    return float(s) or None
+
+def parse_int(s):
+    return int(s) or None
 
 
 #@event.listens_for(DeferredReflection, "instrument_class", propagate=True)
