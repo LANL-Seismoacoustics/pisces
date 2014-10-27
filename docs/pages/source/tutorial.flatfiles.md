@@ -33,9 +33,9 @@ database.
 
 Read a flat file Site table into a database
 
-    import pisces.schema.css3 as css
+    import pisces.schema.kbcore as kb 
 
-    class Site(css.Site):
+    class Site(kb.Site):
         __tablename__ = 'site'
 
     session = sa.orm.Session(engine)
