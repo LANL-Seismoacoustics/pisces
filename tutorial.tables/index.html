@@ -85,51 +85,8 @@
                 
                 
                 
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            <li >
-                                <a href="../pisces/">pisces</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.request/">pisces.request</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.client/">pisces.client</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema/">pisces.schema</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema.css3/">pisces.schema.css3</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema.kbcore/">pisces.schema.kbcore</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io/">pisces.io</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.readwaveform/">pisces.io.readwaveform</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.sac/">pisces.io.sac</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.mseed/">pisces.io.mseed</a>
-                            </li>
-                        
-                        </ul>
+                    <li >
+                        <a href="../api/">API Documentation</a>
                     </li>
                 
                 
@@ -144,6 +101,10 @@
                         
                             <li >
                                 <a href="../about.license/">License</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../about.group/">User's Group</a>
                             </li>
                         
                         </ul>
@@ -329,7 +290,7 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 <h4 id="lookup-tables">Lookup tables</h4>
 <p>(only primary and unique keys are shown)</p>
 <p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png" title="lookup tables" /></p>
-<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="https://github.com/jkmacc-LANL/pisces/blob/dev/docs/data/Anderson1990.pdf?raw=true" title="Anderson et al. (1990) pdf">PDF</a></p>
+<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="https://github.com/jkmacc-LANL/pisces/blob/dev/docs/data/Anderson1990.pdf?raw=true" title="Anderson et al. (1990) pdf">PDF (19 MB)</a></p>
 <h3 id="the-pisces-implementation">The Pisces implementation</h3>
 <p>Pisces implements CSS 3.0 schema with relatively few constraints:</p>
 <ul>
@@ -339,7 +300,7 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 <li>Any column can take an NA value, which will be assigned if not otherwise specified.</li>
 </ul>
 <p>This is done to offer users the flexibility to maintain a database to a level of rigor commensurate with the project.
-A single-user with a 2-year project database may only ever use the origin, wfdisc, arrival, and assoc tables, and doesn't want to deal foreign keys,
+A single-user with a 2-year project database may only ever use the origin, wfdisc, arrival, and assoc tables, and doesn't want to deal with foreign keys,
 whereas a multi-user global database may need to populate most/all tables and use consistent ids.
 Both are possible.</p>
 <!--

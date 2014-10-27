@@ -85,51 +85,8 @@
                 
                 
                 
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            <li >
-                                <a href="../pisces/">pisces</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.request/">pisces.request</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.client/">pisces.client</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema/">pisces.schema</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema.css3/">pisces.schema.css3</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.schema.kbcore/">pisces.schema.kbcore</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io/">pisces.io</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.readwaveform/">pisces.io.readwaveform</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.sac/">pisces.io.sac</a>
-                            </li>
-                        
-                            <li >
-                                <a href="../pisces.io.mseed/">pisces.io.mseed</a>
-                            </li>
-                        
-                        </ul>
+                    <li >
+                        <a href="../api/">API Documentation</a>
                     </li>
                 
                 
@@ -144,6 +101,10 @@
                         
                             <li >
                                 <a href="../about.license/">License</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../about.group/">User's Group</a>
                             </li>
                         
                         </ul>
@@ -273,8 +234,8 @@ print Site.metadata.tables.keys()
 <pre class="prettyprint well"><code>['user.affiliation',  'user.site',  'user.wfdisc',  'user.origin',  'user.assoc']
 </code></pre>
 <h4 id="tables-must-have-a-primary-key">Tables must have a primary key</h4>
-<p>SQLAlchemy’s ORM needs a primary key for the <code>session</code> to keep track of rows, so we specify the primary key in a dictionary and the <code>primary_keys=</code> keyword.
-This may happen if you're loading a table that's actually a view of other tables.</p>
+<p>SQLAlchemy’s ORM needs a primary key for the <code>session</code> to keep track of rows. If a database table is actually just a view of other tables, or a primary key was never specified,
+we can specify the primary key in a dictionary and the <code>primary_keys=</code> keyword.</p>
 <pre class="prettyprint well"><code>try:
     Sitechan, = ps.get_tables(session.bind, ['user.sitechan'])
 except ArgumentError:
@@ -283,16 +244,21 @@ except ArgumentError:
                               primary_keys={'user.sitechan': ['chanid']})
 </code></pre>
 <h3 id="arbitrary-enhanced-tables">Arbitrary enhanced tables</h3>
-<p>When the <code>base=</code> option is used with a <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> class that comes with Pisces, the default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.</p>
-<p>The class is integrated with its correctly-formatted text file (flat file) representation.
-Instances of the class can iterate over values, and in the correct order.</p>
+<p>When the <code>base=</code> option is used with a <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> class that comes with Pisces,
+loaded classes get the following enhancements:</p>
+<ul>
+<li>The default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.</li>
+<li>The class can form its own string representation (flat file row).</li>
+<li>Instances of the class can iterate over values, and in the correct order.</li>
+</ul>
+<p>Note: this will only work if the field names in the table being loaded have been used with this base before.</p>
 <pre class="prettyprint well"><code># load table classes, matching column names with those of a known schema
 
 from pisces.schema.css3 import Base
 
 Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=Base)
 </code></pre>
-<p><code>Base</code> is the parent class for all pre-defined table prototypes that come with Pisces. </p>
+<p><code>Base</code> is the parent class for all pre-defined table prototypes in a given schema that comes with Pisces. </p>
 <hr />
 <h2 id="querying-tables">Querying Tables</h2>
 <p>Querying and editing tables in Pisces is the same as using SQLAlchemy’s
@@ -323,7 +289,10 @@ for io in wus_quakes:
 
 plt.title("{} TA stations and {} quakes mb &gt; 4".format(len(ta_sites), len(wus_quakes)))
 </code></pre>
-<p><img alt="" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png" title="western US" /></p>
+<!-- ![](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US") -->
+
+<p><img alt="western US" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png" title="western US" />
+<!-- <img alt="primary tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png" title="primary tables" /> --></p>
 <h3 id="query-builders">Query-builders</h3>
 <p>Pisces has a set of intuitive query-building functions for common
 seismic queries in <code>pisces.request</code>.</p>
