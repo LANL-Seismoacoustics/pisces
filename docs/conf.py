@@ -21,8 +21,8 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['argparse', 'numpy', 'matplotlib', 'matplotlib.pyplot', 'obspy', 'obspy.taup', 'obspy.signal',
-                'obspy.mseed', 'sqlalchemy', 'sqlalchemy.orm','sqlalchemy.ext.declarative', 'pisces', 'pisces.io']
+MOCK_MODULES = ['argparse', 'numpy', 'matplotlib', 'matplotlib.pyplot', 'obspy',
+                'sqlalchemy', 'sqlalchemy.orm','sqlalchemy.ext.declarative', 'pisces', 'pisces.io']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
