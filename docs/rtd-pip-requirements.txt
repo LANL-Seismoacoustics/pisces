@@ -1,5 +1,2 @@
 mock
-numpy
 numpydoc
-obspy
-sqlalchemy
