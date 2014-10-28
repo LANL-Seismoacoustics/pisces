@@ -152,7 +152,8 @@ learn more about how this works.
     plt.title("{} TA stations and {} quakes mb > 4".format(len(ta_sites), len(wus_quakes)))
 
 <!-- ![](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/wUS.png "western US") -->
-![western US](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/wUS.png "western US")
+<!-- ![western US](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/wUS.png "western US") -->
+![western US](../data/wUS.png)
 <!-- ![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png "primary tables") -->
 
 ### Query-builders
