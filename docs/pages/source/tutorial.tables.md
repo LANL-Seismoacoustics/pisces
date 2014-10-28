@@ -169,7 +169,7 @@ In the ORM, **Python classes represent database tables, and instances of that cl
 The core tables don't describe everything you might care about, such as stacked cross-correlation functions.
 Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <http://www.iris.edu/dms/products/ancc-ciei/>, which looks like this _(sic)_:
 
-![ccwfdisc table](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/ancc-ciei_table.png "ccwfdisc table")
+![ccwfdisc table](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/ancc-ciei_table.png "ccwfdisc table")
 
 We'll define our new table in a file "mytables.py" by doing the following:
 
