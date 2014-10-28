@@ -11,7 +11,7 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
 
 #import obspy.core.util.geodetics as geod
-from obspy.taup import taup
+#from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
 
