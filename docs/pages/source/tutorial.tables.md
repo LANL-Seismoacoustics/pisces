@@ -131,16 +131,16 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 
 (only primary and unique keys are shown)
 
-![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_primary.png "primary tables")
+![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/css3_primary.png "primary tables")
 
 
 #### Lookup tables
 
 (only primary and unique keys are shown)
 
-![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/data/css3_lookup.png "lookup tables")
+![lookup tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/css3_lookup.png "lookup tables")
 
-Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. [PDF (19 MB)](https://github.com/jkmacc-LANL/pisces/blob/dev/docs/data/Anderson1990.pdf?raw=true "Anderson et al. (1990) pdf")
+Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. [PDF (19 MB)](https://github.com/jkmacc-LANL/pisces/blob/dev/docs/pages/data/Anderson1990.pdf?raw=true "Anderson et al. (1990) pdf")
 
 ### The Pisces implementation
 
