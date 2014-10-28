@@ -21,7 +21,7 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['obspy', 'obspy.taup', 'obspy.signal', 'obspy.mseed', 'obspy.core.util.geodetics']
+MOCK_MODULES = ['obspy']
 
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
