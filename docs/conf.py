@@ -60,6 +60,18 @@ for i in range(30):
             if sys.modules.get(m, None) is None:
                 print('Mocking module %s' % m)
                 sys.modules[m] = Mock()
+    except OSError:
+        exc_type, exc_value, tb = sys.exc_info()                                                       
+        codeline = traceback.extract_tb(tb)[-1][-1]                                                    
+        missing_module = codeline.split()[1]                                                           
+        if 'pisces' in missing_module:                                                                 
+            raise                                                                                      
+        # mock missing module and all parent modules                                                   
+        for c in range(missing_module.count('.'), -1, -1):                                             
+            m = missing_module.rsplit('.', c)[0]                                                       
+            if sys.modules.get(m, None) is None:                                                       
+                print('Mocking module %s' % m)                                                         
+                sys.modules[m] = Mock()
     else:
         break
 
