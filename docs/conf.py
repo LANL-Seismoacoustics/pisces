@@ -42,11 +42,11 @@ class Mock(object):
         else:
             return Mock()
 
-# Mock all modules in rf which raise an import error
-for i in range(20):
+# Mock all modules in pisces which raise an import error
+for i in range(30):
     try:
         import pisces
-    except ImportError:
+    except (ImportError, OSError):
         exc_type, exc_value, tb = sys.exc_info()
         codeline = traceback.extract_tb(tb)[-1][-1]
         missing_module = codeline.split()[1]
@@ -61,7 +61,7 @@ for i in range(20):
     else:
         break
 
-sys.modules['pisces.io.readwaveform'] = Mock()
+#sys.modules['pisces.io.readwaveform'] = Mock()
 
 # -- General configuration ------------------------------------------------
 
