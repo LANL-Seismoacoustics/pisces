@@ -47,6 +47,7 @@ class Mock(object):
 for i in range(30):
     try:
         import pisces
+        import pisces.io.readwaveform
     except ImportError:
         exc_type, exc_value, tb = sys.exc_info()
         codeline = traceback.extract_tb(tb)[-1][-1]
