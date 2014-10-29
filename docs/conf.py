@@ -15,8 +15,6 @@
 import sys
 import os
 import traceback
-import mock
-#from mock import Mock as MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,7 +22,6 @@ import mock
 #sys.path.insert(0, os.path.abspath('../pisces'))
 root = os.path.abspath('../')
 sys.path.insert(0, root)
-
 
 
 # Following: https://github.com/trichter/rf
@@ -67,20 +64,7 @@ for i in range(30):
         break
 
 
-MOCK_MODULES = ['pisces', 'pisces.io.readwaveform']
-for mod_name in MOCK_MODULES:
-       sys.modules[mod_name] = mock.Mock() 
-
-
-#class MMock(MagicMock):
-#    @classmethod
-#    def __getattr__(cls, name):
-#            return MMock()
-#
-#MOCK_MODULES = ['pisces.io.readwaveform']
-#sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
-#sys.modules.update(('pisces.io.readwaveform', Mock()))
-#sys.modules['pisces.io.readwaveform'] = Mock()
+sys.modules['pisces.io.readwaveform'] = Mock()
 
 
 # -- General configuration ------------------------------------------------
