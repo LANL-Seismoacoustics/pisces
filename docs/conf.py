@@ -84,7 +84,7 @@ for i in range(30):
 #
 #MOCK_MODULES = ['pisces.io.readwaveform']
 #sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
-sys.modules.update(('pisces.io.readwaveform', Mock()))
+#sys.modules.update(('pisces.io.readwaveform', Mock()))
 #sys.modules['pisces.io.readwaveform'] = Mock()
 
 
