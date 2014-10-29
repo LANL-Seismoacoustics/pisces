@@ -14,25 +14,53 @@
 
 import sys
 import os
-from mock import Mock as MagicMock
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-            return Mock()
-
-MOCK_MODULES = ['obspy', 'pisces.io.readwaveform']
-#MOCK_MODULES = ['obspy','obspy.taup', 'obspy.signal', 'obspy.core.util.geodetics', 'obspy.mseed',
-#                'pisces.io.readwaveform', 'scipy']
-#'sqlalchemy.cprocessors','sqlalchemy.cresultproxy', 'sqlalchemy.cutils', 'numpy', 
-
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
+import traceback
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../pisces'))
+#root = os.path.abspath('../')
+#sys.path.insert(0, root)
+
+# Following: https://github.com/trichter/rf
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):  #@UnusedVariable
+        return Mock()
+
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            mockType = type(name, (), {})
+            mockType.__module__ = __name__
+            return mockType
+        else:
+            return Mock()
+
+# Mock all modules in rf which raise an import error
+for i in range(20):
+    try:
+        import pisces
+    except ImportError:
+        exc_type, exc_value, tb = sys.exc_info()
+        codeline = traceback.extract_tb(tb)[-1][-1]
+        missing_module = codeline.split()[1]
+        if 'pisces' in missing_module:
+            raise
+        # mock missing module and all parent modules
+        for c in range(missing_module.count('.'), -1, -1):
+            m = missing_module.rsplit('.', c)[0]
+            if sys.modules.get(m, None) is None:
+                print('Mocking module %s' % m)
+                sys.modules[m] = Mock()
+    else:
+        break
+
 
 # -- General configuration ------------------------------------------------
 
