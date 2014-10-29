@@ -61,6 +61,7 @@ for i in range(20):
     else:
         break
 
+sys.modules['pisces.io.readwaveform'] = Mock()
 
 # -- General configuration ------------------------------------------------
 
