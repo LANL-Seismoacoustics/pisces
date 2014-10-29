@@ -65,7 +65,7 @@ for i in range(30):
 class MMock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-            return Mock()
+            return MMock()
 
 MOCK_MODULES = ['pisces.io.readwaveform']
 sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
