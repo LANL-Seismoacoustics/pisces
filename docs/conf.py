@@ -62,13 +62,16 @@ for i in range(30):
     else:
         break
 
-class MMock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-            return MMock()
+sys.modules['pisces.io.readwaveform'] = Mock()
 
-MOCK_MODULES = ['pisces.io.readwaveform']
-sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
+#class MMock(MagicMock):
+#    @classmethod
+#    def __getattr__(cls, name):
+#            return MMock()
+#
+#MOCK_MODULES = ['pisces.io.readwaveform']
+#sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
+
 
 # -- General configuration ------------------------------------------------
 
