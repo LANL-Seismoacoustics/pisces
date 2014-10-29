@@ -15,7 +15,7 @@
 import sys
 import os
 import traceback
-from mock import Mock as MagicMock
+#from mock import Mock as MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -62,7 +62,7 @@ for i in range(30):
     else:
         break
 
-sys.modules['pisces.io.readwaveform'] = Mock()
+
 
 #class MMock(MagicMock):
 #    @classmethod
@@ -71,6 +71,8 @@ sys.modules['pisces.io.readwaveform'] = Mock()
 #
 #MOCK_MODULES = ['pisces.io.readwaveform']
 #sys.modules.update((mod_name, MMock()) for mod_name in MOCK_MODULES)
+sys.modules.update(('pisces.io.readwaveform', Mock()))
+#sys.modules['pisces.io.readwaveform'] = Mock()
 
 
 # -- General configuration ------------------------------------------------
