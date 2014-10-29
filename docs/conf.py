@@ -47,7 +47,7 @@ class Mock(object):
 for i in range(30):
     try:
         import pisces
-    except (ImportError, OSError):
+    except ImportError:
         exc_type, exc_value, tb = sys.exc_info()
         codeline = traceback.extract_tb(tb)[-1][-1]
         missing_module = codeline.split()[1]
