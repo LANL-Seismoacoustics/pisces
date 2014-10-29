@@ -15,6 +15,7 @@
 import sys
 import os
 import traceback
+import mock
 #from mock import Mock as MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -23,6 +24,8 @@ import traceback
 #sys.path.insert(0, os.path.abspath('../pisces'))
 root = os.path.abspath('../')
 sys.path.insert(0, root)
+
+
 
 # Following: https://github.com/trichter/rf
 class Mock(object):
@@ -60,21 +63,13 @@ for i in range(30):
             if sys.modules.get(m, None) is None:
                 print('Mocking module %s' % m)
                 sys.modules[m] = Mock()
-    except OSError:
-        exc_type, exc_value, tb = sys.exc_info()                                                       
-        codeline = traceback.extract_tb(tb)[-1][-1]                                                    
-        missing_module = codeline.split()[1]                                                           
-        if 'pisces' in missing_module:                                                                 
-            raise                                                                                      
-        # mock missing module and all parent modules                                                   
-        for c in range(missing_module.count('.'), -1, -1):                                             
-            m = missing_module.rsplit('.', c)[0]                                                       
-            if sys.modules.get(m, None) is None:                                                       
-                print('Mocking module %s' % m)                                                         
-                sys.modules[m] = Mock()
     else:
         break
 
+
+MOCK_MODULES = ['pisces', 'pisces.io.readwaveform']
+for mod_name in MOCK_MODULES:
+       sys.modules[mod_name] = mock.Mock() 
 
 
 #class MMock(MagicMock):
