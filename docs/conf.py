@@ -21,8 +21,9 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['obspy','obspy.taup', 'obspy.signal', 'obspy.core.util.geodetics', 'obspy.mseed',
-                'pisces.io.readwaveform', 'scipy']
+MOCK_MODULES = ['obspy', 'pisces.io.readwaveform']
+#MOCK_MODULES = ['obspy','obspy.taup', 'obspy.signal', 'obspy.core.util.geodetics', 'obspy.mseed',
+#                'pisces.io.readwaveform', 'scipy']
 #'sqlalchemy.cprocessors','sqlalchemy.cresultproxy', 'sqlalchemy.cutils', 'numpy', 
 
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
