@@ -19,9 +19,9 @@ import traceback
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../pisces'))
-#root = os.path.abspath('../')
-#sys.path.insert(0, root)
+#sys.path.insert(0, os.path.abspath('../pisces'))
+root = os.path.abspath('../')
+sys.path.insert(0, root)
 
 # Following: https://github.com/trichter/rf
 class Mock(object):
@@ -73,6 +73,7 @@ for i in range(20):
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'numpydoc'
 ]
