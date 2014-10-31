@@ -18,7 +18,7 @@ sphinx-apidoc -d 2 -f -F -E -e -A 'Jonathan MacCarthy' -V 0.2 -H pisces -o . ~/p
 
 This command will not:
 ```bash
-sphinx-apidoc -d 2 -f -e -E -A 'Jonathan MacCarthy' -V 0.2.1 -H pisces -o . ~/python/pisces/pisces ~/python/pisces/pisces/io/flatfile.py
+sphinx-apidoc -f -e -E -A 'Jonathan MacCarthy' -V 0.2.1 -H pisces -o . ~/python/pisces/pisces ~/python/pisces/pisces/io/flatfile.py
 ```
 
 

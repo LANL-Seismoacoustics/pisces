@@ -6,6 +6,8 @@
 Welcome to pisces's documentation!
 ==================================
 
+See also `pisces home. <http://jkmacc-lanl.github.io/pisces/>`_
+
 Contents:
 
 .. toctree::
