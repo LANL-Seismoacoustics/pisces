@@ -9,9 +9,11 @@ Welcome to pisces's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
+   :titlesonly:
 
    pisces
+
 
 
 Indices and tables

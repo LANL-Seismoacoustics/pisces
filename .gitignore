@@ -34,4 +34,4 @@ pip-log.txt
 nosetests.xml
 
 # Sphinx
-docs/build
+docs/html
