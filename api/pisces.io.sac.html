@@ -1,0 +1,1445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.io.sac module &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="index.html" />
+    <link rel="up" title="pisces.io package" href="pisces.io.html" />
+    <link rel="next" title="pisces.io.trace module" href="pisces.io.trace.html" />
+    <link rel="prev" title="pisces.io.readwaveform module" href="pisces.io.readwaveform.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.io.trace.html" title="pisces.io.trace module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pisces.io.readwaveform.html" title="pisces.io.readwaveform module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.io.html" accesskey="U">pisces.io package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pisces.io.sac">
+<span id="pisces-io-sac-module"></span><h1>pisces.io.sac module<a class="headerlink" href="#module-pisces.io.sac" title="Permalink to this headline">¶</a></h1>
+<p>Conversions between SAC header variables and KB Core fields.</p>
+<dl class="class">
+<dt id="pisces.io.sac.Affiliation">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Affiliation</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Affiliation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Affiliation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Affiliation" title="pisces.schema.kbcore.Affiliation"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Affiliation</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Affiliation.endtime">
+<tt class="descname">endtime</tt><a class="headerlink" href="#pisces.io.sac.Affiliation.endtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Affiliation.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Affiliation.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Affiliation.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Affiliation.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Affiliation.net">
+<tt class="descname">net</tt><a class="headerlink" href="#pisces.io.sac.Affiliation.net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Affiliation.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Affiliation.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Affiliation.time">
+<tt class="descname">time</tt><a class="headerlink" href="#pisces.io.sac.Affiliation.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Arrival">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Arrival</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Arrival"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Arrival" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Arrival" title="pisces.schema.kbcore.Arrival"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Arrival</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.amp">
+<tt class="descname">amp</tt><a class="headerlink" href="#pisces.io.sac.Arrival.amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.arid">
+<tt class="descname">arid</tt><a class="headerlink" href="#pisces.io.sac.Arrival.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.auth">
+<tt class="descname">auth</tt><a class="headerlink" href="#pisces.io.sac.Arrival.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.azimuth">
+<tt class="descname">azimuth</tt><a class="headerlink" href="#pisces.io.sac.Arrival.azimuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.chan">
+<tt class="descname">chan</tt><a class="headerlink" href="#pisces.io.sac.Arrival.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.chanid">
+<tt class="descname">chanid</tt><a class="headerlink" href="#pisces.io.sac.Arrival.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.clip">
+<tt class="descname">clip</tt><a class="headerlink" href="#pisces.io.sac.Arrival.clip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.commid">
+<tt class="descname">commid</tt><a class="headerlink" href="#pisces.io.sac.Arrival.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.delaz">
+<tt class="descname">delaz</tt><a class="headerlink" href="#pisces.io.sac.Arrival.delaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.delslo">
+<tt class="descname">delslo</tt><a class="headerlink" href="#pisces.io.sac.Arrival.delslo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.deltim">
+<tt class="descname">deltim</tt><a class="headerlink" href="#pisces.io.sac.Arrival.deltim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.ema">
+<tt class="descname">ema</tt><a class="headerlink" href="#pisces.io.sac.Arrival.ema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.fm">
+<tt class="descname">fm</tt><a class="headerlink" href="#pisces.io.sac.Arrival.fm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Arrival.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Arrival.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.iphase">
+<tt class="descname">iphase</tt><a class="headerlink" href="#pisces.io.sac.Arrival.iphase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.jdate">
+<tt class="descname">jdate</tt><a class="headerlink" href="#pisces.io.sac.Arrival.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Arrival.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.logat">
+<tt class="descname">logat</tt><a class="headerlink" href="#pisces.io.sac.Arrival.logat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.per">
+<tt class="descname">per</tt><a class="headerlink" href="#pisces.io.sac.Arrival.per" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.qual">
+<tt class="descname">qual</tt><a class="headerlink" href="#pisces.io.sac.Arrival.qual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.rect">
+<tt class="descname">rect</tt><a class="headerlink" href="#pisces.io.sac.Arrival.rect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.slow">
+<tt class="descname">slow</tt><a class="headerlink" href="#pisces.io.sac.Arrival.slow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.snr">
+<tt class="descname">snr</tt><a class="headerlink" href="#pisces.io.sac.Arrival.snr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Arrival.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.stassid">
+<tt class="descname">stassid</tt><a class="headerlink" href="#pisces.io.sac.Arrival.stassid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.stype">
+<tt class="descname">stype</tt><a class="headerlink" href="#pisces.io.sac.Arrival.stype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Arrival.time">
+<tt class="descname">time</tt><a class="headerlink" href="#pisces.io.sac.Arrival.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Assoc">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Assoc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Assoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Assoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Assoc" title="pisces.schema.kbcore.Assoc"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Assoc</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.arid">
+<tt class="descname">arid</tt><a class="headerlink" href="#pisces.io.sac.Assoc.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.azdef">
+<tt class="descname">azdef</tt><a class="headerlink" href="#pisces.io.sac.Assoc.azdef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.azres">
+<tt class="descname">azres</tt><a class="headerlink" href="#pisces.io.sac.Assoc.azres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.belief">
+<tt class="descname">belief</tt><a class="headerlink" href="#pisces.io.sac.Assoc.belief" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.commid">
+<tt class="descname">commid</tt><a class="headerlink" href="#pisces.io.sac.Assoc.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.delta">
+<tt class="descname">delta</tt><a class="headerlink" href="#pisces.io.sac.Assoc.delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.emares">
+<tt class="descname">emares</tt><a class="headerlink" href="#pisces.io.sac.Assoc.emares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.esaz">
+<tt class="descname">esaz</tt><a class="headerlink" href="#pisces.io.sac.Assoc.esaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Assoc.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Assoc.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Assoc.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.orid">
+<tt class="descname">orid</tt><a class="headerlink" href="#pisces.io.sac.Assoc.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.phase">
+<tt class="descname">phase</tt><a class="headerlink" href="#pisces.io.sac.Assoc.phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.seaz">
+<tt class="descname">seaz</tt><a class="headerlink" href="#pisces.io.sac.Assoc.seaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.slodef">
+<tt class="descname">slodef</tt><a class="headerlink" href="#pisces.io.sac.Assoc.slodef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.slores">
+<tt class="descname">slores</tt><a class="headerlink" href="#pisces.io.sac.Assoc.slores" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Assoc.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.timedef">
+<tt class="descname">timedef</tt><a class="headerlink" href="#pisces.io.sac.Assoc.timedef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.timeres">
+<tt class="descname">timeres</tt><a class="headerlink" href="#pisces.io.sac.Assoc.timeres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.vmodel">
+<tt class="descname">vmodel</tt><a class="headerlink" href="#pisces.io.sac.Assoc.vmodel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Assoc.wgt">
+<tt class="descname">wgt</tt><a class="headerlink" href="#pisces.io.sac.Assoc.wgt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Event">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Event</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Event" title="pisces.schema.kbcore.Event"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Event</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.auth">
+<tt class="descname">auth</tt><a class="headerlink" href="#pisces.io.sac.Event.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.commid">
+<tt class="descname">commid</tt><a class="headerlink" href="#pisces.io.sac.Event.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.evid">
+<tt class="descname">evid</tt><a class="headerlink" href="#pisces.io.sac.Event.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.evname">
+<tt class="descname">evname</tt><a class="headerlink" href="#pisces.io.sac.Event.evname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Event.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Event.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Event.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Event.prefor">
+<tt class="descname">prefor</tt><a class="headerlink" href="#pisces.io.sac.Event.prefor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Instrument">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Instrument</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Instrument" title="pisces.schema.kbcore.Instrument"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Instrument</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.band">
+<tt class="descname">band</tt><a class="headerlink" href="#pisces.io.sac.Instrument.band" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.dfile">
+<tt class="descname">dfile</tt><a class="headerlink" href="#pisces.io.sac.Instrument.dfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.digital">
+<tt class="descname">digital</tt><a class="headerlink" href="#pisces.io.sac.Instrument.digital" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.dir">
+<tt class="descname">dir</tt><a class="headerlink" href="#pisces.io.sac.Instrument.dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Instrument.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Instrument.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.inid">
+<tt class="descname">inid</tt><a class="headerlink" href="#pisces.io.sac.Instrument.inid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.insname">
+<tt class="descname">insname</tt><a class="headerlink" href="#pisces.io.sac.Instrument.insname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.instype">
+<tt class="descname">instype</tt><a class="headerlink" href="#pisces.io.sac.Instrument.instype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Instrument.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.ncalib">
+<tt class="descname">ncalib</tt><a class="headerlink" href="#pisces.io.sac.Instrument.ncalib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.ncalper">
+<tt class="descname">ncalper</tt><a class="headerlink" href="#pisces.io.sac.Instrument.ncalper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.rsptype">
+<tt class="descname">rsptype</tt><a class="headerlink" href="#pisces.io.sac.Instrument.rsptype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Instrument.samprate">
+<tt class="descname">samprate</tt><a class="headerlink" href="#pisces.io.sac.Instrument.samprate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Origin">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Origin</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Origin" title="pisces.schema.kbcore.Origin"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Origin</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.algorithm">
+<tt class="descname">algorithm</tt><a class="headerlink" href="#pisces.io.sac.Origin.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.auth">
+<tt class="descname">auth</tt><a class="headerlink" href="#pisces.io.sac.Origin.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.commid">
+<tt class="descname">commid</tt><a class="headerlink" href="#pisces.io.sac.Origin.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.depdp">
+<tt class="descname">depdp</tt><a class="headerlink" href="#pisces.io.sac.Origin.depdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.depth">
+<tt class="descname">depth</tt><a class="headerlink" href="#pisces.io.sac.Origin.depth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.dtype">
+<tt class="descname">dtype</tt><a class="headerlink" href="#pisces.io.sac.Origin.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.etype">
+<tt class="descname">etype</tt><a class="headerlink" href="#pisces.io.sac.Origin.etype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.evid">
+<tt class="descname">evid</tt><a class="headerlink" href="#pisces.io.sac.Origin.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Origin.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Origin.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.grn">
+<tt class="descname">grn</tt><a class="headerlink" href="#pisces.io.sac.Origin.grn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.jdate">
+<tt class="descname">jdate</tt><a class="headerlink" href="#pisces.io.sac.Origin.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.lat">
+<tt class="descname">lat</tt><a class="headerlink" href="#pisces.io.sac.Origin.lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Origin.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.lon">
+<tt class="descname">lon</tt><a class="headerlink" href="#pisces.io.sac.Origin.lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.mb">
+<tt class="descname">mb</tt><a class="headerlink" href="#pisces.io.sac.Origin.mb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.mbid">
+<tt class="descname">mbid</tt><a class="headerlink" href="#pisces.io.sac.Origin.mbid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.ml">
+<tt class="descname">ml</tt><a class="headerlink" href="#pisces.io.sac.Origin.ml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.mlid">
+<tt class="descname">mlid</tt><a class="headerlink" href="#pisces.io.sac.Origin.mlid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.ms">
+<tt class="descname">ms</tt><a class="headerlink" href="#pisces.io.sac.Origin.ms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.msid">
+<tt class="descname">msid</tt><a class="headerlink" href="#pisces.io.sac.Origin.msid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.nass">
+<tt class="descname">nass</tt><a class="headerlink" href="#pisces.io.sac.Origin.nass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.ndef">
+<tt class="descname">ndef</tt><a class="headerlink" href="#pisces.io.sac.Origin.ndef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.ndp">
+<tt class="descname">ndp</tt><a class="headerlink" href="#pisces.io.sac.Origin.ndp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.orid">
+<tt class="descname">orid</tt><a class="headerlink" href="#pisces.io.sac.Origin.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.srn">
+<tt class="descname">srn</tt><a class="headerlink" href="#pisces.io.sac.Origin.srn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Origin.time">
+<tt class="descname">time</tt><a class="headerlink" href="#pisces.io.sac.Origin.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Site">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Site</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Site" title="pisces.schema.kbcore.Site"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Site</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.deast">
+<tt class="descname">deast</tt><a class="headerlink" href="#pisces.io.sac.Site.deast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.dnorth">
+<tt class="descname">dnorth</tt><a class="headerlink" href="#pisces.io.sac.Site.dnorth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.elev">
+<tt class="descname">elev</tt><a class="headerlink" href="#pisces.io.sac.Site.elev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Site.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Site.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.lat">
+<tt class="descname">lat</tt><a class="headerlink" href="#pisces.io.sac.Site.lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Site.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.lon">
+<tt class="descname">lon</tt><a class="headerlink" href="#pisces.io.sac.Site.lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.offdate">
+<tt class="descname">offdate</tt><a class="headerlink" href="#pisces.io.sac.Site.offdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.ondate">
+<tt class="descname">ondate</tt><a class="headerlink" href="#pisces.io.sac.Site.ondate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.refsta">
+<tt class="descname">refsta</tt><a class="headerlink" href="#pisces.io.sac.Site.refsta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Site.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.staname">
+<tt class="descname">staname</tt><a class="headerlink" href="#pisces.io.sac.Site.staname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Site.statype">
+<tt class="descname">statype</tt><a class="headerlink" href="#pisces.io.sac.Site.statype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Sitechan">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Sitechan</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Sitechan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Sitechan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Sitechan" title="pisces.schema.kbcore.Sitechan"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Sitechan</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.chan">
+<tt class="descname">chan</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.chanid">
+<tt class="descname">chanid</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.ctype">
+<tt class="descname">ctype</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.ctype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.descrip">
+<tt class="descname">descrip</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.descrip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.edepth">
+<tt class="descname">edepth</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.edepth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Sitechan.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Sitechan.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.hang">
+<tt class="descname">hang</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.hang" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.offdate">
+<tt class="descname">offdate</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.offdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.ondate">
+<tt class="descname">ondate</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.ondate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Sitechan.vang">
+<tt class="descname">vang</tt><a class="headerlink" href="#pisces.io.sac.Sitechan.vang" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.io.sac.Wfdisc">
+<em class="property">class </em><tt class="descclassname">pisces.io.sac.</tt><tt class="descname">Wfdisc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#Wfdisc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.Wfdisc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pisces.schema.kbcore.html#pisces.schema.kbcore.Wfdisc" title="pisces.schema.kbcore.Wfdisc"><tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.kbcore.Wfdisc</span></tt></a></p>
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.calib">
+<tt class="descname">calib</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.calib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.calper">
+<tt class="descname">calper</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.calper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.chan">
+<tt class="descname">chan</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.chanid">
+<tt class="descname">chanid</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.clip">
+<tt class="descname">clip</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.clip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.commid">
+<tt class="descname">commid</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.datatype">
+<tt class="descname">datatype</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.datatype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.dfile">
+<tt class="descname">dfile</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.dfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.dir">
+<tt class="descname">dir</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.endtime">
+<tt class="descname">endtime</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.endtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.foff">
+<tt class="descname">foff</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.foff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.io.sac.Wfdisc.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.io.sac.Wfdisc.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.instype">
+<tt class="descname">instype</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.instype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.jdate">
+<tt class="descname">jdate</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.lddate">
+<tt class="descname">lddate</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.nsamp">
+<tt class="descname">nsamp</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.nsamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.samprate">
+<tt class="descname">samprate</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.samprate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.segtype">
+<tt class="descname">segtype</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.segtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.sta">
+<tt class="descname">sta</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.time">
+<tt class="descname">time</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.io.sac.Wfdisc.wfid">
+<tt class="descname">wfid</tt><a class="headerlink" href="#pisces.io.sac.Wfdisc.wfid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.affiliation2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">affiliation2sachdr</tt><big>(</big><em>af</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#affiliation2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.affiliation2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.arrival2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">arrival2sachdr</tt><big>(</big><em>ar</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#arrival2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.arrival2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.assoc2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">assoc2sachdr</tt><big>(</big><em>asc</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#assoc2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.assoc2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.event2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">event2sachdr</tt><big>(</big><em>evt</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#event2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.event2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.get_sac_reftime">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">get_sac_reftime</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#get_sac_reftime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.get_sac_reftime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get UTCDateTime object from sac header dict.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.instrument2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">instrument2sachdr</tt><big>(</big><em>ins</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#instrument2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.instrument2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.origin2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">origin2sachdr</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#origin2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.origin2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a fielded origin table record and produces a dictionary of
+corresponding sac header field/value pairs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.sachdr2reftime">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">sachdr2reftime</tt><big>(</big><em>hdr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#sachdr2reftime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.sachdr2reftime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SAC reference UTCDateTime from header dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.site2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">site2sachdr</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#site2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.site2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a fielded site table row and returns a dictionary of corresponding
+sac header field/value pairs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.sitechan2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">sitechan2sachdr</tt><big>(</big><em>sc</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#sitechan2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.sitechan2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tables2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tables2sachdr</tt><big>(</big><em>tables</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tables2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tables2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a sac header dictionary, including default values, from
+current table instances.  SAC reference time is, in order of availability,
+origin time (origin.time), first sample time (wfdisc.time).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2affiliation">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2affiliation</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2affiliation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2affiliation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2arrival">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2arrival</tt><big>(</big><em>tr</em>, <em>pickmap=None</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2arrival"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2arrival" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to tr2assoc, but produces a list of up to 10 Arrival
+instances.  Same header-&gt;phase mapping applies, unless otherwise stated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2assoc">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2assoc</tt><big>(</big><em>tr</em>, <em>pickmap=None</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2assoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2assoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a sac header dictionary, and produces a list of up to 10 
+Assoc instances. Header-&gt;phase mappings follow SAC2000, i.e.:</p>
+<ul class="simple">
+<li>t0: P</li>
+<li>t1: Pn</li>
+<li>t2: Pg</li>
+<li>t3: S</li>
+<li>t4: Sn</li>
+<li>t5: Sg</li>
+<li>t6: Lg</li>
+<li>t7: LR</li>
+<li>t8: Rg</li>
+<li>t9: pP</li>
+</ul>
+<p>An alternate mapping for some or all picks can be supplied, however, 
+as a dictionary of strings in the above form.</p>
+<p>Note: arid values will not be filled in, so do:
+&gt;&gt;&gt; for assoc in kbio.tables[&#8216;assoc&#8217;]:</p>
+<blockquote>
+<div>assoc.arid = lastarid+1
+lastarid += 1</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2event">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2event</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2instrument">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2instrument</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2origin">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2origin</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a sac header dictionary, get a filled origin table instance.
+A few things:
+1) If sac reference time isn&#8217;t event-based, origin time is unknown
+2) magnitude is taken first from hdr[&#8216;mag&#8217;], hdr[&#8216;imagtyp&#8217;] if defined,</p>
+<blockquote>
+<div>then replaced by hdr[&#8216;user0&#8217;],hdr[&#8216;kuser0&#8217;]</div></blockquote>
+<ol class="arabic simple" start="3">
+<li>sac moment, duration, and user-defined magnitude headers aren&#8217;t
+put into the origin table</li>
+<li>origin.auth is taken first from hdr[&#8216;imagsrc&#8217;], then replaced by
+hdr[&#8216;kuser1&#8217;] if defined.  the imagsrc-&gt;auth translations are:</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>INEIC -&gt; ISC:NEIC</li>
+<li>IPDE -&gt; PDE</li>
+<li>IISC -&gt; ISC</li>
+<li>IBRK -&gt; ISC:BERK</li>
+<li>IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -&gt; unchanged</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2site">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2site</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide an ObsPy Trace, get a filled site table instance, using available
+header.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2sitechan">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2sitechan</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2sitechan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2sitechan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a sac header dictionary, get a filled sitechan table instance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.tr2wfdisc">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">tr2wfdisc</tt><big>(</big><em>tr</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#tr2wfdisc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.tr2wfdisc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce wfdisc kbcore table instance from sac header dictionary.
+Clearly this will be a skeleton instance, as the all-important &#8216;dir&#8217; and 
+&#8216;dfile&#8217; must be filled in later.</p>
+<p>Note: if you read a little-endian SAC file onto a big-endian machine, it
+seems that obspy.sac.sacio.SacIO.swap_byte_order has trouble.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.trace2tables">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">trace2tables</tt><big>(</big><em>tr</em>, <em>tables=None</em>, <em>schema='kbcore'</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#trace2tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.trace2tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scrape ObsPy Trace headers into database table dictionary.
+Null values in Trace headers are not returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tr: Obspy.core.Trace</strong></p>
+<p><strong>tables: list, optional</strong></p>
+<blockquote>
+<div><p>Table name strings to return. 
+Default, [&#8216;affiliation&#8217;, &#8216;arrival&#8217;, &#8216;assoc&#8217;, &#8216;event&#8217;, &#8216;instrument&#8217;,
+&#8216;origin&#8217;, &#8216;site&#8217;, &#8216;sitechan&#8217;, &#8216;wfdisc&#8217;]</p>
+</div></blockquote>
+<p><strong>schema: string, optional</strong></p>
+<blockquote>
+<div><p>&#8216;kbcore&#8217; or &#8216;css&#8217;.  Default: &#8216;kbcore&#8217;
+<strong>*Not yet implemented*</strong></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>Dictionary of table objects.  tables[&#8216;arrival&#8217;] and tables[&#8216;assoc&#8217;]
+return (possibly empty) _lists_ of table objects.  If only default 
+values are found for a table, it is omitted.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Some things must be checked or filled in before adding to a database:
+- affiliation.time, endtime
+- arrival.arid
+- assoc.orid, arid
+- event.prefor, evid
+- instrument.inid, dir, dfile, rsptype
+- site.ondate
+- sitechan.ondate, chanid
+- wfdisc.dir, dfile, foff, datetype, wfid</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.io.sac.wfdisc2sachdr">
+<tt class="descclassname">pisces.io.sac.</tt><tt class="descname">wfdisc2sachdr</tt><big>(</big><em>wf</em><big>)</big><a class="reference internal" href="_modules/pisces/io/sac.html#wfdisc2sachdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.io.sac.wfdisc2sachdr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pisces.io.readwaveform.html"
+                        title="previous chapter">pisces.io.readwaveform module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pisces.io.trace.html"
+                        title="next chapter">pisces.io.trace module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pisces.io.sac.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.io.trace.html" title="pisces.io.trace module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pisces.io.readwaveform.html" title="pisces.io.readwaveform module"
+             >previous</a> |</li>
+        <li><a href="index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.io.html" >pisces.io package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

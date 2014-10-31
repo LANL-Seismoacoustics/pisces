@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.schema.util &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pisces.schema.util</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="kn">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">DeclarativeMeta</span><span class="p">,</span> <span class="n">declarative_base</span>
+<span class="c">#from sqlalchemy.ext.declarative import DeferredReflection</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative.api</span> <span class="kn">import</span> <span class="n">_declarative_constructor</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c"># not &gt;0.8</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">_declarative_constructor</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">event</span>
+
+
+<div class="viewcode-block" id="copy_metadata"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.copy_metadata">[docs]</a><span class="k">def</span> <span class="nf">copy_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metadata_out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Copies tables to new metadata with new schema and/or name prefix.</span>
+
+<span class="sd">    To make a new database with the result, use metadata.create_all(engine).</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata_out</span><span class="p">:</span>
+        <span class="n">metadata_out</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">schema</span><span class="p">:</span>
+        <span class="n">metadata_out</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata_out</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">schema</span>
+
+    <span class="c"># assign new schema to tables</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">tometadata</span><span class="p">(</span><span class="n">metadata_out</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
+
+    <span class="c"># assign prefix to tables</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">metadata_out</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">name</span>
+        
+    <span class="k">return</span> <span class="n">metadata_out</span>
+
+</div>
+<div class="viewcode-block" id="get_infovals"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.get_infovals">[docs]</a><span class="k">def</span> <span class="nf">get_infovals</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get flattened values from column info dictionary for given metadata and </span>
+<span class="sd">    desired structure.</span>
+
+<span class="sd">    If key is not in column info, None is used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    colnames: list</span>
+<span class="sd">        Flattened column names.</span>
+<span class="sd">    vals: list</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pisces.schema.kbcore import Base</span>
+<span class="sd">    &gt;&gt;&gt; fields, defaults = get_infovals(Base.metadata, [&#39;site&#39;], &#39;default&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print defaults</span>
+<span class="sd">    [&#39;-&#39;, -1, 2286324, -999.0, -999.0, -999.0, &#39;-&#39;, &#39;-&#39;, &#39;-&#39;, -99999, -99999, &lt;built-in method now of type object at 0x100601060&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; print fields</span>
+<span class="sd">    [&#39;sta&#39;, &#39;ondate&#39;, &#39;offdate&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;staname&#39;, &#39;statype&#39;, &#39;refsta&#39;, &#39;dnorth&#39;, &#39;deast&#39;, &#39;lddate&#39;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: make this recursive?</span>
+    <span class="c"># TODO: make this more efficient.</span>
+
+    <span class="c"># cache all tables</span>
+    <span class="n">tabledct</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">itable</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">itable</span><span class="p">)</span> <span class="k">for</span> <span class="n">itable</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+    <span class="c"># cache all unique column info values in metadata in a dict</span>
+    <span class="n">colvaldct</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">colvaldct</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="n">structvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">colnames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tabledct</span><span class="p">:</span>
+            <span class="n">itabvals</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tabledct</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="n">structvals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">itabvals</span><span class="p">)</span>
+            <span class="n">colnames</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tabledct</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">colvaldct</span><span class="p">:</span>
+            <span class="n">structvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colvaldct</span><span class="p">[</span><span class="n">item</span><span class="p">])</span>
+            <span class="n">colnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">colnames</span><span class="p">,</span> <span class="n">structvals</span>
+</div>
+<div class="viewcode-block" id="attr_generate"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.attr_generate">[docs]</a><span class="k">def</span> <span class="nf">attr_generate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s">&#39;keyvalue&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorate a class that contains integer &#39;keyvalue&#39; id attribute with </span>
+<span class="sd">    a next() integer incrementing method.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If your ID instance is in a session, using .next() modifies it, and thus</span>
+<span class="sd">    stages it for updating upon the next session transaction (flush or commit).</span>
+<span class="sd">    This is bad if it is an existing table you don&#39;t have write privileges on.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; Lastid, = pisces.get_tables(session.bind, [&#39;lastid&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; Lastid = attr_generate(Lastid)</span>
+<span class="sd">    &gt;&gt;&gt; orid = Lastid(keyname=&#39;orid&#39;, keyvalue=1000)</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    1001</span>
+<span class="sd">    &gt;&gt;&gt; orid.keyvalue</span>
+<span class="sd">    1001</span>
+<span class="sd">    &gt;&gt;&gt; session.commit() #does nothing b/c orid wasn&#39;t added</span>
+<span class="sd">    &gt;&gt;&gt; orid = session.query(Lastid).filter(Lastid.keyname == &#39;orid&#39;).first()</span>
+<span class="sd">    &gt;&gt;&gt; orid.keyvalue</span>
+<span class="sd">    10</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    11</span>
+<span class="sd">    &gt;&gt;&gt; session.commit() #updates orid in the database</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set and return the next integer value of &#39;keyvalue&#39;.&quot;&quot;&quot;</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+    <span class="n">cls</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="nb">next</span>
+    <span class="k">return</span> <span class="n">cls</span>
+
+</div>
+<div class="viewcode-block" id="string_formatter"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.string_formatter">[docs]</a><span class="k">def</span> <span class="nf">string_formatter</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get string substitution formatter for given structure and schema.</span>
+<span class="sd">    </span>
+<span class="sd">    If you&#39;re looking for a write_flatfile function, this is it.  It takes</span>
+<span class="sd">    advantage of native python string formatting and file writing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    meta: sqlalchemy.MetaData </span>
+<span class="sd">        Columns in tables must have info={&#39;format&#39;: ?}</span>
+<span class="sd">    structure: iterable of str</span>
+<span class="sd">        Strings are known schema objects (tables, columns).</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fmt: str</span>
+<span class="sd">        String substitution formatter for provided structure within provided</span>
+<span class="sd">        schema.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; recs = session.query(Origin, sta.lat, sta.lon).limit(10).all()</span>
+<span class="sd">    &gt;&gt;&gt; fmt = string_formatter(meta.tables.values(), [&#39;origin&#39;, &#39;lat&#39;, &#39;lon&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; with open(&#39;origin_lat_lon.txt&#39;, &#39;w&#39;) as f:</span>
+<span class="sd">            for rec in recs:</span>
+<span class="sd">                f.write(fmt.format(rec))</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: rewrite to use get_infovals</span>
+    <span class="c"># XXX: fails with some structures</span>
+    <span class="c"># o = session.query(Origin).first()</span>
+    <span class="c"># string_formatter(KBBase.metadata, [&#39;lat&#39;,&#39;lon&#39;]).format(o) # fails</span>
+    <span class="c"># o = session.query(Origin.lat, Origin.lon).first()</span>
+    <span class="c"># string_formatter(KBBase.metadata, [&#39;lat&#39;,&#39;lon&#39;]).format(o) # succeeds</span>
+    <span class="n">tabledct</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">itable</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">itable</span><span class="p">)</span> <span class="k">for</span> <span class="n">itable</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+    <span class="n">colfmtdct</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">colfmtdct</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;format&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">structfmt</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tabledct</span><span class="p">:</span>
+            <span class="n">itabfmt</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;{{{}.{}:{}}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;format&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tabledct</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+            <span class="n">structfmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">itabfmt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">colfmtdct</span><span class="p">:</span>
+            <span class="n">structfmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;{{{}:{}}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">colfmtdct</span><span class="p">[</span><span class="n">item</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">structfmt</span><span class="p">)</span>
+
+<span class="c">## Methods for PiscesMeta ##</span></div>
+<span class="k">def</span> <span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a mapped table instance (a row).</span>
+
+<span class="sd">    Constructor accepts all correctly-ordered positional arguments for a table as a</span>
+<span class="sd">    sequence OR a subset of known keyword arguments.  None values replaced with </span>
+<span class="sd">    __table__ column info[&#39;default&#39;] value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: cache hidden properties line _positions, _types, _defaults, ...</span>
+    <span class="c">#    in get_tables?</span>
+    <span class="c"># XXX: fails if no column.info dictionary (schema=Base.metadata wasn&#39;t</span>
+    <span class="c">#   supplied).</span>
+    <span class="c"># XXX: perhaps None was the intended value</span>
+    <span class="c"># change init to accept any kwargs, but ignore unknown ones.</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Either positional or keyword arguments accepted.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Provide a position argument for each column.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ival</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+            <span class="n">dflt</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ival</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dflt</span><span class="p">,</span> <span class="s">&#39;__call__&#39;</span><span class="p">):</span>
+                    <span class="c">#handle callables, like datetime.datetime.now</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dflt</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dflt</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ival</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># use SQLA&#39;s keyword constructor, then replace Nones with values</span>
+        <span class="n">_declarative_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ival</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">col</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span> 
+                        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
+            <span class="n">dflt</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ival</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dflt</span><span class="p">,</span> <span class="s">&#39;__call__&#39;</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dflt</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dflt</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a schema-aware flat file row representation.&quot;&quot;&quot;</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">string_formatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># TODO: make this use the same mechanics as __getitem__</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class can be used by ``declarative_base``, to add an automatic</span>
+<span class="sd">    ``__repr__`` method to *all* subclasses of ``Base``. This ``__repr__`` </span>
+<span class="sd">    will represent values as::</span>
+<span class="sd"> </span>
+<span class="sd">        ClassName(pkey_1=value_1, pkey_2=value_2, ..., pkey_n=value_n)</span>
+<span class="sd"> </span>
+<span class="sd">    where ``pkey_1..pkey_n`` are the primary key columns of the mapped table</span>
+<span class="sd">    with the corresponding values.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Stolen and modified from http://foobar.lu/wp/2013/07 .</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># doesn&#39;t work for children of DeferredReflection</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[(</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> 
+              <span class="bp">self</span><span class="o">.</span><span class="n">__mapper__</span><span class="o">.</span><span class="n">primary_key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="s">&quot;{0}({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+        <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;{0}={1!r}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]))</span>
+
+
+<div class="viewcode-block" id="from_string"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.from_string">[docs]</a><span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">default_on_error</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a mapped table instance from correctly formatted flat file line.</span>
+
+<span class="sd">    Works with fixed-length fields, separated by a single whitespace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line: str</span>
+<span class="sd">        Flat file line (best to remove newline, but maybe not a problem).</span>
+<span class="sd">    default_on_error: list, optional</span>
+<span class="sd">        Supply a list of column names that return default values if they</span>
+<span class="sd">        produce an error during parsing (e.g. lddate).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError:  Can&#39;t properly parse the line.</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    default_on_error is useful for malformed fields, but it will also mask</span>
+<span class="sd">    other problems with line parsing. It&#39;s better to pre-process tables </span>
+<span class="sd">    to match the table specifications or catch exceptions and isolate </span>
+<span class="sd">    these lines.  </span>
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; with open(&#39;TA.site&#39;,&#39;r&#39;) as ffsite:</span>
+<span class="sd">            for line in ffsite:</span>
+<span class="sd">                isite = Site.from_string(line)</span>
+<span class="sd">    or</span>
+<span class="sd">    &gt;&gt;&gt; with open(&#39;TA.site&#39;,&#39;r&#39;) as ffsite:</span>
+<span class="sd">            for line in ffsite:</span>
+<span class="sd">                isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: use some sort of cached generator expression at load time for this?</span>
+    <span class="c"># TODO: check line length before proceeding.</span>
+    <span class="c"># TODO: write this as a separate importable function, and just wrap it here?</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">parser</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s">&#39;parse&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="n">w</span><span class="p">])</span>
+            <span class="c">#print &quot;{} &#39;{}&#39;&quot;.format(col, line[pos:pos+w])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c">#XXX: ValueError? any error?</span>
+            <span class="c"># remove this clause, in favor or error handling inside info[&#39;parse&#39;]</span>
+            <span class="k">if</span> <span class="n">default_on_error</span> <span class="ow">and</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">default_on_error</span><span class="p">:</span>
+                <span class="c"># None are converted to defaults during __init__</span>
+                <span class="c"># XXX: no it doesn&#39;t.  that&#39;d be nice, though.</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="c">#val = c.info[&#39;default&#39;]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;, column {}: &#39;{}&#39;, positions [{}:{}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="n">w</span><span class="p">],</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pos</span><span class="o">+</span><span class="n">w</span><span class="p">)</span>
+                <span class="c">#XXX: breaks for Python 3</span>
+                <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span>
+
+                <span class="c">#print(&quot;column: {}, value &#39;{}&#39;&quot;.format(c.name, line[pos:pos+w]))</span>
+                <span class="c">#raise e</span>
+        <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="n">w</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">vals</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="c"># this makes class instances behave like NumPy records</span>
+    <span class="c"># implements __iter__ behavior as a side-effect</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span> \
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_setitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    <span class="c"># this makes tables behave like NumPy records</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">i</span><span class="p">],</span> <span class="n">val</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># needed for _getitem__, i think</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; True if primary key values are all equal. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span> 
+                <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">primary_key</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">_update_schema</span><span class="p">(</span><span class="n">targs</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Put schema dict into __table_args__[-1].</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    targs: tuple</span>
+<span class="sd">        The initial __table_args__.</span>
+<span class="sd">    schema: str</span>
+<span class="sd">        The schema string for __table_args__[-1][&#39;schema&#39;].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    targsout : tuple</span>
+<span class="sd">        Ends in a dict containing {&#39;schema&#39;: schema}</span>
+<span class="sd">        Retains all other args.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: make this a generic &#39;_update_args&#39; function, so it can also be used </span>
+    <span class="c">#   with __mapper_args__</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># targs is a tuple ending in a dict</span>
+        <span class="n">targs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">})</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="c"># targs is a tuple not ending in a dict</span>
+            <span class="n">targs</span> <span class="o">=</span> <span class="n">targs</span> <span class="o">+</span> <span class="p">({</span><span class="s">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">},)</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="c"># targs is an empty tuple</span>
+            <span class="n">targs</span> <span class="o">=</span> <span class="p">({</span><span class="s">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">},)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c"># targs is a dict</span>
+        <span class="n">targs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">targs</span>
+
+
+<div class="viewcode-block" id="PiscesMeta"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.PiscesMeta">[docs]</a><span class="k">class</span> <span class="nc">PiscesMeta</span><span class="p">(</span><span class="n">DeclarativeMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clsname</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+        <span class="c">#if &#39;__abstract__&#39; in dct:</span>
+        <span class="c">#    # let normal abstract construction apply.</span>
+        <span class="c">#    # necessary?</span>
+        <span class="c">#    pass</span>
+        <span class="c">#else:</span>
+        <span class="c">#    # assign methods for child classes</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__init__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_init</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__str__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_str</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__repr__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_repr</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__getitem__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_getitem</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__setitem__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_setitem</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__len__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_len</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__eq__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_eq</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;from_string&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">from_string</span><span class="p">)</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s">&#39;_column_info_registry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># put schema into __table_args__, if present</span>
+        <span class="c"># see http://www.sqlalchemy.org/trac/ticket/2700 for a possibly</span>
+        <span class="c">#   better way to do this type of thing.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># schema-qualified __tablename__</span>
+            <span class="n">schema</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__tablename__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__tablename__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tablename</span>
+            <span class="c">#ipdb.set_trace()</span>
+            <span class="c"># add a new base in front, with the correct schema</span>
+            <span class="n">SchemaBase</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">))</span>
+            <span class="c"># copy the column registry into the new base, for DeferredReflection</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;_column_info_registry&#39;</span><span class="p">,</span> <span class="p">{}):</span>
+                    <span class="n">SchemaBase</span><span class="o">.</span><span class="n">_column_info_registry</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">_column_info_registry</span>
+            <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">SchemaBase</span><span class="p">,)</span> <span class="o">+</span> <span class="n">parents</span>
+            <span class="c">#dct[&#39;__table_args__&#39;] = _update_schema(dct[&#39;__table_args__&#39;], schema)</span>
+            <span class="c">#dct[&#39;__table_args__&#39;] = _update_schema(dct.get(&#39;__table_args__&#39;, ()), schema)</span>
+            <span class="c">#dct[&#39;__table_args__&#39;][-1].update({&#39;extend_existing&#39;: True})</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c"># no __tablename__, __table_args__</span>
+            <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c"># not schema-qualified</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PiscesMeta</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clsname</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span> 
+        <span class="c">#return DeclarativeMeta.__new__(cls, clsname, parents, dct) </span>
+        <span class="c">#return type.__new__(cls, clsname, parents, dct) </span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clsname</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PiscesMeta</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">clsname</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span> 
+        <span class="c"># store Column info dictionary in base._column_info_registry</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dct</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cls</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;_column_info_registry&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">info</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+
+<span class="c"># common parser functions for info[&#39;parser&#39;]</span>
+<span class="c"># these return None upon exception, which is later converted to info[&#39;default&#39;]</span></div>
+<div class="viewcode-block" id="parse_str"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.parse_str">[docs]</a><span class="k">def</span> <span class="nf">parse_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="parse_utf"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.parse_utf">[docs]</a><span class="k">def</span> <span class="nf">parse_utf</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Decode a utf-8 encoded string. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="parse_float"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.parse_float">[docs]</a><span class="k">def</span> <span class="nf">parse_float</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="parse_int"><a class="viewcode-back" href="../../../pisces.schema.util.html#pisces.schema.util.parse_int">[docs]</a><span class="k">def</span> <span class="nf">parse_int</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">None</span>
+
+
+<span class="c">#@event.listens_for(DeferredReflection, &quot;instrument_class&quot;, propagate=True)</span>
+<span class="c">#def process_primary_keys(mapper, cls):</span>
+<span class="c">#    &quot;&quot;&quot;Enforce __primary_keys__.</span>
+<span class="c">#</span>
+<span class="c">#    Overwrites cls.__mapper_args__ with a PrimaryKeyConstraint for all columns</span>
+<span class="c">#    named in cls.__primary_keys__.</span>
+<span class="c">#</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    #print &quot; Table: {}&quot;.format(repr(t))</span>
+<span class="c">#    #print &quot; __table_args__: {}&quot;.format(cls.__table_args__)</span>
+<span class="c">#    if hasattr(cls, &#39;__primary_keys__&#39;):</span>
+<span class="c">#        t = cls.__table__</span>
+<span class="c">#        if not all([key in t.primary_key.columns for key in cls.__primary_keys__]):</span>
+<span class="c">#            pkcols = [getattr(t.c, col) for col in cls.__primary_keys__]</span>
+<span class="c">#            #pk = sa.PrimaryKeyConstraint(*pkcols)</span>
+<span class="c">#            #pk = sa.PrimaryKeyConstraint(*cls.__primary_keys__)</span>
+<span class="c">#            #cls.__table_args__ = (pk,) + cls.__table_args__</span>
+<span class="c">#            #cls.__mapper_args__ = (pk,)</span>
+<span class="c">#            cls.__mapper_args__ = (sa.PrimaryKeyConstraint(*pkcols),)</span>
+<span class="c">#            # XXX: I don&#39;t know why the dictionary syntax doesn&#39;t work.</span>
+<span class="c">#            #cls.__mapper_args__ = {&#39;primary_key&#39;: pkcols}</span>
+<span class="c">#</span>
+<span class="c">#    # update __table__.columns with info dictionaries in base._column_info_registry</span>
+<span class="c">#    column_info = getattr(cls.__base__, &#39;_column_info_registry&#39;, None)</span>
+<span class="c">#    if column_info:</span>
+<span class="c">#        for c in cls.__table__.columns:</span>
+<span class="c">#            c.info.update(column_info.get(c.name, {}))</span>
+<span class="c">#</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

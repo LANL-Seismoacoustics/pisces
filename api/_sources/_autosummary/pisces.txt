@@ -1,0 +1,28 @@
+pisces
+======
+
+.. automodule:: pisces
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      copy_metadata
+      db_connect
+      get_tables
+      read_waveform
+      string_formatter
+      travel_times
+      wfdisc2trace
+   
+   
+
+   
+   
+   
+
+   
+   
+   

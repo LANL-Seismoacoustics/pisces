@@ -1,0 +1,664 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.request &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pisces.request</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">request.py</span>
+
+<span class="sd">Convenience functions for common queries.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span><span class="p">,</span> <span class="n">or_</span>
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">UTCDateTime</span>
+<span class="kn">import</span> <span class="nn">obspy.core.util.geodetics</span> <span class="kn">as</span> <span class="nn">geod</span>
+
+<span class="kn">from</span> <span class="nn">pisces.util</span> <span class="kn">import</span> <span class="n">db_connect</span><span class="p">,</span> <span class="n">make_same_size</span>
+<span class="kn">from</span> <span class="nn">pisces.io.trace</span> <span class="kn">import</span> <span class="n">wfdisc2trace</span>
+
+
+<div class="viewcode-block" id="get_wfdisc_rows"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_wfdisc_rows">[docs]</a><span class="k">def</span> <span class="nf">get_wfdisc_rows</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">wfdisc</span><span class="p">,</span> <span class="n">sta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">chan</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">t1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">t2</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                    <span class="n">wfids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">daylong</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a list of wfdisc records from provided SQLAlchemy ORM mapped</span>
+<span class="sd">    wfdisc table, for given station, channel, and time window combination.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session: bound session instance</span>
+<span class="sd">    wfdisc: SQLAlchemy mapped wfdisc table</span>
+<span class="sd">    sta, chan, : str, optional</span>
+<span class="sd">        station, channel strings, </span>
+<span class="sd">    t1, t2 : int, optional</span>
+<span class="sd">        Epoch time window of interest (seconds)</span>
+<span class="sd">        Actually searches for wfdisc.time between t1-86400 and t2 and </span>
+<span class="sd">        wfdisc.endtime &gt; t1</span>
+<span class="sd">    wfids : list of integers, optional </span>
+<span class="sd">        wfid integers. Obviates other arguments.</span>
+<span class="sd">    daylong : bool, optional</span>
+<span class="sd">        If True, uses a slightly different time query for best results.</span>
+<span class="sd">        Not yet implemented (is currently the default behavior).</span>
+<span class="sd">    asquery : bool, optional</span>
+<span class="sd">        Return the query object instead of the results.  Default, False.</span>
+<span class="sd">        Useful if additional you desire additional sorting of filtering.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Print request to the stdout. Not used with asquery=True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of wfdisc row objects, or sqlalchemy.orm.Query instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">wfdisc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">wfids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">wfid</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">wfids</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="n">sta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chan</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">chan</span> <span class="o">==</span> <span class="n">chan</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="mi">86400</span><span class="p">,</span> <span class="n">t2</span><span class="p">))</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">endtime</span> <span class="o">&gt;</span> <span class="n">t1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">t1</span><span class="o">-</span><span class="mi">86400</span><span class="p">)</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">endtime</span> <span class="o">&gt;</span> <span class="n">t1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">wfdisc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">t2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">asquery</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Requesting sta={}, chan={}, time=[{}, {}], wfids={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="n">t1</span><span class="p">),</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="n">t2</span><span class="p">),</span> <span class="n">wfids</span><span class="p">))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+</div>
+<div class="viewcode-block" id="distaz_query"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.distaz_query">[docs]</a><span class="k">def</span> <span class="nf">distaz_query</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Out-of-database subset based on distances and/or azimuths.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    records : iterable of objects with lat, lon attribute floats</span>
+<span class="sd">        Target of the subset.</span>
+<span class="sd">    deg : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr)</span>
+<span class="sd">        minr, maxr in degrees or None for unconstrained.</span>
+<span class="sd">    km : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr)</span>
+<span class="sd">        minr, maxr in km or None for unconstrained.</span>
+<span class="sd">    swath : list or tuple of numbers, optional</span>
+<span class="sd">        (lat, lon, azimuth, tolerance)</span>
+<span class="sd">        Azimuth (from North) +/-tolerance from lat,lon point in degrees.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Subset of supplied records.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#initial True array to propagate through multiple logical AND comparisons</span>
+    <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">deg</span><span class="p">:</span>
+        <span class="n">dgen</span> <span class="o">=</span> <span class="p">(</span><span class="n">geod</span><span class="o">.</span><span class="n">locations2degrees</span><span class="p">(</span><span class="n">irec</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">irec</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">deg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">deg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> \
+                <span class="k">for</span> <span class="n">irec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">)</span>
+        <span class="n">degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">dgen</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">deg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">deg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">degrees</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">deg</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">deg</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">degrees</span><span class="p">)</span>
+
+        <span class="c">#mask0 = np.logical_and(mask0, mask)</span>
+
+    <span class="k">if</span> <span class="n">km</span><span class="p">:</span>
+        <span class="c">#???: this may be backwards</span>
+        <span class="n">mgen</span> <span class="o">=</span> <span class="p">(</span><span class="n">geod</span><span class="o">.</span><span class="n">gps2DistAzimuth</span><span class="p">(</span><span class="n">irec</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">irec</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">km</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">km</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> \
+                  <span class="k">for</span> <span class="n">irec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">)</span>
+        <span class="n">kilometers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">mgen</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">/</span><span class="mf">1e3</span>
+        <span class="c">#meters, azs, bazs = zip(*valgen)</span>
+        <span class="c">#kilometers = np.array(meters)/1e3</span>
+        <span class="k">if</span> <span class="n">km</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">km</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">kilometers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">km</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">km</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">kilometers</span><span class="p">)</span>
+
+        <span class="c">#mask0 = np.logical_and(mask0, mask)</span>
+
+    <span class="k">if</span> <span class="n">swath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">minaz</span> <span class="o">=</span> <span class="n">swath</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">swath</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">maxaz</span> <span class="o">=</span> <span class="n">swath</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">swath</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="c">#???: this may be backwards</span>
+        <span class="n">azgen</span> <span class="o">=</span> <span class="p">(</span><span class="n">geod</span><span class="o">.</span><span class="n">gps2DistAzimuth</span><span class="p">(</span><span class="n">irec</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">irec</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">km</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">km</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span> \
+                 <span class="k">for</span> <span class="n">irec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">)</span>
+        <span class="n">azimuths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">azgen</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">azimuths</span> <span class="o">&gt;=</span> <span class="n">minaz</span><span class="p">)</span>
+        <span class="n">mask0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask0</span><span class="p">,</span> <span class="n">azimuths</span> <span class="o">&lt;=</span> <span class="n">maxaz</span><span class="p">)</span>
+
+    <span class="c">#idx = np.nonzero(np.atleast_1d(mask0))[0] ???</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="p">[</span><span class="n">records</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">recs</span>
+
+</div>
+<div class="viewcode-block" id="geographic_query"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.geographic_query">[docs]</a><span class="k">def</span> <span class="nf">geographic_query</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filter by region (W, E, S, N) [deg] and/or depth range (min, max) [km].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+        <span class="c">#(W,E,S,N)</span>
+        <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lon</span> <span class="o">&gt;</span> <span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lon</span> <span class="o">&lt;</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">region</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lat</span> <span class="o">&gt;</span> <span class="n">region</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">lat</span> <span class="o">&lt;</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">depth</span><span class="p">:</span>
+        <span class="c">#(mindep,maxdep)</span>
+        <span class="k">if</span> <span class="n">depth</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">depth</span> <span class="o">&lt;=</span> <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">asquery</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+</div>
+<div class="viewcode-block" id="netstachan_query"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.netstachan_query">[docs]</a><span class="k">def</span> <span class="nf">netstachan_query</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">networks</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="time_query"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.time_query">[docs]</a><span class="k">def</span> <span class="nf">time_query</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">daylong</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="get_events"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_events">[docs]</a><span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">swath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">etime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">evids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">prefor</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build common queries for events.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session instance</span>
+<span class="sd">        Must be bound.</span>
+<span class="sd">    origin : mapped Origin table class</span>
+<span class="sd">    event : mapped Event table class, optional</span>
+<span class="sd">    region : list or tuple of numbers, optional</span>
+<span class="sd">        (W, E, S, N) in degrees. Default, None.</span>
+<span class="sd">    deg : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr) . Default, None.</span>
+<span class="sd">        minr, maxr in degrees or None for unconstrained.</span>
+<span class="sd">    km : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr)  Default, None.</span>
+<span class="sd">        minr, maxr in km or None for unconstrained.</span>
+<span class="sd">    swath : list or tuple of numbers, optional</span>
+<span class="sd">        (lat, lon, azimuth, tolerance)</span>
+<span class="sd">        Azimuth (from North) +/-tolerance from lat,lon point in degrees.</span>
+<span class="sd">        Not yet implemented.</span>
+<span class="sd">    mag : dict, optional</span>
+<span class="sd">        {&#39;type1&#39;: [min1, max1], &#39;type2&#39;: [min2, max2], ...}</span>
+<span class="sd">        &#39;type&#39; can be &#39;mb&#39;, &#39;ms&#39;, or &#39;ml&#39;.  Produces OR clauses.</span>
+<span class="sd">    depth : tuple or list, optional</span>
+<span class="sd">        Depth interval [mindep, maxdep] in km.</span>
+<span class="sd">        Use None for an unconstrained limit.</span>
+<span class="sd">    etime : tuple or list, optional</span>
+<span class="sd">        (tstart, tend) epoch event time window</span>
+<span class="sd">        Use None for an unconstrained limit.</span>
+<span class="sd">    orids, evids : list or tuple of int, optional</span>
+<span class="sd">        orid, evid numbers &lt; 1000 in length</span>
+<span class="sd">        Evids requires event table.</span>
+<span class="sd">    prefor : bool, optional</span>
+<span class="sd">        Return preferred origins only. Default False.  Requires event table</span>
+<span class="sd">        be provided.</span>
+<span class="sd">    asquery : bool, optional</span>
+<span class="sd">        Return the query object instead of the results.  Default, False.</span>
+<span class="sd">        Useful if additional you desire additional sorting of filtering, or</span>
+<span class="sd">        if you have your own in-database geographic query function(s).  If </span>
+<span class="sd">        supplied, deg, km, and/or swath are ignored in the returned query.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sqlalchemy.orm.Query instance</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Each keyword argument corresponds to an AND clause, except &#39;mag&#39; which</span>
+<span class="sd">    returns OR clauses.  Don&#39;t submit a request containing both &#39;evids&#39; and</span>
+<span class="sd">    &#39;orids&#39; unless you want them joined by an AND clause.  Otherwise process</span>
+<span class="sd">    them individually, then collate and unique them afterwards.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Origin</span> <span class="o">=</span> <span class="n">origin</span>
+    <span class="n">Event</span> <span class="o">=</span> <span class="n">event</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">etime</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">orids</span><span class="p">:</span>
+        <span class="c">#[orid1,orid2,...]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">orid</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">orids</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">mag</span><span class="p">:</span>
+        <span class="c">#TODO: use list comprehension</span>
+        <span class="n">magclause</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">magtype</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">mag</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">magclause</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Origin</span><span class="p">,</span> <span class="n">magtype</span><span class="p">)</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">or_</span><span class="p">(</span><span class="o">*</span><span class="n">magclause</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">evids</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">evid</span> <span class="o">==</span> <span class="n">Event</span><span class="o">.</span><span class="n">evid</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Event</span><span class="o">.</span><span class="n">evid</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">evids</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">prefor</span><span class="p">:</span>
+        <span class="c">#q = q.join(Event,Origin.evid==Event.evid)</span>
+        <span class="c">#q = q.add_columns(Origin.evid)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">orid</span><span class="o">==</span><span class="n">Event</span><span class="o">.</span><span class="n">prefor</span><span class="p">)</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">geographic_query</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">Origin</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">asquery</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">distaz_query</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="n">km</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="n">swath</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+ 
+</div>
+<div class="viewcode-block" id="get_stations"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_stations">[docs]</a><span class="k">def</span> <span class="nf">get_stations</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">sitechan</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">affiliation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nets</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">swath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build common queries for stations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session instance</span>
+<span class="sd">        Must be bound.</span>
+<span class="sd">    site : mapped Site table class</span>
+<span class="sd">    sitechan : mapped Sitechan table class, optional</span>
+<span class="sd">    affiliation : mapped Affiliation table class, optional</span>
+<span class="sd">    stations : list or tuple of strings</span>
+<span class="sd">        Desired station code strings.</span>
+<span class="sd">    channels, nets : list or tuple of strings, or single regex string, optional</span>
+<span class="sd">        Desired channel, network code strings or regex</span>
+<span class="sd">    loc : list/tuple, optional</span>
+<span class="sd">        Location code.</span>
+<span class="sd">        Not yet implemented.</span>
+<span class="sd">    region : tuple or list of numbers, optional</span>
+<span class="sd">        Geographic (W,E,S,N) in degrees, None values for unconstrained.</span>
+<span class="sd">    deg : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr)</span>
+<span class="sd">        minr, maxr in degrees or None for unconstrained.</span>
+<span class="sd">    km : list or tuple of numbers, optional</span>
+<span class="sd">        (centerlat, centerlon, minr, maxr)</span>
+<span class="sd">        minr, maxr in km or None for unconstrained.</span>
+<span class="sd">    swath : list or tuple of numbers, optional</span>
+<span class="sd">        (lat, lon, azimuth, tolerance)</span>
+<span class="sd">        Azimuth (from North) +/-tolerance from lat,lon point in degrees.</span>
+<span class="sd">        Currently only works in gnem Oracle.</span>
+<span class="sd">    asquery : bool, optional</span>
+<span class="sd">        Return the query object instead of the results.  Default, False.</span>
+<span class="sd">        Useful if additional you desire additional sorting of filtering, or</span>
+<span class="sd">        if you have your own in-database geographic query function(s).  If </span>
+<span class="sd">        supplied, deg, km, and/or swath are ignored in the returned query.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Each parameter produces an AND clause, list parameters produce IN </span>
+<span class="sd">    clauses, a regex produces a REGEXP_LIKE clause (Oracle-specific?).</span>
+
+<span class="sd">    deg, km, and swath are evaluated out-of-database by evaluating all other </span>
+<span class="sd">    flags first, then masking.  This can be memory-intensive.  See &quot;Examples&quot;</span>
+<span class="sd">    for how to perform in-database distance filters.</span>
+<span class="sd">    </span>
+<span class="sd">    To include channels or networks with your results use asquery=True, and</span>
+
+<span class="sd">    &gt;&gt;&gt; q = q.add_columns(Sitechan.chan)</span>
+<span class="sd">    &gt;&gt;&gt; q = q.add_columns(Affiliation.net)</span>
+
+<span class="sd">    with the returned query.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Use your own in-database distance query function &quot;km_from_point&quot;:</span>
+
+<span class="sd">    &gt;&gt;&gt; from sqlalchemy import func</span>
+<span class="sd">    &gt;&gt;&gt; q = get_stations(session, site, channels=[&#39;BHZ&#39;], region=(65,75,30,40), asquery=True)</span>
+<span class="sd">    &gt;&gt;&gt; stations = q.filter(func.km_from_point(site.lat, site.lon, 40, -110) &lt; 100).all()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#XXX: remove dependency on func.regexp_like</span>
+    <span class="n">Site</span> <span class="o">=</span> <span class="n">site</span>
+    <span class="n">Sitechan</span> <span class="o">=</span> <span class="n">sitechan</span>
+    <span class="n">Affiliation</span> <span class="o">=</span> <span class="n">affiliation</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">deg</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">stime</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Site</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">stations</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">sta</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">nets</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Affiliation</span><span class="p">,</span> <span class="n">Affiliation</span><span class="o">.</span><span class="n">sta</span><span class="o">==</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nets</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Affiliation</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">nets</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp_like</span><span class="p">(</span><span class="n">Affiliation</span><span class="o">.</span><span class="n">net</span><span class="p">,</span> <span class="n">nets</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Sitechan</span><span class="p">,</span> <span class="n">Sitechan</span><span class="o">.</span><span class="n">sta</span><span class="o">==</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chans</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c">#interpret string as regexp</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp_like</span><span class="p">(</span><span class="n">Sitechan</span><span class="o">.</span><span class="n">chan</span><span class="p">,</span> <span class="n">channnels</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Sitechan</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+    
+    <span class="n">q</span> <span class="o">=</span> <span class="n">geographic_query</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">Site</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">asquery</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">distaz_query</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="n">km</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="n">swath</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+</div>
+<div class="viewcode-block" id="get_arrivals"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_arrivals">[docs]</a><span class="k">def</span> <span class="nf">get_arrivals</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">arrival</span><span class="p">,</span> <span class="n">assoc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">atime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">arids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">asquery</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build common queries for arrivals.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stations, channels : list or tuple of strings</span>
+<span class="sd">        Desired station, channel strings.</span>
+<span class="sd">    arrival: mapped Arrival table class</span>
+<span class="sd">    assoc: mapped Assoc table class, optional</span>
+<span class="sd">    atime : tuple or list of float, optional</span>
+<span class="sd">        (tstart, tend) epoch arrival time window. Either can be None.</span>
+<span class="sd">    phases: list or tuple of strings</span>
+<span class="sd">        Arrival &#39;iphase&#39;.</span>
+<span class="sd">    arids : list of integers</span>
+<span class="sd">        Desired arid numbers.</span>
+<span class="sd">    orids : list of integers</span>
+<span class="sd">        orids from which associated arrivals will be returned. Requires Assoc</span>
+<span class="sd">        table.</span>
+<span class="sd">    auth : list/tuple of strings</span>
+<span class="sd">        Arrival author list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list or sqlalchemy.orm.Query instance</span>
+<span class="sd">        Arrival results.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Each argument adds an AND clause to the SQL query.</span>
+<span class="sd">    Unspecified (keyword) arguments are treated as wildcards.  That is, no</span>
+<span class="sd">    arguments means, &quot;give me all arrivals everywhere ever.&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Arrival</span> <span class="o">=</span> <span class="n">arrival</span>
+    <span class="n">Assoc</span> <span class="o">=</span> <span class="n">assoc</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">atime</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Arrival</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">stations</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">stations</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">phase</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">iphase</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">phase</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">arids</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">arid</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">arids</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">orids</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">arid</span><span class="o">==</span><span class="n">Assoc</span><span class="o">.</span><span class="n">arid</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Assoc</span><span class="o">.</span><span class="n">orid</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">orids</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">auth</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Arrival</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">auth</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">asquery</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+</div>
+<div class="viewcode-block" id="get_waveforms"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_waveforms">[docs]</a><span class="k">def</span> <span class="nf">get_waveforms</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">wfdisc</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">endtime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wfids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get waveforms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session instance</span>
+<span class="sd">        Must be bound.</span>
+<span class="sd">    wfdisc : mapped Wfdisc table class</span>
+<span class="sd">    station, channel : str, optional</span>
+<span class="sd">        Desired station, channel code strings</span>
+<span class="sd">    starttimes, endtimes : float, optional</span>
+<span class="sd">        Epoch start times, end times.  </span>
+<span class="sd">        Traces will be cut to these times.</span>
+<span class="sd">    wfids : iterable of int, optional</span>
+<span class="sd">        Wfdisc wfids.  Obviates the above arguments and just returns full Wfdisc</span>
+<span class="sd">        row waveforms.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obspy.Stream</span>
+<span class="sd">        Traces are merged and cut to requested times.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#TODO: add evids= option?, use with stawin= option in .execute method?</span>
+    <span class="c">#TODO: implement get_arrivals if arrivals=True</span>
+    <span class="n">Wfdisc</span> <span class="o">=</span> <span class="n">wfdisc</span>
+
+    <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wfids</span><span class="p">:</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">starttime</span><span class="p">)</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">endtime</span><span class="p">)</span>
+        <span class="n">sta</span> <span class="o">=</span> <span class="n">station</span>
+        <span class="n">chan</span> <span class="o">=</span> <span class="n">channel</span>
+
+        <span class="n">t1_utc</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t1</span><span class="p">))</span>
+        <span class="n">t2_utc</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t2</span><span class="p">))</span>
+
+        <span class="n">wfs</span> <span class="o">=</span> <span class="n">get_wfdisc_rows</span><span class="p">(</span><span class="n">Wfdisc</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">sta</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+
+        <span class="c">#TODO: do arrival stuff here</span>
+        <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">wfs</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="n">wfdisc2trace</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+                <span class="n">tr</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">t1_utc</span><span class="p">,</span> <span class="n">t2_utc</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c">#tr is None b/c data couldn&#39;t be read</span>
+                <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wfs</span> <span class="o">=</span> <span class="n">get_wfdisc_rows</span><span class="p">(</span><span class="n">Wfdisc</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">wfids</span><span class="o">=</span><span class="n">wfids</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">wfs</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="n">wfdisc2trace</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">st</span>
+
+</div>
+<div class="viewcode-block" id="get_ids"><a class="viewcode-back" href="../../pisces.request.html#pisces.request.get_ids">[docs]</a><span class="k">def</span> <span class="nf">get_ids</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">lastid</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">detach</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get or create lastid rows.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.session instance, bound</span>
+<span class="sd">    lastid : sqlalchemy orm mapped lastid table</span>
+<span class="sd">    ids : list</span>
+<span class="sd">        Desired lastid keyname strings.</span>
+<span class="sd">    detach : bool, optional</span>
+<span class="sd">        If True, expunge results from session before returning.</span>
+<span class="sd">        Useful if you don&#39;t have permission on lastid, and don&#39;t want</span>
+<span class="sd">        session commits to throw a permission error.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Corresponding existing or new rows from lastid table.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Keyvalue is 0 if id name not present in lastid table.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idname</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">iid</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">lastid</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">lastid</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="n">idname</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">iid</span><span class="p">:</span>
+            <span class="n">iid</span> <span class="o">=</span> <span class="n">lastid</span><span class="p">(</span><span class="n">keyname</span><span class="o">=</span><span class="n">idname</span><span class="p">,</span> <span class="n">keyvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iid</span><span class="o">.</span><span class="n">keyvalue</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">detach</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">expunge_all</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

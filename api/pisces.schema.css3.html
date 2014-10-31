@@ -1,0 +1,2291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.schema.css3 module &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="index.html" />
+    <link rel="up" title="pisces.schema package" href="pisces.schema.html" />
+    <link rel="next" title="pisces.schema.kbcore module" href="pisces.schema.kbcore.html" />
+    <link rel="prev" title="pisces.schema package" href="pisces.schema.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.kbcore.html" title="pisces.schema.kbcore module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.html" title="pisces.schema package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.schema.html" accesskey="U">pisces.schema package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pisces.schema.css3">
+<span id="pisces-schema-css3-module"></span><h1>pisces.schema.css3 module<a class="headerlink" href="#module-pisces.schema.css3" title="Permalink to this headline">¶</a></h1>
+<p>Center for Seismic Studies relational database schema 3.0 (CSS3.0)</p>
+<dl class="class">
+<dt id="pisces.schema.css3.Affiliation">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Affiliation</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Affiliation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Affiliation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Affiliation.endtime">
+<tt class="descname">endtime</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Affiliation.endtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Affiliation.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Affiliation.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Affiliation.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Affiliation.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Affiliation.net">
+<tt class="descname">net</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Affiliation.net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Affiliation.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Affiliation.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Affiliation.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Affiliation.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Amplitude">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Amplitude</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.amp">
+<tt class="descname">amp</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.ampid">
+<tt class="descname">ampid</tt><em class="property"> = Column(None, Integer(), table=None, nullable=False)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.ampid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.amptime">
+<tt class="descname">amptime</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.amptime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.amptype">
+<tt class="descname">amptype</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.amptype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.arid">
+<tt class="descname">arid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.chan">
+<tt class="descname">chan</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.clip">
+<tt class="descname">clip</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.clip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.deltaf">
+<tt class="descname">deltaf</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.deltaf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.duration">
+<tt class="descname">duration</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Amplitude.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Amplitude.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.inarrival">
+<tt class="descname">inarrival</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.inarrival" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.parid">
+<tt class="descname">parid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.parid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.per">
+<tt class="descname">per</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.per" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.snr">
+<tt class="descname">snr</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.snr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Amplitude.units">
+<tt class="descname">units</tt><em class="property"> = Column(None, String(length=15), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Amplitude.units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Arrival">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Arrival</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Arrival"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Arrival" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.amp">
+<tt class="descname">amp</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.arid">
+<tt class="descname">arid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.azimuth">
+<tt class="descname">azimuth</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.azimuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.chan">
+<tt class="descname">chan</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.chanid">
+<tt class="descname">chanid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.clip">
+<tt class="descname">clip</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.clip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.delaz">
+<tt class="descname">delaz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.delaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.delslo">
+<tt class="descname">delslo</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.delslo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.deltim">
+<tt class="descname">deltim</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.deltim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.ema">
+<tt class="descname">ema</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.ema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.fm">
+<tt class="descname">fm</tt><em class="property"> = Column(None, String(length=2), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.fm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Arrival.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Arrival.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.iphase">
+<tt class="descname">iphase</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.iphase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.jdate">
+<tt class="descname">jdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Arrival.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.logat">
+<tt class="descname">logat</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.logat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.per">
+<tt class="descname">per</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.per" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.qual">
+<tt class="descname">qual</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.qual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.rect">
+<tt class="descname">rect</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.rect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.slow">
+<tt class="descname">slow</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.slow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.snr">
+<tt class="descname">snr</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.snr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.stassid">
+<tt class="descname">stassid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.stassid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.stype">
+<tt class="descname">stype</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.stype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Arrival.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Arrival.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Assoc">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Assoc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Assoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Assoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.arid">
+<tt class="descname">arid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.azdef">
+<tt class="descname">azdef</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.azdef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.azres">
+<tt class="descname">azres</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.azres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.belief">
+<tt class="descname">belief</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.belief" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.delta">
+<tt class="descname">delta</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.emares">
+<tt class="descname">emares</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.emares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.esaz">
+<tt class="descname">esaz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.esaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Assoc.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Assoc.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Assoc.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.orid">
+<tt class="descname">orid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.phase">
+<tt class="descname">phase</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.seaz">
+<tt class="descname">seaz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.seaz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.slodef">
+<tt class="descname">slodef</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.slodef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.slores">
+<tt class="descname">slores</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.slores" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.timedef">
+<tt class="descname">timedef</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.timedef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.timeres">
+<tt class="descname">timeres</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.timeres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.vmodel">
+<tt class="descname">vmodel</tt><em class="property"> = Column(None, String(length=15), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.vmodel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Assoc.wgt">
+<tt class="descname">wgt</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Assoc.wgt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Event">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Event</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Event.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Event.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.evid">
+<tt class="descname">evid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Event.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.evname">
+<tt class="descname">evname</tt><em class="property"> = Column(None, String(length=32), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Event.evname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Event.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Event.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Event.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Event.prefor">
+<tt class="descname">prefor</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Event.prefor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Gregion">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Gregion</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Gregion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Gregion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Gregion.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Gregion.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Gregion.grn">
+<tt class="descname">grn</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Gregion.grn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Gregion.grname">
+<tt class="descname">grname</tt><em class="property"> = Column(None, String(length=40), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Gregion.grname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Gregion.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Gregion.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Instrument">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Instrument</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.band">
+<tt class="descname">band</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.band" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.dfile">
+<tt class="descname">dfile</tt><em class="property"> = Column(None, String(length=32), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.dfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.digital">
+<tt class="descname">digital</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.digital" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.dir">
+<tt class="descname">dir</tt><em class="property"> = Column(None, String(length=64), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Instrument.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Instrument.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.inid">
+<tt class="descname">inid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.inid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.insname">
+<tt class="descname">insname</tt><em class="property"> = Column(None, String(length=50), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.insname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.instype">
+<tt class="descname">instype</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.instype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Instrument.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.ncalib">
+<tt class="descname">ncalib</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.ncalib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.ncalper">
+<tt class="descname">ncalper</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.ncalper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.rsptype">
+<tt class="descname">rsptype</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.rsptype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Instrument.samprate">
+<tt class="descname">samprate</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Instrument.samprate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Lastid">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Lastid</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Lastid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Lastid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Lastid.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Lastid.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Lastid.keyname">
+<tt class="descname">keyname</tt><em class="property"> = Column(None, String(length=15), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Lastid.keyname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Lastid.keyvalue">
+<tt class="descname">keyvalue</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Lastid.keyvalue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Lastid.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Lastid.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Netmag">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Netmag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Netmag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Netmag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.evid">
+<tt class="descname">evid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Netmag.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Netmag.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Netmag.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.magid">
+<tt class="descname">magid</tt><em class="property"> = Column(None, Integer(), table=None, nullable=False)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.magid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.magnitude">
+<tt class="descname">magnitude</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.magtype">
+<tt class="descname">magtype</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.magtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.net">
+<tt class="descname">net</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.nsta">
+<tt class="descname">nsta</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.nsta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.orid">
+<tt class="descname">orid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Netmag.uncertainty">
+<tt class="descname">uncertainty</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Netmag.uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Network">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Network</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Network.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Network.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Network.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Network.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Network.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.net">
+<tt class="descname">net</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Network.net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.netname">
+<tt class="descname">netname</tt><em class="property"> = Column(None, String(length=80), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Network.netname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Network.nettype">
+<tt class="descname">nettype</tt><em class="property"> = Column(None, String(length=4), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Network.nettype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Origerr">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Origerr</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Origerr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Origerr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.conf">
+<tt class="descname">conf</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.conf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Origerr.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Origerr.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Origerr.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.orid">
+<tt class="descname">orid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sdepth">
+<tt class="descname">sdepth</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sdepth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sdobs">
+<tt class="descname">sdobs</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sdobs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.smajax">
+<tt class="descname">smajax</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.smajax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sminax">
+<tt class="descname">sminax</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sminax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.stime">
+<tt class="descname">stime</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.stime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.strike">
+<tt class="descname">strike</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.strike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.stt">
+<tt class="descname">stt</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.stt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.stx">
+<tt class="descname">stx</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.stx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sty">
+<tt class="descname">sty</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.stz">
+<tt class="descname">stz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.stz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sxx">
+<tt class="descname">sxx</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sxx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sxy">
+<tt class="descname">sxy</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sxy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.sxz">
+<tt class="descname">sxz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.sxz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.syy">
+<tt class="descname">syy</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.syy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.syz">
+<tt class="descname">syz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.syz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origerr.szz">
+<tt class="descname">szz</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origerr.szz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Origin">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Origin</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.algorithm">
+<tt class="descname">algorithm</tt><em class="property"> = Column(None, String(length=15), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.depdp">
+<tt class="descname">depdp</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.depdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.depth">
+<tt class="descname">depth</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.depth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.dtype">
+<tt class="descname">dtype</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.etype">
+<tt class="descname">etype</tt><em class="property"> = Column(None, String(length=7), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.etype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.evid">
+<tt class="descname">evid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Origin.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Origin.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.grn">
+<tt class="descname">grn</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.grn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.jdate">
+<tt class="descname">jdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.lat">
+<tt class="descname">lat</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Origin.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.lon">
+<tt class="descname">lon</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.mb">
+<tt class="descname">mb</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.mb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.mbid">
+<tt class="descname">mbid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.mbid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.ml">
+<tt class="descname">ml</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.ml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.mlid">
+<tt class="descname">mlid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.mlid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.ms">
+<tt class="descname">ms</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.ms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.msid">
+<tt class="descname">msid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.msid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.nass">
+<tt class="descname">nass</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.nass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.ndef">
+<tt class="descname">ndef</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.ndef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.ndp">
+<tt class="descname">ndp</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.ndp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.orid">
+<tt class="descname">orid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.srn">
+<tt class="descname">srn</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.srn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Origin.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Origin.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Remark">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Remark</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Remark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Remark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Remark.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Remark.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Remark.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Remark.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Remark.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Remark.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Remark.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Remark.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Remark.lineno">
+<tt class="descname">lineno</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Remark.lineno" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Remark.remark">
+<tt class="descname">remark</tt><em class="property"> = Column(None, String(length=80), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Remark.remark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Sensor">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Sensor</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.calper">
+<tt class="descname">calper</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.calper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.calratio">
+<tt class="descname">calratio</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.calratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.chan">
+<tt class="descname">chan</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.chanid">
+<tt class="descname">chanid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.endtime">
+<tt class="descname">endtime</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.endtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Sensor.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Sensor.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.inid">
+<tt class="descname">inid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.inid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.instant">
+<tt class="descname">instant</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.instant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.jdate">
+<tt class="descname">jdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Sensor.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sensor.tshift">
+<tt class="descname">tshift</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sensor.tshift" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Site">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Site</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.deast">
+<tt class="descname">deast</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.deast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.dnorth">
+<tt class="descname">dnorth</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.dnorth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.elev">
+<tt class="descname">elev</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.elev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Site.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Site.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.lat">
+<tt class="descname">lat</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Site.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.lon">
+<tt class="descname">lon</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.offdate">
+<tt class="descname">offdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.offdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.ondate">
+<tt class="descname">ondate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.ondate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.refsta">
+<tt class="descname">refsta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.refsta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.staname">
+<tt class="descname">staname</tt><em class="property"> = Column(None, String(length=50), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.staname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Site.statype">
+<tt class="descname">statype</tt><em class="property"> = Column(None, String(length=4), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Site.statype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Sitechan">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Sitechan</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Sitechan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Sitechan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.chan">
+<tt class="descname">chan</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.chanid">
+<tt class="descname">chanid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.ctype">
+<tt class="descname">ctype</tt><em class="property"> = Column(None, String(length=4), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.ctype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.descrip">
+<tt class="descname">descrip</tt><em class="property"> = Column(None, String(length=50), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.descrip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.edepth">
+<tt class="descname">edepth</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.edepth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Sitechan.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Sitechan.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.hang">
+<tt class="descname">hang</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.hang" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.offdate">
+<tt class="descname">offdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.offdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.ondate">
+<tt class="descname">ondate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.ondate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sitechan.vang">
+<tt class="descname">vang</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sitechan.vang" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Sregion">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Sregion</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Sregion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Sregion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Sregion.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Sregion.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sregion.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Sregion.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sregion.srn">
+<tt class="descname">srn</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sregion.srn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Sregion.srname">
+<tt class="descname">srname</tt><em class="property"> = Column(None, String(length=80), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Sregion.srname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Stamag">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Stamag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Stamag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Stamag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.ampid">
+<tt class="descname">ampid</tt><em class="property"> = Column(None, Integer(), table=None, nullable=False)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.ampid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.arid">
+<tt class="descname">arid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.arid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.auth">
+<tt class="descname">auth</tt><em class="property"> = Column(None, String(length=20), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.delta">
+<tt class="descname">delta</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.evid">
+<tt class="descname">evid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.evid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Stamag.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Stamag.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Stamag.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.magdef">
+<tt class="descname">magdef</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.magdef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.magid">
+<tt class="descname">magid</tt><em class="property"> = Column(None, Integer(), table=None, nullable=False)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.magid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.magnitude">
+<tt class="descname">magnitude</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.magres">
+<tt class="descname">magres</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.magres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.magtype">
+<tt class="descname">magtype</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.magtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.mmodel">
+<tt class="descname">mmodel</tt><em class="property"> = Column(None, String(length=15), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.mmodel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.orid">
+<tt class="descname">orid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.orid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.phase">
+<tt class="descname">phase</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Stamag.uncertainty">
+<tt class="descname">uncertainty</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Stamag.uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Wfdisc">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Wfdisc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Wfdisc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Wfdisc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.calib">
+<tt class="descname">calib</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.calib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.calper">
+<tt class="descname">calper</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.calper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.chan">
+<tt class="descname">chan</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.chan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.chanid">
+<tt class="descname">chanid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.chanid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.clip">
+<tt class="descname">clip</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.clip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.commid">
+<tt class="descname">commid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.commid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.datatype">
+<tt class="descname">datatype</tt><em class="property"> = Column(None, String(length=2), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.datatype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.dfile">
+<tt class="descname">dfile</tt><em class="property"> = Column(None, String(length=32), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.dfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.dir">
+<tt class="descname">dir</tt><em class="property"> = Column(None, String(length=64), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.endtime">
+<tt class="descname">endtime</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.endtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.foff">
+<tt class="descname">foff</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.foff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Wfdisc.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Wfdisc.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.instype">
+<tt class="descname">instype</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.instype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.jdate">
+<tt class="descname">jdate</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.jdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.nsamp">
+<tt class="descname">nsamp</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.nsamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.samprate">
+<tt class="descname">samprate</tt><em class="property"> = Column(None, Float(precision=24), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.samprate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.segtype">
+<tt class="descname">segtype</tt><em class="property"> = Column(None, String(length=1), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.segtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.sta">
+<tt class="descname">sta</tt><em class="property"> = Column(None, String(length=6), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.sta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.time">
+<tt class="descname">time</tt><em class="property"> = Column(None, Float(precision=53), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pisces.schema.css3.Wfdisc.to_trace">
+<tt class="descname">to_trace</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Wfdisc.to_trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Wfdisc.to_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the wfdisc line into a Trace instance.  Minimal header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">obspy.Trace</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wfdisc.wfid">
+<tt class="descname">wfid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wfdisc.wfid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pisces.schema.css3.Wftag">
+<em class="property">class </em><tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">Wftag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#Wftag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.Wftag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pisces.schema.util.Base</span></tt></p>
+<dl class="classmethod">
+<dt id="pisces.schema.css3.Wftag.from_string">
+<em class="property">classmethod </em><tt class="descname">from_string</tt><big>(</big><em>line</em>, <em>default_on_error=None</em><big>)</big><a class="headerlink" href="#pisces.schema.css3.Wftag.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>line: str</strong></p>
+<blockquote>
+<div><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</div></blockquote>
+<p><strong>default_on_error: list, optional</strong></p>
+<blockquote>
+<div><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError:  Can&#8217;t properly parse the line.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It&#8217;s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;TA.site&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wftag.lddate">
+<tt class="descname">lddate</tt><em class="property"> = Column(None, DateTime(), table=None, nullable=False, onupdate=ColumnDefault(&lt;function &lt;lambda&gt; at 0x107f1e398&gt;))</em><a class="headerlink" href="#pisces.schema.css3.Wftag.lddate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wftag.tagid">
+<tt class="descname">tagid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wftag.tagid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wftag.tagname">
+<tt class="descname">tagname</tt><em class="property"> = Column(None, String(length=8), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wftag.tagname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pisces.schema.css3.Wftag.wfid">
+<tt class="descname">wfid</tt><em class="property"> = Column(None, Integer(), table=None)</em><a class="headerlink" href="#pisces.schema.css3.Wftag.wfid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.css3.dtfn">
+<tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">dtfn</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#dtfn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.dtfn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pisces.schema.css3.strip">
+<tt class="descclassname">pisces.schema.css3.</tt><tt class="descname">strip</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pisces/schema/css3.html#strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pisces.schema.css3.strip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pisces.schema.html"
+                        title="previous chapter">pisces.schema package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pisces.schema.kbcore.html"
+                        title="next chapter">pisces.schema.kbcore module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pisces.schema.css3.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.kbcore.html" title="pisces.schema.kbcore module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pisces.schema.html" title="pisces.schema package"
+             >previous</a> |</li>
+        <li><a href="index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="pisces.html" >pisces package</a> &raquo;</li>
+          <li><a href="pisces.schema.html" >pisces.schema package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

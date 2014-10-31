@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.client &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pisces.client</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip_longest</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="kn">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">or_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+
+<span class="kn">import</span> <span class="nn">pisces</span> <span class="kn">as</span> <span class="nn">ps</span>
+<span class="kn">import</span> <span class="nn">pisces.request</span> <span class="kn">as</span> <span class="nn">req</span>
+<span class="kn">from</span> <span class="nn">pisces.io.trace</span> <span class="kn">import</span> <span class="n">wfdisc2trace</span>
+
+
+<div class="viewcode-block" id="Client"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client">[docs]</a><span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic database request client.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Initialize a database connection. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        backend: string, optional</span>
+<span class="sd">            One of the SQLAlchemy connection strings from </span>
+<span class="sd">            http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls</span>
+<span class="sd">        user: string, optional</span>
+<span class="sd">            Not required for sqlite.</span>
+<span class="sd">        psswd: string, optional</span>
+<span class="sd">            Not needed for sqlite. Prompted if needed and not provided.</span>
+<span class="sd">        server: string, optional</span>
+<span class="sd">            Database host server.</span>
+<span class="sd">        port: string or integer, optional</span>
+<span class="sd">            Port on remote server.</span>
+<span class="sd">        instance: string, optional</span>
+<span class="sd">            For sqlite, this is the database file name.</span>
+<span class="sd">        conn: string, optional</span>
+<span class="sd">            A fully-formed SQLAlchemy style connection string.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from pisces.client import Client</span>
+<span class="sd">        &gt;&gt;&gt; client = Client(user=&#39;scott&#39;, backend=&#39;oracle&#39;, </span>
+<span class="sd">                            server=&#39;my.server.edu&#39;, port=1521, </span>
+<span class="sd">                            instance=&#39;mydb&#39;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">db_connect</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># do ID management in this class also?</span>
+
+<div class="viewcode-block" id="Client.load_tables"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client.load_tables">[docs]</a>    <span class="k">def</span> <span class="nf">load_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">tables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load core tables.</span>
+
+<span class="sd">        Tables are given as key=value pairs as in:</span>
+<span class="sd">        load_tables(wfdisc=&#39;global.wfdisc_raw&#39;, origin=&#39;location.origin&#39;)</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        sqlalchemy.exc.NoSuchTableError</span>
+<span class="sd">            Table doesn&#39;t exist.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#XXX: fails for no primary key.  use get_tables syntax.</span>
+        <span class="k">for</span> <span class="n">coretable</span><span class="p">,</span> <span class="n">tablename</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">coretable</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> 
+                                                   <span class="p">[</span><span class="n">tablename</span><span class="p">],</span> 
+                                                   <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        </div>
+<div class="viewcode-block" id="Client.get_events"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">depth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">etype</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">evids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">prefor</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get Origin table rows.</span>
+
+<span class="sd">        For further explanation, see: pisces.request.get_events</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#origin = getattr(self, &#39;origin&#39;, None)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;origin&#39;</span><span class="p">)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;event&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">recs</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> 
+                              <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="n">km</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="n">swath</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="n">mag</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+                              <span class="n">etime</span><span class="o">=</span><span class="n">etime</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="n">orids</span><span class="p">,</span> <span class="n">evids</span><span class="o">=</span><span class="n">evids</span><span class="p">,</span> 
+                              <span class="n">prefor</span><span class="o">=</span><span class="n">prefor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">recs</span>
+</div>
+<div class="viewcode-block" id="Client.get_stations"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client.get_stations">[docs]</a>    <span class="k">def</span> <span class="nf">get_stations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nets</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">region</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stime</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get Site table rows.</span>
+
+<span class="sd">        For further explanation, see: pisces.request.get_stations</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">site</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;site&#39;</span><span class="p">)</span>
+        <span class="n">sitechan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;sitechan&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">affiliation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;affiliation&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">recs</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_stations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">sitechan</span><span class="o">=</span><span class="n">sitechan</span><span class="p">,</span> 
+                <span class="n">affiliation</span><span class="o">=</span><span class="n">affiliation</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="n">stations</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
+                <span class="n">nets</span><span class="o">=</span><span class="n">nets</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="n">km</span><span class="p">,</span> <span class="n">swath</span><span class="o">=</span><span class="n">swath</span><span class="p">,</span>
+                <span class="n">stime</span><span class="o">=</span><span class="n">stime</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recs</span>
+
+</div>
+<div class="viewcode-block" id="Client.get_arrivals"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client.get_arrivals">[docs]</a>    <span class="k">def</span> <span class="nf">get_arrivals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">atime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">phases</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">arids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request database arrivals.</span>
+<span class="sd">        </span>
+<span class="sd">        For further explanation, see: pisces.request.get_arrivals</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arrival</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;arrival&#39;</span><span class="p">)</span>
+        <span class="n">assoc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;assoc&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">recs</span> <span class="o">=</span> <span class="n">get_arrivals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">arrival</span><span class="p">,</span> <span class="n">assoc</span><span class="o">=</span><span class="n">assoc</span><span class="p">,</span> 
+                            <span class="n">stations</span><span class="o">=</span><span class="n">stations</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span> <span class="n">atime</span><span class="o">=</span><span class="n">atime</span><span class="p">,</span> 
+                            <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span> <span class="n">arids</span><span class="o">=</span><span class="n">arids</span><span class="p">,</span> <span class="n">orids</span><span class="o">=</span><span class="n">orids</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recs</span>
+
+</div>
+<div class="viewcode-block" id="Client.get_waveforms"><a class="viewcode-back" href="../../pisces.client.html#pisces.client.Client.get_waveforms">[docs]</a>    <span class="k">def</span> <span class="nf">get_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">endtime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wfids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get waveforms. </span>
+
+<span class="sd">        For further explanation, see: pisces.request.get_waveforms</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wfdisc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;wfdisc&#39;</span><span class="p">)</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">get_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">wfdisc</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> 
+                           <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="n">starttime</span><span class="p">,</span> 
+                           <span class="n">endtime</span><span class="o">=</span><span class="n">endtime</span><span class="p">,</span> <span class="n">wfids</span><span class="o">=</span><span class="n">wfids</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">st</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="http://www.jkmacc-LANL.github.io/pisces/tutorial.tables/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+
+        <title>Database Tables - Pisces</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../css/prettify-1.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">Pisces</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tutorial <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            <li class="active">
+                                <a href="./">Database Tables</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../tutorial.queries/">Using the Database</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../tutorial.waveforms/">Import/Export Waveforms</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
+                            </li>
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../api/">API Documentation</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            <li >
+                                <a href="../about.roadmap/">Roadmap</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../about.license/">License</a>
+                            </li>
+                        
+                            <li >
+                                <a href="../about.group/">User's Group</a>
+                            </li>
+                        
+                        </ul>
+                    </li>
+                
+                
+                </ul>
+            
+
+            
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                
+                
+                <li >
+                    <a rel="next" href="..">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../tutorial.queries/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                
+                <li>
+                    <a href="https://github.com/jkmacc-lanl/pisces">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+            
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#the-database">The Database</a></li>
+        
+            <li><a href="#introduction">Introduction</a></li>
+        
+            <li><a href="#the-core-tables">The core tables</a></li>
+        
+            <li><a href="#extending-the-schema">Extending the schema</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="the-database">The Database</h1>
+<p>Learn about the tables, how to create them, and how to make new tables.</p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Pisces uses relational database tables to represent station, event, and waveform information.
+One can think of database tables as a collection of inter-related sheets in an Excel spreadsheet, each holding columns and rows of data.
+The specific tables Pisces uses are defined in the Center for Seismic Studies (CSS) 3.0 seismic schema, and implemented in an SQL relational database.</p>
+<p>SQL databases are ubiquitous, and describing them in detail is beyond the scope of this tutorial.
+For further guidance or tutorials, please consult the <a href="https://www.google.com/search?client=opera&amp;q=sql+databases&amp;sourceid=opera&amp;ie=UTF-8&amp;oe=UTF-8">web</a>.
+Before continuing, however, here are two things to remember:</p>
+<ol>
+<li>
+<p><strong>You don't have to write SQL.</strong></p>
+<p>Pisces uses the <a href="http://www.sqlalchemy.org">SQLAlchemy</a> package (SQLA) and its <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html">Object Relational Mapper</a> to represent database tables.</p>
+<blockquote>
+<p>The SQLAlchemy Object Relational Mapper presents a method of associating user-defined Python classes with database tables, and instances of those classes (objects) with rows in their corresponding tables. --<cite>Mike Beyer</cite>, creator SQLAlchemy</p>
+</blockquote>
+<p>In other words, we can work with familiar Python concepts (classes, instances, and methods) instead of writing SQL (though you can still write SQL if you want).
+This doesn't mean you can <em>ignore</em> the SQL-ness of your database.
+You should understand the concepts, you just don't have to write and manage SQL strings.</p>
+</li>
+<li>
+<p><strong>You don't have to install a relational database management system (DBMS).</strong>  </p>
+<p>You already have one.
+<a href="http://www.sqlite.org">SQLite</a> is part of the Python Standard Library, and SQLAlchemy is compatible with SQLite.
+SQLA is also compatible with <a href="http://docs.sqlalchemy.org/en/rel_0_9/dialects/">many</a> other database backends, so you could scale up and use Oracle or PostgreSQL if it makes sense for your project, <em>and you wouldn't have to change your code</em>.</p>
+</li>
+</ol>
+<!--
+Here are some definitions, if you're not familiar with databases.
+
+**Column**
+:   A bit of data you want to store, defined by data type (float, string, etc.), range, null/default values, etc.
+
+**Table**
+:   A collection of related columns, plus maybe some rules about rows in the table.
+
+**Schema**
+:   A collection of related tables and how the tables relate.
+
+**Relational Database**
+:   An actual implementation of related tables on a system.
+
+**Structured Query Language (SQL)**
+:   A standardized language for querying, joining, and defining database tables.
+    It looks like `select * from origin where lat between 100 and 105 and mb > 4.5`.
+
+**Relational Database Management System (RDMS)**
+:   The software that executes SQL to work with your database.
+    Examples include MySQL, Oracle, PostgreSQL, and SQLite.
+
+Further questions about SQL and relational databases are directed to our [FAQ](https://www.google.com/search?client=opera&q=sql+databases&sourceid=opera&ie=UTF-8&oe=UTF-8).
+-->
+
+<hr />
+<h2 id="the-core-tables">The core tables</h2>
+<p>Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
+These are described in detail in the original specification (Anderson et al., 1990).
+Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).</p>
+<!--
+**affiliation**
+:   Network station affiliations
+
+**arrival**
+:   Summary information on a seismic arrival
+
+**assoc**
+:   Data associating arrivals with origins
+
+**event**
+:   Event identification
+
+**instrument**
+:   Generic (default) calibration information about a station
+
+**lastid**
+:   Counter values (Last value used for keys)
+
+**netmag**
+:   Network magnitude
+
+**network**
+:   Network description and identification
+
+**origerr**
+:   Summary of errors in origin estimations
+
+**origin**
+:   Data on event location and confidence bounds
+
+**remark**
+:   Comments
+
+**sensor**
+:   Specific calibration information for physical channels
+
+**site**
+:   Station location information
+
+**sitechan**
+:   Station-channel information
+
+**sregion**
+:   Seismic region
+
+**stamag**
+:   Station magnitude
+
+**stassoc**
+:   Arrivals from a single station grouped into an event
+
+**wfdisc**
+:   Waveform file header and descriptive information
+
+**wftag**
+:   Waveform mapping file
+
+**wftape**
+:   Waveform tape file header and descriptive information (not generally used)
+-->
+
+<h4 id="primary-tables">Primary tables</h4>
+<p>(only primary and unique keys are shown)</p>
+<p><img alt="primary tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/css3_primary.png" title="primary tables" /></p>
+<h4 id="lookup-tables">Lookup tables</h4>
+<p>(only primary and unique keys are shown)</p>
+<p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/css3_lookup.png" title="lookup tables" /></p>
+<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="https://github.com/jkmacc-LANL/pisces/blob/dev/docs/pages/data/Anderson1990.pdf?raw=true" title="Anderson et al. (1990) pdf">PDF (19 MB)</a></p>
+<h3 id="the-pisces-implementation">The Pisces implementation</h3>
+<p>Pisces implements CSS 3.0 schema with relatively few constraints:</p>
+<ul>
+<li>Primary keys and unique keys are defined, but foreign keys are not. All joins must be explicit.</li>
+<li>ids (e.g. orid, wfid) are not automatically incremented. You must use a counter and the "lastid" table.</li>
+<li>There are no indexes (internal database structures that speed up queries on certain columns or sets of columns).</li>
+<li>Any column can take an NA value, which will be assigned if not otherwise specified.</li>
+</ul>
+<p>This is done to offer users the flexibility to maintain a database to a level of rigor commensurate with the project.
+A single-user with a 2-year project database may only ever use the origin, wfdisc, arrival, and assoc tables, and doesn't want to deal with foreign keys,
+whereas a multi-user global database may need to populate most/all tables and use consistent ids.
+Both are possible.</p>
+<!--
+In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
+-->
+
+<hr />
+<h2 id="extending-the-schema">Extending the schema</h2>
+<h3 id="defining-new-tables">Defining new tables</h3>
+<p>The core tables don't describe everything you might care about, such as stacked cross-correlation functions.
+Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <a href="http://www.iris.edu/dms/products/ancc-ciei/">http://www.iris.edu/dms/products/ancc-ciei/</a>, which looks like this <em>(sic)</em>:</p>
+<p><img alt="ccwfdisc table" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/pages/data/ancc-ciei_table.png" title="ccwfdisc table" /></p>
+<p>We'll define our new table in a file "mytables.py" by doing the following:</p>
+<ul>
+<li>Import our css3 prototypes into the <code>css</code> namespace.</li>
+<li>Inherit from <code>css.Base</code>, so that the Ccwfdisc table is a proper SQLAlchemy table, 
+  and so that the <code>info=</code> dictionaries are used properly in Pisces</li>
+<li>Name the table with <code>__tablename__</code></li>
+<li>Specify the primary and unique constraints with <code>__table_args__</code>.
+  Each table needs at least a primary key constraint.</li>
+<li>Re-use a number of known columns with <code>.copy()</code></li>
+<li>Define new columns, including the <code>info</code> dictionary for Pisces.</li>
+</ul>
+<h4 id="mytablespy">mytables.py</h4>
+<pre class="prettyprint well"><code>import sqlalchemy as sa
+import pisces.schema.css3 as css
+
+class Ccwfdisc(css.Base):
+    __tablename__ = 'ccwfdisc'
+    __table_args__ = (sa.PrimaryKeyConstraint('wfid'), 
+                      sa.UniqueConstraint('wfid', 'dir', 'dfile'))
+
+    sta1 = css.sta.copy()
+    net1 = css.net.copy()
+    sta2 = css.sta.copy()
+    net2 = css.net.copy()
+    chan1 = css.chan.copy()
+    chan2 = css.chan.copy()
+    time = css.time.copy()
+    wfid = css.wfid.copy()
+    endtime = css.endtime.copy()
+    nsamp = css.nsamp.copy()
+    samprate = css.samprate.copy()
+    snrn = sa.Column('snrn', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 16, 'format': '16.6f')
+    snrp = sa.Column('snrp', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 16, 'format': '16.6f')
+    sdate = sa.Column('sdate', sa.Integer, 
+        info={'default': -1 ,'parse': int, 'width': 8, 'format': '8d')
+    edate = sa.Column('edate', sa.Integer, 
+        info={'default': -1 ,'parse': int, 'width': 8, 'format': '8d')
+    stdays = sa.Column('stdays', sa.Integer,
+        info={'default': -1, 'parse': int, 'width': 6, 'format': '6d'))
+    range = sa.Column('range', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 10, 'format': '10.3f')
+    tsnorm = sa.Column('tsnorm', sa.Float(53), 
+        info={'default': -1.0 ,'parse': float, 'width': 14, 'format': '14.4f')
+    datatype = css.datatype.copy()
+    dir = css.dir.copy()
+    dfile = css.dfile.copy()
+    foff = css.foff.copy()
+    lddate = css.lddate.copy()
+</code></pre>
+<h3 id="column-info">Column info</h3>
+<p>The <code>info</code> dictionary for each column needs the following entries, at minimum:</p>
+<ul>
+<li><code>default</code>: The value used for the column when it is otherwise not specified.</li>
+<li><code>parse</code>: A callable that accepts the fixed-width string and returns the right type for the database.</li>
+<li><code>format</code>: The column's external format, from the Python <a href="http://docs.python.org/2/library/string.html#format-specification-mini-language">string format specification mini-language</a>.</li>
+</ul>
+<p>There are some differences between the Fortran-style "external format" and those used by Python.
+In Python, the type characters may be different from Fortran, and they always follow the width.
+See the following table for a few examples:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th>Fortran</th>
+<th align="right">Python</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">6-character string</td>
+<td><code>a6</code></td>
+<td align="right"><code>6.6s</code></td>
+</tr>
+<tr>
+<td align="left">8-digit integer</td>
+<td><code>i8</code></td>
+<td align="right"><code>8d</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="create-a-table">Create a table</h3>
+<p>To create the table in a database, just use SQLAlchemy syntax:</p>
+<pre class="prettyprint well"><code>import sqlalchemy as sa
+from mytables import Ccwfdisc
+
+engine = sa.create_engine('sqlite:///mydatabase.sqlite')
+
+Ccwfdisc.__table__.create(engine)
+</code></pre>
+<p>For every ORM class, there is a hidden <code>__table__</code> object that has a <code>create</code> method.
+This method accepts an <a href="http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html">Engine</a> instance that points to a specific database, where it will be created.</p>
+<h3 id="defining-new-prototype-tables">Defining new prototype tables</h3>
+<p>You can use the previous table with any database, as long as the table will be called "ccwfdisc".
+If you want to re-use this table structure across multiple table names without having to repeat the previous definition each time, you'll need to define a new <em>prototype table</em> (<a href="http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract">abstract table</a> in SQLAlchemy).</p>
+<p>This is how the "ccwfdisc" table would be defined, as a new prototype.</p>
+<h4 id="mytables_abspy">mytables_abs.py</h4>
+<pre class="prettyprint well"><code>import sqlalchemy as sa
+from sqlalchemy.ext.declarative import declared_attr
+import pisces.schema.css3 as css
+
+class Ccwfdisc(css.Base):
+    __abstract__ = True
+
+    @declared_attr
+    def __table_args__(cls):
+        return  (sa.PrimaryKeyConstraint('wfid'), 
+                 sa.UniqueConstraint('wfid', 'dir', 'dfile'))
+
+    sta1 = css.sta.copy()
+    net1 = css.net.copy()
+    sta2 = css.sta.copy()
+    net2 = css.net.copy()
+    chan1 = css.chan.copy()
+    chan2 = css.chan.copy()
+    time = css.time.copy()
+    wfid = css.wfid.copy()
+    endtime = css.endtime.copy()
+    nsamp = css.nsamp.copy()
+    samprate = css.samprate.copy()
+    snrn = sa.Column('snrn', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 16, 'format': '16.6f')
+    snrp = sa.Column('snrp', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 16, 'format': '16.6f')
+    sdate = sa.Column('sdate', sa.Integer, 
+        info={'default': -1 ,'parse': int, 'width': 8, 'format': '8d')
+    edate = sa.Column('edate', sa.Integer, 
+        info={'default': -1 ,'parse': int, 'width': 8, 'format': '8d')
+    stdays = sa.Column('stdays', sa.Integer,
+        info={'default': -1, 'parse': int, 'width': 6, 'format': '6d'))
+    range = sa.Column('range', sa.Float(24), 
+        info={'default': -1.0 ,'parse': float, 'width': 10, 'format': '10.3f')
+    tsnorm = sa.Column('tsnorm', sa.Float(53), 
+        info={'default': -1.0 ,'parse': float, 'width': 14, 'format': '14.4f')
+    datatype = css.datatype.copy()
+    dir = css.dir.copy()
+    dfile = css.dfile.copy()
+    foff = css.foff.copy()
+    lddate = css.lddate.copy()
+</code></pre>
+<p>The differences are minor:</p>
+<ul>
+<li>use <code>__abstract__ = True</code> instead of assigning a <code>__tablename__</code></li>
+<li>use the <code>@declared_attr</code> decorator with a <code>__table_args__</code> <em>function</em> that <em>returns</em> the constraint tuple.</li>
+</ul>
+<p>And this is how the prototype would be implemented and re-used in two different tables, 'ccwfdisc' and 'TA_ccwfdisc'.</p>
+<h4 id="mytables2py">mytables2.py</h4>
+<pre class="prettyprint well"><code>import mytables_abs as ab
+
+class Ccwfdisc(ab.Ccwfdisc):
+    __tablename__ = 'ccwfdisc'
+
+class TA_Ccwfdisc(ab.Ccwfdisc):
+    __tablename__ = 'TA_ccwfdisc'
+</code></pre>
+<p>These two tables look the same, have different names, and can reside in the same database.</p>
+</div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+
+        
+
+        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/prettify-1.0.min.js"></script>
+        <script src="../js/base.js"></script>
+        
+    </body>
+</html>

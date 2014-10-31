@@ -1,0 +1,167 @@
+h2. Imports and connections
+
+Note: you must substitute your own Oracle username, of course.
+
+<pre><code class="python">
+import pisces as ps
+
+# connect with Oracle
+session = ps.db_connect(user='scott', backend='oracle', server='gndd.lanl.gov', port=1521, instance='gnem10g')
+
+# or
+from pisces_gndd import gndd_connect
+session = gndd_connect('scott')
+</code></pre>
+
+@db_connect@ will prompt you for your password and returns a SQLAlchemy "@Session@":http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html instance, which manages database transactions.  It can also take a single fully-qualified database URL (e.g. @'oracle://scott:tiger@gndd.lanl.gov:1521/gnem10g'@ or @'sqlite:///path/to/my/database.sqlite'@), which is passed to "@sqlalchemy.create_engine@":http://docs.sqlalchemy.org/en/rel_0_8/core/engines.html#sqlalchemy.create_engine.  The returned session is bound to Oracle through the @.bind@ attribute, which is a SQLAlchemy Engine instance that specifies the database location and drivers.
+
+@gndd_connect@ is a convenience function in the seperate project:pisces_gndd module, which just fills the connection values out for you.
+
+h2. Loading tables
+
+h3. Arbitrary tables
+
+If you only know the table name (and user/account), you can load a table like this:
+
+<pre><code class="python">
+Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'])
+</code></pre>
+
+Loaded tables are just Python classes defined using "SQLAlchemy's Object Relational Mapper (ORM)":http://docs.sqlalchemy.org/en/rel_0_8/orm/.  Simply, the ORM links regular Python classes to SQL database tables, and instances of these classes to rows in a table.  Column values for a row are attributes on the instance.  
+
+Table classes loaded together share a @.metadata@. "MetaData":http://docs.sqlalchemy.org/en/rel_0_8/core/metadata.html#sqlalchemy.schema.MetaData is a Python representation of underlying SQL objects, and can be used to issue create/add/drop statements to the database.  To add tables loaded later to the same MetaData, use the @metadata=@ flag with the existing instance from one of the earlier-loaded tables:
+
+<pre><code class="python">
+Wfdisc, Assoc = ps.get_tables(session.bind, ['global.wfdisc','global.assoc'], metadata=Site.metadata)
+
+# check the table names in the metadata
+print Site.metadata.tables.keys()
+</code></pre>
+
+<pre>
+['global.affiliation',  'global.site',  'global.wfdisc',  'global.origin',  'global.assoc']
+</pre>
+
+h3. Enhanced tables
+
+When the @base=@ option is used, with a base that comes with Pisces:
+* The default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values
+* The class is integrated with its correctly-formatted text file (flat file) representation.
+* Instances of the class can iterate over values, and in the correct order.
+
+<pre><code class="python">
+# load table classes, matching column names with those of a known schema
+
+from pisces.schema.kbcore import Base as KBBase
+Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affiliation', 'global.origin'], base=KBBase)
+</code></pre>
+
+@KBBase@ is the parent class for all pre-defined KB Core tables that come with Pisces.  Through Python's class inheritance, this functionality is easily [[Wiki#Copy-and-define-tables|added to new tables]].
+
+h4. Tables must have a primary key
+
+<pre><code class="python">
+try:
+    Sitechan, = ps.get_tables(session.bind, ['global.sitechan'])
+except ArgumentError:
+    # failed because global.sitechan has no primary key.  we can force one.
+    Sitechan, = ps.get_tables(session.bind, ['global.sitechan'], primary_keys={'global.sitechan': ['chanid']})
+</code></pre>
+
+In this example, we're loading a table from global that is actually view of several other tables, and has no primary key.  SQLAlchemy's ORM needs a primary key for the @session@ to keep track of things, so we specify the primary key in a dictionary and the @primary_keys=@ keyword.
+
+A growing list of tables and keys in the correct form can be found in project:pisces_gndd .
+<pre><code class="python">
+from pisces_gndd import PRIMARY_KEYS
+
+Sitechan, = ps.get_tables(session.bind, ['global.sitechan'], primary_keys=PRIMARY_KEYS)
+</code></pre>
+
+h2. Querying tables
+
+Querying and editing tables in Pisces is the same as using SQLAlchemy's ORM.  Follow SQLAlchemy's "tutorial":http://docs.sqlalchemy.org/en/rel_0_8/orm/tutorial.html to learn more about how this works.
+
+<pre><code class="python">
+# query all TA stations installed in 2009
+q = session.query(Site).filter(Site.ondate.between(2009001, 2009365))
+ta_sites = q.filter(Site.sta == Affil.sta).filter(Affil.net == 'TA').all()
+
+# query for a subset of western US earthquakes, sorted by mb
+q = session.query(Origin).filter(Origin.lat.between(35, 45)).filter(Origin.mb > 4)
+wus_quakes = q.filter(Origin.lon.between(-115, -105)).order_by(Origin.mb).all()
+
+# plot 'em
+import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
+m = Basemap(llcrnrlon=-130, llcrnrlat=25, urcrnrlon=-80, urcrnrlat=60, resolution='i')
+m.etopo()
+
+for ista in ta_sites:
+    x, y = m(ista.lon, ista.lat)
+    m.plot(x, y, 'b^')
+
+for io in wus_quakes:
+    x, y = m(io.lon, io.lat)
+    m.plot(x, y, 'r*')
+
+plt.title("{} TA stations and {} quakes mb > 4".format(len(ta_sites), len(wus_quakes)))
+
+</code></pre>
+
+!wUS.png!
+
+h3. Query-builders
+
+Pisces has a set of intuitive query-building functions for common seismic queries in @pisces.request@. 
+
+<pre><code class="python">
+import pisces.request as req
+
+# repeat the previous query for a subset of western US earthquakes
+wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)})
+
+# to sort by mb, ask for the query back and do your sort
+wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)}, asquery=True).order_by(Origin.mb).all()
+</code></pre>
+
+Pisces uses NumPy/ObsPy to do distance subsets, which are done out-of-database and can be memory intensive.  They can be done in-database, if you have that capability.
+
+<pre><code class="python">
+# stations <= 200 km from a point, out-of-database
+sites = req.get_stations(session, Site, km=(42, -110, 0, 200))
+
+# in-database "xkm_distance(lat1, lon1, lat2, lon2)" function
+from sqlalchemy import func
+sites = req.get_stations(session, Site, asquery=True).filter(func.xkm_distance(Site.lat, Site.lon, 42, -110).between(0, 200)).all()
+</code></pre>
+
+With our Oracle database, you can use the project:pisces_gndd module:
+<pre><code class="python">
+from pisces_gndd.request import distaz_query
+
+q = req.get_stations(session, Site, asquery=True)
+sites = distaz_query(q, Site, km=(42, -110, 0, 200))
+
+# or stations teleseismic distances from (40, 80)
+telesites = distaz_query(q, Site, deg=(40, 80, 30, 90))
+</code></pre>
+
+h2. Editing tables
+
+The following examples *will not work* unless you have write permission to global tables.  Especially if you have write permission, *don't try to do this*.
+
+<pre><code class="python">
+# add Albuquerque ANMO and the Chelyabinsk bolide
+ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
+bolide = Origin(orid=1, lat=55.15, lon=61.41, mb=2.7, etype='xm')
+session.add_all([ANMO, bolide])
+session.commit()
+
+# edit a Site, delete an Origin
+session.query(Site).filter(Site.sta == 'MK31').update({'lat': 42.5})
+session.query(Origin).filter(Origin.orid = 1001).delete()
+session.commit()
+session.close()
+</code></pre>
+
+Note that not all fields/attributes were specified when creating "ANMO" or "bolide", but their default values are filled in.

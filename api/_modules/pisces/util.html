@@ -1,0 +1,491 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pisces.util &mdash; pisces 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pisces 0.2.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pisces.util</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="kn">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">NoSuchTableError</span><span class="p">,</span> <span class="n">IntegrityError</span><span class="p">,</span> <span class="n">OperationalError</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">ProgrammingError</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="kn">import</span> <span class="n">NoResultFound</span><span class="p">,</span> <span class="n">UnmappedInstanceError</span> 
+
+<span class="kn">import</span> <span class="nn">obspy.core.util.geodetics</span> <span class="kn">as</span> <span class="nn">geod</span>
+<span class="kn">from</span> <span class="nn">obspy.taup</span> <span class="kn">import</span> <span class="n">taup</span>
+
+<span class="kn">from</span> <span class="nn">pisces.schema.util</span> <span class="kn">import</span> <span class="n">PiscesMeta</span>
+
+<div class="viewcode-block" id="db_connect"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.db_connect">[docs]</a><span class="k">def</span> <span class="nf">db_connect</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connect to your database.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    backend : string</span>
+<span class="sd">        One of the SQLAlchemy connection strings from </span>
+<span class="sd">        http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls</span>
+<span class="sd">    user : string, optional</span>
+<span class="sd">        Not required for sqlite.</span>
+<span class="sd">    passwd : string, optional</span>
+<span class="sd">        Not needed for sqlite. Prompted if needed and not provided.</span>
+<span class="sd">    server : string, optional</span>
+<span class="sd">        Database host server.</span>
+<span class="sd">    port : string or integer, optional</span>
+<span class="sd">        Port on remote server.</span>
+<span class="sd">    instance : string, optional</span>
+<span class="sd">        The database instance.  For sqlite, this is the file name.</span>
+<span class="sd">    conn : string, optional</span>
+<span class="sd">        A fully-formed SQLAlchemy style connection string.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    session : bound SQLAlchemy Session instance</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    1. Connect to a local sqlite database file:</span>
+
+<span class="sd">    &gt;&gt;&gt; meta, session = db_connect(conn=&#39;sqlite:///mydb.sqlite&#39;)</span>
+<span class="sd">    #or</span>
+<span class="sd">    &gt;&gt;&gt; meta, session = db_connect(backend=&#39;sqlite&#39;, instance=&#39;mydb.sqlite&#39;)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For connection string format, see:</span>
+<span class="sd">    http://docs.sqlalchemy.org/en/rel_0_8/core/engines.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#TODO: take advantage of sqlalchemy.engine.url.URL</span>
+    <span class="c">#XXX: is not protected against using args and kwargs</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;conn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;conn&#39;</span><span class="p">):</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;conn&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;backend&#39;</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">psswd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;passwd&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;server&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;port&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;instance&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="s">&#39;sqlite&#39;</span><span class="p">:</span>
+            <span class="n">userpsswd</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">psswd</span><span class="p">:</span>
+                <span class="n">psswd</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s">&quot;Enter password for {0}: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="p">))</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">psswd</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s">&quot;Enter username for given password: &quot;</span><span class="p">)</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">psswd</span><span class="p">:</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s">&#39;:&#39;</span>
+
+        <span class="k">if</span> <span class="n">server</span><span class="p">:</span>
+            <span class="n">serverport</span> <span class="o">=</span> <span class="s">&#39;@&#39;</span> <span class="o">+</span> <span class="n">server</span>
+            <span class="k">if</span> <span class="n">port</span><span class="p">:</span>
+                <span class="n">serverport</span> <span class="o">+=</span> <span class="s">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">serverport</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            
+        <span class="n">conn</span> <span class="o">=</span> <span class="s">&quot;{0}://{1}{2}/{3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">userpsswd</span><span class="p">,</span> <span class="n">serverport</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">session</span>
+
+</div>
+<div class="viewcode-block" id="table_contains_all"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.table_contains_all">[docs]</a><span class="k">def</span> <span class="nf">table_contains_all</span><span class="p">(</span><span class="n">itable</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+     <span class="nb">all</span><span class="p">([</span><span class="n">key</span> <span class="ow">in</span> <span class="n">itable</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">])</span>
+
+<span class="c">#def ormtable(fulltablename, base=None):</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    For known schema-qualified tables, use:</span>
+<span class="c">#    Origin = ormtable(&#39;global.origin&#39;, base=kb.Origin)</span>
+<span class="c">#    For arbitrary tables, use:</span>
+<span class="c">#    MyTable = ormtable(&#39;jkmacc.sometable&#39;)</span>
+<span class="c">#    For arbitrary tables without Pisces-specific method, use:</span>
+<span class="c">#    MyTable = ormtable(&#39;jkmacc.sometable&#39;, base=declarative_base())</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#</span>
+<span class="c">#    ORMBase = base if base else declarative_base(metaclass=PiscesMeta,</span>
+<span class="c">#                                                 constructor=None)</span>
+<span class="c">#    parents = (ORMBase,)</span>
+<span class="c">#    try:</span>
+<span class="c">#        owner, tablename = fulltable.split(&#39;.&#39;)</span>
+<span class="c">#    except ValueError:</span>
+<span class="c">#        owner, tablename = None, fulltable</span>
+<span class="c">#    if owner:</span>
+<span class="c">#        parents += declarative_base(metadata=MetaData(schema=owner)),</span>
+<span class="c">#</span>
+<span class="c">#    return type(fulltable.capitalize(), parents, {})</span>
+</div>
+<div class="viewcode-block" id="get_tables"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.get_tables">[docs]</a><span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">fulltablenames</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">primary_keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+               <span class="n">base</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflect/load an arbitrary database table as a mapped class.</span>
+
+<span class="sd">    This is a shortcut for SQLAlchemy&#39;s declarative mapping using __table__.</span>
+<span class="sd">    See http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html#using-a-hybrid-approach-with-table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bind : sqlalchemy.engine.base.Engine instance</span>
+<span class="sd">        Engine pointing to the target database.</span>
+<span class="sd">    fulltables : list of strings</span>
+<span class="sd">        Of the form [&#39;owner1.tablename1&#39;, &#39;owner2.tablename2&#39;, ...]</span>
+<span class="sd">        Leave out &#39;owner.&#39; if database doesn&#39;t use owners (sqlite, etc...)</span>
+<span class="sd">    metadata : sqlalchemy.MetaData, optional</span>
+<span class="sd">        MetaData into which reflected Tables go. If not supplied, a new one</span>
+<span class="sd">        is created, accessible from MyTable.metadata on one of the loaded </span>
+<span class="sd">        tables.</span>
+<span class="sd">    primary_keys : dict, optional</span>
+<span class="sd">        Tablename, primary key list pairs of the form, </span>
+<span class="sd">        {&#39;owner1.tablename1&#39;: [&#39;primary_key1&#39;, &#39;primary_key2&#39;]} </span>
+<span class="sd">        These are required if the table is a view or has no primary key.</span>
+<span class="sd">    base : sqlalchemy.ext.declarative.api.DeclarativeMeta, optional</span>
+<span class="sd">        The declarative base the from which loaded table classes will inherit.</span>
+<span class="sd">        The info dictionary of loaded Columns will be updated from those in </span>
+<span class="sd">        the base.  These are used to generate default values and string </span>
+<span class="sd">        representations.  Import from pisces.schema.css3, or extensions thereof.</span>
+<span class="sd">        Default, sqlalchemy.ext.declarative.api.DeclarativeMeta.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Corresponding list of ORM table classes mapped to reflected tables, </span>
+<span class="sd">        Can be used for querying or making row instances.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    sqlalchemy.exc.NoSuchTableError : Table doesn&#39;t exist.</span>
+<span class="sd">    sqlalchemy.exc.InvalidRequestError : Table already loaded in metadata.</span>
+<span class="sd">    sqlalchemy.exc.ArgumentError : Table has no primary key(s).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    In SQLAlchemy, a database account/owner is generally used with the &quot;schema&quot;</span>
+<span class="sd">    keyword argument.</span>
+
+<span class="sd">    For core tables in a Pisces schema, this function isn&#39;t recommended.  </span>
+<span class="sd">    Instead, subclass from the known abstract table.  </span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    # for unknown table</span>
+<span class="sd">    &gt;&gt;&gt; import pisces.schema.css3 as css</span>
+<span class="sd">    &gt;&gt;&gt; RandomTable = get_tables(engine, [&#39;randomtable&#39;])</span>
+
+<span class="sd">    # for a known/prototype table</span>
+<span class="sd">    &gt;&gt;&gt; class Site(css.Site):</span>
+<span class="sd">            __tablename__ = &#39;myaccount.my_site_tablename&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bind</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Must provide bound metadata or bind.&quot;</span><span class="p">)</span>
+    <span class="c"># we have metadata</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">bind</span><span class="p">:</span>
+        <span class="n">bind</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">bind</span>
+
+    <span class="n">ORMBase</span> <span class="o">=</span> <span class="n">base</span> <span class="k">if</span> <span class="n">base</span> <span class="k">else</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">PiscesMeta</span><span class="p">,</span>
+                                                 <span class="n">constructor</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                                 <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">colinfo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s">&#39;_column_info_registry&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">ORMBase</span><span class="p">,)</span>
+
+
+    <span class="n">outTables</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fulltable</span> <span class="ow">in</span> <span class="n">fulltablenames</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="n">fulltable</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c"># no owner given</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">fulltable</span>
+            
+        <span class="c"># reflect the table</span>
+        <span class="n">itable</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">tablename</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                          <span class="n">autoload_with</span><span class="o">=</span><span class="n">bind</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">owner</span><span class="p">)</span>
+
+        <span class="c"># update reflected table with known schema column info</span>
+        <span class="k">if</span> <span class="n">colinfo</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">itable</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colinfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">{}))</span>
+
+        <span class="n">dct</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;__table__&#39;</span><span class="p">:</span> <span class="n">itable</span><span class="p">}</span>
+        <span class="c"># put any desired __table_args__: {} here</span>
+
+        <span class="c"># no primary key, can&#39;t map. spoof primary key mapping from inputs</span>
+        <span class="k">if</span> <span class="n">primary_keys</span> <span class="ow">and</span> <span class="n">fulltable</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">:</span> 
+            <span class="n">dct</span><span class="p">[</span><span class="s">&#39;__mapper_args__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">itable</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">[</span><span class="n">fulltable</span><span class="p">]]}</span>
+
+        <span class="n">ORMTable</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">tablename</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+
+        <span class="n">outTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ORMTable</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">outTables</span>
+
+</div>
+<div class="viewcode-block" id="make_same_size"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.make_same_size">[docs]</a><span class="k">def</span> <span class="nf">make_same_size</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns numpy arrays the same size as longest inputs.</span>
+<span class="sd">    assume: lat1/lon1 are same size and lat2/lon2 are same size</span>
+<span class="sd">    assume: the smaller of the sizes is a scalar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#TODO: EAFP</span>
+    <span class="n">lon1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon1</span><span class="p">)</span>
+    <span class="n">lat1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span>
+    <span class="n">lon2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon2</span><span class="p">)</span>
+    <span class="n">lat2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+    <span class="c">#assume: lat1/lon1 are same size and lat2/lon2 are same size</span>
+    <span class="c">#assume: the smaller of the sizes is a scalar</span>
+    <span class="n">N1</span> <span class="o">=</span> <span class="n">lon1</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">N2</span> <span class="o">=</span> <span class="n">lon2</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">N1</span> <span class="o">&gt;</span> <span class="n">N2</span><span class="p">:</span>
+        <span class="n">lon2</span> <span class="o">=</span> <span class="n">lon2</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+        <span class="n">lat2</span> <span class="o">=</span> <span class="n">lat2</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">N2</span> <span class="o">&gt;</span> <span class="n">N1</span><span class="p">:</span>
+        <span class="n">lon1</span> <span class="o">=</span> <span class="n">lon1</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+        <span class="n">lat1</span> <span class="o">=</span> <span class="n">lat1</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span>
+
+</div>
+<div class="viewcode-block" id="gen_id"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.gen_id">[docs]</a><span class="k">def</span> <span class="nf">gen_id</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Produce a generator for sequential integer id values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; lastorid = 7</span>
+<span class="sd">    &gt;&gt;&gt; orid = gen_id(lastorid)</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    8</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    9</span>
+
+<span class="sd">    Generate more than one at a time:</span>
+
+<span class="sd">    &gt;&gt;&gt; orid, arid, wfid = (gen_id() for id in [&#39;orid&#39;, &#39;arid&#39;, &#39;wfid&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; orid.next(), arid.next()</span>
+<span class="sd">    (1, 1)</span>
+
+<span class="sd">    Dictionary of id generators for desired ids, starting where they left off.  </span>
+<span class="sd">    ids not in Lastid will be missing</span>
+
+<span class="sd">    &gt;&gt;&gt; ids = session.query(Lastid).filter(Lastid.keyname.in_([&#39;orid&#39;,&#39;arid&#39;]).all()</span>
+<span class="sd">    &gt;&gt;&gt; last = dict([(id.keyname, gen_id(id.keyvalue)) for id in ids])</span>
+<span class="sd">    &gt;&gt;&gt; last[&#39;orid&#39;].next()</span>
+<span class="sd">    8820005</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">i</span>
+</div>
+<div class="viewcode-block" id="travel_times"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.travel_times">[docs]</a><span class="k">def</span> <span class="nf">travel_times</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get *approximate* relative travel time(s).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ref : list or tuple of strings and/or floats</span>
+<span class="sd">        Reference phase names or horizontal velocities [km/sec].</span>
+<span class="sd">    deg : float, optional</span>
+<span class="sd">        Degrees of arc between two points of interest (spherical earth).</span>
+<span class="sd">    km : float, optional</span>
+<span class="sd">        Horizontal kilometers between two points of interest (spherical earth).</span>
+<span class="sd">    depth : float, optional. default, 0.</span>
+<span class="sd">        Depth (positive down) of event, in kilometers.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        Relative times, in seconds, same length as &quot;ref&quot;. NaN if requested time</span>
+<span class="sd">        is undefined.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Get relative P arrival and 2.7 km/sec surface wave arrival at 35 degrees</span>
+<span class="sd">    distance.</span>
+<span class="sd">    &gt;&gt;&gt; times = travel_times([&#39;P&#39;, 2.7], deg=35.0)</span>
+<span class="sd">    To get absolute window, add the origin time like:</span>
+<span class="sd">    &gt;&gt;&gt; w1, w2 = times + epoch_origin_time</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Either deg or km must be indicated.</span>
+<span class="sd">    The user is responsible for adding/subtracting time (such as origin</span>
+<span class="sd">    time, pre-window noise time, etc.) from those predicted in order to define </span>
+<span class="sd">    a window.</span>
+<span class="sd">    Phase travel times use ak135.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ref</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iref</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c"># phase time requested</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tt</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">deg</span><span class="p">:</span>
+                    <span class="n">deg</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">kilometers2degrees</span><span class="p">(</span><span class="n">km</span><span class="p">)</span>
+                <span class="n">tt</span> <span class="o">=</span> <span class="n">taup</span><span class="o">.</span><span class="n">getTravelTimes</span><span class="p">(</span><span class="n">deg</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s">&#39;ak135&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">ph</span><span class="p">[</span><span class="s">&#39;phase_name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ph</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">iref</span><span class="p">)</span>
+                <span class="n">itt</span> <span class="o">=</span> <span class="p">[</span><span class="n">ph</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ph</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="c"># phase not found</span>
+                <span class="n">itt</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># horizontal velocity</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">km</span><span class="p">:</span>
+                <span class="n">km</span> <span class="o">=</span> <span class="n">deg</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">360.0</span><span class="p">)</span><span class="o">*</span><span class="mf">6371.0</span>
+            <span class="n">itt</span> <span class="o">=</span> <span class="n">km</span><span class="o">/</span><span class="n">iref</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">itt</span>
+
+    <span class="k">return</span> <span class="n">times</span>
+
+</div>
+<div class="viewcode-block" id="add_rows"><a class="viewcode-back" href="../../pisces.util.html#pisces.util.add_rows">[docs]</a><span class="k">def</span> <span class="nf">add_rows</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handle common errors with logging in SQLAlchemy add_all.</span>
+
+<span class="sd">    Tries to add in bulk.  Failing that, it will rollback and optionally try</span>
+<span class="sd">    to add one at a time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session </span>
+<span class="sd">    rows : list</span>
+<span class="sd">        Mapped table instances.</span>
+<span class="sd">    recurse : bool, optional</span>
+<span class="sd">        After failure, try to add records individually.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    num : int</span>
+<span class="sd">        Number of objects added.  0 if none.</span>
+<span class="sd">    e : exception or None</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">ProgrammingError</span><span class="p">,</span> <span class="n">UnmappedInstanceError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c"># IntegrityError: duplicate row(s)</span>
+        <span class="c"># ProgrammingError: string encoding problem</span>
+        <span class="c"># UnmappedInstanceError: tried to add something like a list or None</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c"># always executed</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="ow">and</span> <span class="n">recurse</span><span class="p">:</span>
+            <span class="c"># if an exception was thrown and recursion was requested</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">add_rows</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="p">[</span><span class="n">row</span><span class="p">],</span> <span class="n">recurse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">num</span> <span class="o">+=</span> <span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">num</span><span class="p">,</span> <span class="n">e</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pisces 0.2.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan MacCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
