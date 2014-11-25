@@ -18,8 +18,7 @@ from numpy.distutils.core import setup, Extension
 doclines = __doc__.split("\n")
 
 # also stolen from ObsPy
-SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(
-    inspect.currentframe())))
+SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 # def find_packages():
 #     """
@@ -48,7 +47,7 @@ setup(name='pisces-db',
     install_requires=['numpy','obspy>=0.8','sqlalchemy>=0.7'],
     ext_package='pisces.io.lib',
     ext_modules=[Extension('libecompression', ['pisces/io/src/e_compression/e_compression.c']),
-         Extension('libconvert',glob.glob('pisces/io/src/convert/*.c'))],
+                 Extension('libconvert',glob.glob('pisces/io/src/convert/*.c'))],
     #package_data={'pysmo.aimbat': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
     #'entry_points' = {'console_scripts': ['find_events': 'pisces.scripts.find_events:main',
     #                                       find_stations': 'pisces.scripts.find_stations:main',
