@@ -1,5 +1,7 @@
 import pdb
 import sys
+from collections import OrderedDict
+
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 #from sqlalchemy.ext.declarative import DeferredReflection
@@ -164,14 +166,16 @@ def string_formatter(meta, structure):
     structfmt = []
     for idx, item in enumerate(structure):
         if item in tabledct:
-            itabfmt = ' '.join(["{{{}.{}:{}}}".format(idx, self._attrname[c.name], c.info.get('format','')) \
+            #e.g. {0.attribute_name:format} {1.attribute_name:format} ...
+            itabfmt = ' '.join(["{{{}.{}:{}}}".format(idx, c.name, c.info.get('format','')) \
                                 for c in tabledct[item].columns])
             structfmt.append(itabfmt)
         elif item in colfmtdct:
+            # e.g. {0:format} {1:format}
             structfmt.append("{{{}:{}}}".format(idx, colfmtdct[item]))
     return ' '.join(structfmt)
 
-## Methods for PiscesMeta ##
+################ Methods for PiscesMeta #####################
 def _init(self, *args, **kwargs):
     """
     Create a mapped table instance (a row).
@@ -181,17 +185,22 @@ def _init(self, *args, **kwargs):
     __table__ column info['default'] value.
 
     """
+    # Given to the metaclass to become the __init__ for the class, which means things in it are 
+    # done to the instances (self).
+
     # this method is a hot mess:
     # TODO: cache hidden properties line _positions, _types, _defaults, ...
-    #    in get_tables?
+    #    in get_tables?  --> No, put this in PiscesMeta.__init__
     # XXX: fails if no column.info dictionary (schema=Base.metadata wasn't
     #   supplied).
     # XXX: perhaps None was the intended value
-    # change init to accept any kwargs, but ignore unknown ones.
+    # TODO: change init to accept any kwargs, but ignore unknown ones.
 
     # XXX: fails for attribute name different from column name (e.g. 'yield_' vs 'yield')
     # use self.__mapper__.columns['yield_'].name to get attr-column mapping
-    self._attrname = {c.name: a for a,c in self.__mapper__.c.items()} #{col_name: attr_name}
+    # TODO: I think it want this snippet to be in PiscesMeta.__new__
+    #self._attrname = {c.name: a for a,c in self.__mapper__.c.items()} #{col_name: attr_name}
+    #self._strfmt = string_formatter(self.__base__.metadata, [self.__table__.name])
     if args:
         # positional value instantiation
         if kwargs:
@@ -223,12 +232,13 @@ def _init(self, *args, **kwargs):
 
 def _str(self):
     """Return a schema-aware flat file row representation."""
-    attrname = {c.name: a for a,c in self.__mapper__.c.items()} 
     #fmt = string_formatter(self.__table__.metadata, [attrname[c.name] for c in self.__table__.columns])
-    fmt = string_formatter(self.__table__.metadata, [self.__table__.name])
-
-    return fmt.format(self)
+    #fmt = string_formatter(self.__table__.metadata, [self.__table__.name])
+    #return fmt.format(self)
     
+    # XXX: i don't know why this works...
+    return self._format_string.format(*self)
+
 def _repr(self):
     # TODO: make this use the same mechanics as __getitem__
     """
@@ -250,8 +260,7 @@ def _repr(self):
     items = [(col.name, getattr(self, col.name)) for col in 
               self.__mapper__.primary_key]
 
-    return "{0}({1})".format(self.__class__.__name__,
-        ', '.join(['{0}={1!r}'.format(*_) for _ in items]))
+    return "{0}({1})".format(self.__class__.__name__, ', '.join(['{0}={1!r}'.format(*_) for _ in items]))
 
 
 def from_string(cls, line, default_on_error=None):
@@ -338,14 +347,16 @@ def _len(self):
     # needed for _getitem__, i think
     return len(self.__table__.columns)
 
-def _eq(self):
+def _eq(self, other):
     """ True if primary key values are all equal. """
-    return all([getattr(self, self._attrname[c.name]) == getattr(inst, inst._attrname[c.name]) 
+    return all([getattr(self, self._attrname[c.name]) == getattr(other, other._attrname[c.name]) 
                 for c in self.__table__.primary_key.columns])
 
 
 class PiscesMeta(DeclarativeMeta):
     def __new__(cls, clsname, parents, dct):
+
+        # all child classes will have these methods/data
         dct['__init__'] = _init
         dct['__str__'] = _str
         dct['__repr__'] = _repr
@@ -354,13 +365,12 @@ class PiscesMeta(DeclarativeMeta):
         dct['__len__'] = _len
         dct['__eq__'] = _eq
         dct['from_string'] = classmethod(from_string)
-        dct['_column_info_registry'] = {}
+        dct['_column_info_registry'] = {}   #this is a class-level attribute
 
-        # put schema into __table_args__, if present
+        # if __tablename__ looks like 'schema.tablename', split it and move schema to __table_args__
         # see http://www.sqlalchemy.org/trac/ticket/2700 for a possibly
         # better way to do this type of thing.
         try:
-            # __tablename__ looks like 'schema.tablename'
             schema, tablename = dct['__tablename__'].split('.')
             dct['__tablename__'] = tablename
             SchemaBase = declarative_base(metadata=sa.MetaData(schema=schema))
@@ -373,12 +383,19 @@ class PiscesMeta(DeclarativeMeta):
             # no __tablename__, __table_args__
             pass
         except ValueError:
-            # not schema-qualified
+            # not a schema-qualified name
             pass
 
         return super(PiscesMeta, cls).__new__(cls, clsname, parents, dct) 
 
     def __init__(cls, clsname, parents, dct):
+
+        # called once with a new Base
+        # called again for each __abstract__ inheriting class
+        # called again for each actual class
+        # _not_ called for class instances (rows).  The's dct['__init__']
+
+        # this is SQLA's DeclarativeMeta.__init__
         super(PiscesMeta, cls).__init__(clsname, parents, dct) 
 
         # store Column info dictionary in base._column_info_registry
@@ -389,9 +406,17 @@ class PiscesMeta(DeclarativeMeta):
                 except KeyError:
                     pass
 
+        # for actual tables, add usefull class attributes
+        # "cls._format_string" is the class's format string (duh)
+        # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
+        if hasattr(cls, '__table__'):
+            cls._attrname = {c.name: a for a,c in cls.__mapper__.c.items()} #{col_name: attr_name}
+            cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
 
-# common parser functions for info['parser']
+
+################# common parser functions for info['parser'] ##################
 # these return None upon exception, which is later converted to info['default']
+
 def parse_str(s):
     return str(s).strip() or None
 
