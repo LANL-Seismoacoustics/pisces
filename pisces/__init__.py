@@ -13,13 +13,13 @@ solution that:
 
 The ultimate goal of Pisces is to allow the user to write code that will not 
 eventually have to be abandoned due to different project scales, system 
-architectures, or budgetary and licensing concerns.  
+architectures, or licensing concerns.  
 
 """
 
 __version__ = '0.2'
 
-from pisces.util import db_connect, get_tables, travel_times
+from pisces.util import db_connect, get_tables, travel_times, make_table
 from pisces.schema.util import copy_metadata, string_formatter
 #from pisces.io.flatfile import read_flatfile, format_records
 from pisces.io.trace import wfdisc2trace

@@ -18,7 +18,7 @@ from numpy.distutils.core import setup, Extension
 doclines = __doc__.split("\n")
 
 # also stolen from ObsPy
-SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 # def find_packages():
 #     """

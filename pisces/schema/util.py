@@ -236,7 +236,8 @@ def _str(self):
     #fmt = string_formatter(self.__table__.metadata, [self.__table__.name])
     #return fmt.format(self)
     
-    # XXX: i don't know why this works...
+    # XXX: i don't know why this works.  I expected an unpacked `self` to work, because it can 
+    # iterate itself.  Think it has something to do with the way _format_string is constructed.
     return self._format_string.format(*self)
 
 def _repr(self):
@@ -353,6 +354,13 @@ def _eq(self, other):
                 for c in self.__table__.primary_key.columns])
 
 
+def _update_docstring(cls):
+    s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.') \
+            for c in cls.__table__.columns])
+    s += "\n\nFORMAT STRING:\n{}\n".format(cls._format_string)
+    s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
+    return s
+
 class PiscesMeta(DeclarativeMeta):
     def __new__(cls, clsname, parents, dct):
 
@@ -412,6 +420,7 @@ class PiscesMeta(DeclarativeMeta):
         if hasattr(cls, '__table__'):
             cls._attrname = {c.name: a for a,c in cls.__mapper__.c.items()} #{col_name: attr_name}
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
+            cls.__doc__ = _update_docstring(cls)
 
 
 ################# common parser functions for info['parser'] ##################

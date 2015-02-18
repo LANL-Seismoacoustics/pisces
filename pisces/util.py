@@ -231,6 +231,23 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     return outTables
 
 
+def make_table(fulltablename, prototype):
+    try:
+        owner, tablename = fulltablename.split('.')
+    except ValueError:
+        owner, tablename = None, fulltablename
+
+    parents = (prototype,)
+    if owner:
+        OwnerBase = declarative_base(metadata=sa.MetaData(schema=owner))
+        parents = (OwnerBase, prototype)
+    else:
+        parents = (prototype,)
+
+    dct = {'__tablename__': tablename}
+
+    return type(tablename.capitalize(), parents, dct)
+
 def make_same_size(lat1, lon1, lat2, lon2):
     """
     Returns numpy arrays the same size as longest inputs.

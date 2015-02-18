@@ -34,6 +34,8 @@ class Client(object):
             For sqlite, this is the database file name.
         conn: string, optional
             A fully-formed SQLAlchemy style connection string.
+        session : sqlalchemy.orm.Session
+            An existing session instance.
 
         Examples
         --------
@@ -43,7 +45,10 @@ class Client(object):
                             instance='mydb')
 
         """
-        session = ps.db_connect(**kwargs)
+        if kwargs.get('session', None):
+            session = session
+        else:
+            session = ps.db_connect(**kwargs)
         self.metadata = sa.MetaData(session.bind)
         self.session = session
 
