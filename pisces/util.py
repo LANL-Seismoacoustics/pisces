@@ -232,6 +232,28 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 def make_table(fulltablename, prototype):
+    """
+    Create a new ORM class/model on-the-fly from a prototype.
+
+    Parameters
+    ----------
+    fulltablename : str
+        Schema-qualified name of the database table, like 'owner.tablename' or just 'tablename'.
+        The resulting classname will be the capitalized tablename, like 'Tablename'.
+    prototype : sqlalchemy abstract ORM class
+        The prototype table class. pisces.schema.css.Site, for example.
+
+    Notes
+    -----
+    It's better to declare classes in an external module, and import them.  SQLAlchemy doesn't let 
+    you use the same table names twice, so on-the-fly class creation and naming is risky:
+
+    1. You can't use make_tables again if you accidentally overwrite the variable you used
+       to hold the class you created.  
+    2. You can't use make_tables again if you import something from a script/module where 
+       make_tables was used with the same table name.  
+
+    """
     try:
         owner, tablename = fulltablename.split('.')
     except ValueError:
@@ -247,6 +269,7 @@ def make_table(fulltablename, prototype):
     dct = {'__tablename__': tablename}
 
     return type(tablename.capitalize(), parents, dct)
+
 
 def make_same_size(lat1, lon1, lat2, lon2):
     """
