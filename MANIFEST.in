@@ -32,6 +32,9 @@ include pisces/schema/__init__.py
 include pisces/schema/css3.py
 include pisces/schema/kbcore.py
 include pisces/schema/util.py
+include pisces/tables/__init__.py
+include pisces/tables/css3.py
+include pisces/tables/kbcore.py
 include pisces_db.egg-info/PKG-INFO
 include pisces_db.egg-info/SOURCES.txt
 include pisces_db.egg-info/dependency_links.txt
