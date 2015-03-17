@@ -364,7 +364,7 @@ def _update_docstring(cls):
 class PiscesMeta(DeclarativeMeta):
     def __new__(cls, clsname, parents, dct):
 
-        # all child classes will have these methods/data
+        # child classes will have methods/data put into "dct"
         dct['__init__'] = _init
         dct['__str__'] = _str
         dct['__repr__'] = _repr
@@ -414,8 +414,7 @@ class PiscesMeta(DeclarativeMeta):
                 except KeyError:
                     pass
 
-        # for actual tables, add usefull class attributes
-        # "cls._format_string" is the class's format string (duh)
+        # for actual ORM classes, add usefull class attributes
         # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
         if hasattr(cls, '__table__'):
             cls._attrname = {c.name: a for a,c in cls.__mapper__.c.items()} #{col_name: attr_name}
