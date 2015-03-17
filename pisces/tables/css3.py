@@ -1,7 +1,7 @@
 import pisces.schema.css3 as css3
 
 
-class Affiliation(kb.Affiliation):
+class Affiliation(css3.Affiliation):
     __tablename__ = 'affiliation'
 
 class Amplitude(css3.Amplitude):
