@@ -19,7 +19,7 @@ before_install:
 # Install packages
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose sqlalchemy
-  - conda install --yes -c obspy obspy
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION -c obspy obspy
   - python setup.py install
 # command to run tests
 # script: nosetests
