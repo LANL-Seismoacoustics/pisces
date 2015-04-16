@@ -11,21 +11,11 @@ pages:
 - ['tutorial.waveforms.md', 'Tutorial', 'Import/Export Waveforms']
 - ['tutorial.flatfiles.md', 'Tutorial', 'Import/Export Flat Files']
 - ['api.md', 'API Documentation']
-#- ['pisces.md', 'Documentation', 'pisces']
-#- ['pisces.request.md', 'Documentation', 'pisces.request']
-#- ['pisces.client.md', 'Documentation', 'pisces.client']
-#- ['pisces.schema.md', 'Documentation', 'pisces.schema']
-#- ['pisces.schema.css3.md', 'Documentation', 'pisces.schema.css3']
-#- ['pisces.schema.kbcore.md', 'Documentation', 'pisces.schema.kbcore']
-#- ['pisces.io.md', 'Documentation', 'pisces.io']
-#- ['pisces.io.readwaveform.md', 'Documentation', 'pisces.io.readwaveform']
-#- ['pisces.io.sac.md', 'Documentation', 'pisces.io.sac']
-#- ['pisces.io.mseed.md', 'Documentation', 'pisces.io.mseed']
 - ['about.roadmap.md', 'About', 'Roadmap']
 - ['about.license.md', 'About', 'License']
 - ['about.group.md', 'About', "User's Group"]
 
-docs_dir: 'docs/pages/source'
-site_dir: 'docs/pages/build'
+docs_dir: 'source/pages'
+site_dir: 'html'
 theme: 'mkdocs'
 # theme_center_lead: true

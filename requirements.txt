@@ -1,3 +1,2 @@
-numpy
-obspy>0.8
-sqlalchemy>0.7
+obspy
+sqlalchemy

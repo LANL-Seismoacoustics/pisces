@@ -231,6 +231,46 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     return outTables
 
 
+def make_table(fulltablename, prototype):
+    """
+    Create a new ORM class/model on-the-fly from a prototype.
+
+    Parameters
+    ----------
+    fulltablename : str
+        Schema-qualified name of the database table, like 'owner.tablename' or just 'tablename'.
+        The resulting classname will be the capitalized tablename, like 'Tablename'.
+    prototype : sqlalchemy abstract ORM class
+        The prototype table class. pisces.schema.css.Site, for example.
+
+    Notes
+    -----
+    It's better to declare classes in an external module, and import them.  SQLAlchemy doesn't let 
+    you use the same table names twice, so on-the-fly class creation and naming is risky:
+
+    1. You can't use make_tables again if you accidentally overwrite the variable you used
+       to hold the class you created.  
+    2. You can't use make_tables again if you import something from a script/module where 
+       make_tables was used with the same table name.  
+
+    """
+    try:
+        owner, tablename = fulltablename.split('.')
+    except ValueError:
+        owner, tablename = None, fulltablename
+
+    parents = (prototype,)
+    if owner:
+        OwnerBase = declarative_base(metadata=sa.MetaData(schema=owner))
+        parents = (OwnerBase, prototype)
+    else:
+        parents = (prototype,)
+
+    dct = {'__tablename__': tablename}
+
+    return type(tablename.capitalize(), parents, dct)
+
+
 def make_same_size(lat1, lon1, lat2, lon2):
     """
     Returns numpy arrays the same size as longest inputs.
@@ -397,3 +437,12 @@ def add_rows(session, rows, recurse=False):
                 num += i
 
     return num, e
+
+
+def create_table_as(tablename, query):
+    # get names, types from query.column_descriptions, in order
+    # make a class from these types and tablename
+    # query.session.add_all
+    # return class
+    pass
+

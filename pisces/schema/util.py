@@ -1,4 +1,7 @@
+import pdb
 import sys
+from collections import OrderedDict
+
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 #from sqlalchemy.ext.declarative import DeferredReflection
@@ -163,13 +166,16 @@ def string_formatter(meta, structure):
     structfmt = []
     for idx, item in enumerate(structure):
         if item in tabledct:
-            itabfmt = ' '.join(["{{{}.{}:{}}}".format(idx, c.name, c.info.get('format','')) for c in tabledct[item].columns])
+            #e.g. {0.attribute_name:format} {1.attribute_name:format} ...
+            itabfmt = ' '.join(["{{{}.{}:{}}}".format(idx, c.name, c.info.get('format','')) \
+                                for c in tabledct[item].columns])
             structfmt.append(itabfmt)
         elif item in colfmtdct:
+            # e.g. {0:format} {1:format}
             structfmt.append("{{{}:{}}}".format(idx, colfmtdct[item]))
     return ' '.join(structfmt)
 
-## Methods for PiscesMeta ##
+################ Methods for PiscesMeta #####################
 def _init(self, *args, **kwargs):
     """
     Create a mapped table instance (a row).
@@ -179,13 +185,24 @@ def _init(self, *args, **kwargs):
     __table__ column info['default'] value.
 
     """
+    # Given to the metaclass to become the __init__ for the class, which means things in it are 
+    # done to the instances (self).
+
+    # this method is a hot mess:
     # TODO: cache hidden properties line _positions, _types, _defaults, ...
-    #    in get_tables?
+    #    in get_tables?  --> No, put this in PiscesMeta.__init__
     # XXX: fails if no column.info dictionary (schema=Base.metadata wasn't
     #   supplied).
     # XXX: perhaps None was the intended value
-    # change init to accept any kwargs, but ignore unknown ones.
+    # TODO: change init to accept any kwargs, but ignore unknown ones.
+
+    # XXX: fails for attribute name different from column name (e.g. 'yield_' vs 'yield')
+    # use self.__mapper__.columns['yield_'].name to get attr-column mapping
+    # TODO: I think it want this snippet to be in PiscesMeta.__new__
+    #self._attrname = {c.name: a for a,c in self.__mapper__.c.items()} #{col_name: attr_name}
+    #self._strfmt = string_formatter(self.__base__.metadata, [self.__table__.name])
     if args:
+        # positional value instantiation
         if kwargs:
             raise ValueError("Either positional or keyword arguments accepted.")
         if len(args) != len(self.__table__.columns):
@@ -194,31 +211,35 @@ def _init(self, *args, **kwargs):
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
-                    #handle callables, like datetime.datetime.now
-                    setattr(self, c.name, dflt())
+                    # handle callables, like datetime.datetime.now
+                    setattr(self, self._attrname[c.name], dflt())
                 else:
-                    setattr(self, c.name, dflt)
+                    setattr(self, self._attrname[c.name], dflt)
             else:
-                setattr(self, c.name, ival)
+                setattr(self, self._attrname[c.name], ival)
     else:
-        # use SQLA's keyword constructor, then replace Nones with values
+        # keyword value instantiation
+        # use SQLA's keyword constructor, then replace None attribute values with defaults 
         _declarative_constructor(self, **kwargs)
-        for c, ival in [(col, getattr(self, col.name, None)) 
-                        for col in self.__table__.columns]:
+        for c, ival in [(col, getattr(self, self._attrname[col.name], None)) for col in self.__table__.columns]:
             dflt = c.info.get('default', None)
             if ival is None:
                 if hasattr(dflt, '__call__'):
-                    setattr(self, c.name, dflt())
+                    setattr(self, self._attrname[c.name], dflt())
                 else:
-                    setattr(self, c.name, dflt)
+                    setattr(self, self._attrname[c.name], dflt)
 
 
 def _str(self):
     """Return a schema-aware flat file row representation."""
-    fmt = string_formatter(self.__table__.metadata, [self.__table__.name])
-
-    return fmt.format(self)
+    #fmt = string_formatter(self.__table__.metadata, [attrname[c.name] for c in self.__table__.columns])
+    #fmt = string_formatter(self.__table__.metadata, [self.__table__.name])
+    #return fmt.format(self)
     
+    # XXX: i don't know why this works.  I expected an unpacked `self` to work, because it can 
+    # iterate itself.  Think it has something to do with the way _format_string is constructed.
+    return self._format_string.format(*self)
+
 def _repr(self):
     # TODO: make this use the same mechanics as __getitem__
     """
@@ -240,8 +261,7 @@ def _repr(self):
     items = [(col.name, getattr(self, col.name)) for col in 
               self.__mapper__.primary_key]
 
-    return "{0}({1})".format(self.__class__.__name__,
-        ', '.join(['{0}={1!r}'.format(*_) for _ in items]))
+    return "{0}({1})".format(self.__class__.__name__, ', '.join(['{0}={1!r}'.format(*_) for _ in items]))
 
 
 def from_string(cls, line, default_on_error=None):
@@ -291,8 +311,7 @@ def from_string(cls, line, default_on_error=None):
             val = parser(line[pos:pos+w])
             #print "{} '{}'".format(col, line[pos:pos+w])
         except ValueError as e:
-            #XXX: ValueError? any error?
-            # remove this clause, in favor or error handling inside info['parse']
+            #TODO: remove this clause, in favor or error handling inside info['parse']
             if default_on_error and col in default_on_error:
                 # None are converted to defaults during __init__
                 # XXX: no it doesn't.  that'd be nice, though.
@@ -303,75 +322,82 @@ def from_string(cls, line, default_on_error=None):
                 #XXX: breaks for Python 3
                 raise type(e)(str(e) + msg)
 
+                # debuggin
                 #print("column: {}, value '{}'".format(c.name, line[pos:pos+w]))
                 #raise e
+
         vals.append(val)
         pos += w+1
 
     return cls(*vals)
 
+def from_function(cls, function, *args, **kwargs):
+    """
+    Create a list of instances from a custom function.
+
+    Parameters
+    ----------
+    function : function
+        A user-supplied function that takes *args, and *kwargs as arguments,
+        and returns a list of dictionaries: 
+
+        [dictionaries] = function(*args, *kwargs)  
+
+        The dictionary keys are column names, and the values are row values.
+        Each dictionary is unpacked into the class constructor to make a class
+        instance.
+
+    Returns
+    -------
+    list
+        A list of class (row) instances, populated from the dictionaries
+        returned by the user-supplied function.
+
+    Examples
+    --------
+    >>> from mymodule import sac_to_arrivals, sac_to_origin
+    >>> arrivals = Arrival.from_function(sac_to_arrivals, sacfile)
+    >>> origins = Origin.from_function(sac_to_origin,  sacfile)
+
+    """
+    dict_list = function(*args, **kwargs)
+
+    return [cls(**d) for d in dict_list]
+
 def _getitem(self, i):
-    # this makes class instances behave like NumPy records
-    # implements __iter__ behavior as a side-effect
-    return [getattr(self, c.name, c.info.get('default', None)) \
-            for c in self.__table__.columns].__getitem__(i)
+    # integer indexing based on column order in __table__
+    # helps implement __iter__ behavior as a side-effect
+    values = [getattr(self, self._attrname[c.name], c.info.get('default', None)) \
+            for c in self.__table__.columns]
+    return values.__getitem__(i)
 
 def _setitem(self, i, val):
-    # this makes tables behave like NumPy records
-    setattr(self, self.__table__.columns.keys()[i], val)
+    # integer indexing based on column order in __table__
+    # helps implement __iter__ behavior as a side-effect
+    colname = self.__table__.columns.keys()[i]
+    setattr(self, self._attrname[colname], val)
 
 def _len(self):
     # needed for _getitem__, i think
     return len(self.__table__.columns)
 
-def _eq(self):
+def _eq(self, other):
     """ True if primary key values are all equal. """
-    return all([getattr(self, c.name) == getattr(inst, c.name ) 
-                for attr in self.__table__.primary_key.columns])
+    return all([getattr(self, self._attrname[c.name]) == getattr(other, other._attrname[c.name]) 
+                for c in self.__table__.primary_key.columns])
 
-def _update_schema(targs, schema):
-    """Put schema dict into __table_args__[-1].
 
-    Parameters
-    ----------
-    targs: tuple
-        The initial __table_args__.
-    schema: str
-        The schema string for __table_args__[-1]['schema'].
-
-    Returns
-    -------
-    targsout : tuple
-        Ends in a dict containing {'schema': schema}
-        Retains all other args.
-
-    """
-    # TODO: make this a generic '_update_args' function, so it can also be used 
-    #   with __mapper_args__
-    try:
-        # targs is a tuple ending in a dict
-        targs[-1].update({'schema': schema})
-    except AttributeError:
-        # targs is a tuple not ending in a dict
-            targs = targs + ({'schema': schema},)
-    except IndexError:
-        # targs is an empty tuple
-            targs = ({'schema': schema},)
-    except KeyError:
-        # targs is a dict
-        targs.update({'schema': schema})
-
-    return targs
-
+def _update_docstring(cls):
+    s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.') \
+            for c in cls.__table__.columns])
+    s += "\n\nFORMAT STRING:\n{}\n".format(cls._format_string)
+    s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
+    return s
 
 class PiscesMeta(DeclarativeMeta):
     def __new__(cls, clsname, parents, dct):
-        #if '__abstract__' in dct:
-        #    # let normal abstract construction apply.
-        #    # necessary?
-        #    pass
-        #else:
-        #    # assign methods for child classes
+
+        # child classes will have methods/data put into "dct"
         dct['__init__'] = _init
         dct['__str__'] = _str
         dct['__repr__'] = _repr
@@ -379,40 +405,43 @@ class PiscesMeta(DeclarativeMeta):
         dct['__setitem__'] = _setitem
         dct['__len__'] = _len
         dct['__eq__'] = _eq
-        dct['from_string'] = classmethod(from_string)
-        dct['_column_info_registry'] = {}
 
-        # put schema into __table_args__, if present
+        dct['from_string'] = classmethod(from_string)
+        dct['from_function'] = classmethod(from_function)
+
+        dct['_column_info_registry'] = {}   #this is a class-level attribute
+
+        # if __tablename__ looks like 'schema.tablename', split it and move schema to __table_args__
         # see http://www.sqlalchemy.org/trac/ticket/2700 for a possibly
-        #   better way to do this type of thing.
+        # better way to do this type of thing.
         try:
-            # schema-qualified __tablename__
             schema, tablename = dct['__tablename__'].split('.')
             dct['__tablename__'] = tablename
-            #ipdb.set_trace()
-            # add a new base in front, with the correct schema
             SchemaBase = declarative_base(metadata=sa.MetaData(schema=schema))
-            # copy the column registry into the new base, for DeferredReflection
+            # copy the column registry into the new base, for use with DeferredReflection
             for p in parents:
                 if getattr(p, '_column_info_registry', {}):
                     SchemaBase._column_info_registry = p._column_info_registry
             parents = (SchemaBase,) + parents
-            #dct['__table_args__'] = _update_schema(dct['__table_args__'], schema)
-            #dct['__table_args__'] = _update_schema(dct.get('__table_args__', ()), schema)
-            #dct['__table_args__'][-1].update({'extend_existing': True})
         except KeyError:
             # no __tablename__, __table_args__
             pass
         except ValueError:
-            # not schema-qualified
+            # not a schema-qualified name
             pass
 
         return super(PiscesMeta, cls).__new__(cls, clsname, parents, dct) 
-        #return DeclarativeMeta.__new__(cls, clsname, parents, dct) 
-        #return type.__new__(cls, clsname, parents, dct) 
 
     def __init__(cls, clsname, parents, dct):
+
+        # called once with a new Base
+        # called again for each __abstract__ inheriting class
+        # called again for each actual class
+        # _not_ called for class instances (rows).  The's dct['__init__']
+
+        # this is SQLA's DeclarativeMeta.__init__
         super(PiscesMeta, cls).__init__(clsname, parents, dct) 
+
         # store Column info dictionary in base._column_info_registry
         for key, val in dct.iteritems():
             if isinstance(val, sa.Column):
@@ -421,9 +450,17 @@ class PiscesMeta(DeclarativeMeta):
                 except KeyError:
                     pass
 
+        # for actual ORM classes, add usefull class attributes
+        # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
+        if hasattr(cls, '__table__'):
+            cls._attrname = {c.name: a for a,c in cls.__mapper__.c.items()} #{col_name: attr_name}
+            cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
+            cls.__doc__ = _update_docstring(cls)
 
-# common parser functions for info['parser']
+
+################# common parser functions for info['parser'] ##################
 # these return None upon exception, which is later converted to info['default']
+
 def parse_str(s):
     return str(s).strip() or None
 
@@ -438,31 +475,3 @@ def parse_int(s):
     return int(s) or None
 
 
-#@event.listens_for(DeferredReflection, "instrument_class", propagate=True)
-#def process_primary_keys(mapper, cls):
-#    """Enforce __primary_keys__.
-#
-#    Overwrites cls.__mapper_args__ with a PrimaryKeyConstraint for all columns
-#    named in cls.__primary_keys__.
-#
-#    """
-#    #print " Table: {}".format(repr(t))
-#    #print " __table_args__: {}".format(cls.__table_args__)
-#    if hasattr(cls, '__primary_keys__'):
-#        t = cls.__table__
-#        if not all([key in t.primary_key.columns for key in cls.__primary_keys__]):
-#            pkcols = [getattr(t.c, col) for col in cls.__primary_keys__]
-#            #pk = sa.PrimaryKeyConstraint(*pkcols)
-#            #pk = sa.PrimaryKeyConstraint(*cls.__primary_keys__)
-#            #cls.__table_args__ = (pk,) + cls.__table_args__
-#            #cls.__mapper_args__ = (pk,)
-#            cls.__mapper_args__ = (sa.PrimaryKeyConstraint(*pkcols),)
-#            # XXX: I don't know why the dictionary syntax doesn't work.
-#            #cls.__mapper_args__ = {'primary_key': pkcols}
-#
-#    # update __table__.columns with info dictionaries in base._column_info_registry
-#    column_info = getattr(cls.__base__, '_column_info_registry', None)
-#    if column_info:
-#        for c in cls.__table__.columns:
-#            c.info.update(column_info.get(c.name, {}))
-#
