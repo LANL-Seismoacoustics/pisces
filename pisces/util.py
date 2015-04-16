@@ -437,3 +437,12 @@ def add_rows(session, rows, recurse=False):
                 num += i
 
     return num, e
+
+
+def create_table_as(tablename, query):
+    # get names, types from query.column_descriptions, in order
+    # make a class from these types and tablename
+    # query.session.add_all
+    # return class
+    pass
+
