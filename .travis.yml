@@ -20,8 +20,9 @@ install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose 
   - conda install --yes -c obspy obspy
   - conda install --yes sqlalchemy=0.9.9
-  - python setup.py build
   - python setup.py install
+  - python -c "import sys; print sys.path"
+  - python -c "import os; import pisces; print(os.path.dirname(pisces.__file__))"
 
 # command to run tests
 script: nosetests
