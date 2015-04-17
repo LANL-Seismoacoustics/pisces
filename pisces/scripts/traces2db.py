@@ -54,6 +54,7 @@ PROTOTYPES = {'affiliation': kb.Affiliation,
               'assoc': kb.Assoc,
               'event': kb.Event,
               'instrument': kb.Instrument,
+              'lastid': kb.Lastid,
               'origin': kb.Origin,
               'site': kb.Site,
               'sitechan': kb.Sitechan,
@@ -62,6 +63,51 @@ PROTOTYPES = {'affiliation': kb.Affiliation,
 #TODO: refactor parts of main into db.util.traces2db
 #TODO: factor out parts for updating a database, gear only towards writing 
 #       fresh tables
+
+def reflect_or_create_tables(options):
+    """
+    returns a dict of classes
+     make 'em if they don't exist
+     "tables" is {'wfdisc': mapped table class, ...}
+     """
+    tables = {}
+    # this list should mirror the command line table options
+    for table in mapfns.keys() + ['lastid']:
+        #if options.all_tables:
+        fulltabnm = getattr(options, table, None)
+        if fulltabnm:
+            try:
+                tables[table] = ps.get_tables(session.bind, [fulltabnm])[0]
+            except NoSuchTableError:
+                print "{0} doesn't exist. Adding it.".format(fulltabnm)
+                tables[table] = ps.make_table(fulltabnm, PROTOTYPES[table])
+                tables[table].__table__.create(session.bind, checkfirst=True)
+
+    return tables
+
+
+def get_file_iterator(options):
+    """
+    returns a sequence of files
+    raises IOError if problemmatic
+    raises ValueError if problemmatic
+    """
+    ###########  BUILD FILE ITERATOR/GENERATOR ########## 
+    if options.f is not None:
+        files = options.f
+    elif options.l is not None:
+        try:
+            lfile = open(options.l, 'r')
+            #make a generator of non-blank lines
+            files = (line.strip() for line in lfile if line.strip())
+        except IOError:
+            msg = "{0} does not exist.".format(options.l)
+            raise IOError(msg)
+    else:
+        msg = "Must provide input files or file list."
+        raise ValueError(msg)
+
+    return files
 
 #---------------- MAIN ---------------#
 def main(argv=None):
@@ -264,37 +310,17 @@ def main(argv=None):
                                             port=options.port, 
                                             instance=options.instance)
 
-            ########## REFLECT OR CREATE TABLES ########## 
-            # make 'em if they don't exist
-            # "tables" is {'wfdisc': mapped table class, ...}
-            tables = {}
-            # this list should mirror the command line table options
-            for table in mapfns.keys() + ['lastid']:
-                #if options.all_tables:
-                fulltabnm = getattr(options, table, None)
-                if fulltabnm:
-                    try:
-                        tables[table] = ps.get_tables(session.bind, [fulltabnm])[0]
-                    except NoSuchTableError:
-                        print "{0} doesn't exist. Adding it.".format(fulltabnm)
-                        tables[table] = ps.make_table(fulltabnm, PROTOTYPES[table])
-                        tables[table].__table__.create(session.bind, checkfirst=True)
+            tables = reflect_or_create_tables(options)
 
-            ###########  BUILD FILE ITERATOR/GENERATOR ########## 
-            if options.f is not None:
-                files = options.f
-            elif options.l is not None:
-                try:
-                    lfile = open(options.l, 'r')
-                    #make a generator of only non-blank lines
-                    #pdb.set_trace()
-                    files = (line.strip() for line in lfile if line.strip())
-                    #lfile.close()
-                except IOError:
-                    print "{0} does not exist.".format(options.l)
-                    exit_code = 1
-            else:
-                print "Must provide input files or file list." + os.linesep
+
+            try:
+                files = get_file_iterator(options)
+            except IOError as e:
+                # file list doesn't exist
+                raise e
+                exit_code = 1
+            except ValueError:
+                # input neither a file list nor input files
                 print parser.print_help()
                 exit_code = 1
 
