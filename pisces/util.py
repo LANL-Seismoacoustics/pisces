@@ -471,7 +471,7 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     Lastid(keyname='orid'), Lastid(keyname='orid')
 
     Test for their existence by name.
-    >>> 'orid' in last 
+    >>> 'orid' in last
     True
 
     Use the Lastid's 'next' generator behavior for readable code
