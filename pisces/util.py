@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
+from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
 
 import obspy.core.util.geodetics as geod
 from obspy.core import AttribDict
@@ -23,7 +23,7 @@ def db_connect(*args, **kwargs):
     Parameters
     ----------
     backend : string
-        One of the SQLAlchemy connection strings from 
+        One of the SQLAlchemy connection strings from
         http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls
     user : string, optional
         Not required for sqlite.
@@ -487,9 +487,9 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
 
     """
 
-    q = session.query(Lastid)
     last = AttribDict()
 
+    q = session.query(Lastid)
     if keynames is None:
         lastids = q.all()
     else:
