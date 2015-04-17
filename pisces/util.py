@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
+from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
 
 import obspy.core.util.geodetics as geod
 from obspy.core import AttribDict
@@ -23,7 +23,7 @@ def db_connect(*args, **kwargs):
     Parameters
     ----------
     backend : string
-        One of the SQLAlchemy connection strings from 
+        One of the SQLAlchemy connection strings from
         http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls
     user : string, optional
         Not required for sqlite.
@@ -37,7 +37,7 @@ def db_connect(*args, **kwargs):
         The database instance.  For sqlite, this is the file name.
     conn : string, optional
         A fully-formed SQLAlchemy style connection string.
-        
+
     Returns
     -------
     session : bound SQLAlchemy Session instance
@@ -91,7 +91,7 @@ def db_connect(*args, **kwargs):
                 serverport += ':' + str(port)
         else:
             serverport = ''
-            
+
         conn = "{0}://{1}{2}/{3}".format(backend, userpsswd, serverport, instance)
 
     engine = sa.create_engine(conn)
@@ -125,7 +125,7 @@ def table_contains_all(itable, keys):
 #
 #    return type(fulltable.capitalize(), parents, {})
 
-def get_tables(bind, fulltablenames, metadata=None, primary_keys=None, 
+def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
     Reflect/load an arbitrary database table as a mapped class.
@@ -142,23 +142,23 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
         Leave out 'owner.' if database doesn't use owners (sqlite, etc...)
     metadata : sqlalchemy.MetaData, optional
         MetaData into which reflected Tables go. If not supplied, a new one
-        is created, accessible from MyTable.metadata on one of the loaded 
+        is created, accessible from MyTable.metadata on one of the loaded
         tables.
     primary_keys : dict, optional
-        Tablename, primary key list pairs of the form, 
-        {'owner1.tablename1': ['primary_key1', 'primary_key2']} 
+        Tablename, primary key list pairs of the form,
+        {'owner1.tablename1': ['primary_key1', 'primary_key2']}
         These are required if the table is a view or has no primary key.
     base : sqlalchemy.ext.declarative.api.DeclarativeMeta, optional
         The declarative base the from which loaded table classes will inherit.
-        The info dictionary of loaded Columns will be updated from those in 
-        the base.  These are used to generate default values and string 
+        The info dictionary of loaded Columns will be updated from those in
+        the base.  These are used to generate default values and string
         representations.  Import from pisces.schema.css3, or extensions thereof.
         Default, sqlalchemy.ext.declarative.api.DeclarativeMeta.
 
     Returns
     -------
     list
-        Corresponding list of ORM table classes mapped to reflected tables, 
+        Corresponding list of ORM table classes mapped to reflected tables,
         Can be used for querying or making row instances.
 
     Raises
@@ -172,8 +172,8 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     In SQLAlchemy, a database account/owner is generally used with the "schema"
     keyword argument.
 
-    For core tables in a Pisces schema, this function isn't recommended.  
-    Instead, subclass from the known abstract table.  
+    For core tables in a Pisces schema, this function isn't recommended.
+    Instead, subclass from the known abstract table.
 
     Examples
     --------
@@ -208,9 +208,9 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
         except ValueError:
             # no owner given
             owner, tablename = None, fulltable
-            
+
         # reflect the table
-        itable = sa.Table(tablename, metadata, autoload=True, 
+        itable = sa.Table(tablename, metadata, autoload=True,
                           autoload_with=bind, schema=owner)
 
         # update reflected table with known schema column info
@@ -222,13 +222,13 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
         # put any desired __table_args__: {} here
 
         # no primary key, can't map. spoof primary key mapping from inputs
-        if primary_keys and fulltable in primary_keys: 
+        if primary_keys and fulltable in primary_keys:
             dct['__mapper_args__'] = {'primary_key': [getattr(itable.c, key) for key in primary_keys[fulltable]]}
 
         ORMTable = type(tablename.capitalize(), parents, dct)
 
         outTables.append(ORMTable)
-        
+
     return outTables
 
 
@@ -239,20 +239,22 @@ def make_table(fulltablename, prototype):
     Parameters
     ----------
     fulltablename : str
-        Schema-qualified name of the database table, like 'owner.tablename' or just 'tablename'.
-        The resulting classname will be the capitalized tablename, like 'Tablename'.
+        Schema-qualified name of the database table, like 'owner.tablename'
+        or just 'tablename'.  The resulting classname will be the capitalized
+        tablename, like 'Tablename'.
     prototype : sqlalchemy abstract ORM class
         The prototype table class. pisces.schema.css.Site, for example.
 
     Notes
     -----
-    It's better to declare classes in an external module, and import them.  SQLAlchemy doesn't let 
-    you use the same table names twice, so on-the-fly class creation and naming is risky:
+    It's better to declare classes in an external module, and import them.
+    SQLAlchemy doesn't let you use the same table names twice, so on-the-fly
+    class creation and naming is risky:
 
-    1. You can't use make_tables again if you accidentally overwrite the variable you used
-       to hold the class you created.  
-    2. You can't use make_tables again if you import something from a script/module where 
-       make_tables was used with the same table name.  
+    1. You can't use make_tables again if you accidentally overwrite the
+       variable you used to hold the class you created.
+    2. You can't use make_tables again if you import something from a
+       script/module where make_tables was used with the same table name.
 
     """
     try:
@@ -317,7 +319,7 @@ def gen_id(i=0):
     >>> orid.next(), arid.next()
     (1, 1)
 
-    Dictionary of id generators for desired ids, starting where they left off.  
+    Dictionary of id generators for desired ids, starting where they left off.
     ids not in Lastid will be missing
 
     >>> ids = session.query(Lastid).filter(Lastid.keyname.in_(['orid','arid']).all()
@@ -330,7 +332,7 @@ def gen_id(i=0):
         i += 1
         yield i
 
-def travel_times(ref, deg=None, km=None, depth=0.): 
+def travel_times(ref, deg=None, km=None, depth=0.):
     """
     Get *approximate* relative travel time(s).
 
@@ -363,7 +365,7 @@ def travel_times(ref, deg=None, km=None, depth=0.):
     -----
     Either deg or km must be indicated.
     The user is responsible for adding/subtracting time (such as origin
-    time, pre-window noise time, etc.) from those predicted in order to define 
+    time, pre-window noise time, etc.) from those predicted in order to define
     a window.
     Phase travel times use ak135.
 
@@ -401,7 +403,7 @@ def add_rows(session, rows, recurse=False):
 
     Parameters
     ----------
-    session : sqlalchemy.orm.Session 
+    session : sqlalchemy.orm.Session
     rows : list
         Mapped table instances.
     recurse : bool, optional
@@ -412,7 +414,7 @@ def add_rows(session, rows, recurse=False):
     num : int
         Number of objects added.  0 if none.
     e : exception or None
-    
+
     """
     e = None
     num = 0
@@ -442,9 +444,8 @@ def add_rows(session, rows, recurse=False):
 
 def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     """
-    Load or create Lastid instances into a attribute-based dictionary.
-
-    Very convenient for working with last ids
+    Load or create Lastid instances into a convenient and readable
+    attribute-based dictionary.
 
     Parameters
     ----------
@@ -465,20 +466,18 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     Examples
     --------
     Get and set lastid values directly by name or by attribute.
-    >>> ids = LastidManager(session, Lastid, ids=['orid', 'arid'])
-    >>> ids.orid
-    17
-    >>> ids['orid']
-    17
+    >>> last = get_lastids(session, Lastid, ['orid', 'arid'])
+    >>> last.orid, last['orid']
+    Lastid(keyname='orid'), Lastid(keyname='orid')
 
     Test for their existence by name.
-    >>> 'orid' in ids
+    >>> 'orid' in last 
     True
 
     Use the Lastid's 'next' generator behavior for readable code
-    >>> next(ids.orid)
+    >>> next(last.orid)
     18
-    >>> ids.orid
+    >>> last.orid.keyvalue
     18
 
     Update your database when you're done.
