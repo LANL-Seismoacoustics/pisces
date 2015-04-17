@@ -11,6 +11,7 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError 
 
 import obspy.core.util.geodetics as geod
+from obspy.core import AttribDict
 from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
@@ -437,3 +438,74 @@ def add_rows(session, rows, recurse=False):
                 num += i
 
     return num, e
+
+
+def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
+    """
+    Load or create Lastid instances into a attribute-based dictionary.
+
+    Very convenient for working with last ids
+
+    Parameters
+    ----------
+    session : sqlalchemy.orm.Session instance
+    Lastid : Lastid table class
+    ids : list or tuple of strings
+        Lastid.keyname values to load.
+    expunge : bool
+        If True, expunge loaded ids from the session.  This frees you
+        to modify them without affecting the database from which they
+        were loaded.  In this case, you'll have to add them back into a
+        session and commit them for their changes to be reflected on the
+        database.
+    create : bool
+        If True, create ids that don't already exist.
+
+
+    Examples
+    --------
+    Get and set lastid values directly by name or by attribute.
+    >>> ids = LastidManager(session, Lastid, ids=['orid', 'arid'])
+    >>> ids.orid
+    17
+    >>> ids['orid']
+    17
+
+    Test for their existence by name.
+    >>> 'orid' in ids
+    True
+
+    Use the Lastid's 'next' generator behavior for readable code
+    >>> next(ids.orid)
+    18
+    >>> ids.orid
+    18
+
+    Update your database when you're done.
+    >>> session.add_all(ids.values())
+    >>> session.commit() #
+
+    """
+
+    q = session.query(Lastid)
+    last = AttribDict()
+
+    if keynames is None:
+        lastids = q.all()
+    else:
+        lastids = []
+        for keyname in keynames:
+            lastid = q.filter(Lastid.keyname == keyname).first()
+            if lastid:
+                lastids.append(lastid)
+            elif create:
+                lastid = Lastid(keyname=keyname, keyvalue=0)
+                session.add(lastid)
+                lastids.append(lastid)
+
+    for lastid in lastids:
+        if expunge:
+            session.expunge(lastid)
+        last[lastid.keyname] = lastid
+
+    return last

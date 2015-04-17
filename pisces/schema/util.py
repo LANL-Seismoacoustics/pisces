@@ -331,6 +331,39 @@ def from_string(cls, line, default_on_error=None):
 
     return cls(*vals)
 
+def from_function(cls, function, *args, **kwargs):
+    """
+    Create a list of instances from a custom function.
+
+    Parameters
+    ----------
+    function : function
+        A user-supplied function that takes *args, and *kwargs as arguments,
+        and returns a list of dictionaries: 
+
+        [dictionaries] = function(*args, *kwargs)  
+
+        The dictionary keys are column names, and the values are row values.
+        Each dictionary is unpacked into the class constructor to make a class
+        instance.
+
+    Returns
+    -------
+    list
+        A list of class (row) instances, populated from the dictionaries
+        returned by the user-supplied function.
+
+    Examples
+    --------
+    >>> from mymodule import sac_to_arrivals, sac_to_origin
+    >>> arrivals = Arrival.from_function(sac_to_arrivals, sacfile)
+    >>> origins = Origin.from_function(sac_to_origin,  sacfile)
+
+    """
+    dict_list = function(*args, **kwargs)
+
+    return [cls(**d) for d in dict_list]
+
 def _getitem(self, i):
     # integer indexing based on column order in __table__
     # helps implement __iter__ behavior as a side-effect
@@ -372,7 +405,10 @@ class PiscesMeta(DeclarativeMeta):
         dct['__setitem__'] = _setitem
         dct['__len__'] = _len
         dct['__eq__'] = _eq
+
         dct['from_string'] = classmethod(from_string)
+        dct['from_function'] = classmethod(from_function)
+
         dct['_column_info_registry'] = {}   #this is a class-level attribute
 
         # if __tablename__ looks like 'schema.tablename', split it and move schema to __table_args__
