@@ -1,10 +1,31 @@
+import glob
+from collections import namedtuple
 from optparse import OptionParser
 
+import sqlalchemy.exc as exc
+import sqlalchemy.orm.exc as oexc
+
 import pisces as ps
+import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
+
+# for readability, use these named tuples for core tables, like:
+# for coretable in CORETABLES:
+#    print coretable.name, coretable.prototype, coretable.table
+CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
+CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
+              CoreTable('arrival', kba.Arrival, kb.Arrival),
+              CoreTable('assoc', kba.Assoc, kb.Assoc),
+              CoreTable('event', kba.Event, kb.Event),
+              CoreTable('instrument', kba.Instrument, kb.Instrument),
+              CoreTable('lastid', kba.Lastid, kb.Lastid),
+              CoreTable('origin', kba.Origin, kb.Origin),
+              CoreTable('site', kba.Site, kb.Site),
+              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
+              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
 
 # HELPER FUNCTIONS
 def split_slash(option, opt_str, value, parser):
@@ -21,10 +42,32 @@ def expand_glob(option, opt_str, value, parser):
 def get_parser():
     """
     This is where the command-line options are defined and parsed from argv
+
+    Returns
+    -------
+    optparse.OptionParser instance
+
+    Examles
+    -------
+    Test the parser with this syntax:
+
+    >>> from sac2db import get_parser
+    >>> parser = get_parser()
+    >>> options, args = parser.parse_args(['-f','*.sac','dbout'])
+    >>> print options
+    {'origin': None, 'site': None, 'wfdisc': None, 'affiliation': None, 'port':
+    '', 'conn': None, 'backend': 'sqlite', 'all_tables': None, 'instance': '',
+    'event': None, 'instrument': None, 'arrival': None, 'sitechan': None,
+    'psswd': '', 'assoc': None, 'user': '', 'f': <generator object iglob at
+    0x10c782f50>, 'l': None, 'server': '', 't': None, 'lastid': None,
+    'rel_path': False, 'gndd': False}
+    >>> print args
+    ['dbout']
+
     """
     parser = OptionParser(usage="Usage: %prog [options] ",
-            description="""Write data from sac or mseed headers into a database. Currently, only SAC files are supported.""",
-            version='0.1')
+            description="""Write data from SAC files into a database.""",
+            version='0.2')
     parser.add_option('-f','--files',
             default=None,
             help="Unix-style file name expansion for trace files.",
@@ -82,105 +125,121 @@ def get_parser():
                   For sqlite, this is the file name.",
             type='string',
             dest='instance')
-    parser.add_option('--affiliation',
-            default=None,
-            help="Name of desired output affiliation table. Optional.  \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='affiliation')
-    parser.add_option('--arrival',
-            default=None,
-            help="Name of desired output arrival table.  Optional. \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='arrival')
-    parser.add_option('--assoc',
-            default=None,
-            help="Name of desired output assoc table.  Optional. \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='assoc')
-    parser.add_option('--event',
-            default=None,
-            help="Name of desired output event table.  Optional.  \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='event')
-    parser.add_option('--instrument',
-            default=None,
-            help="Name of desired output instrument table.  Optional.  \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='instrument')
-    parser.add_option('--origin',
-            default=None,
-            help="Name of desired output origin table.  Optional.  \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='origin')
-    parser.add_option('--site',
-            default=None,
-            help="Name of desired output site table.  Optional. \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='site')
-    parser.add_option('--sitechan',
-            default=None,
-            help="Name of desired output sitechan table.  Optional.",
-            type='string',
-            metavar='owner.tablename',
-            dest='sitechan')
-    parser.add_option('--wfdisc',
-            default=None,
-            help="Name of desired output wfdisc table.  Optional. \
-                  No owner for sqlite. Currently always adds wfdisc rows.",
-            type='string',
-            metavar='owner.tablename',
-            dest='wfdisc')
-    parser.add_option('--lastid',
-            default=None,
-            help="Name of desired output lastid table.  Required.  \
-                  No owner for sqlite.",
-            type='string',
-            metavar='owner.tablename',
-            dest='lastid')
-    parser.add_option('--all_tables',
-            default=None,
-            help="Convenience flag.  Attempt to fill all tables. \
-                  e.g. jon.test_ will attempt to produce tables like \
-                  jon.test_origin, jon.test_sitechan, ...\
-                  Not yet implemented.",
-            type='string',
-            metavar='owner.prefix',
-            dest='all_tables')
     parser.add_option('--gndd',
             default=False,
-            help="""Convenience flag fills in server, port, instance, backend for gnem database users.""",
+            help="Convenience flag for GNEM database users. \
+                  Sets server, port, instance, and backend.",
             action='store_true',
             dest='gndd')
     parser.add_option('--rel_path',
             default=False,
-            help="Write directory entries as relative paths, not absolute.",
+            help="Write directories ('dir') as relative paths, not absolute.",
             action='store_true',
-            dest='rel_path')    pass
+            dest='rel_path')
+    # ----------------------- Add core table arguments ------------------------
+    #The following loop adds core table options.  They look like:
+    #parser.add_option('--origin',
+    #        default=None,
+    #        help="Name of desired output origin table.  Optional.  \
+    #              No owner for sqlite.",
+    #        type='string',
+    #        metavar='owner.tablename',
+    #        dest='origin')
+    for coretable in CORETABLES:
+        parser.add_option('--' + coretable.name,
+                          default=None,
+                          help="Name of desired output {} table.  Optional. \
+                                No owner for sqlite.".format(coretable.name),
+                          type='string',
+                          metavar='owner.tablename',
+                          dest=coretable.name)
+    # -------------------------------------------------------------------------
+    parser.add_option('--all_tables',
+            default=None,
+            help="Convenience flag.  Attempt to fill all tables.\
+                  e.g. myaccount.test_ will attempt to produce tables \
+                  like myaccount.test_origin, myaccount.test_sitechan.\
+                  Not yet implemented.",
+            type='string',
+            metavar='owner.prefix',
+            dest='all_tables')
 
+    return parser
 
-def parse_tables(args):
+def get_session(options):
+    if options.gndd:
+        #TODO: add a password option here
+        try:
+            from pisces_gndd import gndd_connect
+            session = gndd_connect(options.user)
+        except ImportError as e:
+            msg = "Must have pisces_gndd installed with --gndd option."
+            raise ImportError(msg)
+    else:
+        if options.conn:
+            session = ps.db_connect(conn=options.conn)
+        else:
+            session = ps.db_connect(user=options.user, 
+                                    psswd=options.psswd, 
+                                    backend=options.backend, 
+                                    server=options.server,
+                                    port=options.port, 
+                                    instance=options.instance)
+
+def get_tables(args, session):
     # returns dictionary of canonical {tablenames: classes} using ps.make_table
-    pass
+    # this list should mirror the command line table options
+    # options:
+    # * the table is a vanilla name.  either all_tables has no prefix, or the
+    #   supplied table names are vanilla.  -> just use the vanilla models in 
+    #   pisces.tables.kbcore.
+    # * the table is a custom name.  either all_tables has a prefix, or the 
+    #   supplied tables aren't vanilla.
+    #   * the tables already exist -> use get_tables
+    #   * the tables are new -> use make_tables and .__table__.create
+    tables = {}
+    for coretable in CORETABLES:
+        if options.all_tables is None:
+            fulltabnm = getattr(options, coretable.name, None)
+        else:
+            fulltabnm = options.all_tables + coretable.name
+
+        if fulltabnm == coretable.name:
+            # it's a vanilla table name. you can just use pre-packaged table classes
+            tables[coretable.name] = coretable.table
+        else:
+            try:
+                tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
+            except exc.NoSuchTableError:
+                print "{0} doesn't exist. Creating it.".format(fulltabnm)
+                tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
+                tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+
+    return tables
 
 
-def parse_files(args):
-    # returns an iterator of file names
-    pass
+def get_files(options):
+    """
+    returns a sequence of files (names?)
+    raises IOError if problematic
+    raises ValueError if problematic
+    """
+    ###########  BUILD FILE ITERATOR/GENERATOR ##########
+    if options.f is not None:
+        files = options.f
+    elif options.l is not None:
+        try:
+            lfile = open(options.l, 'r')
+            #make a generator of non-blank lines
+            files = (line.strip() for line in lfile if line.strip())
+        except IOError:
+            msg = "{0} does not exist.".format(options.l)
+            raise IOError(msg)
+    else:
+        msg = "Must provide input files or file list."
+        raise ValueError(msg)
 
+    return files
 
 def sac2db(sacfile, last, **tables):
     """
@@ -192,7 +251,7 @@ def sac2db(sacfile, last, **tables):
     last : dict
         The output from get_lastids: a dictionary of lastid keyname: instances.
     site, origin, event, wfdisc, sitechan : SQLA table classes with .from_sac
-    
+
     """
     # TODO: remove id handling
     out = {}
@@ -215,7 +274,7 @@ def sac2db(sacfile, last, **tables):
             sitechan.chanid = last.chanid.next()
 
     if 'wfdisc' in tables:
-        # XXX: Always gonna be a wfdisc, right? 
+        # XXX: Always gonna be a wfdisc, right?
         # XXX: Always writes a _new_ row b/c always new wfid
         # wfdisc.dir
         # wfdisc.dfile
@@ -247,7 +306,7 @@ def sac2db(sacfile, last, **tables):
                 assoc.orid = origin.orid
 
     return out
-    
+
 
 def manage_ids(session, last, **rows):
     # last is an AttributeDict of {'keyvalue': lastid instance, ...}
@@ -302,11 +361,11 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
-    session = parse_session(args)
+    session = get_session(args)
 
-    tables = parse_tables(args)
+    tables = get_tables(args)
 
-    files = parse_files(args)
+    files = get_files(args)
 
     for table in tables.values():
         table.__table__.create(session.bind, checkfirst=True)
