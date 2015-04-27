@@ -12,6 +12,17 @@ except ImportError:
     from sqlalchemy.ext.declarative import _declarative_constructor
 from sqlalchemy import event
 
+# TODO: add a .to_dict() method or a dict-like __getitem__/__setitem__, and
+#   remove value iteration, so that copying a row looks like
+#   Class(inst.to_dict())
+#   or
+#   Class(**inst)
+#   and this works:
+#   for (col, val) in inst:
+#       print col, val
+#
+#   This will affect .from_string (i think) and __init__, and _print_format,
+#   and __str__
 
 def copy_metadata(metadata, prefix='', schema=None, metadata_out=None):
     """
