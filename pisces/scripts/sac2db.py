@@ -41,13 +41,13 @@ def expand_glob(option, opt_str, value, parser):
 
 def get_parser():
     """
-    This is where the command-line options are defined and parsed from argv
+    This is where the command-line options are defined, to be parsed from argv
 
     Returns
     -------
     optparse.OptionParser instance
 
-    Examles
+    Examples
     -------
     Test the parser with this syntax:
 
@@ -179,21 +179,24 @@ def get_session(options):
         if options.conn:
             session = ps.db_connect(conn=options.conn)
         else:
-            session = ps.db_connect(user=options.user, 
-                                    psswd=options.psswd, 
-                                    backend=options.backend, 
+            session = ps.db_connect(user=options.user,
+                                    psswd=options.psswd,
+                                    backend=options.backend,
                                     server=options.server,
-                                    port=options.port, 
+                                    port=options.port,
                                     instance=options.instance)
+
+    return session
+
 
 def get_tables(args, session):
     # returns dictionary of canonical {tablenames: classes} using ps.make_table
     # this list should mirror the command line table options
     # options:
     # * the table is a vanilla name.  either all_tables has no prefix, or the
-    #   supplied table names are vanilla.  -> just use the vanilla models in 
+    #   supplied table names are vanilla.  -> just use the vanilla models in
     #   pisces.tables.kbcore.
-    # * the table is a custom name.  either all_tables has a prefix, or the 
+    # * the table is a custom name.  either all_tables has a prefix, or the
     #   supplied tables aren't vanilla.
     #   * the tables already exist -> use get_tables
     #   * the tables are new -> use make_tables and .__table__.create
@@ -205,7 +208,7 @@ def get_tables(args, session):
             fulltabnm = options.all_tables + coretable.name
 
         if fulltabnm == coretable.name:
-            # it's a vanilla table name. you can just use pre-packaged table classes
+            # it's a vanilla table name. just use pre-packaged table classes
             tables[coretable.name] = coretable.table
         else:
             try:
