@@ -190,30 +190,42 @@ def get_session(options):
 
 
 def get_tables(args, session):
-    # returns dictionary of canonical {tablenames: classes} using ps.make_table
-    # this list should mirror the command line table options
-    # options:
-    # * the table is a vanilla name.  either all_tables has no prefix, or the
-    #   supplied table names are vanilla.  -> just use the vanilla models in
-    #   pisces.tables.kbcore.
-    # * the table is a custom name.  either all_tables has a prefix, or the
-    #   supplied tables aren't vanilla.
-    #   * the tables already exist -> use get_tables
-    #   * the tables are new -> use make_tables and .__table__.create
+    """
+    Load or create canonical ORM KB Core table classes.
+
+    Parameters
+    ----------
+    args : optparse.OptionParser
+    session : sqlalchemy.orm.Session
+
+    Returns
+    -------
+    tables : dict
+        Canonical table names and mapped classes, like: {'tablename': class, ...}
+
+    """
+    # The Plan:
+    # 1. For each core table, build or get the table name
+    # 2. If it's a canonical table name, just use a pre-packaged table class
+    # 3. If not, try to autoload it.
+    # 4. If it doesn't exist, make it from a prototype and create it in the database.
     tables = {}
     for coretable in CORETABLES:
+        # build the table name
         if options.all_tables is None:
             fulltabnm = getattr(options, coretable.name, None)
         else:
             fulltabnm = options.all_tables + coretable.name
 
         if fulltabnm == coretable.name:
-            # it's a vanilla table name. just use pre-packaged table classes
+            # it's a vanilla table name. just use a pre-packaged table class
             tables[coretable.name] = coretable.table
         else:
             try:
+                # autoload a custom table name and/or owner
                 tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
             except exc.NoSuchTableError:
+                # doesn't exist, make one and create it
                 print "{0} doesn't exist. Creating it.".format(fulltabnm)
                 tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
                 tables[coretable.name].__table__.create(session.bind, checkfirst=True)
@@ -227,7 +239,6 @@ def get_files(options):
     raises IOError if problematic
     raises ValueError if problematic
     """
-    ###########  BUILD FILE ITERATOR/GENERATOR ##########
     if options.f is not None:
         files = options.f
     elif options.l is not None:
@@ -243,6 +254,7 @@ def get_files(options):
         raise ValueError(msg)
 
     return files
+
 
 def sac2db(sacfile, last, **tables):
     """
