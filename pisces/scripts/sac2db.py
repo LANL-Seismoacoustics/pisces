@@ -8,13 +8,15 @@ import sqlalchemy.orm.exc as oexc
 import pisces as ps
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
+import pisces.io.sac as sac
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
 
 # for readability, use these named tuples for core tables, like:
-# for coretable in CORETABLES:
-#    print coretable.name, coretable.prototype, coretable.table
+# tab = CORETABLES[7]
+# tab.name is 'site', tab.prototype is the abstract Site class,
+# and tab.table is an actual Site table
 CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
               CoreTable('arrival', kba.Arrival, kb.Arrival),
@@ -41,13 +43,13 @@ def expand_glob(option, opt_str, value, parser):
 
 def get_parser():
     """
-    This is where the command-line options are defined and parsed from argv
+    This is where the command-line options are defined, to be parsed from argv
 
     Returns
     -------
     optparse.OptionParser instance
 
-    Examles
+    Examples
     -------
     Test the parser with this syntax:
 
@@ -166,6 +168,7 @@ def get_parser():
 
     return parser
 
+
 def get_session(options):
     if options.gndd:
         #TODO: add a password option here
@@ -179,41 +182,59 @@ def get_session(options):
         if options.conn:
             session = ps.db_connect(conn=options.conn)
         else:
-            session = ps.db_connect(user=options.user, 
-                                    psswd=options.psswd, 
-                                    backend=options.backend, 
+            session = ps.db_connect(user=options.user,
+                                    psswd=options.psswd,
+                                    backend=options.backend,
                                     server=options.server,
-                                    port=options.port, 
+                                    port=options.port,
                                     instance=options.instance)
 
-def get_tables(args, session):
-    # returns dictionary of canonical {tablenames: classes} using ps.make_table
-    # this list should mirror the command line table options
-    # options:
-    # * the table is a vanilla name.  either all_tables has no prefix, or the
-    #   supplied table names are vanilla.  -> just use the vanilla models in 
-    #   pisces.tables.kbcore.
-    # * the table is a custom name.  either all_tables has a prefix, or the 
-    #   supplied tables aren't vanilla.
-    #   * the tables already exist -> use get_tables
-    #   * the tables are new -> use make_tables and .__table__.create
+    return session
+
+
+def get_or_create_tables(args, session, create=True):
+    """
+    Load or create canonical ORM KB Core table classes.
+
+    Parameters
+    ----------
+    args : optparse.OptionParser
+    session : sqlalchemy.orm.Session
+
+    Returns
+    -------
+    tables : dict
+        Canonical table names and mapped classes, like: {'tablename': class, ...}
+
+    """
+    # The Plan:
+    # 1. For each core table, build or get the table name
+    # 2. If it's a vanilla table name, just use a pre-packaged table class
+    # 3. If not, try to autoload it.
+    # 4. If it doesn't exist, make it from a prototype and create it in the database.
     tables = {}
     for coretable in CORETABLES:
+        # build the table name
         if options.all_tables is None:
             fulltabnm = getattr(options, coretable.name, None)
         else:
             fulltabnm = options.all_tables + coretable.name
 
         if fulltabnm == coretable.name:
-            # it's a vanilla table name. you can just use pre-packaged table classes
+            # it's a vanilla table name. just use a pre-packaged table class
             tables[coretable.name] = coretable.table
         else:
             try:
+                # autoload a custom table name and/or owner
                 tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
-            except exc.NoSuchTableError:
-                print "{0} doesn't exist. Creating it.".format(fulltabnm)
-                tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
-                tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+            except exc.NoSuchTableError as e:
+                if create:
+                    # make one and create it
+                    print "{0} doesn't exist. Creating it.".format(fulltabnm)
+                    tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
+                    tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+                else:
+                    raise e
 
     return tables
 
@@ -224,7 +245,6 @@ def get_files(options):
     raises IOError if problematic
     raises ValueError if problematic
     """
-    ###########  BUILD FILE ITERATOR/GENERATOR ##########
     if options.f is not None:
         files = options.f
     elif options.l is not None:
@@ -241,13 +261,15 @@ def get_files(options):
 
     return files
 
+
 def sac2db(sacfile, last, **tables):
     """
-    Get core tables instances from an item.
+    Get core tables instances from a SAC file.
 
     Parameters
     ----------
-    item : SAC file name
+    sacfile : str
+        SAC file name
     last : dict
         The output from get_lastids: a dictionary of lastid keyname: instances.
     site, origin, event, wfdisc, sitechan : SQLA table classes with .from_sac
@@ -308,7 +330,10 @@ def sac2db(sacfile, last, **tables):
     return out
 
 
-def manage_ids(session, last, **rows):
+def manage_rows(session, last, **rows):
+    """
+    Unify related table instances/row, including: ids, dir, and dfile
+    """
     # last is an AttributeDict of {'keyvalue': lastid instance, ...}
     # rows is a dictionary of {'canonical tablename': [list of instances], ...}
     # of _related_ instances from a single SAC header?
@@ -363,23 +388,23 @@ def main(argv=None):
 
     session = get_session(args)
 
-    tables = get_tables(args)
+    tables = get_or_create_tables(args, session, create=True)
 
     files = get_files(args)
 
-    for table in tables.values():
-        table.__table__.create(session.bind, checkfirst=True)
-
-    lastids = ['orid', 'evid', 'chanid', 'wfid', 'arid']
+    lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = ps.get_lastids(session, tables['lastid'], lastids, create=True)
 
     for sacfile in files:
         print sacfile
 
+        tr = read(sacfile, format='SAC')
+
+        rows = sac.trace2rows(tr)
         rows = sac2db(sacfile, last, **tables)
 
         # manage the ids
-        manage_ids(session, last, **rows)
+        manage_rows(session, last, **rows)
 
         # manage dir, dfile
 

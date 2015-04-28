@@ -1,11 +1,14 @@
 """
 Conversions between SAC header variables and KB Core fields.
 
+Converts SAC header dictionaries to KB Core table dictionaries and vice-versa.
+
 """
-#XXX: currently not working
-#TODO: remove functions already in pisces.io.trace
-#TODO: make everything just translate dictionaries, not classes
-#TODO: change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
+# XXX: currently not working
+# TODO: remove functions already in pisces.io.trace
+# TODO: make everything just translate dictionaries, not classes and make
+#    everything less obspy.Trace-centric
+# TODO: change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
 import sys
 import os
 from collections import OrderedDict
@@ -13,7 +16,7 @@ from collections import OrderedDict
 from obspy.core import UTCDateTime, Trace, Stats, AttribDict
 import obspy.core.util.geodetics as geod
 
-import pisces.schema.kbcore as kb
+import pisces.tables.kbcore as kb
 from pisces.io.readwaveform import read_waveform
 from pisces.io.util import _map_header, _buildhdr
 
@@ -23,159 +26,132 @@ OBSPYDEFAULT = {'network': '',
                 'location': '',
                 'channel': ''}
 
-
-class Site(kb.Site):
-    __tablename__ = 'site'
-
-class Sitechan(kb.Sitechan):
-    __tablename__ = 'sitechan'
-
-class Affiliation(kb.Affiliation):
-    __tablename__ = 'affiliation'
-
-class Instrument(kb.Instrument):
-    __tablename__ = 'instrument'
-
-class Origin(kb.Origin):
-    __tablename__ = 'origin'
-
-class Event(kb.Event):
-    __tablename__ = 'event'
-
-class Assoc(kb.Assoc):
-    __tablename__ = 'assoc'
-
-class Arrival(kb.Arrival):
-    __tablename__ = 'arrival'
-
-class Wfdisc(kb.Wfdisc):
-    __tablename__ = 'wfdisc'
-
+# TODO: much of this will be superseded by obspy.io.sac
 # ------------------ CONVERT SAC HEADER DICTIONARY TO TABLES ------------#
 # SAC default values
 IDEFAULT = -12345
-FDEFAULT = -12345.0 
+FDEFAULT = -12345.0
 SDEFAULT = '-12345  '
 SLDEFAULT = '-12345          '
 SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
-         'cmpaz': FDEFAULT, 'cmpinc': FDEFAULT, 'delta': FDEFAULT, 
-         'depmax': FDEFAULT, 'depmen': FDEFAULT, 'depmin': FDEFAULT, 
-         'dist': FDEFAULT, 'e': FDEFAULT, 'evdp': FDEFAULT, 'evla': FDEFAULT, 
-         'evlo': FDEFAULT, 'f': FDEFAULT, 'gcarc': FDEFAULT, 'idep': IDEFAULT, 
-         'ievreg': IDEFAULT, 'ievtype': IDEFAULT, 'iftype': IDEFAULT, 
+         'cmpaz': FDEFAULT, 'cmpinc': FDEFAULT, 'delta': FDEFAULT,
+         'depmax': FDEFAULT, 'depmen': FDEFAULT, 'depmin': FDEFAULT,
+         'dist': FDEFAULT, 'e': FDEFAULT, 'evdp': FDEFAULT, 'evla': FDEFAULT,
+         'evlo': FDEFAULT, 'f': FDEFAULT, 'gcarc': FDEFAULT, 'idep': IDEFAULT,
+         'ievreg': IDEFAULT, 'ievtype': IDEFAULT, 'iftype': IDEFAULT,
          'iinst': IDEFAULT, 'imagsrc': IDEFAULT, 'imagtyp': IDEFAULT,
-         'int1': FDEFAULT, 'iqual': IDEFAULT, 'istreg': IDEFAULT, 
-         'isynth': IDEFAULT, 'iztype': IDEFAULT, 'ka': SDEFAULT, 
-         'kcmpnm': SDEFAULT, 'kdatrd': SDEFAULT, 'kevnm': SLDEFAULT, 
+         'int1': FDEFAULT, 'iqual': IDEFAULT, 'istreg': IDEFAULT,
+         'isynth': IDEFAULT, 'iztype': IDEFAULT, 'ka': SDEFAULT,
+         'kcmpnm': SDEFAULT, 'kdatrd': SDEFAULT, 'kevnm': SLDEFAULT,
          'kf': SDEFAULT, 'khole': SDEFAULT, 'kinst': SDEFAULT,
          'knetwk': SDEFAULT, 'ko': SDEFAULT, 'kstnm': SDEFAULT, 'kt0': SDEFAULT,
          'kt1': SDEFAULT, 'kt2': SDEFAULT, 'kt3': SDEFAULT, 'kt4': SDEFAULT,
          'kt5': SDEFAULT, 'kt6': SDEFAULT, 'kt7': SDEFAULT, 'kt8': SDEFAULT,
-         'kt9': SDEFAULT, 'kuser0': SDEFAULT, 'kuser1': SDEFAULT, 
-         'kuser2': SDEFAULT, 'lcalda': IDEFAULT, 'leven': IDEFAULT, 
-         'lovrok': IDEFAULT, 'lpspol': IDEFAULT, 'mag': FDEFAULT, 
-         'nevid': IDEFAULT, 'norid': IDEFAULT, 'npts': IDEFAULT, 
-         'nvhdr': IDEFAULT, 'nwfid': IDEFAULT, 'nzhour': IDEFAULT, 
+         'kt9': SDEFAULT, 'kuser0': SDEFAULT, 'kuser1': SDEFAULT,
+         'kuser2': SDEFAULT, 'lcalda': IDEFAULT, 'leven': IDEFAULT,
+         'lovrok': IDEFAULT, 'lpspol': IDEFAULT, 'mag': FDEFAULT,
+         'nevid': IDEFAULT, 'norid': IDEFAULT, 'npts': IDEFAULT,
+         'nvhdr': IDEFAULT, 'nwfid': IDEFAULT, 'nzhour': IDEFAULT,
          'nzjday': IDEFAULT, 'nzmin': IDEFAULT, 'nzmsec': IDEFAULT,
-         'nzsec': IDEFAULT, 'nzyear': IDEFAULT, 'o': FDEFAULT, 
-         'odelta': FDEFAULT, 'scale': FDEFAULT, 'stdp': FDEFAULT, 
+         'nzsec': IDEFAULT, 'nzyear': IDEFAULT, 'o': FDEFAULT,
+         'odelta': FDEFAULT, 'scale': FDEFAULT, 'stdp': FDEFAULT,
          'stel': FDEFAULT, 'stla': FDEFAULT, 'stlo': FDEFAULT, 't0': FDEFAULT,
-         't1': FDEFAULT, 't2': FDEFAULT, 't3': FDEFAULT, 't4': FDEFAULT, 
-         't5': FDEFAULT, 't6': FDEFAULT, 't7': FDEFAULT, 't8': FDEFAULT, 
-         't9': FDEFAULT, 'unused10': FDEFAULT, 'unused11': FDEFAULT, 
+         't1': FDEFAULT, 't2': FDEFAULT, 't3': FDEFAULT, 't4': FDEFAULT,
+         't5': FDEFAULT, 't6': FDEFAULT, 't7': FDEFAULT, 't8': FDEFAULT,
+         't9': FDEFAULT, 'unused10': FDEFAULT, 'unused11': FDEFAULT,
          'unused12': FDEFAULT, 'unused6': FDEFAULT, 'unused7': FDEFAULT,
-         'unused8': FDEFAULT, 'unused9': FDEFAULT, 'user0': FDEFAULT, 
-         'user1': FDEFAULT, 'user2': FDEFAULT, 'user3': FDEFAULT, 
-         'user4': FDEFAULT, 'user5': FDEFAULT, 'user6': FDEFAULT, 
+         'unused8': FDEFAULT, 'unused9': FDEFAULT, 'user0': FDEFAULT,
+         'user1': FDEFAULT, 'user2': FDEFAULT, 'user3': FDEFAULT,
+         'user4': FDEFAULT, 'user5': FDEFAULT, 'user6': FDEFAULT,
          'user7': FDEFAULT, 'user8': FDEFAULT, 'user9': FDEFAULT,
-         'xmaximum': FDEFAULT, 'xminimum': FDEFAULT, 'ymaximum': FDEFAULT, 
+         'xmaximum': FDEFAULT, 'xminimum': FDEFAULT, 'ymaximum': FDEFAULT,
          'yminimum': FDEFAULT}
 
 
 # the following functions accept a SAC header dictionary, and return respective
 # kbcore table instances, assumes default SAC header values set to None
+def get_sac_reftime(header):
+    """
+    Get SAC header reference time as a UTCDateTime instance from a SAC header
+    dictionary.  
 
-def get_sac_reftime(tr):
+    If using ObsPy to read the SAC file, use debug_headers=True to get the full
+    header, including nz time headers.
+
     """
-    Get UTCDateTime object from sac header dict.
-    """
-    # "nz" fields are not kept when ObsPy reads a SAC file.  They're used 
+    # "nz" fields are not kept when ObsPy reads a SAC file.  They're used
     # to make "starttime", then discarded.
     # t0 = nzyear + nzjday + nzhour + nzminute + nzsecond + nzmsec*1000
-    # starttime = t0 + b
+    # tr.stats.starttime = t0 + b
     # therefore: t0 = starttime - b
-    if tr.stats.sac.b is SACDEFAULT['b']:
-        t0 = tr.stats.starttime
-    else:
-        t0 = tr.stats.starttime - tr.stats.sac.b
 
-    return t0
-
-def sachdr2reftime(hdr):
-    """Get SAC reference UTCDateTime from header dictionary.
-    """
-    # reftime = nzyear + nzjday + nzhour + nzminute + nzsecond + nzmsec*1000
-    tdict = {'year': 1970, 'month': 1, 'day': 1, 'minute': 0, 'microsecond': 0}
-    # for non-default values in hdr, return desired values, mapped to new keys
-    mapdict = _map_header({'nzyear': 'year', 'nzjday':'julday', 'nzhour':'hour', 
-                           'nzmin':'minute', 'nzsec':'second', 
-                           'nzmsec':'microsecond'}, hdr, SACDEFAULT)
-    tdict.update(mapdict)
-    if tdict['microsecond']:
-        tdict['microsecond'] *= 1000.
-    
-    #tdict = {}
-    #tdict.update((key, val) for key, val in tmpdict.iteritems() \
-    #        if val is not None)
-
-    t0 = UTCDateTime(**tdict)
-
-
-def tr2site(tr):
-    """
-    Provide an ObsPy Trace, get a filled site table instance, using available
-    header.
-    """
-    sitedict = {}
-
-    #1) from obspy header first
-    if tr.stats.station:
-        sitedict['sta'] = tr.stats.station
-
-    #2) get from sac header
+    # TODO: let null nz values be 0?
     try:
-        sac2site = {'stla': 'lat', 'stlo': 'lon', 'stel': 'elev'}
-        sitedict.update(_map_header(sac2site, tr.stats.sac, SACDEFAULT))
-        try:            
-            sitedict['elev'] /= 1000
-        except KeyError:
-            #no 'elev' 
-            pass
-    except (AttributeError, KeyError):
-        # tr.stats has no "sac" attribute
+        yr = header['nzyear']
+        if 0 <= yr <= 99:
+            yr += 1900
+        nzjday = header['nzjday']
+        nzhour = header['nzhour']
+        nzmin = header['nzmin']
+        nzsec = header['nzsec']
+        nzmsec = header['nzmsec']
+    except KeyError as e:
+        msg = "Not enough time information: {}".format(e.message)
+        raise KeyError(msg)
+
+    try:
+        reftime = UTCDateTime(year=yr, julday=nzjday, hour=nzhour, minute=nzmin,
+                              second=nzsec, microsecond=nzmsec * 1000)
+        #reftime = datetime.datetime(yr, 1, 1, nzhour, nzmin, nzsec, nzmsec * 1000) + \
+        #                            datetime.timedelta(int(nzjday-1))
+        # NOTE: epoch seconds can be got by:
+        # (reftime - datetime.datetime(1970,1,1)).total_seconds()
+    except ValueError:
+        # may contain -12345 null values?
+        msg = "Invalid time headers."
+        raise ValueError(msg)
+
+    return reftime
+
+
+def sachdr2site(header):
+    """
+    Provide a SAC header dictionary, get a site table dictionary.
+
+    """
+    sac_site = [('kstnm', 'sta'),
+                ('stla', 'lat'),
+                ('stlo', 'lon'),
+                ('stel', 'elev')]
+
+    sitedict = {}
+    for hdr, col in sac_site:
+        val = header.get(hdr, None)
+        sitedict[col] = val if val != SACDEFAULT[hdr] else None
+
+    # clean up
+    try:
+        sitedict['elev'] /= 1000.0
+    except KeyError:
+        #no 'elev'
         pass
 
-    if sitedict:
-        site = Site(**sitedict)
-    else:
-        site = None
-
-    return site
+    return sitedict or None
 
 
 def tr2sitechan(tr):
     """Provide a sac header dictionary, get a filled sitechan table instance."""
 
     #1) from obspy header
-    sitechandict = _map_header({'station': 'sta', 'channel': 'chan'}, tr.stats, 
+    sitechandict = _map_header({'station': 'sta', 'channel': 'chan'}, tr.stats,
                                 OBSPYDEFAULT)
 
     #2) from sac header
     try:
         sac2sitechan = {'cmpaz': 'hang', 'cmpinc': 'vang', 'stdp': 'edepth'}
         sitechandict.update(_map_header(sac2sitechan, tr.stats.sac, SACDEFAULT))
-        try:           
-            sitechandict['edepth'] /= 1000.
+        try:
+            sitechandict['edepth'] /= 1000.0
         except (TypeError, KeyError):
             #edepth is None or missing
             pass
@@ -183,13 +159,8 @@ def tr2sitechan(tr):
         # no tr.stats.sac
         pass
 
-    if sitechandict:
-        sitechan = Sitechan(**sitechandict)
-    else:
-        sitechan = None
+    return sitechandict or None
 
-    return sitechan
-    
 
 def tr2affiliation(tr):
     #1) from obspy header
@@ -204,12 +175,7 @@ def tr2affiliation(tr):
         # no tr.stats.sac or 'knetwk', etc.
         pass
 
-    if affildict:
-        affil = Affiliation(**affildict)
-    else:
-        affil = None
-
-    return affil
+    return affildict or None
 
 
 def tr2instrument(tr):
@@ -217,18 +183,13 @@ def tr2instrument(tr):
     #1) from sac header
     instrdict = {'samprate': int(tr.stats.sampling_rate)}
     try:
-        instrdict = _map_header({'kinst': 'ins', 'iinst': 'instype'}, 
+        instrdict = _map_header({'kinst': 'ins', 'iinst': 'instype'},
                                 tr.stats.sac, SACDEFAULT)
     except AttributeError:
         #no tr.stats.sac
         pass
 
-    if instrdict:
-        instr = Instrument(**instrdict)
-    else:
-        instr = None
-
-    return instr
+    return instrdict or None
 
 
 def tr2origin(tr):
@@ -247,11 +208,11 @@ def tr2origin(tr):
      * IPDE -> PDE
      * IISC -> ISC
      * IBRK -> ISC:BERK
-     * IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -> unchanged 
-    
+     * IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -> unchanged
+
     """
     # simple SAC translations
-    sac2origin = {'evla': 'lat', 'evlo': 'lon', 'norid': 'orid', 
+    sac2origin = {'evla': 'lat', 'evlo': 'lon', 'norid': 'orid',
                   'nevid': 'evid', 'ievreg': 'grn', 'evdp': 'depth'}
     try:
         origindict = _map_header(sac2origin, tr.stats.sac, SACDEFAULT)
@@ -267,7 +228,7 @@ def tr2origin(tr):
         pass
 
     #etype translations
-    edict = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt', 
+    edict = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
             43: 'ec', 72: 'me', 73: 'me', 74: 'me', 75: 'me', 76: 'mb',
             77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
             83: 'mc'}
@@ -277,12 +238,12 @@ def tr2origin(tr):
         #ievtyp is None, or not a key in edict (e.g. sac default value)
         pass
 
-    #1: 
+    #1:
     try:
         t = get_sac_reftime(tr)
         if tr.stats.sac['iztype'] == 11:
             #reference time is an origin time
-            if tr.stats.sac.o is SACDEFAULT['o']:
+            if tr.stats.sac.o == SACDEFAULT['o']:
                 o = 0.0
             else:
                 o = tr.stats.sac.o
@@ -311,7 +272,7 @@ def tr2origin(tr):
         pass
 
     #3: origin author
-    authdict = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD', 
+    authdict = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD',
             64: 'IUSGS', 65: 'ISC:BERK', 66: 'ICALTECH', 67: 'ILLNL',
             68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
     try:
@@ -324,12 +285,7 @@ def tr2origin(tr):
     if tr.stats.sac['kuser1']:
         origindict['auth'] = tr.stats.sac['kuser1']
 
-    if origindict:
-        origin = Origin(**origindict)
-    else:
-        origin = None
-
-    return origin
+    return origindict or None
 
 
 def tr2event(tr):
@@ -341,17 +297,12 @@ def tr2event(tr):
         #no tr.stats.sac
         pass
 
-    if eventdict:
-        event = Event(**eventdict)
-    else:
-        event = None
-
-    return event
+    return eventdict or None
 
 
 def tr2assoc(tr, pickmap=None):
     """
-    Takes a sac header dictionary, and produces a list of up to 10 
+    Takes a sac header dictionary, and produces a list of up to 10
     Assoc instances. Header->phase mappings follow SAC2000, i.e.:
 
     * t0: P
@@ -365,9 +316,9 @@ def tr2assoc(tr, pickmap=None):
     * t8: Rg
     * t9: pP
 
-    An alternate mapping for some or all picks can be supplied, however, 
-    as a dictionary of strings in the above form.  
-    
+    An alternate mapping for some or all picks can be supplied, however,
+    as a dictionary of strings in the above form.
+
     Note: arid values will not be filled in, so do:
     >>> for assoc in kbio.tables['assoc']:
             assoc.arid = lastarid+1
@@ -376,7 +327,7 @@ def tr2assoc(tr, pickmap=None):
     """
     pick2phase = {'t0': 'P', 't1': 'Pn', 't2': 'Pg', 't3': 'S',
     't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
-    't9': 'pP'} 
+    't9': 'pP'}
 
     #overwrite defaults with supplied map
     if pickmap:
@@ -388,8 +339,8 @@ def tr2assoc(tr, pickmap=None):
     #XXX: I just calculate it if no values are currently filled in.
     assocdict = {}
     try:
-        assocdict.update(_map_header({'az': 'esaz', 'baz': 'seaz', 
-                                      'gcarc': 'delta'}, tr.stats.sac, 
+        assocdict.update(_map_header({'az': 'esaz', 'baz': 'seaz',
+                                      'gcarc': 'delta'}, tr.stats.sac,
                                       SACDEFAULT))
     except AttributeError:
         # no tr.stats.sac
@@ -398,9 +349,9 @@ def tr2assoc(tr, pickmap=None):
     #overwrite if any are None
     if not assocdict:
         try:
-            delta = geod.locations2degrees(tr.stats.sac.stla, tr.stats.sac.stlo, 
+            delta = geod.locations2degrees(tr.stats.sac.stla, tr.stats.sac.stlo,
                                            tr.stats.sac.evla, tr.stats.sac.evlo)
-            m, seaz, esaz = geod.gps2DistAzimuth(tr.stats.sac.stla, 
+            m, seaz, esaz = geod.gps2DistAzimuth(tr.stats.sac.stla,
                 tr.stats.sac.stlo, tr.stats.sac.evla, tr.stats.sac.evlo)
             assocdict['esaz'] = esaz
             assocdict['seaz'] = seaz
@@ -433,7 +384,7 @@ def tr2assoc(tr, pickmap=None):
             iassoc.update(assocdict)
             assocs.append(iassoc)
 
-    return [Assoc(**assoc) for assoc in assocs]
+    return assocs
 
 
 def tr2arrival(tr, pickmap=None):
@@ -447,7 +398,7 @@ def tr2arrival(tr, pickmap=None):
     #phase names are pulled from the pick2phase dictionary
     pick2phase = {'t0': 'P', 't1': 'Pn', 't2': 'Pg', 't3': 'S',
     't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
-    't9': 'pP'} 
+    't9': 'pP'}
 
     if pickmap:
         pick2phase.update(pickmap)
@@ -480,12 +431,12 @@ def tr2arrival(tr, pickmap=None):
             iarrival.update(arrivaldict)
             arrivals.append(iassoc)
 
-    return [Arrival(**arrival) for arrival in arrivals]
+    return arrivals
 
 
 def tr2wfdisc(tr):
     """Produce wfdisc kbcore table instance from sac header dictionary.
-    Clearly this will be a skeleton instance, as the all-important 'dir' and 
+    Clearly this will be a skeleton instance, as the all-important 'dir' and
     'dfile' must be filled in later.
 
     Note: if you read a little-endian SAC file onto a big-endian machine, it
@@ -501,7 +452,7 @@ def tr2wfdisc(tr):
     wfdict['samprate'] = int(tr.stats.sampling_rate)
     if tr.stats.station:
         wfdict['sta'] = tr.stats.station
-    if tr.stats.channel: 
+    if tr.stats.channel:
         wfdict['chan'] = tr.stats.channel
     if tr.stats.calib:
         wfdict['calib'] = tr.stats.calib
@@ -510,6 +461,7 @@ def tr2wfdisc(tr):
     try:
         wfdict.update(_map_header({'nwfid': 'wfid'}, tr.stats.sac, SACDEFAULT))
         wfdict['foff'] = 634
+        # XXX: not necessarily correct
         if sys.byteorder == 'little':
             wfdict['datatype'] = 'f4'
         else:
@@ -518,7 +470,7 @@ def tr2wfdisc(tr):
         #no tr.stats.sac
         pass
 
-    return Wfdisc(**wfdict)
+    return wfdict or None
 
 
 def trace2tables(tr, tables=None, schema='kbcore'):
@@ -530,7 +482,7 @@ def trace2tables(tr, tables=None, schema='kbcore'):
     ----------
     tr: Obspy.core.Trace
     tables: list, optional
-        Table name strings to return. 
+        Table name strings to return.
         Default, ['affiliation', 'arrival', 'assoc', 'event', 'instrument',
         'origin', 'site', 'sitechan', 'wfdisc']
     schema: string, optional
@@ -541,7 +493,7 @@ def trace2tables(tr, tables=None, schema='kbcore'):
     -------
     dict
         Dictionary of table objects.  tables['arrival'] and tables['assoc']
-        return (possibly empty) _lists_ of table objects.  If only default 
+        return (possibly empty) _lists_ of table objects.  If only default
         values are found for a table, it is omitted.
 
     Notes
@@ -571,9 +523,7 @@ def trace2tables(tr, tables=None, schema='kbcore'):
         tables = fns.keys()
 
     t = AttribDict()
-    #for table, fn in fns.iteritems():
-    for table in tables:
-        ifn = fns[table]
+    for table, ifn in tables.items():
         itab = ifn(tr)
         if itab:
             t[table] = ifn(tr)
@@ -614,7 +564,7 @@ def origin2sachdr(o):
         'nevid': 'evid', 'norid': 'orid', 'user0': 'mb'}
     hdr = _buildhdr(keymap, o)
     return hdr
- 
+
 def event2sachdr(evt):
     return {}
 
@@ -644,14 +594,14 @@ KB2SAC = OrderedDict({'site': site2sachdr,
 def tables2sachdr(tables):
     """Returns a sac header dictionary, including default values, from
     current table instances.  SAC reference time is, in order of availability,
-    origin time (origin.time), first sample time (wfdisc.time). 
-    
-    """              
+    origin time (origin.time), first sample time (wfdisc.time).
+
+    """
 
     hdr = SACDEFAULT.copy()
     for table, tabfun in KB2SAC.iteritems():
         hdr.update(tabfun(tables.get(table, None)))
-        
+
     return hdr
 
 
