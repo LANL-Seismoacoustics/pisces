@@ -1,11 +1,14 @@
 """
 Conversions between SAC header variables and KB Core fields.
 
+Converts SAC header dictionaries to KB Core table dictionaries and vice-versa.
+
 """
-#XXX: currently not working
-#TODO: remove functions already in pisces.io.trace
-#TODO: make everything just translate dictionaries, not classes
-#TODO: change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
+# XXX: currently not working
+# TODO: remove functions already in pisces.io.trace
+# TODO: make everything just translate dictionaries, not classes and make
+#    everything less obspy.Trace-centric
+# TODO: change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
 import sys
 import os
 from collections import OrderedDict
@@ -67,65 +70,70 @@ SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
 
 # the following functions accept a SAC header dictionary, and return respective
 # kbcore table instances, assumes default SAC header values set to None
-
-def get_sac_reftime(tr):
+def get_sac_reftime(header):
     """
-    Get UTCDateTime object from sac header dict.
+    Get SAC header reference time as a UTCDateTime instance from a SAC header
+    dictionary.  
+
+    If using ObsPy to read the SAC file, use debug_headers=True to get the full
+    header, including nz time headers.
+
     """
     # "nz" fields are not kept when ObsPy reads a SAC file.  They're used
     # to make "starttime", then discarded.
     # t0 = nzyear + nzjday + nzhour + nzminute + nzsecond + nzmsec*1000
-    # starttime = t0 + b
+    # tr.stats.starttime = t0 + b
     # therefore: t0 = starttime - b
-    if tr.stats.sac.b is SACDEFAULT['b']:
-        t0 = tr.stats.starttime
-    else:
-        t0 = tr.stats.starttime - tr.stats.sac.b
 
-    return t0
-
-def sachdr2reftime(hdr):
-    """Get SAC reference UTCDateTime from header dictionary.
-    """
-    # reftime = nzyear + nzjday + nzhour + nzminute + nzsecond + nzmsec*1000
-    tdict = {'year': 1970, 'month': 1, 'day': 1, 'minute': 0, 'microsecond': 0}
-    # for non-default values in hdr, return desired values, mapped to new keys
-    mapdict = _map_header({'nzyear': 'year', 'nzjday':'julday', 'nzhour':'hour',
-                           'nzmin':'minute', 'nzsec':'second',
-                           'nzmsec':'microsecond'}, hdr, SACDEFAULT)
-    tdict.update(mapdict)
-    if tdict['microsecond']:
-        tdict['microsecond'] *= 1000.0
-
-    #tdict = {}
-    #tdict.update((key, val) for key, val in tmpdict.iteritems() \
-    #        if val is not None)
-
-    t0 = UTCDateTime(**tdict)
-
-
-def tr2site(tr):
-    """
-    Provide an ObsPy Trace, get a filled site table instance, using available
-    header.
-    """
-    sitedict = {}
-
-    #1) from obspy header first
-    if tr.stats.station:
-        sitedict['sta'] = tr.stats.station
-
-    #2) get from sac header
+    # TODO: let null nz values be 0?
     try:
-        sac2site = {'stla': 'lat', 'stlo': 'lon', 'stel': 'elev'}
-        sitedict.update(_map_header(sac2site, tr.stats.sac, SACDEFAULT))
-        try:
-            sitedict['elev'] /= 1000.0
-        except KeyError:
-            #no 'elev'
-            pass
-    except (AttributeError, KeyError):
-        # tr.stats has no "sac" attribute
+        yr = header['nzyear']
+        if 0 <= yr <= 99:
+            yr += 1900
+        nzjday = header['nzjday']
+        nzhour = header['nzhour']
+        nzmin = header['nzmin']
+        nzsec = header['nzsec']
+        nzmsec = header['nzmsec']
+    except KeyError as e:
+        msg = "Not enough time information: {}".format(e.message)
+        raise KeyError(msg)
+
+    try:
+        reftime = UTCDateTime(year=yr, julday=nzjday, hour=nzhour, minute=nzmin,
+                              second=nzsec, microsecond=nzmsec * 1000)
+        #reftime = datetime.datetime(yr, 1, 1, nzhour, nzmin, nzsec, nzmsec * 1000) + \
+        #                            datetime.timedelta(int(nzjday-1))
+        # NOTE: epoch seconds can be got by:
+        # (reftime - datetime.datetime(1970,1,1)).total_seconds()
+    except ValueError:
+        # may contain -12345 null values?
+        msg = "Invalid time headers."
+        raise ValueError(msg)
+
+    return reftime
+
+
+def sachdr2site(header):
+    """
+    Provide a SAC header dictionary, get a site table dictionary.
+
+    """
+    sac_site = [('kstnm', 'sta'),
+                ('stla', 'lat'),
+                ('stlo', 'lon'),
+                ('stel', 'elev')]
+
+    sitedict = {}
+    for hdr, col in sac_site:
+        val = header.get(hdr, None)
+        sitedict[col] = val if val != SACDEFAULT[hdr] else None
+
+    # clean up
+    try:
+        sitedict['elev'] /= 1000.0
+    except KeyError:
+        #no 'elev'
         pass
 
     return sitedict or None
