@@ -345,8 +345,8 @@ def sachdr2assoc(header, pickmap=None):
     #header info is there, so we only need to try to if lcalca is False.
     #XXX: I just calculate it if no values are currently filled in.
     sac_assoc = [('az', 'esaz'),
-                  ('baz', 'seaz'),
-                  ('gcarc', 'delta'))
+                 ('baz', 'seaz'),
+                 ('gcarc', 'delta')]
 
     assocdict = {}
     for hdr, col in sac_assoc:
@@ -489,7 +489,7 @@ def sachdr2wfdisc(header):
     return wfdict or None
 
 
-def sachdr2tables(header, tables=None, schema='kbcore'):
+def sachdr2tables(header, tables=None):
     """
     Scrape ObsPy Trace headers into database table dictionary.
     Null values in Trace headers are not returned.
@@ -501,14 +501,11 @@ def sachdr2tables(header, tables=None, schema='kbcore'):
         Table name strings to return.
         Default, ['affiliation', 'arrival', 'assoc', 'event', 'instrument',
         'origin', 'site', 'sitechan', 'wfdisc']
-    schema: string, optional
-        'kbcore' or 'css'.  Default: 'kbcore'
-        ***Not yet implemented***
 
     Returns
     -------
     dict
-        Dictionary of table objects.  tables['arrival'] and tables['assoc']
+        Dictionary of table dictionaries.  tables['arrival'] and tables['assoc']
         return (possibly empty) _lists_ of table objects.  If only default
         values are found for a table, it is omitted.
 
@@ -543,6 +540,8 @@ def sachdr2tables(header, tables=None, schema='kbcore'):
         itab = ifn(header)
         if itab:
             t[table] = ifn(header)
+
+    # t[table] doesn't exist if table's function didn't return anything
 
     return t
 

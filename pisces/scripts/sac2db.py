@@ -398,10 +398,11 @@ def main(argv=None):
     for sacfile in files:
         print sacfile
 
-        tr = read(sacfile, format='SAC')
+        tr = read(sacfile, format='SAC', debug_headers=True)
 
         rows = sac.trace2rows(tr)
-        rows = sac2db(sacfile, last, **tables)
+        rows = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
+        rows = sac2db(sacheader, last, **tables)
 
         # manage the ids
         manage_rows(session, last, **rows)
