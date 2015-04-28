@@ -73,7 +73,7 @@ SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
 def get_sac_reftime(header):
     """
     Get SAC header reference time as a UTCDateTime instance from a SAC header
-    dictionary.  
+    dictionary.
 
     If using ObsPy to read the SAC file, use debug_headers=True to get the full
     header, including nz time headers.
@@ -108,7 +108,7 @@ def get_sac_reftime(header):
         # (reftime - datetime.datetime(1970,1,1)).total_seconds()
     except ValueError:
         # may contain -12345 null values?
-        msg = "Invalid time headers."
+        msg = "Invalid or missing time headers."
         raise ValueError(msg)
 
     return reftime
@@ -132,69 +132,73 @@ def sachdr2site(header):
     # clean up
     try:
         sitedict['elev'] /= 1000.0
-    except KeyError:
+    except (TypeError, KeyError):
         #no 'elev'
         pass
 
     return sitedict or None
 
 
-def tr2sitechan(tr):
-    """Provide a sac header dictionary, get a filled sitechan table instance."""
+def sachdr2sitechan(header):
+    """
+    Provide a sac header dictionary, get a sitechan table dictionary.
 
-    #1) from obspy header
-    sitechandict = _map_header({'station': 'sta', 'channel': 'chan'}, tr.stats,
-                                OBSPYDEFAULT)
+    """
+    sac_sitechan = [('kstnm', 'sta'),
+                    ('kcmpnm', 'chan'),
+                    ('cmpaz', 'hang'),
+                    ('cmpinc', 'vang'),
+                    ('stdp', 'edepth')]
 
-    #2) from sac header
+    sitechandict = {}
+    for hdr, col in sac_sitechan:
+        val = header.get(hdr, None)
+        sitechandict[col] = val if val != SACDEFAULT[hdr] else None
+
     try:
-        sac2sitechan = {'cmpaz': 'hang', 'cmpinc': 'vang', 'stdp': 'edepth'}
-        sitechandict.update(_map_header(sac2sitechan, tr.stats.sac, SACDEFAULT))
-        try:
-            sitechandict['edepth'] /= 1000.0
-        except (TypeError, KeyError):
-            #edepth is None or missing
-            pass
-    except (AttributeError, KeyError):
-        # no tr.stats.sac
+        sitechandict['edepth'] /= 1000.0
+    except (TypeError, KeyError):
+        #edepth is None or missing
         pass
 
     return sitechandict or None
 
 
-def tr2affiliation(tr):
-    #1) from obspy header
-    affildict = _map_header({'network': 'net', 'station': 'sta'}, tr.stats,
-                             OBSPYDEFAULT)
+def sachdr2affiliation(header):
+    sac_affil = [('knetwk', 'net'),
+                 ('kstnm', 'sta')]
 
-    #2) from sac header
-    try:
-        sac2affiliation = {'knetwk': 'net', 'kstnm': 'sta'}
-        affildict.update(_map_header(sac2affiliation, tr.stats.sac, SACDEFAULT))
-    except (AttributeError, KeyError):
-        # no tr.stats.sac or 'knetwk', etc.
-        pass
+    affildict = {}
+    for hdr, col in sac_affil:
+        val = header.get(hdr, None)
+        affildict[col] = val if val != SACDEFAULT[hdr] else None
 
     return affildict or None
 
 
-def tr2instrument(tr):
+def sachdr2instrument(header):
     #TODO: investigate hdr['resp0-9'] values
-    #1) from sac header
-    instrdict = {'samprate': int(tr.stats.sampling_rate)}
+    sac_instr = [('kinst', 'ins'),
+                 ('iinst', 'instype'),
+                 ('samprate', 'delta')]
+
+    instrdict = {}
+    for hdr, col in sac_instr:
+        val = header.get(hdr, None)
+        instrdict[col] = val if val != SACDEFAULT[hdr] else None
+
+    # clean up
     try:
-        instrdict = _map_header({'kinst': 'ins', 'iinst': 'instype'},
-                                tr.stats.sac, SACDEFAULT)
-    except AttributeError:
-        #no tr.stats.sac
+        instrdict['samprate'] = int(1.0 / instrdict['samprate'])
+    except (TypeError, KeyError):
         pass
 
     return instrdict or None
 
 
-def tr2origin(tr):
+def sachdr2origin(header):
     """
-    Provide a sac header dictionary, get a filled origin table instance.
+    Provide a sac header dictionary, get a filled origin table dictionary.
     A few things:
     1) If sac reference time isn't event-based, origin time is unknown
     2) magnitude is taken first from hdr['mag'], hdr['imagtyp'] if defined,
@@ -212,19 +216,23 @@ def tr2origin(tr):
 
     """
     # simple SAC translations
-    sac2origin = {'evla': 'lat', 'evlo': 'lon', 'norid': 'orid',
-                  'nevid': 'evid', 'ievreg': 'grn', 'evdp': 'depth'}
-    try:
-        origindict = _map_header(sac2origin, tr.stats.sac, SACDEFAULT)
-    except AttributeError:
-        #no tr.stats.sac
-        pass
+    sac_origin = [('evla', 'lat'),
+                  ('evlo', 'lon'),
+                  ('norid', 'orid'),
+                  ('nevid', 'evid'),
+                  ('ievreg', 'grn'),
+                  ('evdp', 'depth')]
+
+    origindict = {}
+    for hdr, col in sac_origin:
+        val = header.get(hdr, None)
+        origindict[col] = val if val != SACDEFAULT[hdr] else None
 
     #depth
     try:
-        origindict['depth'] = tr.stats.sac['evdp']/1000.
-    except (TypeError, AttributeError):
-        #evdp is None, or no tr.stats.sac
+        origindict['depth'] /= 1000.0
+    except (TypeError, KeyError):
+        #evdp is None or mising
         pass
 
     #etype translations
@@ -233,41 +241,40 @@ def tr2origin(tr):
             77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
             83: 'mc'}
     try:
-        origindict['etype'] = edict[tr.stats.sac['ievtype']]
-    except (AttributeError, KeyError):
-        #ievtyp is None, or not a key in edict (e.g. sac default value)
+        origindict['etype'] = edict[header['ievtype']]
+    except (TypeError, KeyError):
+        #ievtyp is None, or not a key in edict
         pass
 
     #1:
     try:
-        t = get_sac_reftime(tr)
-        if tr.stats.sac['iztype'] == 11:
+        t = get_sac_reftime(header)
+        if header['iztype'] == 11:
             #reference time is an origin time
-            if tr.stats.sac.o == SACDEFAULT['o']:
-                o = 0.0
-            else:
-                o = tr.stats.sac.o
+            o = header.get('o', None)
+            o = o if (o != SACDEFAULT['o']) else 0.0
+
             origindict['time'] = t.timestamp - o
             origindict['jdate'] = int((t-o).strftime('%Y%j'))
-    except (AttributeError, KeyError):
+    except (ValueError, KeyError):
         # no trace.stats.sac, no iztype
         pass
 
     #2: magnitude
     magdict = {52: 'mb', 53: 'ms', 54: 'ml'}
     try:
-        origindict[magdict[tr.stats.sac['imagtyp']]] = tr.stats.sac['mag']
-    except KeyError:
+        origindict[magdict[header['imagtyp']]] = header['mag']
+    except (ValueError, KeyError):
         #imagtyp is None or not a key in magdict
         pass
 
     # is kuser0 is a recognized magnitude type, overwrite mag
     #XXX: this is a LANL wfdisc2sac thing
     try:
-        magtype = tr.stats.sac['kuser0'].strip()
+        magtype = header['kuser0'].strip()
         if magtype in magdict.values():
-            origindict[magtype] = tr.stats.sac['user0']
-    except AttributeError:
+            origindict[magtype] = header['user0']
+    except (KeyError, ValueError):
         #kuser0 is None
         pass
 
@@ -276,31 +283,31 @@ def tr2origin(tr):
             64: 'IUSGS', 65: 'ISC:BERK', 66: 'ICALTECH', 67: 'ILLNL',
             68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
     try:
-        origindict['auth'] = authdict[tr.stats.sac['imagsrc']]
-    except KeyError:
+        origindict['auth'] = authdict[header['imagsrc']]
+    except (KeyError, ValueError):
         # imagsrc not in authdict (i.e. sac default value)
         pass
 
     #XXX: this is LANL wfdisc2sac thing.  maybe turn it off?
-    if tr.stats.sac['kuser1']:
-        origindict['auth'] = tr.stats.sac['kuser1']
+    if header.get('kuser1'):
+        origindict['auth'] = header['kuser1']
 
     return origindict or None
 
 
-def tr2event(tr):
+def sachdr2event(header):
+    sac_event = [('nevid', 'evid'),
+                 ('kevnm', 'evname')]
+
     eventdict = {}
-    try:
-        eventdict.update(_map_header({'nevid': 'evid', 'kevnm': 'evname'},
-                                tr.stats.sac, SACDEFAULT))
-    except AttributeError:
-        #no tr.stats.sac
-        pass
+    for hdr, col in sac_event:
+        val = header.get(hdr, None)
+        eventdict[col] = val if val != SACDEFAULT[hdr] else None
 
     return eventdict or None
 
 
-def tr2assoc(tr, pickmap=None):
+def sachdr2assoc(header, pickmap=None):
     """
     Takes a sac header dictionary, and produces a list of up to 10
     Assoc instances. Header->phase mappings follow SAC2000, i.e.:
@@ -337,33 +344,34 @@ def tr2assoc(tr, pickmap=None):
     # obspy.read tries to calculate these values if lcalca is True and needed
     #header info is there, so we only need to try to if lcalca is False.
     #XXX: I just calculate it if no values are currently filled in.
+    sac_assoc = [('az', 'esaz'),
+                  ('baz', 'seaz'),
+                  ('gcarc', 'delta'))
+
     assocdict = {}
-    try:
-        assocdict.update(_map_header({'az': 'esaz', 'baz': 'seaz',
-                                      'gcarc': 'delta'}, tr.stats.sac,
-                                      SACDEFAULT))
-    except AttributeError:
-        # no tr.stats.sac
-        pass
+    for hdr, col in sac_assoc:
+        val = header.get(hdr, None)
+        assocdict[col] = val if val != SACDEFAULT[hdr] else None
 
     #overwrite if any are None
     if not assocdict:
         try:
-            delta = geod.locations2degrees(tr.stats.sac.stla, tr.stats.sac.stlo,
-                                           tr.stats.sac.evla, tr.stats.sac.evlo)
-            m, seaz, esaz = geod.gps2DistAzimuth(tr.stats.sac.stla,
-                tr.stats.sac.stlo, tr.stats.sac.evla, tr.stats.sac.evlo)
+            delta = geod.locations2degrees(header['stla'], header['stlo'],
+                                           header['evla'], header['evlo'])
+            m, seaz, esaz = geod.gps2DistAzimuth(header['stla'], header['stlo'],
+                                                 header['evla'], header['evlo'])
             assocdict['esaz'] = esaz
             assocdict['seaz'] = seaz
             assocdict['delta'] = delta
-        except (AttributeError, TypeError):
+        except (ValueError, TypeError):
             #some sac header values are None
             pass
 
-    if tr.stats.station:
-        assocdict['sta'] = tr.stats.station
+    if header.get('kstnm', None):
+        assocdict['sta'] = header['kstnm']
 
-    assocdict.update(_map_header({'norid': 'orid'}, tr.stats.sac, SACDEFAULT))
+    orid = header.get('norid', None)
+    assocdict['orid'] = orid if orid != SACDEFAULT['norid'] else None
 
     #now, do the phase arrival mappings
     #for each pick in hdr, make a separate dictionary containing assocdict plus
@@ -372,14 +380,14 @@ def tr2assoc(tr, pickmap=None):
     for key in pick2phase:
         kkey = 'k' + key
         #if there's a value in t[0-9]
-        if tr.stats.sac[key] != SACDEFAULT[key]:
+        if header.get(key, None) not in (SACDEFAULT[key], None):
             #if the phase name kt[0-9] is null
-            if tr.stats.sac[kkey] == SACDEFAULT[kkey]:
+            if header[kkey] == SACDEFAULT[kkey]:
                 #take it from the map
                 iassoc = {'phase': pick2phase[key]}
             else:
                 #take it directly
-                iassoc = {'phase': tr.stats.sac[kkey]}
+                iassoc = {'phase': header[kkey]}
 
             iassoc.update(assocdict)
             assocs.append(iassoc)
@@ -387,9 +395,9 @@ def tr2assoc(tr, pickmap=None):
     return assocs
 
 
-def tr2arrival(tr, pickmap=None):
-    """Similar to tr2assoc, but produces a list of up to 10 Arrival
-    instances.  Same header->phase mapping applies, unless otherwise stated.
+def sachdr2arrival(header, pickmap=None):
+    """Similar to sachdr2assoc, but produces a list of up to 10 Arrival
+    dictionaries.  Same header->phase mapping applies, unless otherwise stated.
 
     """
     #puts t[0-9] times into arrival.time if they're not null
@@ -405,28 +413,28 @@ def tr2arrival(tr, pickmap=None):
 
     #simple translations
     arrivaldict = {}
-    if tr.stats.station:
-        arrivaldict['sta'] = tr.stats.station
-    if tr.stats.channel:
-        arrivaldict['chan'] = tr.stats.channel
+    if header.get('kstnm', None) not in (SACDEFAULT['kstnm'], None):
+        arrivaldict['sta'] = header['kstnm']
+    if header.get('kcmpnm', None) not in (SACDEFAULT['kcmpnm'], None):
+        arrivaldict['chan'] = header['kcmpnm']
 
     #phases and arrival times
-    t0 = get_sac_reftime(tr)
+    t0 = get_sac_reftime(header)
     arrivals = []
     for key in pick2phase:
         kkey = 'k' + key
         # if there's a value in t[0-9]
-        if tr.stats.sac[key] != SACDEFAULT[key]:
-            itime = t + tr.stats.sac[key]
+        if header.get('key', None) not in (SACDEFAULT[key], None):
+            itime = t + header[key]
             iarrival = {'time': itime.timestamp,
                         'jdate': int(itime.strftime('%Y%j'))}
             #if the phase name kt[0-9] is null
-            if tr.stats.sac[kkey] == SACDEFAULT[kkey]:
+            if header[kkey] == SACDEFAULT[kkey]:
                 #take it from the pick2phase map
                 iarrival['iphase'] = pick2phase[key]
             else:
                 #take it directly
-                iarrival['iphase'] = tr.stats.sac[kkey]
+                iarrival['iphase'] = header[kkey]
 
             iarrival.update(arrivaldict)
             arrivals.append(iassoc)
@@ -434,46 +442,54 @@ def tr2arrival(tr, pickmap=None):
     return arrivals
 
 
-def tr2wfdisc(tr):
+def sachdr2wfdisc(header):
     """Produce wfdisc kbcore table instance from sac header dictionary.
     Clearly this will be a skeleton instance, as the all-important 'dir' and
-    'dfile' must be filled in later.
-
-    Note: if you read a little-endian SAC file onto a big-endian machine, it
-    seems that obspy.sac.sacio.SacIO.swap_byte_order has trouble.
+    'dfile' and 'datatype' must be filled in later.
 
     """
-    # from obspy header
-    wfdict = {}
-    wfdict['nsamp'] = tr.stats.npts
-    wfdict['time'] = tr.stats.starttime.timestamp
-    wfdict['endtime'] = tr.stats.endtime.timestamp
-    wfdict['jdate'] = int(tr.stats.starttime.strftime('%Y%j'))
-    wfdict['samprate'] = int(tr.stats.sampling_rate)
-    if tr.stats.station:
-        wfdict['sta'] = tr.stats.station
-    if tr.stats.channel:
-        wfdict['chan'] = tr.stats.channel
-    if tr.stats.calib:
-        wfdict['calib'] = tr.stats.calib
+    t0 = get_sac_reftime(header)
+    b = header.get('b', None)
+    b = b if (b != SACDEFAULT['b']) else 0.0
+    starttime = t0 + b
+    e = header.get('e', None)
+    e = e if (e != SACDEFAULT['e']) else 0.0
+    endtime = t0 + e
 
-    #from sac header
-    try:
-        wfdict.update(_map_header({'nwfid': 'wfid'}, tr.stats.sac, SACDEFAULT))
-        wfdict['foff'] = 634
-        # XXX: not necessarily correct
-        if sys.byteorder == 'little':
-            wfdict['datatype'] = 'f4'
-        else:
-            wfdict['datatype'] = 't4'
-    except AttributeError:
-        #no tr.stats.sac
-        pass
+    wfdict = {}
+    wfdict['nsamp'] = header.get('npts', None)
+    wfdict['time'] = starttime.timestamp
+    wfdict['endtime'] = endtime.timestamp
+    wfdict['jdate'] = int(starttime.strftime('%Y%j'))
+    wfdict['samprate'] = int(1.0 / header['delta'])
+
+    kstnm = header.get('kstnm', None)
+    if kstnm not in (SACDEFAULT['kstnm'], None):
+        wfdict['sta'] = kstnm
+
+    kcmpnm = header.get('kcmpnm', None)
+    if kcmpnm not in (SACDEFAULT['kcmpnm'], None):
+        wfdict['chan'] = kcmpnm
+
+    scale = header.get('scale', None)
+    if scale not in (SACDEFAULT['scale'], None):
+        wfdict['calib'] = scale
+
+    nwfid = header.get('nwfid', None)
+    if nwfid not in (SACDEFAULT['nwfid'], None):
+        wfdict['wfid'] = nwfid
+
+    wfdict['foff'] = 634
+
+    if sys.byteorder == 'little':
+        wfdict['datatype'] = 'f4'
+    else:
+        wfdict['datatype'] = 't4'
 
     return wfdict or None
 
 
-def trace2tables(tr, tables=None, schema='kbcore'):
+def sachdr2tables(header, tables=None, schema='kbcore'):
     """
     Scrape ObsPy Trace headers into database table dictionary.
     Null values in Trace headers are not returned.
@@ -509,24 +525,24 @@ def trace2tables(tr, tables=None, schema='kbcore'):
     - wfdisc.dir, dfile, foff, datetype, wfid
 
     """
-    fns = {'affiliation': tr2affiliation,
-           'arrival': tr2arrival,
-           'assoc': tr2assoc,
-           'event': tr2event,
-           'instrument': tr2instrument,
-           'origin': tr2origin,
-           'site': tr2site,
-           'sitechan': tr2sitechan,
-           'wfdisc': tr2wfdisc}
+    fns = {'affiliation': sachdr2affiliation,
+           'arrival': sachdr2arrival,
+           'assoc': sachdr2assoc,
+           'event': sachdr2event,
+           'instrument': sachdr2instrument,
+           'origin': sachdr2origin,
+           'site': sachdr2site,
+           'sitechan': sachdr2sitechan,
+           'wfdisc': sachdr2wfdisc}
 
     if tables is None:
         tables = fns.keys()
 
     t = AttribDict()
     for table, ifn in tables.items():
-        itab = ifn(tr)
+        itab = ifn(header)
         if itab:
-            t[table] = ifn(tr)
+            t[table] = ifn(header)
 
     return t
 
