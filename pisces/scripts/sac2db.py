@@ -192,13 +192,13 @@ def get_session(options):
     return session
 
 
-def get_or_create_tables(args, session, create=True):
+def get_or_create_tables(options, session, create=True):
     """
     Load or create canonical ORM KB Core table classes.
 
     Parameters
     ----------
-    args : optparse.OptionParser
+    options : optparse.OptionParser
     session : sqlalchemy.orm.Session
 
     Returns
