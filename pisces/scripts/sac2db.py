@@ -384,13 +384,13 @@ def main(argv=None):
     """
     parser = get_parser()
 
-    args = parser.parse_args(argv)
+    options, args = parser.parse_args(argv)
 
-    session = get_session(args)
+    session = get_session(options)
 
-    tables = get_or_create_tables(args, session, create=True)
+    tables = get_or_create_tables(options, session, create=True)
 
-    files = get_files(args)
+    files = get_files(options)
 
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = ps.get_lastids(session, tables['lastid'], lastids, create=True)
