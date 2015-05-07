@@ -229,11 +229,12 @@ def get_or_create_tables(options, session, create=True):
                 tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
             except exc.NoSuchTableError as e:
                 if create:
-                    # make one and create it
+                    # user wants to make one and create it
                     print "{0} doesn't exist. Creating it.".format(fulltabnm)
                     tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
                     tables[coretable.name].__table__.create(session.bind, checkfirst=True)
                 else:
+                    # user expected the table to be there
                     raise e
 
     return tables
