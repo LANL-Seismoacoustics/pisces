@@ -377,7 +377,6 @@ def manage_rows(session, last, **rows):
 
 
 
-
 def main(argv=None):
     """
     Command-line arguments are created and parsed, fed to functions.
@@ -401,7 +400,6 @@ def main(argv=None):
 
         tr = read(sacfile, format='SAC', debug_headers=True)
 
-        rows = sac.trace2rows(tr)
         rows = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
         rows = sac2db(sacheader, last, **tables)
 
