@@ -8,7 +8,7 @@ import math
 
 import numpy as np
 from sqlalchemy import func, or_
-from obspy.core import UTCDateTime
+from obspy.core import UTCDateTime, Stream
 import obspy.core.util.geodetics as geod
 
 from pisces.util import db_connect, make_same_size
@@ -47,6 +47,7 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     list of wfdisc row objects, or sqlalchemy.orm.Query instance
 
     """
+
     q = session.query(wfdisc)
     if wfids is not None:
         q = q.filter(wfdisc.wfid.in_(wfids))
@@ -511,7 +512,7 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
         t1_utc = UTCDateTime(float(t1))
         t2_utc = UTCDateTime(float(t2))
 
-        wfs = get_wfdisc_rows(Wfdisc, session, sta, chan, t1, t2)
+        wfs = get_wfdisc_rows( session,Wfdisc, sta, chan, t1, t2)
 
         #TODO: do arrival stuff here
         for wf in wfs:
@@ -523,7 +524,7 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
                 #tr is None b/c data couldn't be read
                 pass
     else:
-        wfs = get_wfdisc_rows(Wfdisc, session, wfids=wfids)
+        wfs = get_wfdisc_rows( session,Wfdisc, wfids=wfids)
         for wf in wfs:
             try:
                 tr = wfdisc2trace(wf)

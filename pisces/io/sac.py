@@ -13,7 +13,7 @@ import sys
 import os
 from collections import OrderedDict
 
-from obspy.core import UTCDateTime, Trace, Stats, AttribDict
+from obspy.core import UTCDateTime, AttribDict
 import obspy.core.util.geodetics as geod
 
 import pisces.tables.kbcore as kb
@@ -491,13 +491,13 @@ def sachdr2wfdisc(header):
 
 def sachdr2tables(header, tables=None):
     """
-    Scrape ObsPy Trace headers into database table dictionary.
-    Null values in Trace headers are not returned.
+    Scrape SAC header dictionary into database table dictionaries.
 
     Parameters
     ----------
-    tr: Obspy.core.Trace
-    tables: list, optional
+    header : dict
+        SAC header
+    tables : list/tuple of strings, optional
         Table name strings to return.
         Default, ['affiliation', 'arrival', 'assoc', 'event', 'instrument',
         'origin', 'site', 'sitechan', 'wfdisc']
