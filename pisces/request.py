@@ -441,7 +441,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
     if channels:
         q = q.filter(Arrival.chan.in_(channels))
 
-    if phase:
+    if phases:
         q = q.filter(Arrival.iphase.in_(phase))
 
     if t:
