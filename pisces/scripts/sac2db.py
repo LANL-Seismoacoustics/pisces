@@ -1,11 +1,18 @@
+#!/usr/bin/env python
+import sys
 import glob
 from collections import namedtuple
 from optparse import OptionParser
+import argparse
 
+from sqlalchemy import create_engine
 import sqlalchemy.exc as exc
 import sqlalchemy.orm.exc as oexc
 
+from obspy.sac.core import isSAC
+
 import pisces as ps
+from pisces.util import get_lastids, url_connect
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
 import pisces.io.sac as sac
@@ -30,16 +37,9 @@ CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
               CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
 
 # HELPER FUNCTIONS
-def split_slash(option, opt_str, value, parser):
-    setattr(parser.values, option.dest, [float(val) for val in value.split("/")])
-
-def split_comma(option, opt_str, value, parser):
-    setattr(parser.values, option.dest, [val.strip() for val in value.split(",")])
-
 def expand_glob(option, opt_str, value, parser):
     """Returns an iglob iterator for file iteration. Good for large file lists."""
     setattr(parser.values, option.dest, glob.iglob(value))
-
 
 def get_parser():
     """
@@ -55,141 +55,83 @@ def get_parser():
 
     >>> from sac2db import get_parser
     >>> parser = get_parser()
-    >>> options, args = parser.parse_args(['-f','*.sac','dbout'])
+    >>> options = parser.parse_args(['--origin', 'origin', '--affiliation',
+                                     'my.affiliation', '*.sac', 
+                                     'sqlite://mydb.sqlite'])
     >>> print options
-    {'origin': None, 'site': None, 'wfdisc': None, 'affiliation': None, 'port':
-    '', 'conn': None, 'backend': 'sqlite', 'all_tables': None, 'instance': '',
-    'event': None, 'instrument': None, 'arrival': None, 'sitechan': None,
-    'psswd': '', 'assoc': None, 'user': '', 'f': <generator object iglob at
-    0x10c782f50>, 'l': None, 'server': '', 't': None, 'lastid': None,
-    'rel_path': False, 'gndd': False}
-    >>> print args
-    ['dbout']
+    Namespace(affiliation='my.affiliation', all_tables=None, arrival=None,
+    assoc=None, event=None, files=['*.sac'], instrument=None, lastid=None,
+    origin='origin', rel_path=False, site=None, sitechan=None, 
+    url='sqlite://mydb.sqlite', wfdisc=None)
 
     """
-    parser = OptionParser(usage="Usage: %prog [options] ",
-            description="""Write data from SAC files into a database.""",
+    parser = argparse.ArgumentParser(prog='sac2db', usage="sac2db [options] files dburl",
+            description="""
+            Write data from SAC files into a database.
+            
+            If individual table name flags are specified, only those core
+            tables are written from SAC file headers, otherwise all core tables
+            are written to standard or prefixed table names.""",
             version='0.2')
-    parser.add_option('-f','--files',
-            default=None,
-            help="Unix-style file name expansion for trace files.",
-            type='string',
-            action="callback",
-            callback=expand_glob,
-            dest='f')
-    parser.add_option('-l','--list',
-            default=None,
-            help="A text file containing a column of trace file names.",
-            type='string',
-            dest='l')
-    parser.add_option('-t','--tables',
-            help="Only parse into this comma-seperated list of tables.",
-            default=None,
-            action='callback',
-            callback=split_comma,
-            dest='t')
-    parser.add_option('--conn',
-            default=None,
-            help="SQLAlchemy-style output database connection string.",
-            type='string',
-            dest='conn')
-    parser.add_option('-u', '--user',
-            default='',
-            help="Database user name. Not needed for sqlite and remotely \
-                  authenticated connections.",
-            type='string',
-            dest='user')
-    parser.add_option('-b', '--backend',
-            default='sqlite',
-            help="SQLAlchemy-style backend and driver string.",
-            type='string',
-            dest='backend')
-    parser.add_option('-p', '--psswd',
-            default='',
-            help="Database password.  Not needed for sqlite and remotely \
-                  authenticated connections.  Prompted for if needed and \
-                  not given.",
-            type='string',
-            dest='psswd')
-    parser.add_option('-s', '--server',
-            default='',
-            help="Local or remote database server. Not needed for sqlite.",
-            type='string',
-            dest='server')
-    parser.add_option('--port',
-            default='',
-            help="Port on database server.  Optional.",
-            type='string',
-            dest='port')
-    parser.add_option('-i', '--instance',
-            default='',
-            help="Database instance name.  Optional for some backends.\
-                  For sqlite, this is the file name.",
-            type='string',
-            dest='instance')
-    parser.add_option('--gndd',
-            default=False,
-            help="Convenience flag for GNEM database users. \
-                  Sets server, port, instance, and backend.",
-            action='store_true',
-            dest='gndd')
-    parser.add_option('--rel_path',
-            default=False,
-            help="Write directories ('dir') as relative paths, not absolute.",
-            action='store_true',
-            dest='rel_path')
     # ----------------------- Add core table arguments ------------------------
-    #The following loop adds core table options.  They look like:
-    #parser.add_option('--origin',
-    #        default=None,
-    #        help="Name of desired output origin table.  Optional.  \
-    #              No owner for sqlite.",
-    #        type='string',
-    #        metavar='owner.tablename',
-    #        dest='origin')
+    #The following loop adds the core table owner/name options.
     for coretable in CORETABLES:
-        parser.add_option('--' + coretable.name,
-                          default=None,
-                          help="Name of desired output {} table.  Optional. \
-                                No owner for sqlite.".format(coretable.name),
-                          type='string',
-                          metavar='owner.tablename',
-                          dest=coretable.name)
+        parser.add_argument('--' + coretable.name,
+                            default=None,
+                            help="Name of desired output {} table.  Optional. \
+                                  No owner for sqlite.".format(coretable.name),
+                            metavar='owner.tablename',
+                            dest=coretable.name)
     # -------------------------------------------------------------------------
-    parser.add_option('--all_tables',
-            default=None,
+    parser.add_argument('--all_tables',
             help="Convenience flag.  Attempt to fill all tables.\
                   e.g. myaccount.test_ will attempt to produce tables \
                   like myaccount.test_origin, myaccount.test_sitechan.\
                   Not yet implemented.",
-            type='string',
             metavar='owner.prefix',
             dest='all_tables')
+
+    parser.add_argument('files',
+            nargs='+',
+            help="SAC file names, including any Unix-style name expansions.")
+    parser.add_argument('url',
+            help="SQLAlchemy-style database connection string, such as \
+            sqlite://mydb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
+    parser.add_argument('--rel_path',
+            default=False,
+            help="Write directories ('dir') as relative paths, not absolute.",
+            action='store_true',
+            dest='rel_path')
 
     return parser
 
 
 def get_session(options):
-    if options.gndd:
-        #TODO: add a password option here
-        try:
-            from pisces_gndd import gndd_connect
-            session = gndd_connect(options.user)
-        except ImportError as e:
-            msg = "Must have pisces_gndd installed with --gndd option."
-            raise ImportError(msg)
-    else:
-        if options.conn:
-            session = ps.db_connect(conn=options.conn)
-        else:
-            session = ps.db_connect(user=options.user,
-                                    psswd=options.psswd,
-                                    backend=options.backend,
-                                    server=options.server,
-                                    port=options.port,
-                                    instance=options.instance)
+    # accept command line arguments, return a database-bound session.
+    session = url_connect(options.url)
 
     return session
+
+
+def get_files(options):
+    """
+    Return a sequence of SAC file names from either a list of file names
+    (trivial) or a text file list (presumable because there are too many files
+    to use normal shell expansion).
+
+    """
+    if len(options.files) == 1 and not isSAC(options.files[0]):
+        #make a generator of non-blank lines
+        try:
+            listfile = open(options.files[0], 'r')
+            files = (line.strip() for line in listfile if line.strip())
+        except IOError:
+            msg = "{0} does not exist.".format(options.files[0])
+            raise IOError(msg)
+    else:
+        files = options.files
+
+    return files
 
 
 def get_or_create_tables(options, session, create=True):
@@ -204,7 +146,8 @@ def get_or_create_tables(options, session, create=True):
     Returns
     -------
     tables : dict
-        Canonical table names and mapped classes, like: {'tablename': class, ...}
+        Mapping between canonical table names and SQLA ORM classes.
+        e.g. {'origin': MyOrigin, ...}
 
     """
     # The Plan:
@@ -218,6 +161,7 @@ def get_or_create_tables(options, session, create=True):
         if options.all_tables is None:
             fulltabnm = getattr(options, coretable.name, None)
         else:
+            # XXX: fails for schema-qualified table names 'user.tablename'
             fulltabnm = options.all_tables + coretable.name
 
         if fulltabnm == coretable.name:
@@ -234,33 +178,19 @@ def get_or_create_tables(options, session, create=True):
                     tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
                     tables[coretable.name].__table__.create(session.bind, checkfirst=True)
                 else:
-                    # user expected the table to be there
+                    # user expected the table to be there and it isn't
                     raise e
+            except AttributeError:
+                # fulltabnm is None
+                # lastid table is special.  always load or create it.
+                if coretable.name == 'lastid':
+                    pass
+                else:
+                    pass
 
     return tables
 
 
-def get_files(options):
-    """
-    returns a sequence of files (names?)
-    raises IOError if problematic
-    raises ValueError if problematic
-    """
-    if options.f is not None:
-        files = options.f
-    elif options.l is not None:
-        try:
-            lfile = open(options.l, 'r')
-            #make a generator of non-blank lines
-            files = (line.strip() for line in lfile if line.strip())
-        except IOError:
-            msg = "{0} does not exist.".format(options.l)
-            raise IOError(msg)
-    else:
-        msg = "Must provide input files or file list."
-        raise ValueError(msg)
-
-    return files
 
 
 def sac2db(sacfile, last, **tables):
@@ -331,7 +261,7 @@ def sac2db(sacfile, last, **tables):
     return out
 
 
-def manage_rows(session, last, **rows):
+def make_atomic(session, last, **rows):
     """
     Unify related table instances/row, including: ids, dir, and dfile
     """
@@ -384,16 +314,16 @@ def main(argv=None):
     """
     parser = get_parser()
 
-    options, args = parser.parse_args(argv)
+    options = parser.parse_args(argv)
 
     session = get_session(options)
 
-    tables = get_or_create_tables(options, session, create=True)
-
     files = get_files(options)
 
+    tables = get_or_create_tables(options, session, create=True)
+
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
-    last = ps.get_lastids(session, tables['lastid'], lastids, create=True)
+    last = get_lastids(session, tables['lastid'], lastids, create=True)
 
     for sacfile in files:
         print sacfile
@@ -404,7 +334,7 @@ def main(argv=None):
         rows = sac2db(sacheader, last, **tables)
 
         # manage the ids
-        manage_rows(session, last, **rows)
+        make_atomic(session, last, **rows)
 
         # manage dir, dfile
 
