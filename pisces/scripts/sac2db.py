@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 import sqlalchemy.exc as exc
 import sqlalchemy.orm.exc as oexc
 
+from obspy import read
 from obspy.sac.core import isSAC
 
 import pisces as ps
@@ -47,7 +48,7 @@ def get_parser():
 
     Returns
     -------
-    optparse.OptionParser instance
+    argparse.ArgumentParser instance
 
     Examples
     -------
@@ -56,7 +57,7 @@ def get_parser():
     >>> from sac2db import get_parser
     >>> parser = get_parser()
     >>> options = parser.parse_args(['--origin', 'origin', '--affiliation',
-                                     'my.affiliation', '*.sac', 
+                                     'myaffiliation', '*.sac', 
                                      'sqlite://mydb.sqlite'])
     >>> print options
     Namespace(affiliation='my.affiliation', all_tables=None, arrival=None,
@@ -65,7 +66,6 @@ def get_parser():
     url='sqlite://mydb.sqlite', wfdisc=None)
 
     """
-    #usage="sac2db [options] files dburl",    
     parser = argparse.ArgumentParser(prog='sac2db',
             description="""
             Write data from SAC files into a database.
@@ -84,27 +84,25 @@ def get_parser():
                             metavar='owner.tablename',
                             dest=coretable.name)
     # -------------------------------------------------------------------------
-
-    parser.add_argument('files',
-            nargs='+',
-            help="SAC file names, including any Unix-style name expansions.")
+    parser.add_argument('--absolute_paths',
+            default=False,
+            help="Write database 'dir' directory entries as absolute paths, not relative.",
+            action='store_true',
+            dest='rel_path')
 
     parser.add_argument('url',
             help="SQLAlchemy-style database connection string, such as \
             sqlite:///mylocaldb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
 
     parser.add_argument('dbout',
-            help="Convenience flag.  Name all tables using prefix.\
-                  e.g. myaccount.test_ will attempt to produce tables \
+            help="Target tables using 'account.prefix naming.'\
+                  e.g. myaccount.test_ will target tables \
                   like myaccount.test_origin, myaccount.test_sitechan.\
-                  Not yet implemented.",
-            metavar='owner.prefix')
+                  Use '-' (no quotes) for default standard table names.")
 
-    parser.add_argument('--rel_path',
-            default=False,
-            help="Write directories ('dir') as relative paths, not absolute.",
-            action='store_true',
-            dest='rel_path')
+    parser.add_argument('files',
+            nargs='+',
+            help="SAC file names, including any Unix-style name expansions.")
 
     return parser
 
@@ -143,7 +141,7 @@ def get_or_create_tables(options, session, create=True):
 
     Parameters
     ----------
-    options : optparse.OptionParser
+    options : argparse.ArgumentParser
     session : sqlalchemy.orm.Session
 
     Returns
@@ -158,44 +156,36 @@ def get_or_create_tables(options, session, create=True):
     # 2. If it's a vanilla table name, just use a pre-packaged table class
     # 3. If not, try to autoload it.
     # 4. If it doesn't exist, make it from a prototype and create it in the database.
+
+    # New Plan:
+    # 1. Always need a lastid. Check for it, maybe create it.
+
+    dbout = options.dbout
+    if dbout == '-':
+        dbout = ''
+
     tables = {}
     for coretable in CORETABLES:
         # build the table name
-        if options.all_tables is None:
-            fulltabnm = getattr(options, coretable.name, None)
+        if getattr(options, coretable.name, None):
+            fulltablename = getattr(options, coretable.name)
         else:
-            # XXX: fails for schema-qualified table names 'user.tablename'
-            fulltabnm = options.all_tables + coretable.name
+            fulltablename = dbout + coretable.name
 
-        if fulltabnm == coretable.name:
-            # it's a vanilla table name. just use a pre-packaged table class
+        # fulltablename is either an arbitrary string or dbout + core name, but not None
+
+        # put table classes into the tables dictionary
+        if fulltablename == coretable.name:
+            # it's a vanilla table name. just use a pre-packaged table class instead of making one.
             tables[coretable.name] = coretable.table
-        elif fulltabnm is None:
-            pass
         else:
-            try:
-                # autoload a custom table name and/or owner
-                tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
-            except (exc.NoSuchTableError, exc.OperationalError) as e:
-                if create:
-                    # user wants to make one and create it
-                    print "{0} doesn't exist. Creating it.".format(fulltabnm)
-                    tables[coretable.name] = ps.make_table(fulltabnm, coretable.prototype)
-                    tables[coretable.name].__table__.create(session.bind, checkfirst=True)
-                else:
-                    # user expected the table to be there and it isn't
-                    raise e
-            except AttributeError:
-                # fulltabnm is None
-                # lastid table is special.  always load or create it.
-                if coretable.name == 'lastid':
-                    pass
-                else:
-                    pass
+            tables[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
+
+        tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+
+    session.commit()
 
     return tables
-
-
 
 
 def sac2db(sacfile, last, **tables):
@@ -330,11 +320,12 @@ def main(argv=None):
 
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = get_lastids(session, tables['lastid'], lastids, create=True)
+    session.commit()
 
     for sacfile in files:
         print sacfile
 
-        tr = read(sacfile, format='SAC', debug_headers=True)
+        tr = read(sacfile, format='SAC', debug_headers=True)[0]
 
         rows = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
         rows = sac2db(sacheader, last, **tables)
