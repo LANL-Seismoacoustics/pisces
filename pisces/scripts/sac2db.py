@@ -65,7 +65,8 @@ def get_parser():
     url='sqlite://mydb.sqlite', wfdisc=None)
 
     """
-    parser = argparse.ArgumentParser(prog='sac2db', usage="sac2db [options] files dburl",
+    #usage="sac2db [options] files dburl",    
+    parser = argparse.ArgumentParser(prog='sac2db',
             description="""
             Write data from SAC files into a database.
             
@@ -83,20 +84,22 @@ def get_parser():
                             metavar='owner.tablename',
                             dest=coretable.name)
     # -------------------------------------------------------------------------
-    parser.add_argument('--all_tables',
-            help="Convenience flag.  Attempt to fill all tables.\
-                  e.g. myaccount.test_ will attempt to produce tables \
-                  like myaccount.test_origin, myaccount.test_sitechan.\
-                  Not yet implemented.",
-            metavar='owner.prefix',
-            dest='all_tables')
 
     parser.add_argument('files',
             nargs='+',
             help="SAC file names, including any Unix-style name expansions.")
+
     parser.add_argument('url',
             help="SQLAlchemy-style database connection string, such as \
-            sqlite://mydb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
+            sqlite:///mylocaldb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
+
+    parser.add_argument('dbout',
+            help="Convenience flag.  Name all tables using prefix.\
+                  e.g. myaccount.test_ will attempt to produce tables \
+                  like myaccount.test_origin, myaccount.test_sitechan.\
+                  Not yet implemented.",
+            metavar='owner.prefix')
+
     parser.add_argument('--rel_path',
             default=False,
             help="Write directories ('dir') as relative paths, not absolute.",
@@ -167,11 +170,13 @@ def get_or_create_tables(options, session, create=True):
         if fulltabnm == coretable.name:
             # it's a vanilla table name. just use a pre-packaged table class
             tables[coretable.name] = coretable.table
+        elif fulltabnm is None:
+            pass
         else:
             try:
                 # autoload a custom table name and/or owner
                 tables[coretable.name] = ps.get_tables(session.bind, [fulltabnm])[0]
-            except exc.NoSuchTableError as e:
+            except (exc.NoSuchTableError, exc.OperationalError) as e:
                 if create:
                     # user wants to make one and create it
                     print "{0} doesn't exist. Creating it.".format(fulltabnm)
@@ -315,6 +320,7 @@ def main(argv=None):
     parser = get_parser()
 
     options = parser.parse_args(argv)
+    print options
 
     session = get_session(options)
 
@@ -354,4 +360,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(sys.argv[1:])
