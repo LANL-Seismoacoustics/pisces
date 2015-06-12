@@ -360,7 +360,7 @@ def main(argv=None):
                 except exc.IntegrityError as e:
                     # duplicate or nonexistant primary keys
                     session.rollback()
-                    print("rollback {}".format(table)
+                    print("rollback {}".format(table))
                 except exc.OperationalError as e:
                     # no such table, or database is locked
                     session.rollback()
