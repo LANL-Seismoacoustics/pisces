@@ -89,7 +89,7 @@ def get_parser():
             default=False,
             help="Write database 'dir' directory entries as absolute paths, not relative.",
             action='store_true',
-            dest='rel_path')
+            dest='absolute_paths')
 
     parser.add_argument('url',
             help="SQLAlchemy-style database connection string, such as \
@@ -158,8 +158,7 @@ def get_or_create_tables(options, session, create=True):
     # 3. If not, try to autoload it.
     # 4. If it doesn't exist, make it from a prototype and create it in the database.
 
-    # New Plan:
-    # 1. Always need a lastid. Check for it, maybe create it.
+    # TODO: check options for which tables to produce.
 
     dbout = options.dbout
     if dbout == '-':
@@ -265,6 +264,7 @@ def dicts2rows(dicts, classes):
         dicts[table] = [cls(**dct) for dct in dcts]
 
     return dicts
+
 
 def make_atomic(session, last, **rows):
     """
