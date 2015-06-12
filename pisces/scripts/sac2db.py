@@ -347,8 +347,12 @@ def main(argv=None):
 
         # manage dir, dfile
         for wf in rows['wfdisc']:
-            wf.dir = os.path.dirname(sacfile)
             wf.dfile = os.path.basename(sacfile)
+            if options.absolute_paths:
+                idir = os.path.dirname(os.path.realpath(sacfile))
+            else:
+                idir = os.path.dirname(sacfile)
+            wf.dir = idir
 
 
         for table, instances in rows.items():
