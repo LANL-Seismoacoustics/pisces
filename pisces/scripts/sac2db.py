@@ -201,6 +201,7 @@ def sac2db(sacfile, last, **tables):
     site, origin, event, wfdisc, sitechan : SQLA table classes with .from_sac
 
     """
+    # XXX: this doesn't work (yet?)
     # TODO: remove id handling
     out = {}
     try:
@@ -255,6 +256,14 @@ def sac2db(sacfile, last, **tables):
 
     return out
 
+def dicts2rows(dicts, classes):
+    # print dicts
+    for table, dcts in dicts.items():
+        #print table, dcts
+        cls = classes[table]
+        dicts[table] = [cls(**dct) for dct in dcts]
+
+    return dicts
 
 def make_atomic(session, last, **rows):
     """
@@ -265,12 +274,13 @@ def make_atomic(session, last, **rows):
     # of _related_ instances from a single SAC header?
     # TODO: check existance of rows before changing their ids.
 
+    #print rows
     # the order matters here
 
     # for SAC, only 1
     for event in rows.get('event', []):
         # skips if no 'event' key and if 'event' value is empty []
-        # XXX: check for existance first
+        # XXX: check for existence first
         event.evid = next(last.evid)
 
     # for SAC, only 1
@@ -310,7 +320,7 @@ def main(argv=None):
     parser = get_parser()
 
     options = parser.parse_args(argv)
-    print options
+    #print options
 
     session = get_session(options)
 
@@ -320,15 +330,16 @@ def main(argv=None):
 
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = get_lastids(session, tables['lastid'], lastids, create=True)
-    session.commit()
 
     for sacfile in files:
         print sacfile
 
         tr = read(sacfile, format='SAC', debug_headers=True)[0]
 
-        rows = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
-        rows = sac2db(sacheader, last, **tables)
+        # rows needs to be a dict of lists, for make_atomic
+        dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
+        #rows = sac2db(tr.stats.sac, last, **tables)
+        rows = dicts2rows(dicts, tables)
 
         # manage the ids
         make_atomic(session, last, **rows)
@@ -342,10 +353,10 @@ def main(argv=None):
                 try:
                     session.add_all(instances)
                     session.commit()
-                except IntegrityError as e:
+                except exc.IntegrityError as e:
                     # duplicate or nonexistant primary keys
                     session.rollback()
-                except OperationalError as e:
+                except exc.OperationalError as e:
                     # no such table, or database is locked
                     session.rollback()
 
