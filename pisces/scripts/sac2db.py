@@ -345,6 +345,9 @@ def main(argv=None):
         make_atomic(session, last, **rows)
 
         # manage dir, dfile
+        for wf in rows['wfdisc']:
+            wf.dir = os.path.dirname(sacfile)
+            wf.dfile = os.path.basename(sacfile)
 
 
         for table, instances in rows.items():
@@ -356,9 +359,11 @@ def main(argv=None):
                 except exc.IntegrityError as e:
                     # duplicate or nonexistant primary keys
                     session.rollback()
+                    print("rollback")
                 except exc.OperationalError as e:
                     # no such table, or database is locked
                     session.rollback()
+                    print("rollback")
 
 
 if __name__ == '__main__':
