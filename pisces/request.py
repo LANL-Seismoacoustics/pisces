@@ -71,7 +71,8 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
         res = q
     else:
         if verbose:
-            print("Requesting sta={}, chan={}, time=[{}, {}], wfids={}".format(sta, chan, UTCDateTime(t1), UTCDateTime(t2), wfids))
+            msg = "Requesting sta={}, chan={}, time=[{}, {}], wfids={}"
+            print(msg.format(sta, chan, UTCDateTime(t1), UTCDateTime(t2), wfids))
         res = q.all()
 
     return res

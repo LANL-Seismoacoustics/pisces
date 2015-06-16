@@ -1,7 +1,7 @@
 """
-Conversions between SAC header variables and KB Core fields.
+Conversions between SAC header variables and CSS or KB Core fields.
 
-Converts SAC header dictionaries to KB Core table dictionaries and vice-versa.
+Converts a SAC header dictionary into a list of table dictionaries and vice-versa.
 
 """
 # XXX: currently not working
@@ -13,7 +13,7 @@ import sys
 import os
 from collections import OrderedDict
 
-from obspy.core import UTCDateTime, Trace, Stats, AttribDict
+from obspy.core import UTCDateTime, AttribDict
 import obspy.core.util.geodetics as geod
 
 import pisces.tables.kbcore as kb
@@ -136,7 +136,7 @@ def sachdr2site(header):
         #no 'elev'
         pass
 
-    return sitedict or None
+    return [sitedict] or []
 
 
 def sachdr2sitechan(header):
@@ -150,7 +150,7 @@ def sachdr2sitechan(header):
                     ('cmpinc', 'vang'),
                     ('stdp', 'edepth')]
 
-    sitechandict = {}
+    sitechandict = AttribDict()
     for hdr, col in sac_sitechan:
         val = header.get(hdr, None)
         sitechandict[col] = val if val != SACDEFAULT[hdr] else None
@@ -161,28 +161,28 @@ def sachdr2sitechan(header):
         #edepth is None or missing
         pass
 
-    return sitechandict or None
+    return [sitechandict] or []
 
 
 def sachdr2affiliation(header):
     sac_affil = [('knetwk', 'net'),
                  ('kstnm', 'sta')]
 
-    affildict = {}
+    affildict = AttribDict()
     for hdr, col in sac_affil:
         val = header.get(hdr, None)
         affildict[col] = val if val != SACDEFAULT[hdr] else None
 
-    return affildict or None
+    return [affildict] or []
 
 
 def sachdr2instrument(header):
     #TODO: investigate hdr['resp0-9'] values
-    sac_instr = [('kinst', 'ins'),
+    sac_instr = [('kinst', 'insname'),
                  ('iinst', 'instype'),
-                 ('samprate', 'delta')]
+                 ('delta', 'samprate')]
 
-    instrdict = {}
+    instrdict = AttribDict()
     for hdr, col in sac_instr:
         val = header.get(hdr, None)
         instrdict[col] = val if val != SACDEFAULT[hdr] else None
@@ -193,7 +193,7 @@ def sachdr2instrument(header):
     except (TypeError, KeyError):
         pass
 
-    return instrdict or None
+    return [instrdict] or []
 
 
 def sachdr2origin(header):
@@ -223,7 +223,7 @@ def sachdr2origin(header):
                   ('ievreg', 'grn'),
                   ('evdp', 'depth')]
 
-    origindict = {}
+    origindict = AttribDict()
     for hdr, col in sac_origin:
         val = header.get(hdr, None)
         origindict[col] = val if val != SACDEFAULT[hdr] else None
@@ -292,19 +292,19 @@ def sachdr2origin(header):
     if header.get('kuser1'):
         origindict['auth'] = header['kuser1']
 
-    return origindict or None
+    return [origindict] or []
 
 
 def sachdr2event(header):
     sac_event = [('nevid', 'evid'),
                  ('kevnm', 'evname')]
 
-    eventdict = {}
+    eventdict = AttribDict()
     for hdr, col in sac_event:
         val = header.get(hdr, None)
         eventdict[col] = val if val != SACDEFAULT[hdr] else None
 
-    return eventdict or None
+    return [eventdict] or []
 
 
 def sachdr2assoc(header, pickmap=None):
@@ -348,7 +348,7 @@ def sachdr2assoc(header, pickmap=None):
                  ('baz', 'seaz'),
                  ('gcarc', 'delta')]
 
-    assocdict = {}
+    assocdict = AttribDict()
     for hdr, col in sac_assoc:
         val = header.get(hdr, None)
         assocdict[col] = val if val != SACDEFAULT[hdr] else None
@@ -412,7 +412,7 @@ def sachdr2arrival(header, pickmap=None):
         pick2phase.update(pickmap)
 
     #simple translations
-    arrivaldict = {}
+    arrivaldict = AttribDict()
     if header.get('kstnm', None) not in (SACDEFAULT['kstnm'], None):
         arrivaldict['sta'] = header['kstnm']
     if header.get('kcmpnm', None) not in (SACDEFAULT['kcmpnm'], None):
@@ -456,8 +456,8 @@ def sachdr2wfdisc(header):
     e = e if (e != SACDEFAULT['e']) else 0.0
     endtime = t0 + e
 
-    wfdict = {}
-    wfdict['nsamp'] = header.get('npts', None)
+    wfdict = AttribDict()
+    wfdict['nsamp'] = int(header.get('npts', None))
     wfdict['time'] = starttime.timestamp
     wfdict['endtime'] = endtime.timestamp
     wfdict['jdate'] = int(starttime.strftime('%Y%j'))
@@ -473,7 +473,7 @@ def sachdr2wfdisc(header):
 
     scale = header.get('scale', None)
     if scale not in (SACDEFAULT['scale'], None):
-        wfdict['calib'] = scale
+        wfdict['calib'] = float(scale)
 
     nwfid = header.get('nwfid', None)
     if nwfid not in (SACDEFAULT['nwfid'], None):
@@ -486,18 +486,18 @@ def sachdr2wfdisc(header):
     else:
         wfdict['datatype'] = 't4'
 
-    return wfdict or None
+    return [wfdict] or []
 
 
 def sachdr2tables(header, tables=None):
     """
-    Scrape ObsPy Trace headers into database table dictionary.
-    Null values in Trace headers are not returned.
+    Scrape SAC header dictionary into database table dictionaries.
 
     Parameters
     ----------
-    tr: Obspy.core.Trace
-    tables: list, optional
+    header : dict
+        SAC header
+    tables : list/tuple of strings, optional
         Table name strings to return.
         Default, ['affiliation', 'arrival', 'assoc', 'event', 'instrument',
         'origin', 'site', 'sitechan', 'wfdisc']
@@ -505,8 +505,7 @@ def sachdr2tables(header, tables=None):
     Returns
     -------
     dict
-        Dictionary of table dictionaries.  tables['arrival'] and tables['assoc']
-        return (possibly empty) _lists_ of table objects.  If only default
+        Dictionary of lists of table dictionaries.  If only default
         values are found for a table, it is omitted.
 
     Notes
@@ -535,11 +534,16 @@ def sachdr2tables(header, tables=None):
     if tables is None:
         tables = fns.keys()
 
-    t = AttribDict()
-    for table, ifn in tables.items():
-        itab = ifn(header)
+    #t = AttribDict()
+    t = {}
+    for table in tables:
+        try:
+            itab = fns[table](header)
+        except KeyError:
+            itab = []
+
         if itab:
-            t[table] = ifn(header)
+            t[table] = itab
 
     # t[table] doesn't exist if table's function didn't return anything
 

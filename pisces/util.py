@@ -100,6 +100,49 @@ def db_connect(*args, **kwargs):
     return session
 
 
+def url_connect(url):
+    """
+    Connect to a database using an RFC-1738 compliant URL, like sqlalchemy's
+    create_engine, prompting for a password if a username is supplied.
+
+    Parameters
+    ----------
+    url : string
+        A fully-formed SQLAlchemy style connection string.
+        See http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls
+
+    Returns
+    -------
+    session : bound SQLAlchemy Session instance
+
+    Examples
+    --------
+    SQLite database file, local:
+    >>> url_connect('sqlite:///local/path/to/mydb.sqlite')
+
+    SQLite database file, full path:
+    >>> url_connect('sqlite:////full/path/to/mydb.sqlite')
+
+    Remote Oracle, OS-authenticated (no user or password needs to be specified)
+    >>> url_connect('oracle://dbserver.lanl.gov:8080/mydb')
+    
+    Remote Oracle, password-authenticated (specify user, prompted for password)
+    >>> url_connect('oracle://scott@dbserver.lanl.gov:8080/mydb')
+    Enter password for scott:
+
+    Remote Oracle, password-authenticated (password specified)
+    >>> url_connect('oracle://scott:tiger@dbserver.lanl.gov:8080/mydb')
+
+    """
+    e = sa.create_engine(url)
+    if e.url.username and not e.url.password:
+        e.url.password = getpass("Enter password for {0}: ".format(e.url.username))
+
+    session = Session(bind=e)
+
+    return session
+
+
 def table_contains_all(itable, keys):
      all([key in itable.columns for key in keys])
 
