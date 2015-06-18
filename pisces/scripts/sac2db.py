@@ -3,8 +3,8 @@ import os
 import sys
 import glob
 from collections import namedtuple
-from optparse import OptionParser
 import argparse
+import pdb
 
 from sqlalchemy import create_engine
 import sqlalchemy.exc as exc
@@ -58,22 +58,35 @@ def get_parser():
     >>> from sac2db import get_parser
     >>> parser = get_parser()
     >>> options = parser.parse_args(['--origin', 'origin', '--affiliation',
-                                     'myaffiliation', '*.sac', 
-                                     'sqlite://mydb.sqlite'])
+                                     'myaffiliation', 'sqlite:///mydb.sqlite',
+                                     '*.sac'])
     >>> print options
-    Namespace(affiliation='my.affiliation', all_tables=None, arrival=None,
+    Namespace(affiliation='my.affiliation', arrival=None,
     assoc=None, event=None, files=['*.sac'], instrument=None, lastid=None,
-    origin='origin', rel_path=False, site=None, sitechan=None, 
-    url='sqlite://mydb.sqlite', wfdisc=None)
+    origin='origin', absolute_path=False, site=None, sitechan=None, 
+    url='sqlite:///mydb.sqlite', wfdisc=None)
 
     """
     parser = argparse.ArgumentParser(prog='sac2db',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
             description="""
             Write data from SAC files into a database.
             
             If individual table name flags are specified, only those core
             tables are written from SAC file headers, otherwise all core tables
-            are written to standard or prefixed table names.""",
+            are written to standard or prefixed table names.
+            
+            Examples
+            --------
+            # use standard table names to local test.sqlite file
+            sac2db.py sqlite:///test.sqlite - datadir/*.sac
+
+            # prefix all tables in an oracle account with my_
+            sac2db.py oracle://user@server.domain.com:port/dbname my_ datadir/*.sac
+            
+            # if there are too many SAC files for the shell to handle, use a list:
+            find datadir -name "*.sac" -print > saclist.txt
+            sac2db.py sqlite:///test.sqlite - saclist.txt""",
             version='0.2')
     # ----------------------- Add core table arguments ------------------------
     #The following loop adds the core table owner/name options.

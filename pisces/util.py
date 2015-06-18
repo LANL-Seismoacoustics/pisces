@@ -134,9 +134,11 @@ def url_connect(url):
     >>> url_connect('oracle://scott:tiger@dbserver.lanl.gov:8080/mydb')
 
     """
-    e = sa.create_engine(url)
-    if e.url.username and not e.url.password:
-        e.url.password = getpass("Enter password for {0}: ".format(e.url.username))
+    this_url = sa.engine.url.make_url(url)
+    if this_url.username and not this_url.password:
+        this_url.password = getpass("Enter password for {0}: ".format(this_url.username))
+
+    e = sa.create_engine(this_url)
 
     session = Session(bind=e)
 
