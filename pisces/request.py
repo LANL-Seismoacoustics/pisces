@@ -13,6 +13,7 @@ import obspy.core.util.geodetics as geod
 
 from pisces.util import db_connect, make_same_size
 from pisces.io.trace import wfdisc2trace
+#from IPython import embed
 
 
 def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None, 
