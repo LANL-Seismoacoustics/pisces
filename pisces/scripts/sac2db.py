@@ -364,6 +364,8 @@ def main(argv=None):
         plugins = get_plugins(options)
         rows = apply_plugins(plugins, **rows)
 
+        # add rows to the database
+        # XXX: not done very elegantly.  some problem rows are simply skipped.
         for table, instances in rows.items():
             if instances:
                 # could be empty []
