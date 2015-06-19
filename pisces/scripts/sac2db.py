@@ -4,6 +4,7 @@ import sys
 import glob
 from collections import namedtuple
 import argparse
+import imp
 import pdb
 
 from sqlalchemy import create_engine
@@ -72,32 +73,80 @@ def get_parser():
             description="""
             Write data from SAC files into a database.
             
-            If individual table name flags are specified, only those core
-            tables are written from SAC file headers, otherwise all core tables
-            are written to standard or prefixed table names.
+            Standard lowercase core table names are used by default, but can be
+            prefixed (see --prefix). Individual table names can also be specified.
+
+            Plugins
+            -------
+            Plugin functions can be added for custom processing.  Plugins must be
+            functions with a signature like "myplugin(**kwargs)", which
+            accept keyword arguments that include the canonical table names as
+            keywords and lists of corresponding table instances as values,
+            modifies them, and returns them. The --plugin flag can be specified
+            multiple times, and each plugin is executed in the order in which
+            it was specified.  Specified plugins are executed for each SAC
+            file, after a collection of the core table instances are created.
+
+            e.g.
+            A plugin like this, which stuffs 'mysta' into all site.refsta
+            attributes...
+
+            # in plugins/sac.py
+            def stuff_refsta(**kwargs):
+                for site in kwargs.get('site', []):
+                    site.refsta = 'mysta'
+
+                return kwargs
+
+            ...is called like this:
+            sac2db.py --plugin plugins/sac:stuff_refsta sqlite:///mydb.sqlite *.sac
+
+            More complex plugin function configuration can be done with the
+            standard library ConfigParser library and text config files, for example.
+
             
             Examples
             --------
             # use standard table names to local test.sqlite file
             sac2db.py sqlite:///test.sqlite - datadir/*.sac
 
-            # prefix all tables in an oracle account with my_
+            # prefix all tables in an oracle account with my_, prompt for password
             sac2db.py oracle://user@server.domain.com:port/dbname my_ datadir/*.sac
             
             # if there are too many SAC files for the shell to handle, use a list:
             find datadir -name "*.sac" -print > saclist.txt
-            sac2db.py sqlite:///test.sqlite - saclist.txt""",
+            sac2db.py sqlite:///test.sqlite saclist.txt
+
+            """,
             version='0.2')
     # ----------------------- Add core table arguments ------------------------
     #The following loop adds the core table owner/name options.
+    table_group = parser.add_argument_group('table name overriding',
+            "Optionally, override individual standard table names using 'owner.tablename' naming. No owner for sqlite.")
     for coretable in CORETABLES:
-        parser.add_argument('--' + coretable.name,
+        table_group.add_argument('--' + coretable.name,
                             default=None,
-                            help="Name of desired output {} table.  Optional. \
-                                  No owner for sqlite.".format(coretable.name),
                             metavar='owner.tablename',
                             dest=coretable.name)
     # -------------------------------------------------------------------------
+    parser.add_argument('--plugin',
+            default=None,
+            metavar='path/to/module_file:plugin_function',
+            dest='plugins',
+            action='append',
+            help="For each SAC file, import and execute an additional plugin \
+                  function.  The function must accept keyword arguments that \
+                  include canonical table name keywords and lists of table \
+                  instances as values. ")
+
+    parser.add_argument('--prefix',
+            default='',
+            metavar='owner.prefix',
+            dest='prefix',
+            help="Target tables using 'account.prefix naming.'\
+                  e.g. myaccount.test_ will target tables \
+                  like myaccount.test_origin, myaccount.test_sitechan.")
+
     parser.add_argument('--absolute_paths',
             default=False,
             help="Write database 'dir' directory entries as absolute paths, not relative.",
@@ -108,17 +157,30 @@ def get_parser():
             help="SQLAlchemy-style database connection string, such as \
             sqlite:///mylocaldb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
 
-    parser.add_argument('dbout',
-            help="Target tables using 'account.prefix naming.'\
-                  e.g. myaccount.test_ will target tables \
-                  like myaccount.test_origin, myaccount.test_sitechan.\
-                  Use '-' (no quotes) for default standard table names.")
-
     parser.add_argument('files',
             nargs='+',
-            help="SAC file names, including any Unix-style name expansions.")
+            help="SAC file names, including shell name expansions.")
 
     return parser
+
+
+def get_plugins(options):
+    """Returns a list of imported plugin function objects."""
+    plugin_functions = []
+    if options.plugins:
+        for plugin_string in options.plugins:
+            try:
+                pth, fn = plugin_string.split(':')
+            except ValueError:
+                msg = "Must specify plugin like: path/to/modulename:plugin_function"
+                raise ValueError(msg)
+            pth = pth.split(os.path.sep)
+            modname = pth.pop(-1)
+            f, pathname, descr = imp.find_module(modname, pth)
+            mod = imp.load_module(modname, f, pathname, descr)
+            plugin_functions.append(getattr(mod, fn))
+
+    return plugin_functions
 
 
 def get_session(options):
@@ -173,9 +235,7 @@ def get_or_create_tables(options, session, create=True):
 
     # TODO: check options for which tables to produce.
 
-    dbout = options.dbout
-    if dbout == '-':
-        dbout = ''
+    dbout = options.prefix
 
     tables = {}
     for coretable in CORETABLES:
@@ -201,78 +261,8 @@ def get_or_create_tables(options, session, create=True):
     return tables
 
 
-def sac2db(sacfile, last, **tables):
-    """
-    Get core tables instances from a SAC file.
-
-    Parameters
-    ----------
-    sacfile : str
-        SAC file name
-    last : dict
-        The output from get_lastids: a dictionary of lastid keyname: instances.
-    site, origin, event, wfdisc, sitechan : SQLA table classes with .from_sac
-
-    """
-    # XXX: this doesn't work (yet?)
-    # TODO: remove id handling
-    out = {}
-    try:
-        Lastid = tables.pop('lastid')
-    except KeyError:
-        msg = "Must include Lastid table."
-        raise KeyError(msg)
-
-    # required
-    if 'site' in tables:
-        Site = tables['site']
-        out['site'] = Site.from_sac(item)
-        # twiddle lastids here?
-
-    if 'sitechan' in tables:
-        # sitechan.ondate
-        # sitechan.chanid
-        if not sitechan.chanid:
-            sitechan.chanid = last.chanid.next()
-
-    if 'wfdisc' in tables:
-        # XXX: Always gonna be a wfdisc, right?
-        # XXX: Always writes a _new_ row b/c always new wfid
-        # wfdisc.dir
-        # wfdisc.dfile
-        # wfdisc.wfid
-        if options.rel_path:
-            wfdisc.dir = os.path.dirname(ifile)
-        else:
-            wfdisc.dir = os.path.abspath(os.path.dirname(ifile))
-        wfdisc.dfile = os.path.basename(ifile)
-        wfdisc.wfid = last.wfid.next()
-
-    if 'origin' in tables:
-        Origin = tables['origin']
-        out['origin'] = Origin.from_sac(item)
-        # twiddle lastids here?
-
-    if 'arrivals' in tables:
-        Arrival = tables['arrival']
-        out['arrival'] = Arrival.from_sac(item)
-
-    if ('assoc' in tables) and ('arrivals' in tables):
-        # assoc.arid
-        # assoc.orid
-        #XXX: assumes arrivals are related to origin
-        # and assocs and arrivals are in the same order
-        for (assoc, arrival) in zip(assocs, arrivals):
-            assoc.arid = arrival.arid
-            if hasattr(origin, 'orid'):
-                assoc.orid = origin.orid
-
-    return out
-
 def dicts2rows(dicts, classes):
-    # print dicts
     for table, dcts in dicts.items():
-        #print table, dcts
         cls = classes[table]
         dicts[table] = [cls(**dct) for dct in dcts]
 
@@ -325,6 +315,12 @@ def make_atomic(session, last, **rows):
         wfdisc.wfid = next(last.wfid)
 
 
+def apply_plugins(plugins, **rows):
+    for plugin in plugins:
+        rows = plugin(**rows)
+
+    return rows
+
 
 def main(argv=None):
     """
@@ -334,7 +330,6 @@ def main(argv=None):
     parser = get_parser()
 
     options = parser.parse_args(argv)
-    #print options
 
     session = get_session(options)
 
@@ -352,11 +347,7 @@ def main(argv=None):
 
         # rows needs to be a dict of lists, for make_atomic
         dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
-        #rows = sac2db(tr.stats.sac, last, **tables)
         rows = dicts2rows(dicts, tables)
-
-        # manage the ids
-        make_atomic(session, last, **rows)
 
         # manage dir, dfile
         for wf in rows['wfdisc']:
@@ -367,6 +358,11 @@ def main(argv=None):
                 idir = os.path.dirname(sacfile)
             wf.dir = idir
 
+        # manage the ids
+        make_atomic(session, last, **rows)
+
+        plugins = get_plugins(options)
+        rows = apply_plugins(plugins, **rows)
 
         for table, instances in rows.items():
             if instances:
