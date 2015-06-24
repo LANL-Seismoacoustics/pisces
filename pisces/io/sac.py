@@ -1,17 +1,25 @@
 """
 Conversions between SAC header variables and CSS or KB Core fields.
 
+
 Converts a SAC header dictionary into a list of table dictionaries and vice-versa.
 
 """
 # XXX: currently not working
-# TODO: remove functions already in pisces.io.trace
-# TODO: make everything just translate dictionaries, not classes and make
-#    everything less obspy.Trace-centric
-# TODO: change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
+# TODO: 
+#   - remove functions already in pisces.io.trace
+#   - make everything just translate dictionaries, not classes and make
+#     everything less obspy.Trace-centric
+#   - change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
+#   - use pysac (hopefully obspy.io.sac, eventually)
+#   - make a bunch of column/header translation functions, like "kcmpnm_to_chan"
+#     and "chan_to_kcmpnm", and use them in higher-level functions, like 
+#     "sachdr_to_wfdisc" and "wfdisc_to_sachdr".
+
 import sys
 import os
 from collections import OrderedDict
+import functools
 
 from obspy.core import UTCDateTime, AttribDict
 import obspy.core.util.geodetics as geod
@@ -67,6 +75,173 @@ SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
          'xmaximum': FDEFAULT, 'xminimum': FDEFAULT, 'ymaximum': FDEFAULT,
          'yminimum': FDEFAULT}
 
+############################# DECORATORS ######################################
+# Decorator functions allow readable, reusable handling of header values.
+def cast_to_int(original_func):
+    """
+    Cast a function's argument to int before the function operates on it, like:
+
+    Examples
+    --------
+    >>> @cast_to_int
+    ... def nwfid_to_wfid(nwfid):
+    ...     return nwfid
+    >>> nwfid_to_wfid(12.3)
+    12
+
+    """
+    @functools.wraps(original_func)
+    def converter(hdr):
+        return original_func(int(hdr))
+    return converter
+
+def cast_to_float(original_func):
+    """
+    Cast a function's argument to float before the function operates on it, like:
+
+    Examples
+    --------
+    >>> @cast_to_float
+    ... def stla_to_lat(stla):
+    ...     return stla
+    >>> lat = stla_to_lat(numpy.float32(12.3))
+    >>> type(lat)
+    float
+    # not numpy.float32
+
+    """
+    @functools.wraps(original_func)
+    def converter(hdr):
+        return original_func(float(hdr))
+    return converter
+
+def strip_string(original_func):
+    """
+    Strip white space from a function's argument to float before the function
+    operates on it, like:
+
+    Examples
+    --------
+    >>> @strip_string
+    ... def kcmpnm_to_chan(kcmpnm):
+    ...     return kcmpnm[:6]
+    >>> kclmpnm_to_chan(' my_too_long_component ')
+    'my_too'
+
+    """
+    @functools.wraps(original_func)
+    def converter(hdr):
+        return original_func(int(hdr))
+    return converter
+
+def truncate_string(N):
+    def make_func(original_func):
+        @functools.wraps(original_func)
+        def func_wrapper(val):
+            return val[:N]
+        return func_wrapper
+
+
+# decorator for when you find default/null SAC header values
+# if a value is detected, function returns return_value instead of being executed
+# XXX: not clear how this could be used with other decorators
+def swap_if_value(detected_value, return_value):
+    def check_value(original_func):
+        def func_wrapper(arg):
+            if arg == detected_value:
+                out = return_value
+            else:
+                out = arg
+            return out
+        return func_wrapper
+
+
+# ############################## STRING HEADER CONVERSIONS ####################
+# SAC -> CSS
+def kcmpnm_to_chan(kcmpnm):
+    return kcmpnm.strip()[:8]
+
+def kevnm_to_evname(kevnm):
+    return kevnm.strip()
+
+def kinst_to_insname(kinst):
+    return kinst.strip()
+
+def knetwk_to_net(knetwk):
+    return knetwk.strip()[:8]
+
+def kstnm_to_sta(kstnm):
+    return kstnm.strip()[:6]
+
+
+# CSS -> SAC
+def chan_to_kcmpnm(chan):
+    return chan
+
+def evname_to_kevnm(evname):
+    return evname
+
+def insname_to_kinst(insname):
+    return insname
+
+def net_to_knetwk(net):
+    return net
+
+def sta_to_kstnm(sta):
+    return kstnm
+
+
+# ############################## INT HEADER CONVERSIONS #######################
+# DATA
+#
+ENUM_NAMES = {1: 'itime', 2: 'irlim', 3: 'iamph', 4: 'ixy', 5: 'iunkn',
+              6: 'idisp', 7: 'ivel', 8: 'iacc', 9: 'ib', 10: 'iday', 11: 'io',
+              12: 'ia', 13: 'it0', 14: 'it1', 15: 'it2', 16: 'it3', 17: 'it4',
+              18: 'it5', 19: 'it6', 20: 'it7', 21: 'it8', 22: 'it9',
+              23: 'iradnv', 24: 'itannv', 25: 'iradev', 26: 'itanev',
+              27: 'inorth', 28: 'ieast', 29: 'ihorza', 30: 'idown', 31: 'iup',
+              32: 'illlbb', 33: 'iwwsn1', 34: 'iwwsn2', 35: 'ihglp', 36: 'isro',
+              37: 'inucl', 38: 'ipren', 39: 'ipostn', 40: 'iquake', 41: 'ipreq',
+              42: 'ipostq', 43: 'ichem', 44: 'iother', 45: 'igood', 46: 'iglch',
+              47: 'idrop', 48: 'ilowsn', 49: 'irldta', 50: 'ivolts', 52: 'imb',
+              53: 'ims', 54: 'iml', 55: 'imw', 56: 'imd', 57: 'imx', 58: 'ineic',
+              59: 'ipdeq', 60: 'ipdew', 61: 'ipde', 62: 'iisc', 63: 'ireb',
+              64: 'iusgs', 65: 'ibrk', 66: 'icaltech', 67: 'illnl', 68: 'ievloc',
+              69: 'ijsop', 70: 'iuser', 71: 'iunknown', 72: 'iqb', 73: 'iqb1',
+              74: 'iqb2', 75: 'iqbx', 76: 'iqmt', 77: 'ieq', 78: 'ieq1',
+              79: 'ieq2', 80: 'ime', 81: 'iex', 82: 'inu', 83: 'inc', 84: 'io_',
+              85: 'il', 86: 'ir', 87: 'it', 88: 'iu', 89: 'ieq3', 90: 'ieq0',
+              91: 'iex0', 92: 'iqc', 93: 'iqb0', 94: 'igey', 95: 'ilit',
+              96: 'imet', 97: 'iodor', 103: 'ios'} 
+
+# ievtyp -> etype
+ETYPEDICT = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
+             43: 'ec', 72: 'me', 73: 'me', 74: 'me', 75: 'me', 76: 'mb',
+             77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
+             83: 'mc'}
+
+# evtype -> ievtyp
+IEVTYPDICT = dict((_val,_key) for _key,_val in ETYPEDICT.iteritems())
+#
+# imagsrc -> auth
+AUTHDICT = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD',
+            64: 'IUSGS', 65: 'ISC:BERK', 66: 'ICALTECH', 67: 'ILLNL',
+            68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
+#
+# auth -> imagsrc
+IMAGSRCDICT = dict((_val,_key) for _key,_val in AUTHDICT.iteritems())
+
+
+# SAC -> CSS
+def ievreg_to_grn(ievreg):
+    return int(ievreg)
+
+def ievtyp_to_etype(ievtyp):
+    """Provide the ievtyp(e) integer, get the etype string."""
+    return ETYPEDICT[ievtyp]
+
+
+
 
 # the following functions accept a SAC header dictionary, and return respective
 # kbcore table instances, assumes default SAC header values set to None
@@ -113,6 +288,35 @@ def get_sac_reftime(header):
 
     return reftime
 
+def _cast_int(d, keys):
+    for key in keys:
+        try:
+            d[key] = int(d[key])
+        except (TypeError, KeyError):
+            # no key, or int(None)
+            pass
+
+    return d
+
+def _cast_float(d, keys):
+    for key in keys:
+        try:
+            d[key] = float(d[key])
+        except (TypeError, KeyError):
+            # no key, or int(None)
+            pass
+
+    return d
+
+def _clean_str(d, keys):
+    for key in keys:
+        try:
+            d[key] = d[key].strip()
+        except (KeyError, AttributeError):
+            # no key, None.strip()
+            pass
+
+    return d
 
 def sachdr2site(header):
     """
@@ -135,6 +339,11 @@ def sachdr2site(header):
     except (TypeError, KeyError):
         #no 'elev'
         pass
+
+    sitedict = _cast_float(sitedict, ['lat', 'lon', 'elev'])
+    sitedict = _clean_str(sitedict, ['sta'])
+
+    sitedict['sta'] = sitedict['sta'].strip()[:6]
 
     return [sitedict] or []
 
@@ -161,6 +370,10 @@ def sachdr2sitechan(header):
         #edepth is None or missing
         pass
 
+    sitechandict = _cast_float(sitechandict, ['hang', 'vang', 'edepth'])
+    sitechandict = _clean_str(sitechandict, ['sta', 'chan'])
+    sitechandict['sta'] = sitechandict['sta'].strip()[:6]
+
     return [sitechandict] or []
 
 
@@ -172,6 +385,10 @@ def sachdr2affiliation(header):
     for hdr, col in sac_affil:
         val = header.get(hdr, None)
         affildict[col] = val if val != SACDEFAULT[hdr] else None
+
+    affildict = _clean_str(affildict, ['net', 'sta'])
+
+    affildict['sta'] = affildict['sta'].strip()[:6]
 
     return [affildict] or []
 
@@ -192,6 +409,7 @@ def sachdr2instrument(header):
         instrdict['samprate'] = int(round(1.0 / instrdict['samprate'],0))
     except (TypeError, KeyError):
         pass
+
 
     return [instrdict] or []
 
@@ -292,6 +510,9 @@ def sachdr2origin(header):
     if header.get('kuser1'):
         origindict['auth'] = header['kuser1']
 
+    origindict = _cast_float(origindict, ['lat', 'lon', 'depth'])
+    origindict = _cast_int(origindict, ['evid', 'orid'])
+
     return [origindict] or []
 
 
@@ -303,6 +524,8 @@ def sachdr2event(header):
     for hdr, col in sac_event:
         val = header.get(hdr, None)
         eventdict[col] = val if val != SACDEFAULT[hdr] else None
+
+    eventdict = _cast_int(eventdict, ['evid'])
 
     return [eventdict] or []
 
@@ -465,7 +688,7 @@ def sachdr2wfdisc(header):
 
     kstnm = header.get('kstnm', None)
     if kstnm not in (SACDEFAULT['kstnm'], None):
-        wfdict['sta'] = kstnm
+        wfdict['sta'] = kstnm.strip()[:6]
 
     kcmpnm = header.get('kcmpnm', None)
     if kcmpnm not in (SACDEFAULT['kcmpnm'], None):
@@ -533,6 +756,11 @@ def sachdr2tables(header, tables=None):
 
     if tables is None:
         tables = fns.keys()
+
+#     for key in header:
+#         if key.startswith('k'):
+#             try:
+#                 header[key] = header[key].strip()[:6]
 
     #t = AttribDict()
     t = {}
