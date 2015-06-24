@@ -189,7 +189,7 @@ def sachdr2instrument(header):
 
     # clean up
     try:
-        instrdict['samprate'] = int(1.0 / instrdict['samprate'])
+        instrdict['samprate'] = int(round(1.0 / instrdict['samprate'],0))
     except (TypeError, KeyError):
         pass
 
