@@ -518,6 +518,8 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
         #TODO: do arrival stuff here
         for wf in wfs:
             try:
+            	#from IPython import embed
+            	#embed()
                 tr = wfdisc2trace(wf)
                 tr.trim(t1_utc, t2_utc)
                 st.append(tr)
