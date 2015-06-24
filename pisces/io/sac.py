@@ -19,6 +19,7 @@ Converts a SAC header dictionary into a list of table dictionaries and vice-vers
 import sys
 import os
 from collections import OrderedDict
+import functools
 
 from obspy.core import UTCDateTime, AttribDict
 import obspy.core.util.geodetics as geod
@@ -75,7 +76,7 @@ SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
          'yminimum': FDEFAULT}
 
 ############################# DECORATORS ######################################
-# Decorator functions allow readable common handling of header values.
+# Decorator functions allow readable, reusable handling of header values.
 def cast_to_int(original_func):
     """
     Cast a function's argument to int before the function operates on it, like:
@@ -89,6 +90,7 @@ def cast_to_int(original_func):
     12
 
     """
+    @functools.wraps(original_func)
     def converter(hdr):
         return original_func(int(hdr))
     return converter
@@ -108,6 +110,7 @@ def cast_to_float(original_func):
     # not numpy.float32
 
     """
+    @functools.wraps(original_func)
     def converter(hdr):
         return original_func(float(hdr))
     return converter
@@ -126,9 +129,18 @@ def strip_string(original_func):
     'my_too'
 
     """
+    @functools.wraps(original_func)
     def converter(hdr):
         return original_func(int(hdr))
     return converter
+
+def truncate_string(N):
+    def make_func(original_func):
+        @functools.wraps(original_func)
+        def func_wrapper(val):
+            return val[:N]
+        return func_wrapper
+
 
 # decorator for when you find default/null SAC header values
 # if a value is detected, function returns return_value instead of being executed
@@ -141,30 +153,25 @@ def swap_if_value(detected_value, return_value):
             else:
                 out = arg
             return out
-        return fun_wrapper
+        return func_wrapper
 
 
-# ############################## STRING HEADERS ###############################
+# ############################## STRING HEADER CONVERSIONS ####################
 # SAC -> CSS
-@strip_string
 def kcmpnm_to_chan(kcmpnm):
-    return kcmpnm[:8]
+    return kcmpnm.strip()[:8]
 
-@strip_string
 def kevnm_to_evname(kevnm):
-    return kevnm
+    return kevnm.strip()
 
-@strip_string
 def kinst_to_insname(kinst):
-    return kinst
+    return kinst.strip()
 
-@strip_string
 def knetwk_to_net(knetwk):
-    return knetwk[:8]
+    return knetwk.strip()[:8]
 
-@strip_string
 def kstnm_to_sta(kstnm):
-    return kstnm[:6]
+    return kstnm.strip()[:6]
 
 
 # CSS -> SAC
@@ -184,7 +191,7 @@ def sta_to_kstnm(sta):
     return kstnm
 
 
-# ############################## INT HEADERS ##################################
+# ############################## INT HEADER CONVERSIONS #######################
 # DATA
 #
 ENUM_NAMES = {1: 'itime', 2: 'irlim', 3: 'iamph', 4: 'ixy', 5: 'iunkn',
@@ -212,6 +219,7 @@ ETYPEDICT = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
              43: 'ec', 72: 'me', 73: 'me', 74: 'me', 75: 'me', 76: 'mb',
              77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
              83: 'mc'}
+
 # evtype -> ievtyp
 IEVTYPDICT = dict((_val,_key) for _key,_val in ETYPEDICT.iteritems())
 #
@@ -225,11 +233,11 @@ IMAGSRCDICT = dict((_val,_key) for _key,_val in AUTHDICT.iteritems())
 
 
 # SAC -> CSS
-@cast_to_int
 def ievreg_to_grn(ievreg):
-    return ievreg
+    return int(ievreg)
 
 def ievtyp_to_etype(ievtyp):
+    """Provide the ievtyp(e) integer, get the etype string."""
     return ETYPEDICT[ievtyp]
 
 
@@ -335,6 +343,8 @@ def sachdr2site(header):
     sitedict = _cast_float(sitedict, ['lat', 'lon', 'elev'])
     sitedict = _clean_str(sitedict, ['sta'])
 
+    sitedict['sta'] = sitedict['sta'].strip()[:6]
+
     return [sitedict] or []
 
 
@@ -362,6 +372,7 @@ def sachdr2sitechan(header):
 
     sitechandict = _cast_float(sitechandict, ['hang', 'vang', 'edepth'])
     sitechandict = _clean_str(sitechandict, ['sta', 'chan'])
+    sitechandict['sta'] = sitechandict['sta'].strip()[:6]
 
     return [sitechandict] or []
 
@@ -376,6 +387,8 @@ def sachdr2affiliation(header):
         affildict[col] = val if val != SACDEFAULT[hdr] else None
 
     affildict = _clean_str(affildict, ['net', 'sta'])
+
+    affildict['sta'] = affildict['sta'].strip()[:6]
 
     return [affildict] or []
 
@@ -675,7 +688,7 @@ def sachdr2wfdisc(header):
 
     kstnm = header.get('kstnm', None)
     if kstnm not in (SACDEFAULT['kstnm'], None):
-        wfdict['sta'] = kstnm
+        wfdict['sta'] = kstnm.strip()[:6]
 
     kcmpnm = header.get('kcmpnm', None)
     if kcmpnm not in (SACDEFAULT['kcmpnm'], None):

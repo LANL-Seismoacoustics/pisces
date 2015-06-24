@@ -101,8 +101,8 @@ def get_parser():
             ...is called like this:
             sac2db.py --plugin plugins/sac:stuff_refsta sqlite:///mydb.sqlite *.sac
 
-            More complex plugin function configuration can be done with the
-            standard library ConfigParser library and text config files, for example.
+            More complex plugin function configuration may be done with the
+            standard library ConfigParser module and text config files.
 
             
             Examples
@@ -269,7 +269,7 @@ def dicts2rows(dicts, classes):
     return dicts
 
 
-def make_atomic(session, last, **rows):
+def make_atomic(last, **rows):
     """
     Unify related table instances/row, including: ids, dir, and dfile
     """
@@ -322,6 +322,8 @@ def apply_plugins(plugins, **rows):
     return rows
 
 
+# TODO: make this main also accept a get_iterable and get_row_dicts functions,
+#   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py
 def main(argv=None):
     """
     Command-line arguments are created and parsed, fed to functions.
@@ -340,17 +342,33 @@ def main(argv=None):
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = get_lastids(session, tables['lastid'], lastids, create=True)
 
+    # for item in iterable:
     for sacfile in files:
         print sacfile
 
+        # row_dicts = get_row_dicts(item)
         tr = read(sacfile, format='SAC', debug_headers=True)[0]
 
         # rows needs to be a dict of lists, for make_atomic
+        # row_dicts = get_row_dicts(tr.stats.sac) # put in the whole trace, to determine byte order?
         dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
+        # row_instances = dicts_to_instances(row_dicts, tables)
         rows = dicts2rows(dicts, tables)
 
-        # manage dir, dfile
+        # manage dir, dfile, datatype
+        bo = tr.data.dtype.byteorder
+        if bo == '<':
+            datatype = 'f4'
+        elif bo == '>':
+            datatype = 't4'
+        elif bo == '=':
+            if sys.byteorder == 'little':
+                datatype = 'f4'
+            else:
+                datatype = 't4'
+
         for wf in rows['wfdisc']:
+            wf.datatype = datatype
             wf.dfile = os.path.basename(sacfile)
             if options.absolute_paths:
                 idir = os.path.dirname(os.path.realpath(sacfile))
@@ -359,9 +377,10 @@ def main(argv=None):
             wf.dir = idir
 
         # manage the ids
-        make_atomic(session, last, **rows)
+        make_atomic(last, **rows)
 
         plugins = get_plugins(options)
+
         rows = apply_plugins(plugins, **rows)
 
         # add rows to the database
