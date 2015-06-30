@@ -19,6 +19,7 @@ from pisces.util import get_lastids, url_connect
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
 import pisces.io.sac as sac
+from IPython import embed
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
@@ -64,7 +65,7 @@ def get_parser():
     >>> print options
     Namespace(affiliation='my.affiliation', arrival=None,
     assoc=None, event=None, files=['*.sac'], instrument=None, lastid=None,
-    origin='origin', absolute_path=False, site=None, sitechan=None, 
+    origin='origin', absolute_path=False, site=None, sitechan=None,
     url='sqlite:///mydb.sqlite', wfdisc=None)
 
     """
@@ -72,7 +73,7 @@ def get_parser():
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description="""
             Write data from SAC files into a database.
-            
+
             Standard lowercase core table names are used by default, but can be
             prefixed (see --prefix). Individual table names can also be specified.
 
@@ -104,7 +105,7 @@ def get_parser():
             More complex plugin function configuration may be done with the
             standard library ConfigParser module and text config files.
 
-            
+
             Examples
             --------
             # use standard table names to local test.sqlite file
@@ -112,7 +113,7 @@ def get_parser():
 
             # prefix all tables in an oracle account with my_, prompt for password
             sac2db.py oracle://user@server.domain.com:port/dbname my_ datadir/*.sac
-            
+
             # if there are too many SAC files for the shell to handle, use a list:
             find datadir -name "*.sac" -print > saclist.txt
             sac2db.py sqlite:///test.sqlite saclist.txt
