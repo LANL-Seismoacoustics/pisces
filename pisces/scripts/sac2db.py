@@ -356,6 +356,7 @@ def main(argv=None):
         rows = dicts2rows(dicts, tables)
 
         # manage dir, dfile, datatype
+        # XXX: hack.  replace with an updated obspy.io.sac later.
         bo = tr.data.dtype.byteorder
         if bo == '<':
             datatype = 'f4'

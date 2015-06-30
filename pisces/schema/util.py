@@ -23,6 +23,8 @@ from sqlalchemy import event
 #
 #   This will affect .from_string (i think) and __init__, and _print_format,
 #   and __str__
+# TODO: add a decorator like
+#   https://blogs.gnome.org/danni/2013/03/07/generating-json-from-sqlalchemy-objects/
 
 def copy_metadata(metadata, prefix='', schema=None, metadata_out=None):
     """
