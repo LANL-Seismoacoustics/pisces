@@ -347,6 +347,7 @@ def main(argv=None):
         print sacfile
 
         # row_dicts = get_row_dicts(item)
+
         tr = read(sacfile, format='SAC', debug_headers=True)[0]
 
         # rows needs to be a dict of lists, for make_atomic
