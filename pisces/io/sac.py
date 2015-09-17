@@ -692,7 +692,7 @@ def sachdr2wfdisc(header):
 
     kcmpnm = header.get('kcmpnm', None)
     if kcmpnm not in (SACDEFAULT['kcmpnm'], None):
-        wfdict['chan'] = kcmpnm
+        wfdict['chan'] = kcmpnm.strip()[:8]
 
     scale = header.get('scale', None)
     if scale not in (SACDEFAULT['scale'], None):
