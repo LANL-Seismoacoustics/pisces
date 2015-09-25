@@ -19,7 +19,6 @@ from pisces.util import get_lastids, url_connect
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
 import pisces.io.sac as sac
-from IPython import embed
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
