@@ -15,6 +15,7 @@ from obspy.core import AttribDict
 from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
+from IPython import embed 
 
 def db_connect(*args, **kwargs):
     """
@@ -553,3 +554,118 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
         last[lastid.keyname] = lastid
 
     return last
+   
+import argparse
+import imp
+import pdb
+
+from collections import namedtuple
+
+import pisces.schema.kbcore as kba
+import pisces.tables.kbcore as kb
+   
+CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
+CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
+              CoreTable('arrival', kba.Arrival, kb.Arrival),
+              CoreTable('assoc', kba.Assoc, kb.Assoc),
+              CoreTable('event', kba.Event, kb.Event),
+              CoreTable('instrument', kba.Instrument, kb.Instrument),
+              CoreTable('lastid', kba.Lastid, kb.Lastid),
+              CoreTable('origin', kba.Origin, kb.Origin),
+              CoreTable('site', kba.Site, kb.Site),
+              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
+              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
+
+
+def get_options(db,prefix=None):
+	'''
+    for coretable in CORETABLES:
+        table_group.add_argument('--' + coretable.name,
+                            default=None,
+							metavar='owner.tablename',
+							dest=coretable.name)
+	'''
+	options={'url':'sqlite:///'+db,'prefix':prefix}
+
+	return options
+
+
+def get_session(options):
+    # accept command line arguments, return a database-bound session.
+    embed()
+    session = url_connect(options['url'])
+
+    return session
+
+
+def get_or_create_tables(options, session, create=True):
+    """
+    Load or create canonical ORM KB Core table classes.
+
+    Parameters
+    ----------
+    options : argparse.ArgumentParser
+    session : sqlalchemy.orm.Session
+
+    Returns
+    -------
+    tables : dict
+        Mapping between canonical table names and SQLA ORM classes.
+        e.g. {'origin': MyOrigin, ...}
+
+    """
+    # The Plan:
+    # 1. For each core table, build or get the table name
+    # 2. If it's a vanilla table name, just use a pre-packaged table class
+    # 3. If not, try to autoload it.
+    # 4. If it doesn't exist, make it from a prototype and create it in the database.
+
+    # TODO: check options for which tables to produce.
+
+    dbout = options['prefix']
+
+    tables = {}
+    for coretable in CORETABLES:
+        # build the table name
+        if options['prefix']==None:
+            fulltablename = coretable.name
+        else:
+            fulltablename = dbout + coretable.name
+
+        # fulltablename is either an arbitrary string or dbout + core name, but not None
+
+        # put table classes into the tables dictionary
+        if fulltablename == coretable.name:
+            # it's a vanilla table name. just use a pre-packaged table class instead of making one.
+            tables[coretable.name] = coretable.table
+        else:
+            tables[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
+
+        tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+
+    session.commit()
+
+    return tables
+
+
+def dbinit(db,prefix):
+    """
+    Command-line arguments are created and parsed, fed to functions.
+
+    """
+    options = get_options(db,prefix)
+    session = get_session(options)
+    files = get_files(options)
+
+    tables = get_or_create_tables(options, session, create=True)
+
+    lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
+    last = get_lastids(session, tables['lastid'], lastids, create=True)   
+   
+   
+   
+   
+   
+   
+   
+   

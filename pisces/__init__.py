@@ -19,7 +19,7 @@ architectures, or licensing concerns.
 
 __version__ = '0.2'
 
-from pisces.util import db_connect, get_tables, travel_times, make_table
+from pisces.util import db_connect, get_tables, travel_times, make_table,dbinit
 from pisces.schema.util import copy_metadata, string_formatter
 #from pisces.io.flatfile import read_flatfile, format_records
 from pisces.io.trace import wfdisc2trace

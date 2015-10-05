@@ -684,7 +684,7 @@ def sachdr2wfdisc(header):
     wfdict['time'] = starttime.timestamp
     wfdict['endtime'] = endtime.timestamp
     wfdict['jdate'] = int(starttime.strftime('%Y%j'))
-    wfdict['samprate'] = int(1.0 / header['delta'])
+    wfdict['samprate'] = int(numpy.round(1.0 / header['delta']))
 
     kstnm = header.get('kstnm', None)
     if kstnm not in (SACDEFAULT['kstnm'], None):
