@@ -485,6 +485,7 @@ def parse_float(s):
     return float(s) or None
 
 def parse_int(s):
-    return int(s) or None
+    # XXX: int('0') will fail
+    return int(s)
 
 

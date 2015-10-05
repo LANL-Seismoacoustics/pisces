@@ -19,7 +19,6 @@ from pisces.util import get_lastids, url_connect
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
 import pisces.io.sac as sac
-from IPython import embed
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
@@ -109,10 +108,10 @@ def get_parser():
             Examples
             --------
             # use standard table names to local test.sqlite file
-            sac2db.py sqlite:///test.sqlite - datadir/*.sac
+            sac2db.py sqlite:///test.sqlite datadir/*.sac
 
             # prefix all tables in an oracle account with my_, prompt for password
-            sac2db.py oracle://user@server.domain.com:port/dbname my_ datadir/*.sac
+            sac2db.py oracle://user@server.domain.com:port/dbname --prefix my_ datadir/*.sac
 
             # if there are too many SAC files for the shell to handle, use a list:
             find datadir -name "*.sac" -print > saclist.txt
@@ -323,6 +322,9 @@ def apply_plugins(plugins, **rows):
     return rows
 
 
+def sac2db(files, url, tables, plugins=None, abs_paths=False):
+    pass
+
 # TODO: make this main also accept a get_iterable and get_row_dicts functions,
 #   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py
 def main(argv=None):
@@ -333,6 +335,8 @@ def main(argv=None):
     parser = get_parser()
 
     options = parser.parse_args(argv)
+
+    # options_dict = vars(options)
 
     session = get_session(options)
 

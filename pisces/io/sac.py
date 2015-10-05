@@ -684,15 +684,16 @@ def sachdr2wfdisc(header):
     wfdict['time'] = starttime.timestamp
     wfdict['endtime'] = endtime.timestamp
     wfdict['jdate'] = int(starttime.strftime('%Y%j'))
-    wfdict['samprate'] = int(numpy.round(1.0 / header['delta']))
-
+    
+    wfdict['samprate'] = int(round(1.0 / header['delta']))
+    
     kstnm = header.get('kstnm', None)
     if kstnm not in (SACDEFAULT['kstnm'], None):
         wfdict['sta'] = kstnm.strip()[:6]
 
     kcmpnm = header.get('kcmpnm', None)
     if kcmpnm not in (SACDEFAULT['kcmpnm'], None):
-        wfdict['chan'] = kcmpnm
+        wfdict['chan'] = kcmpnm.strip()[:8]
 
     scale = header.get('scale', None)
     if scale not in (SACDEFAULT['scale'], None):
