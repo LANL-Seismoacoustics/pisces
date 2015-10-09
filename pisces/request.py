@@ -13,7 +13,6 @@ import obspy.core.util.geodetics as geod
 
 from pisces.util import db_connect, make_same_size
 from pisces.io.trace import wfdisc2trace
-#from IPython import embed
 
 
 def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None, 
@@ -518,8 +517,6 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
         #TODO: do arrival stuff here
         for wf in wfs:
             try:
-            	#from IPython import embed
-            	#embed()
                 tr = wfdisc2trace(wf)
                 tr.trim(t1_utc, t2_utc)
                 st.append(tr)
