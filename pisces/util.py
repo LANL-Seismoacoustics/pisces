@@ -15,7 +15,6 @@ from obspy.core import AttribDict
 from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
-from IPython import embed 
 
 def db_connect(*args, **kwargs):
     """
@@ -592,7 +591,6 @@ def get_options(db,prefix=None):
 
 def get_session(options):
     # accept command line arguments, return a database-bound session.
-    embed()
     session = url_connect(options['url'])
 
     return session
