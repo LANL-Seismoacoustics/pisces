@@ -554,14 +554,8 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
 
     return last
    
-import argparse
-import imp
-import pdb
-
 from collections import namedtuple
 
-import pisces.schema.kbcore as kba
-import pisces.tables.kbcore as kb
    
 CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),

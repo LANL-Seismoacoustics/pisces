@@ -1,6 +1,6 @@
 import pdb
 import sys
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -25,6 +25,8 @@ from sqlalchemy import event
 #   and __str__
 # TODO: add a decorator like
 #   https://blogs.gnome.org/danni/2013/03/07/generating-json-from-sqlalchemy-objects/
+
+CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 
 def copy_metadata(metadata, prefix='', schema=None, metadata_out=None):
     """

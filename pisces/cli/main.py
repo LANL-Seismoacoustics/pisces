@@ -22,24 +22,30 @@ entry_points.
 
 import click
 
+import sac2db
+import pisces.request as req
+
 # ------------------------------- MAIN ----------------------------------------
 # This is the main function/group.  It does nothing except provide a top-level
 # --help and serve as a single point of invocation for other subcommands, like
 # the way "git" works.  Also, since click.option doesn't support help=, we
 # document common arguments, like URL, in the main function.
-@click.group()
+
+@click.group()  # "group" means that the command/function can take sub-commands
 def cli(**kwargs):
     """
     Pisces command-line interface.
 
     Commonly-used functionality is exposed as subcommands of this top-level
-    function.
+    function. See "Commands" for things you can do.  Common ARGS are described
+    below.
 
     \b
     Arguments:
       URL     SQLAlchemy-compatible database URI string.
               e.g. sqlite:///localdb.sqlite
-                   oracle://user@server:port/database
+                   oracle://user[:password]@server:port/database
+                      (leave out password blank for prompt)
         
 
     """
@@ -54,7 +60,7 @@ def init(**kwargs):
     """
     Initialize the core tables.
 
-    This is the much longer help for this function.
+    Not yet implemented.
 
     """
     print("init: {}".format(kwargs))
@@ -67,7 +73,7 @@ def drop(**kwargs):
     """
     Drop core tables.
 
-    This is the much longer help for this function.
+    Not yet implemented.
 
     """
     print("drop: {}".format(kwargs))
@@ -93,7 +99,7 @@ def mseed2db(**kwargs):
     """
     Scrape MSEED files into database tables.
 
-    This is the much longer help for this function.
+    Not yet implemented.
 
     """
     print("mseed2db: {}".format(kwargs))
@@ -105,21 +111,21 @@ def mseed2db(**kwargs):
 @cli.group('query')
 def query(**kwargs):
     """
-    Perform a query.
+    Perform a basic query.
 
-    Longer help for this function.
+    Not yet implemented.
 
     """
-    print("get: {}".format(kwargs))
+    print("query: {}".format(kwargs))
 
 
 @query.command('stations')
 @click.argument('url')
 def query_stations(**kwargs):
     """
-    Get stations from site table.
+    Query stations from the site table.
 
-    Much longer help for this function.
+    Not yet implemented.
 
     """
     print("stations: {}".format(kwargs))
@@ -128,9 +134,9 @@ def query_stations(**kwargs):
 @click.argument('url')
 def query_events(**kwargs):
     """
-    Get origins from origin table.
+    Query the origin table for events.
 
-    Much longer help for this function.
+    Not yet implemented.
 
     """
     print("events: {}".format(kwargs))
@@ -139,9 +145,9 @@ def query_events(**kwargs):
 @click.argument('url')
 def query_waveforms(**kwargs):
     """
-    Get origins from origin table.
+    Query waveforms from the wfdisc table.
 
-    Much longer help for this function.
+    Not yet implemented.
 
     """
     print("waveforms: {}".format(kwargs))

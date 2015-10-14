@@ -1,63 +1,76 @@
-import pisces.schema.kbcore as kb
+from pisces.schema.util import CoreTable
+import pisces.schema.kbcore as kba
 
 
-class Affiliation(kb.Affiliation):
+class Affiliation(kba.Affiliation):
     __tablename__ = 'affiliation'
 
-class Amplitude(kb.Amplitude):
+class Amplitude(kba.Amplitude):
     __tablename__ = 'amplitude'
 
-class Arrival(kb.Arrival):
+class Arrival(kba.Arrival):
     __tablename__ = 'arrival'
 
-class Assoc(kb.Assoc):
+class Assoc(kba.Assoc):
     __tablename__ = 'assoc'
 
-class Event(kb.Event):
+class Event(kba.Event):
     __tablename__ = 'event'
 
-class Gregion(kb.Gregion):
+class Gregion(kba.Gregion):
     __tablename__ = 'gregion'
 
-class Instrument(kb.Instrument):
+class Instrument(kba.Instrument):
     __tablename__ = 'instrument'
 
-class Lastid(kb.Lastid):
+class Lastid(kba.Lastid):
     __tablename__ = 'lastid'
 
-class Netmag(kb.Netmag):
+class Netmag(kba.Netmag):
     __tablename__ = 'netmag'
 
-class Network(kb.Network):
+class Network(kba.Network):
     __tablename__ = 'network'
 
-class Origerr(kb.Origerr):
+class Origerr(kba.Origerr):
     __tablename__ = 'origerr'
 
-class Origin(kb.Origin):
+class Origin(kba.Origin):
     __tablename__ = 'origin'
 
-class Remark(kb.Remark):
+class Remark(kba.Remark):
     __tablename__ = 'remark'
 
-class Sensor(kb.Sensor):
+class Sensor(kba.Sensor):
     __tablename__ = 'sensor'
 
-class Site(kb.Site):
+class Site(kba.Site):
     __tablename__ = 'site'
 
-class Sitechan(kb.Sitechan):
+class Sitechan(kba.Sitechan):
     __tablename__ = 'sitechan'
 
-class Sregion(kb.Sregion):
+class Sregion(kba.Sregion):
     __tablename__ = 'sregion'
 
-class Stamag(kb.Stamag):
+class Stamag(kba.Stamag):
     __tablename__ = 'stamag'
 
-class Wfdisc(kb.Wfdisc):
+class Wfdisc(kba.Wfdisc):
     __tablename__ = 'wfdisc'
 
-class Wftag(kb.Wftag):
+class Wftag(kba.Wftag):
     __tablename__ = 'wftag'
+
+CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
+              CoreTable('arrival', kba.Arrival, kb.Arrival),
+              CoreTable('assoc', kba.Assoc, kb.Assoc),
+              CoreTable('event', kba.Event, kb.Event),
+              CoreTable('instrument', kba.Instrument, kb.Instrument),
+              CoreTable('lastid', kba.Lastid, kb.Lastid),
+              CoreTable('origin', kba.Origin, kb.Origin),
+              CoreTable('site', kba.Site, kb.Site),
+              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
+              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
+
 
