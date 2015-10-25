@@ -15,6 +15,8 @@ from obspy.core import AttribDict
 from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
+import pisces.schema.kbcore as kba
+
 
 def db_connect(*args, **kwargs):
     """
@@ -527,7 +529,7 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
 
     Update your database when you're done.
     >>> session.add_all(ids.values())
-    >>> session.commit() #
+    >>> session.commit()
 
     """
 
@@ -554,20 +556,18 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
 
     return last
    
-from collections import namedtuple
 
-   
-CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
-CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
-              CoreTable('arrival', kba.Arrival, kb.Arrival),
-              CoreTable('assoc', kba.Assoc, kb.Assoc),
-              CoreTable('event', kba.Event, kb.Event),
-              CoreTable('instrument', kba.Instrument, kb.Instrument),
-              CoreTable('lastid', kba.Lastid, kb.Lastid),
-              CoreTable('origin', kba.Origin, kb.Origin),
-              CoreTable('site', kba.Site, kb.Site),
-              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
-              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
+
+#CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
+#              CoreTable('arrival', kba.Arrival, kb.Arrival),
+#              CoreTable('assoc', kba.Assoc, kb.Assoc),
+#              CoreTable('event', kba.Event, kb.Event),
+#              CoreTable('instrument', kba.Instrument, kb.Instrument),
+#              CoreTable('lastid', kba.Lastid, kb.Lastid),
+#              CoreTable('origin', kba.Origin, kb.Origin),
+#              CoreTable('site', kba.Site, kb.Site),
+#              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
+#              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
 
 
 def get_options(db,prefix=None):

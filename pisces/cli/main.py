@@ -82,14 +82,14 @@ def drop(**kwargs):
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
 @click.argument('url')
-def sac2db(**kwargs):
+def sac2db(*args, **kwargs):
     """
     Scrape SAC files into database tables.
 
     This is the much longer help for this function.
 
     """
-    print("sac2db: {}".format(kwargs))
+    print("sac2db: {}, {}".format(args, kwargs))
 
 
 # ------------------------------- MSEED2DB ------------------------------------
