@@ -22,8 +22,7 @@ entry_points.
 
 import click
 
-import sac2db
-import pisces.request as req
+from pisces.commands import sac2db
 
 # ------------------------------- MAIN ----------------------------------------
 # This is the main function/group.  It does nothing except provide a top-level
@@ -82,7 +81,7 @@ def drop(**kwargs):
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
 @click.argument('url')
-def sac2db(*args, **kwargs):
+def sac2db_command(*args, **kwargs):
     """
     Scrape SAC files into database tables.
 

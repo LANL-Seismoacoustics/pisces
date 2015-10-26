@@ -19,8 +19,8 @@ architectures, or licensing concerns.
 
 __version__ = '0.2.1'
 
-from pisces.util import db_connect, get_tables, travel_times, make_table,dbinit
-from pisces.schema.util import copy_metadata, string_formatter
+from pisces.util import db_connect, get_tables, travel_times, make_table
+from pisces.schema.util import string_formatter
 from pisces.io.trace import wfdisc2trace
 from pisces.schema import kbcore
 from pisces.io.readwaveform import read_waveform

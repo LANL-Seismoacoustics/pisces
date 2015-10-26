@@ -583,21 +583,21 @@ def get_options(db,prefix=None):
 	return options
 
 
-def get_session(options):
-    # accept command line arguments, return a database-bound session.
-    session = url_connect(options['url'])
 
-    return session
-
-
-def get_or_create_tables(options, session, create=True):
+def get_or_create_tables(session, prefix=None, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
 
     Parameters
     ----------
-    options : argparse.ArgumentParser
     session : sqlalchemy.orm.Session
+    prefix : str
+        Table name prefix for core tables, e.g. 'global.' for 'global.<tablename>'
+    create : bool
+        If True, create a table that isn't found.
+    
+    Also accepted are canonical table name keywords with '[owner.]tablename'
+    arguments, which will replace any prefix-based core table names.
 
     Returns
     -------
@@ -614,17 +614,15 @@ def get_or_create_tables(options, session, create=True):
 
     # TODO: check options for which tables to produce.
 
-    dbout = options['prefix']
-
     tables = {}
     for coretable in CORETABLES:
         # build the table name
         if options['prefix']==None:
             fulltablename = coretable.name
         else:
-            fulltablename = dbout + coretable.name
+            fulltablename = prefix + coretable.name
 
-        # fulltablename is either an arbitrary string or dbout + core name, but not None
+        # fulltablename is either an arbitrary string or prefix + core name, but not None
 
         # put table classes into the tables dictionary
         if fulltablename == coretable.name:
@@ -638,26 +636,3 @@ def get_or_create_tables(options, session, create=True):
     session.commit()
 
     return tables
-
-
-def dbinit(db,prefix):
-    """
-    Command-line arguments are created and parsed, fed to functions.
-
-    """
-    options = get_options(db,prefix)
-    session = get_session(options)
-    files = get_files(options)
-
-    tables = get_or_create_tables(options, session, create=True)
-
-    lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
-    last = get_lastids(session, tables['lastid'], lastids, create=True)   
-   
-   
-   
-   
-   
-   
-   
-   
