@@ -1,4 +1,3 @@
-import pdb
 import sys
 from collections import OrderedDict, namedtuple
 
@@ -12,6 +11,7 @@ except ImportError:
     from sqlalchemy.ext.declarative import _declarative_constructor
 from sqlalchemy import event
 
+# NO SELF IMPORTS!
 
 # TODO: add a .to_dict() method or a dict-like __getitem__/__setitem__, and
 #   remove value iteration, so that copying a row looks like
