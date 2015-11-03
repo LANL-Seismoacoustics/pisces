@@ -9,13 +9,12 @@
         <link rel="canonical" href="http://www.jkmacc-LANL.github.io/pisces/tutorial.waveforms/">
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-        <title>Import/Export Waveforms - Pisces</title>
+	<title>Import/Export Waveforms - Pisces</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="../css/prettify-1.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
-        
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -64,21 +63,29 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tutorial <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li >
-                                <a href="../tutorial.tables/">Database Tables</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.tables/">Database Tables</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.queries/">Using the Database</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.queries/">Using the Database</a>
+</li>
+
                         
-                            <li class="active">
-                                <a href="./">Import/Export Waveforms</a>
-                            </li>
+                            
+<li class="active">
+    <a href="./">Import/Export Waveforms</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -95,17 +102,23 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li >
-                                <a href="../about.roadmap/">Roadmap</a>
-                            </li>
+                            
+<li >
+    <a href="../about.roadmap/">Roadmap</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.license/">License</a>
-                            </li>
+                            
+<li >
+    <a href="../about.license/">License</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.group/">User's Group</a>
-                            </li>
+                            
+<li >
+    <a href="../about.group/">User's Group</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -114,40 +127,42 @@
                 </ul>
             
 
-            
-            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
-                
-                
-                <li >
-                    <a rel="next" href="../tutorial.queries/">
-                        <i class="fa fa-arrow-left"></i> Previous
-                    </a>
-                </li>
-                <li >
-                    <a rel="prev" href="../tutorial.flatfiles/">
-                        Next <i class="fa fa-arrow-right"></i>
-                    </a>
-                </li>
-                
-                
                 <li>
-                    <a href="https://github.com/jkmacc-lanl/pisces">
-                        
-                            <i class="fa fa-github"></i>
-                        
-                        GitHub
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
                     </a>
                 </li>
+                
+                    <li >
+                        <a rel="next" href="../tutorial.queries/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../tutorial.flatfiles/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a href="https://github.com/jkmacc-lanl/pisces">
+                            
+                                <i class="fa fa-github"></i>
+                            
+                            GitHub
+                        </a>
+                    </li>
                 
             </ul>
-            
         </div>
     </div>
 </div>
 
         <div class="container">
-            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
         <li class="main active"><a href="#working-with-waveforms">Working with Waveforms</a></li>
@@ -158,12 +173,12 @@
         
             <li><a href="#adding-waveforms-to-the-database">Adding waveforms to the database</a></li>
         
-            <li><a href="#localizing-your-wfdisc-table">Localizing your wfdisc table</a></li>
+            <li><a href="#copying-localizing-waveform-files">Copying (localizing) waveform files</a></li>
         
     
     </ul>
 </div></div>
-            <div class="col-md-9" role="main">
+                <div class="col-md-9" role="main">
 
 <h1 id="working-with-waveforms">Working with Waveforms</h1>
 <p>How to read and write waveforms.</p>
@@ -171,11 +186,151 @@
 <h2 id="introduction">Introduction</h2>
 <hr />
 <h2 id="retrieving-waves-from-a-query">Retrieving waves from a query</h2>
+<p>Waveforms are described in the <code>Wfdisc</code> table, and there are two ways to get waveforms from a query.</p>
+<h3 id="read-directly-from-wfdisc-instances">Read directly from <code>wfdisc</code> instances</h3>
+<p>If you have instances from the <code>Wfdisc</code> class, you can easily convert them to ObsPy <code>Trace</code>
+instances for analysis or plotting.  Pisces Wfdisc class instances have a <code>to_trace</code> method,
+which produces <code>Trace</code> instance from the <code>Wfdisc</code> instance.  Alternately, you can use the 
+<code>wfdisc2trace</code> function on a vanilla SQLAlchemy Wfdisc instance (no <code>to_trace</code> method).
+Finally, you can use the low-level function <code>read_waveform</code>, which underlies all the methods above.
+This function returns a raw NumPy array instead of an Obspy Trace, however.</p>
+<pre><code class="python">from mytables import Wfdisc
+from pisces import wfdisc2trace, read_waveform
+
+
+# loop over 10 BHZ wfdisc instances from the database
+for wf in session.query(Wfdisc).filter(Wfdisc.chan == 'BHZ').limit(10):
+    # the following two traces should be the same
+    tr = wf.to_trace()
+    tr = wfdisc2trace(wf) 
+
+    # get the raw data
+    data = read_waveform(wf.dir + '/' + wf.dfile, wf.datatype, wf.foff, wf.nsamp)
+
+    #do analysis, writing, and/or plotting here...
+
+</code></pre>
+
+<h3 id="using-the-piscesclient-class">Using the <code>pisces.Client</code> class</h3>
+<!--
+
+The `Client` class is instantiated to point to a database, and relevant table names can be targeted
+using the `load_tables` method.  Thereafter, the table classes are available in the instance's
+`.tables` dictionary attribute.  In the following example, we retrieve windowed waveforms 
+around predicted P and surface wave arrivals for some large events in 2010.
+
+
+wzxhzdk:1
+
+First, the client is instantiated with a database connection URL.
+Next, the required station, event, and data tables are loaded with `load_tables`.
+The `get_events` method is called to request events in 2010 with mb >= 5.4 that
+are 30-90 epicentral degrees from latitude 40, longitude -105, returning a list
+of Origin class instances (table rows). As the distance calculation is done
+out-of-database, all events that match the other criteria are loaded first
+before applying the distance filter. For large result sets, this can be
+memory-intensive without an additional in-database filter, such as a region box
+or smaller magnitude range. The `get_stations` method collects BHZ channels in
+the western US, and returns a list of Site instances. Finally, we loop through
+events and stations to predict a travel time window at each station using `travel_times` function, 
+request the corresponding waveforms (as a collection of ObsPy Trace objects, called a `Stream`) 
+using `get_waveform`, and write each trace to disc as a SAC file using the ObsPy Trace object write
+method, which supports several output formats, including miniSEED.
+
+-->
+
 <hr />
 <h2 id="adding-waveforms-to-the-database">Adding waveforms to the database</h2>
+<p>Database-building scripts are in development, but adding waveforms to a database
+is still relatively easy.  Using <a href="http://www.obspy.org">ObsPy</a>, any number of
+waveform <a href="https://docs.obspy.org/packages/autogen/obspy.core.stream.read.html">formats</a>
+can be read and the basic header "scraped" into a <code>Wfdisc</code> row.</p>
+<p>Here's an example for a SAC file.</p>
+<pre><code class="python">import os
+from glob import glob
+
+from obspy import read
+from pisces import db_connect
+from pisces.tables.css3 import Wfdisc
+
+
+session = db_connect(conn='sqlite:///mydatabase.sqlite')
+
+Wfdisc.__table__.create(session.bind)
+
+FTYPE = 'SAC'
+
+for ifile in glob(&quot;*.SAC&quot;):
+   tr = read(ifile, format='SAC')[0]
+   idir, idfile = os.path.split(ifile)
+   wf = Wfdisc(sta=tr.stats.station, chan=tr.stats.channel, 
+               samprate=tr.stats.sampling_rate, nsamp=tr.stats.npts, 
+               time=tr.stats.starttime.timestamp, foff=634, dir=idir,
+               dfile=idfile, endtime=tr.stats.endtime.timestamp)
+   session.add(wf)
+
+session.commit()
+session.close()
+
+</code></pre>
+
 <hr />
-<h2 id="localizing-your-wfdisc-table">Localizing your wfdisc table</h2>
-</div>
+<h2 id="copying-localizing-waveform-files">Copying (localizing) waveform files</h2>
+<p>If you want to move waveform files from one database to another one, you may need copy the files
+and tweak the Wfdisc table.  Wfdisc tables contain
+file name and directory information about the waveforms stored on disk, so those need to be 
+corrected when you move the files.  In the example below, we copy wfdisc instances from <code>session1</code>,
+pointing to the originating database, to <code>session2</code>, which points at the destination database.</p>
+<pre><code class="python">import os
+import shutil
+
+def copy_waves(wfdiscs, old_base, new_base):
+    &quot;&quot;&quot;Replace old_base with new_base in the .dir attribute of wfdisc list, and copies the 
+    waveform files to the new location.
+
+    Parameters
+    ----------
+    wfdiscs : list
+        Wfdisc instances from source database.
+    old_base, new_base : str
+        The top of the old (new) data directory trees.  This assumes all wfdiscs originate and 
+        end up under single directories. The directory structure under the new_base will mirror
+        that under old_base.
+
+    Returns
+    -------
+    wfdiscs_out : list
+        Same as input list, but .dir attribute now points to the new_base location.  
+
+    &quot;&quot;&quot;
+    for wf in wfdiscs:
+        # replace the directory
+        old_file =  os.path.sep.join([wf.dir, wf.dfile])
+        wf.dir.replace(old_base, new_base)
+        new_file =  os.path.sep.join([wf.dir, wf.dfile])
+        try:
+            shutil.copyfile(old_file, new_file)
+        except IOError:
+            # new directory doesn't exist yet.  this is like &quot;mkdir -p&quot; 
+            os.makedirs(os.path.dirname(new_file))
+            shutil.copyfile(old_file, new_file)
+
+# get the wfdiscs
+wfs = session1.query(Wfdisc1).all()
+
+# release the link between the wfdiscs and the originating database
+# this makes them &quot;floating&quot; instances, so they can be added to the destination database
+session1.expunge_all(wfs)
+
+# do the copy and tweaking
+wfs = copy_waves(wfs, '/old/path/to/top/of/data', '/my/new/path/to/top/of/data')
+
+# add and commit them to the destination database
+session2.add_all(wfdiscs)
+session2.commit()
+
+</code></pre></div>
+            
         </div>
 
         <footer class="col-md-12">
@@ -184,12 +339,37 @@
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        
-
-        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
         <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/prettify-1.0.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
         <script src="../js/base.js"></script>
-        
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

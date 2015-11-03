@@ -9,13 +9,12 @@
         <link rel="canonical" href="http://www.jkmacc-LANL.github.io/pisces/tutorial.queries/">
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-        <title>Using the Database - Pisces</title>
+	<title>Using the Database - Pisces</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="../css/prettify-1.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
-        
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -64,21 +63,29 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tutorial <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li >
-                                <a href="../tutorial.tables/">Database Tables</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.tables/">Database Tables</a>
+</li>
+
                         
-                            <li class="active">
-                                <a href="./">Using the Database</a>
-                            </li>
+                            
+<li class="active">
+    <a href="./">Using the Database</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.waveforms/">Import/Export Waveforms</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.waveforms/">Import/Export Waveforms</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -95,17 +102,23 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li >
-                                <a href="../about.roadmap/">Roadmap</a>
-                            </li>
+                            
+<li >
+    <a href="../about.roadmap/">Roadmap</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.license/">License</a>
-                            </li>
+                            
+<li >
+    <a href="../about.license/">License</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.group/">User's Group</a>
-                            </li>
+                            
+<li >
+    <a href="../about.group/">User's Group</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -114,40 +127,42 @@
                 </ul>
             
 
-            
-            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
-                
-                
-                <li >
-                    <a rel="next" href="../tutorial.tables/">
-                        <i class="fa fa-arrow-left"></i> Previous
-                    </a>
-                </li>
-                <li >
-                    <a rel="prev" href="../tutorial.waveforms/">
-                        Next <i class="fa fa-arrow-right"></i>
-                    </a>
-                </li>
-                
-                
                 <li>
-                    <a href="https://github.com/jkmacc-lanl/pisces">
-                        
-                            <i class="fa fa-github"></i>
-                        
-                        GitHub
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
                     </a>
                 </li>
+                
+                    <li >
+                        <a rel="next" href="../tutorial.tables/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../tutorial.waveforms/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a href="https://github.com/jkmacc-lanl/pisces">
+                            
+                                <i class="fa fa-github"></i>
+                            
+                            GitHub
+                        </a>
+                    </li>
                 
             </ul>
-            
         </div>
     </div>
 </div>
 
         <div class="container">
-            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
         <li class="main active"><a href="#using-the-database">Using the Database</a></li>
@@ -165,7 +180,7 @@
     
     </ul>
 </div></div>
-            <div class="col-md-9" role="main">
+                <div class="col-md-9" role="main">
 
 <h1 id="using-the-database">Using the Database</h1>
 <p>Load, query, join, write, and copy tables.</p>
@@ -173,7 +188,7 @@
 <h2 id="introduction">Introduction</h2>
 <p>In this tutorial, we'll make a database connection, load or import tables, and work with them.</p>
 <p>To begin, we'll make a database connection.  </p>
-<pre class="prettyprint well"><code>import pisces as ps
+<pre><code>import pisces as ps
 
 # connect with Oracle
 session = ps.db_connect(user='scott', backend='oracle', server='my.server.edu', 
@@ -205,13 +220,13 @@ Number 2 returns a class with none of the above enhancements.
 It is good for quick table loading when you have no prior knowledge of the table or you don't have a table prototype to use for it.
 Number 3 returns a class with default value instantiation and easy flat file <em>writing</em>, but no other Pisces-specific class methods.</p>
 <h3 id="import-your-defined-tables">Import your defined tables</h3>
-<p>Import tables/classes from modules where you previously defined them, as in the <a href="Using%20the%20Database">previous tutorial page</a>.
+<p>Import tables/classes from modules where you previously defined them, as in the <a href="../Using the Database">previous tutorial page</a>.
 This is the preferred way to load tables, as it offers the most flexibility and functionality.</p>
-<pre class="prettyprint well"><code>import from mytables import Site, Wfdisc, Origin
+<pre><code>import from mytables import Site, Wfdisc, Origin
 </code></pre>
 <h3 id="arbitrary-tables">Arbitrary tables</h3>
 <p>If you only know the table name (and account), you can load a table using <code>get_tables</code>:</p>
-<pre class="prettyprint well"><code># Oracle account.table syntax
+<pre><code># Oracle account.table syntax
 Site, Affil, Origin = ps.get_tables(session.bind, ['user.site', 'user.affiliation', 
                                                    'user.origin'])
 
@@ -225,18 +240,18 @@ is a Python representation of underlying SQL objects, and can be used to
 issue create/add/drop statements to the database. To add tables loaded
 later to the same MetaData, use the <code>metadata=</code> flag with the existing
 instance from one of the earlier-loaded tables:</p>
-<pre class="prettyprint well"><code>Wfdisc, Assoc = ps.get_tables(session.bind, ['user.wfdisc', 'user.assoc'], metadata=Site.metadata)
+<pre><code>Wfdisc, Assoc = ps.get_tables(session.bind, ['user.wfdisc', 'user.assoc'], metadata=Site.metadata)
 
 # check the table names in the metadata
 print Site.metadata.tables.keys()
 </code></pre>
 <p>Tables present in your MetaData can be seen in its <code>.tables</code> dictionary:</p>
-<pre class="prettyprint well"><code>['user.affiliation',  'user.site',  'user.wfdisc',  'user.origin',  'user.assoc']
+<pre><code>['user.affiliation',  'user.site',  'user.wfdisc',  'user.origin',  'user.assoc']
 </code></pre>
 <h4 id="tables-must-have-a-primary-key">Tables must have a primary key</h4>
 <p>SQLAlchemy’s ORM needs a primary key for the <code>session</code> to keep track of rows. If a database table is actually just a view of other tables, or a primary key was never specified,
 we can specify the primary key in a dictionary and the <code>primary_keys=</code> keyword.</p>
-<pre class="prettyprint well"><code>try:
+<pre><code>try:
     Sitechan, = ps.get_tables(session.bind, ['user.sitechan'])
 except ArgumentError:
     # failed because user.sitechan has no primary key.  we can force one with primary_keys
@@ -252,7 +267,7 @@ loaded classes get the following enhancements:</p>
 <li>Instances of the class can iterate over values, and in the correct order.</li>
 </ul>
 <p>Note: this will only work if the field names in the table being loaded have been used with this base before.</p>
-<pre class="prettyprint well"><code># load table classes, matching column names with those of a known schema
+<pre><code># load table classes, matching column names with those of a known schema
 
 from pisces.schema.css3 import Base
 
@@ -265,7 +280,7 @@ Site, Affil, Origin = ps.get_tables(session.bind, ['global.site','global.affilia
 ORM. Follow SQLAlchemy’s
 <a href="http://docs.sqlalchemy.org/en/rel_0_8/orm/tutorial.html">tutorial</a> to
 learn more about how this works.</p>
-<pre class="prettyprint well"><code># query all TA stations installed in 2009
+<pre><code># query all TA stations installed in 2009
 q = session.query(Site).filter(Site.ondate.between(2009001, 2009365))
 ta_sites = q.filter(Site.sta == Affil.sta).filter(Affil.net == 'TA').all()
 
@@ -293,7 +308,7 @@ plt.title("{} TA stations and {} quakes mb &gt; 4".format(len(ta_sites), len(wus
 <h3 id="query-builders">Query-builders</h3>
 <p>Pisces has a set of intuitive query-building functions for common
 seismic queries in <code>pisces.request</code>.</p>
-<pre class="prettyprint well"><code>import pisces.request as req
+<pre><code>import pisces.request as req
 
 # repeat the previous query for a subset of western US earthquakes
 wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'mb': (4, None)})
@@ -303,7 +318,7 @@ wus_quakes = req.get_events(session, Origin, region=(-115, -105, 35, 45), mag={'
 </code></pre>
 <p>Pisces uses NumPy/ObsPy to do distance subsets, which are done out-of-database and can be memory intensive. 
 They can be done in-database, if you have a stored function "xkm_distance", for example, that calculates lateral distances.</p>
-<pre class="prettyprint well"><code># stations &lt;= 200 km from lat 42, lon -110, out-of-database
+<pre><code># stations &lt;= 200 km from lat 42, lon -110, out-of-database
 sites = req.get_stations(session, Site, km=(42, -110, 0, 200))
 
 # in-database "xkm_distance(lat1, lon1, lat2, lon2)" function
@@ -311,7 +326,7 @@ from sqlalchemy import func
 sites = req.get_stations(session, Site, asquery=True).filter(func.xkm_distance(Site.lat, Site.lon, 42, -110).between(0, 200)).all()
 </code></pre>
 <h3 id="editing-tables">Editing tables</h3>
-<pre class="prettyprint well"><code># add Albuquerque ANMO and the Chelyabinsk bolide
+<pre><code># add Albuquerque ANMO and the Chelyabinsk bolide
 ANMO = Site(sta='ANMO', lat=34.9459, lon=-106.4572, elev=1.85)
 bolide = Origin(orid=1, lat=55.15, lon=61.41, mb=2.7, etype='xm')
 session.add_all([ANMO, bolide])
@@ -329,8 +344,8 @@ or “bolide”, but their default values are filled in.</p>
 <h2 id="using-ids">Using ids</h2>
 <hr />
 <h2 id="copying-data-between-tables">Copying Data between Tables</h2>
-<hr />
-</div>
+<hr /></div>
+            
         </div>
 
         <footer class="col-md-12">
@@ -339,12 +354,37 @@ or “bolide”, but their default values are filled in.</p>
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        
-
-        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
         <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/prettify-1.0.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
         <script src="../js/base.js"></script>
-        
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

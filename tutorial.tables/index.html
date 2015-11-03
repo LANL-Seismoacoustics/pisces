@@ -9,13 +9,12 @@
         <link rel="canonical" href="http://www.jkmacc-LANL.github.io/pisces/tutorial.tables/">
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-        <title>Database Tables - Pisces</title>
+	<title>Database Tables - Pisces</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="../css/prettify-1.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
-        
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -64,21 +63,29 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tutorial <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li class="active">
-                                <a href="./">Database Tables</a>
-                            </li>
+                            
+<li class="active">
+    <a href="./">Database Tables</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.queries/">Using the Database</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.queries/">Using the Database</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.waveforms/">Import/Export Waveforms</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.waveforms/">Import/Export Waveforms</a>
+</li>
+
                         
-                            <li >
-                                <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
-                            </li>
+                            
+<li >
+    <a href="../tutorial.flatfiles/">Import/Export Flat Files</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -95,17 +102,23 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
-                            <li >
-                                <a href="../about.roadmap/">Roadmap</a>
-                            </li>
+                            
+<li >
+    <a href="../about.roadmap/">Roadmap</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.license/">License</a>
-                            </li>
+                            
+<li >
+    <a href="../about.license/">License</a>
+</li>
+
                         
-                            <li >
-                                <a href="../about.group/">User's Group</a>
-                            </li>
+                            
+<li >
+    <a href="../about.group/">User's Group</a>
+</li>
+
                         
                         </ul>
                     </li>
@@ -114,40 +127,42 @@
                 </ul>
             
 
-            
-            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
-                
-                
-                <li >
-                    <a rel="next" href="..">
-                        <i class="fa fa-arrow-left"></i> Previous
-                    </a>
-                </li>
-                <li >
-                    <a rel="prev" href="../tutorial.queries/">
-                        Next <i class="fa fa-arrow-right"></i>
-                    </a>
-                </li>
-                
-                
                 <li>
-                    <a href="https://github.com/jkmacc-lanl/pisces">
-                        
-                            <i class="fa fa-github"></i>
-                        
-                        GitHub
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
                     </a>
                 </li>
+                
+                    <li >
+                        <a rel="next" href="..">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../tutorial.queries/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a href="https://github.com/jkmacc-lanl/pisces">
+                            
+                                <i class="fa fa-github"></i>
+                            
+                            GitHub
+                        </a>
+                    </li>
                 
             </ul>
-            
         </div>
     </div>
 </div>
 
         <div class="container">
-            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
         <li class="main active"><a href="#the-database">The Database</a></li>
@@ -161,7 +176,7 @@
     
     </ul>
 </div></div>
-            <div class="col-md-9" role="main">
+                <div class="col-md-9" role="main">
 
 <h1 id="the-database">The Database</h1>
 <p>Learn about the tables, how to create them, and how to make new tables.</p>
@@ -325,7 +340,7 @@ Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <a h
 <li>Define new columns, including the <code>info</code> dictionary for Pisces.</li>
 </ul>
 <h4 id="mytablespy">mytables.py</h4>
-<pre class="prettyprint well"><code>import sqlalchemy as sa
+<pre><code>import sqlalchemy as sa
 import pisces.schema.css3 as css
 
 class Ccwfdisc(css.Base):
@@ -397,7 +412,7 @@ See the following table for a few examples:</p>
 </table>
 <h3 id="create-a-table">Create a table</h3>
 <p>To create the table in a database, just use SQLAlchemy syntax:</p>
-<pre class="prettyprint well"><code>import sqlalchemy as sa
+<pre><code>import sqlalchemy as sa
 from mytables import Ccwfdisc
 
 engine = sa.create_engine('sqlite:///mydatabase.sqlite')
@@ -411,7 +426,7 @@ This method accepts an <a href="http://docs.sqlalchemy.org/en/rel_0_9/core/engin
 If you want to re-use this table structure across multiple table names without having to repeat the previous definition each time, you'll need to define a new <em>prototype table</em> (<a href="http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract">abstract table</a> in SQLAlchemy).</p>
 <p>This is how the "ccwfdisc" table would be defined, as a new prototype.</p>
 <h4 id="mytables_abspy">mytables_abs.py</h4>
-<pre class="prettyprint well"><code>import sqlalchemy as sa
+<pre><code>import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 import pisces.schema.css3 as css
 
@@ -461,7 +476,7 @@ class Ccwfdisc(css.Base):
 </ul>
 <p>And this is how the prototype would be implemented and re-used in two different tables, 'ccwfdisc' and 'TA_ccwfdisc'.</p>
 <h4 id="mytables2py">mytables2.py</h4>
-<pre class="prettyprint well"><code>import mytables_abs as ab
+<pre><code>import mytables_abs as ab
 
 class Ccwfdisc(ab.Ccwfdisc):
     __tablename__ = 'ccwfdisc'
@@ -469,8 +484,8 @@ class Ccwfdisc(ab.Ccwfdisc):
 class TA_Ccwfdisc(ab.Ccwfdisc):
     __tablename__ = 'TA_ccwfdisc'
 </code></pre>
-<p>These two tables look the same, have different names, and can reside in the same database.</p>
-</div>
+<p>These two tables look the same, have different names, and can reside in the same database.</p></div>
+            
         </div>
 
         <footer class="col-md-12">
@@ -479,12 +494,37 @@ class TA_Ccwfdisc(ab.Ccwfdisc):
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        
-
-        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
         <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/prettify-1.0.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
         <script src="../js/base.js"></script>
-        
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>
