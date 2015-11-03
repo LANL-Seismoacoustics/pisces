@@ -16,7 +16,36 @@ How to read and write waveforms.
 
 Waveforms are described in the `Wfdisc` table, and there are two ways to get waveforms from a query.
 
+### Read directly from `wfdisc` instances
+
+If you have instances from the `Wfdisc` class, you can easily convert them to ObsPy `Trace`
+instances for analysis or plotting.  Pisces Wfdisc class instances have a `to_trace` method,
+which produces `Trace` instance from the `Wfdisc` instance.  Alternately, you can use the 
+`wfdisc2trace` function on a vanilla SQLAlchemy Wfdisc instance (no `to_trace` method).
+Finally, you can use the low-level function `read_waveform`, which underlies all the methods above.
+This function returns a raw NumPy array instead of an Obspy Trace, however.
+
+```python
+from mytables import Wfdisc
+from pisces import wfdisc2trace, read_waveform
+
+
+# loop over 10 BHZ wfdisc instances from the database
+for wf in session.query(Wfdisc).filter(Wfdisc.chan == 'BHZ').limit(10):
+    # the following two traces should be the same
+    tr = wf.to_trace()
+    tr = wfdisc2trace(wf) 
+
+    # get the raw data
+    data = read_waveform(wf.dir + '/' + wf.dfile, wf.datatype, wf.foff, wf.nsamp)
+
+    #do analysis, writing, and/or plotting here...
+
+```
+
 ### Using the `pisces.Client` class
+
+<!--
 
 The `Client` class is instantiated to point to a database, and relevant table names can be targeted
 using the `load_tables` method.  Thereafter, the table classes are available in the instance's
@@ -70,63 +99,48 @@ request the corresponding waveforms (as a collection of ObsPy Trace objects, cal
 using `get_waveform`, and write each trace to disc as a SAC file using the ObsPy Trace object write
 method, which supports several output formats, including miniSEED.
 
-
-### Read directly from `wfdisc` instances
-
-If you have instances from the `Wfdisc` class, you can easily convert them to ObsPy `Trace`
-instances for analysis or plotting.  Pisces Wfdisc class instances have a `to_trace` method,
-which produces `Trace` instance from the `Wfdisc` instance.  Alternately, you can use the 
-`wfdisc2trace` function on a vanilla SQLAlchemy Wfdisc instance (no `to_trace` method).
-Finally, you can use the low-level function `read_waveform`, which underlies all the methods above.
-This function returns a raw NumPy array instead of an Obspy Trace, however.
-
-```python
-from mytables import Wfdisc
-from pisces import wfdisc2trace, read_waveform
-
-
-# loop over 10 BHZ wfdisc instances from the database
-for wf in session.query(Wfdisc).filter(Wfdisc.chan == 'BHZ').limit(10):
-    # the following two traces should be the same
-    tr = wf.to_trace()
-    tr = wfdisc2trace(wf) 
-
-    # get the raw data
-    data = read_waveform(wf.dir + '/' + wf.dfile, wf.datatype, wf.foff, wf.nsamp)
-
-    #do analysis, writing, and/or plotting here...
-
-```
+-->
 
 ---
 
 
 ## Adding waveforms to the database
 
-<!-- 
-A directory tree of waveform files can be converted into a set of related database tables.
-These may include wfdisc, site, sitechan, origin, and event tables.  Currently, only SAC files
-are supported, though miniseed files are targeted for support as well.
+Database-building scripts are in development, but adding waveforms to a database
+is still relatively easy.  Using [ObsPy](http://www.obspy.org), any number of
+waveform [formats](https://docs.obspy.org/packages/autogen/obspy.core.stream.read.html)
+can be read and the basic header "scraped" into a `Wfdisc` row.
 
-### Using traces2db.py
+Here's an example for a SAC file.
 
-`traces2db.py` is a script that traverses a directory tree of SAC files, and writes the following 
-database tables:
+```python
+import os
+from glob import glob
 
-* wfdisc
-* site
-* sitechan
-* lastid
+from obspy import read
+from pisces import db_connect
+from pisces.tables.css3 import Wfdisc
 
-The following tables are optional, subject to header information and user input.
 
-* arrival
-* assoc
-* origin 
-* event 
+session = db_connect(conn='sqlite:///mydatabase.sqlite')
 
--->
+Wfdisc.__table__.create(session.bind)
 
+FTYPE = 'SAC'
+
+for ifile in glob("*.SAC"):
+   tr = read(ifile, format='SAC')[0]
+   idir, idfile = os.path.split(ifile)
+   wf = Wfdisc(sta=tr.stats.station, chan=tr.stats.channel, 
+               samprate=tr.stats.sampling_rate, nsamp=tr.stats.npts, 
+               time=tr.stats.starttime.timestamp, foff=634, dir=idir,
+               dfile=idfile, endtime=tr.stats.endtime.timestamp)
+   session.add(wf)
+
+session.commit()
+session.close()
+
+```
 
 ---
 
