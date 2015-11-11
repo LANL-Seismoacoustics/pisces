@@ -48,10 +48,16 @@ setup(name='pisces-db',
     ext_package='pisces.io.lib',
     ext_modules=[Extension('libecompression', ['pisces/io/src/e_compression/e_compression.c']),
                  Extension('libconvert',glob.glob('pisces/io/src/convert/*.c'))],
+    # From pysmo.aimbat
     #package_data={'pysmo.aimbat': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
     #'entry_points' = {'console_scripts': ['find_events': 'pisces.scripts.find_events:main',
     #                                       find_stations': 'pisces.scripts.find_stations:main',
     #                                       'traces2db': 'pisces.scripts.traces2db:main'],
+    # From Click
+    #entry_points='''
+    #   [console_scripts]
+    #   yourscript=yourpackage.scripts.yourscript:cli
+    #''',
     license='LANL-MIT',
     platforms=['Mac OS X', 'Linux/Unix'],
     classifiers=['Development Status :: 3 - Alpha',

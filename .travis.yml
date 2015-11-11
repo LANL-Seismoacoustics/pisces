@@ -1,11 +1,9 @@
 language: python
 python:
-  - 2.6
   - 2.7
-  - 3.3
 notifications:
   email: false
- 
+
 # Setup anaconda
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -16,10 +14,15 @@ before_install:
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
   # - sudo rm -rf /dev/shm
   # - sudo ln -s /run/shm /dev/shm
+
 # Install packages
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose sqlalchemy
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose 
   - conda install --yes -c obspy obspy
-  - python setup.py install
+  - conda install --yes sqlalchemy=0.9.9
+  - python setup.py develop
+    #  - python -c "import sys; print sys.path"
+    #  - python -c "import os; import pisces; print(os.path.dirname(pisces.__file__))"
+
 # command to run tests
 script: nosetests

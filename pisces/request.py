@@ -56,11 +56,11 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
         if chan is not None:
             q = q.filter(wfdisc.chan == chan)
         if [t1, t2].count(None) == 0:
-            q = q.filter(wfdisc.time.between(t1-86400, t2))
+            q = q.filter(wfdisc.time.between(t1 - 86400, t2))
             q = q.filter(wfdisc.endtime > t1)
         else:
             if t1 is not None:
-                q = q.filter(wfdisc.time >= t1-86400)
+                q = q.filter(wfdisc.time >= t1 - 86400)
                 q = q.filter(wfdisc.endtime > t1)
             if t2 is not None:
                 q = q.filter(wfdisc.time <= t2)
@@ -69,7 +69,8 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
         res = q
     else:
         if verbose:
-            print("Requesting sta={}, chan={}, time=[{}, {}], wfids={}".format(sta, chan, UTCDateTime(t1), UTCDateTime(t2), wfids))
+            msg = "Requesting sta={}, chan={}, time=[{}, {}], wfids={}"
+            print(msg.format(sta, chan, UTCDateTime(t1), UTCDateTime(t2), wfids))
         res = q.all()
 
     return res
@@ -441,7 +442,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
     if channels:
         q = q.filter(Arrival.chan.in_(channels))
 
-    if phase:
+    if phases:
         q = q.filter(Arrival.iphase.in_(phase))
 
     if t:
