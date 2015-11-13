@@ -40,41 +40,50 @@ def get_plugins(plugins):
     return plugin_functions
 
 
-def get_files(options):
+def get_files(file_list):
     """
     Return a sequence of SAC file names from either a list of file names
     (trivial) or a text file list (presumable because there are too many files
     to use normal shell expansion).
 
     """
-    if len(options.files) == 1 and not isSAC(options.files[0]):
+    if len(file_list) == 1 and not isSAC(file_list[0]):
         #make a generator of non-blank lines
         try:
-            listfile = open(options.files[0], 'r')
+            listfile = open(file_list[0], 'r')
             files = (line.strip() for line in listfile if line.strip())
         except IOError:
-            msg = "{0} does not exist.".format(options.files[0])
+            msg = "{0} does not exist.".format(file_list[0])
             raise IOError(msg)
     else:
-        files = options.files
+        files = file_list
 
     return files
 
 
-def get_or_create_tables(options, session, create=True):
+def get_or_create_tables(session, dbout=None, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
 
     Parameters
     ----------
-    options : argparse.ArgumentParser
     session : sqlalchemy.orm.Session
+    prefix : str
+        Prefix for canonical table names, e.g. 'myaccount.' or 'TA_' .
+        Canonical table names are used if no dbout is provided.
+    create : bool
+        If True, create tables that don't yet exist.
+
+    Canonical table keyword/tablename string pairs, such as site='other.site',
+    can override dbout.  For example, you may want to use a different Lastid
+    table, so that ids don't start from 1.
 
     Returns
     -------
     tables : dict
-        Mapping between canonical table names and SQLA ORM classes.
-        e.g. {'origin': MyOrigin, ...}
+        A mapping between canonical table names and SQLA declarative classes
+        with the correct __tablename__.
+        e.g. {'origin': Origin, ...}
 
     """
     # The Plan:
@@ -85,30 +94,26 @@ def get_or_create_tables(options, session, create=True):
 
     # TODO: check options for which tables to produce.
 
-    dbout = options.prefix
+    if dbout is None:
+        dbout = ''
 
-    tables = {}
-    for coretable in CORETABLES:
+    tabledict = {}
+    for coretable in CORETABLES.values():
         # build the table name
-        if getattr(options, coretable.name, None):
-            fulltablename = getattr(options, coretable.name)
-        else:
-            fulltablename = dbout + coretable.name
-
-        # fulltablename is either an arbitrary string or dbout + core name, but not None
+        fulltablename = tables.get(coretable.name, dbout + coretable.name)
 
         # put table classes into the tables dictionary
         if fulltablename == coretable.name:
             # it's a vanilla table name. just use a pre-packaged table class instead of making one.
-            tables[coretable.name] = coretable.table
+            tabledict[coretable.name] = coretable.table
         else:
-            tables[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
+            tabledict[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
 
-        tables[coretable.name].__table__.create(session.bind, checkfirst=True)
+        tabledict[coretable.name].__table__.create(session.bind, checkfirst=True)
 
     session.commit()
 
-    return tables
+    return tabledict
 
 
 def dicts2rows(dicts, classes):

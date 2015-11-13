@@ -22,7 +22,22 @@ entry_points.
 
 import click
 
-from pisces.commands import sac2db
+# from pisces.commands import sac2db
+
+
+def split_commas(ctx, param, value):
+    """
+    Convert from a comma-separated list to a true list.
+    """
+    # ctx, param, value is the required calling signature for a Click callback
+    try:
+        values = value.split(',')
+    except AttributeError:
+        # values is None
+        values = None
+
+    return values
+
 
 # ------------------------------- MAIN ----------------------------------------
 # This is the main function/group.  It does nothing except provide a top-level
@@ -54,8 +69,7 @@ def cli(**kwargs):
 # ------------------------------- INIT ----------------------------------------
 @cli.command('init')
 @click.argument('url')
-@click.option('-t', help="help!")
-def init(**kwargs):
+def init_command(**kwargs):
     """
     Initialize the core tables.
 
@@ -68,7 +82,7 @@ def init(**kwargs):
 # ------------------------------- DROP ----------------------------------------
 @cli.command('drop')
 @click.argument('url')
-def drop(**kwargs):
+def drop_command(**kwargs):
     """
     Drop core tables.
 
@@ -81,6 +95,9 @@ def drop(**kwargs):
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
 @click.argument('url')
+@click.option('-t', '--tables',
+              help="Comma-separated, list of tables to create. (no spaces)",
+              metavar="owner.tablename[,...]", callback=split_commas)
 def sac2db_command(*args, **kwargs):
     """
     Scrape SAC files into database tables.
@@ -94,7 +111,7 @@ def sac2db_command(*args, **kwargs):
 # ------------------------------- MSEED2DB ------------------------------------
 @cli.command('mseed2db')
 @click.argument('url')
-def mseed2db(**kwargs):
+def mseed2db_command(**kwargs):
     """
     Scrape MSEED files into database tables.
 
