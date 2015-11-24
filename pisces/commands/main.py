@@ -8,13 +8,15 @@ nested interface, which is then exported to the command-line using setuptools
 entry_points.
 
 """
-
-# Developers:
+# DEVELOPERS:
 # To add a subcommand to the main command, do the following:
-# 1. Add a module file in pisces/cli/ to do your implementation
-# 2. Import useful Pisces or other functions into your module
-# 3. Program your functionality into a single function, and import it here.
-# 4. Write a wrapper function for your implementation function here,
+# 1. Add a module file in pisces/commands/ for your implementation
+# 2. Program your functionality into a single function in your modules, and
+#    import it here.  The module should really just be an ordering of Pisces
+#    library functions/classes.  The Pisces library functions/classes work with
+#    native Python objects. The commands submodules do the business of converting
+#    command-line arguments to a useful form for those library functions.
+# 3. Write a wrapper function for your implementation function here,
 #    and decorate it with click.  The docstring for this wrapper function is the
 #    one that is exposed at the command-line.
 #    @cli.command('command_name') adds a new "pisces command_name"
@@ -22,12 +24,14 @@ entry_points.
 
 import click
 
-# from pisces.commands import sac2db
-
+from pisces import __version__
+from pisces.util import url_connect
+from pisces.commands import sac2db
 
 def split_commas(ctx, param, value):
     """
     Convert from a comma-separated list to a true list.
+
     """
     # ctx, param, value is the required calling signature for a Click callback
     try:
@@ -45,8 +49,10 @@ def split_commas(ctx, param, value):
 # the way "git" works.  Also, since click.option doesn't support help=, we
 # document common arguments, like URL, in the main function.
 
-@click.group()  # "group" means that the command/function can take sub-commands
-def cli(**kwargs):
+# "group" means that the command/function can take sub-commands
+@click.group(context_settings={'help_option_names': ['-h', '--help']})
+@click.version_option(__version__, '-V', '--version')
+def cli():
     """
     Pisces command-line interface.
 
@@ -56,32 +62,33 @@ def cli(**kwargs):
 
     \b
     Arguments:
-      URL     SQLAlchemy-compatible database URI string.
+      DB      SQLAlchemy-compatible database URI string.
               e.g. sqlite:///localdb.sqlite
                    oracle://user[:password]@server:port/database
                       (leave out password blank for prompt)
+              May also be defined as an environmental variable PISCESDB.
         
 
     """
-    print("cli: {}".format(kwargs))
+    pass
 
 
 # ------------------------------- INIT ----------------------------------------
-@cli.command('init')
-@click.argument('url')
-def init_command(**kwargs):
+@cli.command('create')
+@click.argument('DB')
+def create_command(**kwargs):
     """
-    Initialize the core tables.
+    Create core tables.
 
     Not yet implemented.
 
     """
-    print("init: {}".format(kwargs))
+    print("create: {}".format(kwargs))
 
 
 # ------------------------------- DROP ----------------------------------------
 @cli.command('drop')
-@click.argument('url')
+@click.argument('DB')
 def drop_command(**kwargs):
     """
     Drop core tables.
@@ -94,23 +101,51 @@ def drop_command(**kwargs):
 
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
-@click.argument('url')
+@click.argument('db', envvar='PISCESDB')
 @click.option('-t', '--tables',
-              help="Comma-separated, list of tables to create. (no spaces)",
-              metavar="owner.tablename[,...]", callback=split_commas)
-def sac2db_command(*args, **kwargs):
+              help=("Comma-separated (no spaces), list of tables to create.  "
+                    "Default is all core tables with standard names."),
+              metavar="owner.tablename[,...]",
+              callback=split_commas)
+@click.option('-p', '--prefix', default="",
+              help=("Target tables using 'account.prefix naming.  "
+                    "e.g. myaccount.test_ will target tables like "
+                    "myaccount.test_origin, myaccount.test_sitechan."))
+@click.option('-A', '--absolute_paths', is_flag=True,
+              help=("If set, write database 'dir' directory entries as"
+                    " absolute paths, not relative."))
+@click.option('-l', '--file_list', type=click.File('r'),
+              help="A list file, one file name per line.")
+@click.argument('files', nargs=-1, type=click.Path())
+def sac2db_command(**kwargs):
     """
     Scrape SAC files into database tables.
 
-    This is the much longer help for this function.
+    SAC files may be used to produce the following tables: Wfdisc, Site,
+    Sitechan, Origin, Event, Arrival, Assoc, Lastid, and Instrument.  Id
+    numbering will follow the Lastid table, if one is found, otherwise it will
+    start from 1.
+
+    Examples
+    --------
+    # use standard table names to local test.sqlite file
+    pisces sac2db sqlite:///test.sqlite datadir/*.sac
+
+    # prefix all tables in an oracle account with prefix my_, prompt for password
+    pisces sac2db --prefix my_ oracle://user@server.domain.com:port/dbname datadir/*.sac
+
+    # if there are too many SAC files for the shell to handle, use a list:
+    find datadir -name "*.sac" -print > saclist.txt
+    sac2db.py sqlite:///test.sqlite saclist.txt
 
     """
-    print("sac2db: {}, {}".format(args, kwargs))
+    session = url_connect(kwargs['db'])
+    sac2db.main(session=session, **kwargs)
 
 
 # ------------------------------- MSEED2DB ------------------------------------
 @cli.command('mseed2db')
-@click.argument('url')
+@click.argument('DB')
 def mseed2db_command(**kwargs):
     """
     Scrape MSEED files into database tables.
@@ -125,6 +160,7 @@ def mseed2db_command(**kwargs):
 # This is where elementary querying is done, mostly using pisces.request
 #
 @cli.group('query')
+@click.argument('DB')
 def query(**kwargs):
     """
     Perform a basic query.
@@ -136,7 +172,7 @@ def query(**kwargs):
 
 
 @query.command('stations')
-@click.argument('url')
+@click.argument('DB')
 def query_stations(**kwargs):
     """
     Query stations from the site table.
@@ -147,7 +183,7 @@ def query_stations(**kwargs):
     print("stations: {}".format(kwargs))
 
 @query.command('events')
-@click.argument('url')
+@click.argument('DB')
 def query_events(**kwargs):
     """
     Query the origin table for events.
@@ -158,7 +194,7 @@ def query_events(**kwargs):
     print("events: {}".format(kwargs))
 
 @query.command('waveforms')
-@click.argument('url')
+@click.argument('DB')
 def query_waveforms(**kwargs):
     """
     Query waveforms from the wfdisc table.

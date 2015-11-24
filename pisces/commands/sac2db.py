@@ -177,17 +177,31 @@ def apply_plugins(plugins, **rows):
     return rows
 
 
-def sac2db(session, files, tables, plugins=None, abs_paths=False):
+def sac2db(session, tables, files, plugins=None, absolute_paths=False):
     pass
 
 # TODO: make this main also accept a get_iterable and get_row_dicts functions,
 #   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py
-def main(*args, **kwargs):
+def main(**kwargs):
     """
     Command-line arguments are created and parsed, fed to functions.
 
+    Parameters
+    ----------
+    session : SQLAlchemy.orm.Session instance
+    tables : list
+        Canonical names for desired database tables.
+    prefix : str
+        Target core tables using 'account.prefix' naming.
+    absolute_paths : bool
+    file_list : str
+        Name of a text file containing full SAC file names.
+    files : list
+        List of SAC file names.
+
     """
-    session = get_session(options)
+    print("sac2db: {}".format(kwargs))
+    return None
 
     files = get_files(options)
 
