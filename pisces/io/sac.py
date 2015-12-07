@@ -281,7 +281,7 @@ def get_sac_reftime(header):
         #                            datetime.timedelta(int(nzjday-1))
         # NOTE: epoch seconds can be got by:
         # (reftime - datetime.datetime(1970,1,1)).total_seconds()
-    except ValueError:
+    except ValueError, TypeError:
         # may contain -12345 null values?
         msg = "Invalid or missing time headers."
         raise ValueError(msg)
