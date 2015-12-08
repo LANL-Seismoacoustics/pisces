@@ -5,17 +5,19 @@ site_description: A practical seismological database library in Python.
 repo_url: https://github.com/jkmacc-lanl/pisces
 
 pages:
-- ['index.md', 'Home']
-- ['tutorial.tables.md', 'Tutorial', 'Database Tables']
-- ['tutorial.queries.md', 'Tutorial', 'Using the Database']
-- ['tutorial.waveforms.md', 'Tutorial', 'Import/Export Waveforms']
-- ['tutorial.flatfiles.md', 'Tutorial', 'Import/Export Flat Files']
-- ['api.md', 'API Documentation']
-- ['about.roadmap.md', 'About', 'Roadmap']
-- ['about.license.md', 'About', 'License']
-- ['about.group.md', 'About', "User's Group"]
+- Home: 'index.md'
+- Tutorial:
+    - 'Database Tables': 'tutorial.tables.md'
+    - 'Using the Database': 'tutorial.queries.md'
+    - 'Import/Export Waveforms': 'tutorial.waveforms.md'
+    - 'Import/Export Flat Files': 'tutorial.flatfiles.md'
+- API Documentation: 'api.md'
+- About:
+    - 'Roadmap': 'about.roadmap.md'
+    - 'License': 'about.license.md'
+    - "User's Group": 'about.group.md'
 
 docs_dir: 'source/pages'
 site_dir: 'html'
-theme: 'mkdocs'
+theme: 'readthedocs'
 # theme_center_lead: true
