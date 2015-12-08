@@ -103,7 +103,7 @@ Get an ObsPy [Trace](http://docs.obspy.org/packages/autogen/obspy.core.trace.Tra
     tr = wf.to_trace()  
     tr.plot()  
 
-![ANMO waveform](https://raw.github.com/jkmacc-LANL/pisces/master/docs/pages/data/ANMO.png "ANMO waveform")
+![ANMO waveform](data/ANMO.png "ANMO waveform")
 
 ---
 
