@@ -32,7 +32,7 @@ setup(name='pisces-db',
                  Extension('libconvert',glob.glob('pisces/io/src/convert/*.c'))],
     entry_points = """
         [console_scripts]
-        pisces=pisces.cli.main:cli
+        pisces=pisces.commands.main:cli
         """,
     #package_data={'pysmo.aimbat': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
     #'entry_points' = {'console_scripts': ['find_events': 'pisces.scripts.find_events:main',
