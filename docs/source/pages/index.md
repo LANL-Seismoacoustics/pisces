@@ -23,7 +23,7 @@ Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack i
 
 * Import/export waveforms directly to/from your database.
 * Easy importing/exporting of text "flat-file" data tables.
-* Build database queries using Python objects and methods ([SQLAlchemy](http:/www.sqlalchemy.org)), not by concatenating SQL strings.
+* Build database queries using Python objects and methods ([SQLAlchemy](http://www.sqlalchemy.org)), not by concatenating SQL strings.
 * Integration with [ObsPy](http://www.obspy.org).
 * Geographic filtering of results.
 
