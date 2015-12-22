@@ -61,7 +61,8 @@ def get_files(file_list):
     return files
 
 
-def get_or_create_tables(session, dbout=None, create=True, **tables):
+# TODO: put in util.py ?
+def get_or_create_tables(session, prefix=None, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
 
@@ -69,13 +70,13 @@ def get_or_create_tables(session, dbout=None, create=True, **tables):
     ----------
     session : sqlalchemy.orm.Session
     prefix : str
-        Prefix for canonical table names, e.g. 'myaccount.' or 'TA_' .
-        Canonical table names are used if no dbout is provided.
+        Prefix for canonical table names, e.g. 'myaccount.' or 'TA_' (no owner/schema).
+        Canonical table names are used if no prefix is provided.
     create : bool
         If True, create tables that don't yet exist.
 
     Canonical table keyword/tablename string pairs, such as site='other.site',
-    can override dbout.  For example, you may want to use a different Lastid
+    can override prefix.  For example, you may want to use a different Lastid
     table, so that ids don't start from 1.
 
     Returns
@@ -94,13 +95,13 @@ def get_or_create_tables(session, dbout=None, create=True, **tables):
 
     # TODO: check options for which tables to produce.
 
-    if dbout is None:
-        dbout = ''
+    if not prefix:
+        prefix = ''
 
     tabledict = {}
     for coretable in CORETABLES.values():
         # build the table name
-        fulltablename = tables.get(coretable.name, dbout + coretable.name)
+        fulltablename = tables.get(coretable.name, prefix + coretable.name)
 
         # put table classes into the tables dictionary
         if fulltablename == coretable.name:
@@ -201,18 +202,21 @@ def main(**kwargs):
 
     """
     print("sac2db: {}".format(kwargs))
-    return None
+    session = kwargs['session']
 
-    files = get_files(options)
+    if kwargs.get('file_list'):
+        files = get_files(kwargs['file_list'])
+    else:
+        files = kwargs['files']
 
-    tables = get_or_create_tables(options, session, create=True)
+    tables = get_or_create_tables(session, create=True)
 
     lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
     last = get_lastids(session, tables['lastid'], lastids, create=True)
 
     # for item in iterable:
     for sacfile in files:
-        print sacfile
+        print(sacfile)
 
         # row_dicts = get_row_dicts(item)
 
@@ -240,7 +244,7 @@ def main(**kwargs):
         for wf in rows['wfdisc']:
             wf.datatype = datatype
             wf.dfile = os.path.basename(sacfile)
-            if options.absolute_paths:
+            if kwargs['absolute_paths']:
                 idir = os.path.dirname(os.path.realpath(sacfile))
             else:
                 idir = os.path.dirname(sacfile)
@@ -249,9 +253,9 @@ def main(**kwargs):
         # manage the ids
         make_atomic(last, **rows)
 
-        plugins = get_plugins(options)
+        # plugins = get_plugins(options)
 
-        rows = apply_plugins(plugins, **rows)
+        # rows = apply_plugins(plugins, **rows)
 
         # add rows to the database
         # XXX: not done very elegantly.  some problem rows are simply skipped.

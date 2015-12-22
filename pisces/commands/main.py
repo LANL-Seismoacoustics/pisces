@@ -101,7 +101,7 @@ def drop_command(**kwargs):
 
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
-@click.argument('db', envvar='PISCESDB')
+@click.argument('DB', envvar='PISCESDB')
 @click.option('-t', '--tables',
               help=("Comma-separated (no spaces), list of tables to create.  "
                     "Default is all core tables with standard names."),
@@ -139,7 +139,10 @@ def sac2db_command(**kwargs):
     sac2db.py sqlite:///test.sqlite saclist.txt
 
     """
+    # common local functions
     session = url_connect(kwargs['db'])
+
+    # command-specific funtions
     sac2db.main(session=session, **kwargs)
 
 
