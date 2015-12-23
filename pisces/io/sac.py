@@ -274,7 +274,6 @@ def get_sac_reftime(header):
         msg = "Not enough time information: {}".format(e.message)
         raise KeyError(msg)
 
-<<<<<<< HEAD
     try:
         reftime = UTCDateTime(year=yr, julday=nzjday, hour=nzhour, minute=nzmin,
                               second=nzsec, microsecond=nzmsec * 1000)
