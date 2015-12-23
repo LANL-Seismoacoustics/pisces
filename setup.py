@@ -17,24 +17,6 @@ from numpy.distutils.core import setup, Extension
 
 doclines = __doc__.split("\n")
 
-# also stolen from ObsPy
-#SETUP_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
-# def find_packages():
-#     """
-#     Simple function to find all modules under the current folder.
-# 
-#     Stolen from ObsPy.
-#     """
-#     modules = []
-#     for dirpath, _, filenames in os.walk(os.path.join(SETUP_DIRECTORY,
-#             "pisces")):
-#         if "__init__.py" in filenames:
-#             modules.append(os.path.relpath(dirpath, SETUP_DIRECTORY))
-#     return [_i.replace(os.sep, ".") for _i in modules]
-
-# download_url = 'http://github.com/jkmacc-lanl/pisces/tarball/0.2',
-
 setup(name='pisces-db',
     version='0.2.1',
     description='A Practical Seismological Database Library in Python.',
@@ -44,20 +26,14 @@ setup(name='pisces-db',
     packages=['pisces','pisces.schema','pisces.io','pisces.tables'],
     url='https://github.com/jkmacc-LANL/pisces',
     keywords = ['seismology', 'geophysics', 'database'],
-    install_requires=['numpy','obspy>=0.8','sqlalchemy>=0.9'],
+    install_requires=['numpy','obspy>=0.8','sqlalchemy>=0.9','Click'],
     ext_package='pisces.io.lib',
     ext_modules=[Extension('libecompression', ['pisces/io/src/e_compression/e_compression.c']),
                  Extension('libconvert',glob.glob('pisces/io/src/convert/*.c'))],
-    # From pysmo.aimbat
-    #package_data={'pysmo.aimbat': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
-    #'entry_points' = {'console_scripts': ['find_events': 'pisces.scripts.find_events:main',
-    #                                       find_stations': 'pisces.scripts.find_stations:main',
-    #                                       'traces2db': 'pisces.scripts.traces2db:main'],
-    # From Click
-    #entry_points='''
-    #   [console_scripts]
-    #   yourscript=yourpackage.scripts.yourscript:cli
-    #''',
+    entry_points = """
+        [console_scripts]
+        pisces=pisces.commands.main:cli
+        """,
     license='LANL-MIT',
     platforms=['Mac OS X', 'Linux/Unix'],
     classifiers=['Development Status :: 3 - Alpha',

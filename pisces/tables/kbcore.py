@@ -1,3 +1,4 @@
+from pisces.schema.util import CoreTable
 import pisces.schema.kbcore as kb
 
 
@@ -61,3 +62,13 @@ class Wfdisc(kb.Wfdisc):
 class Wftag(kb.Wftag):
     __tablename__ = 'wftag'
 
+CORETABLES = {'affiliation': CoreTable('affiliation', kb.Affiliation, Affiliation),
+              'arrival': CoreTable('arrival', kb.Arrival, Arrival),
+              'assoc': CoreTable('assoc', kb.Assoc, Assoc),
+              'event': CoreTable('event', kb.Event, Event),
+              'instrument': CoreTable('instrument', kb.Instrument, Instrument),
+              'lastid': CoreTable('lastid', kb.Lastid, Lastid),
+              'origin': CoreTable('origin', kb.Origin, Origin),
+              'site': CoreTable('site', kb.Site, Site),
+              'sitechan': CoreTable('sitechan', kb.Sitechan, Sitechan),
+              'wfdisc': CoreTable('wfdisc', kb.Wfdisc, Wfdisc)}

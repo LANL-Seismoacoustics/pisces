@@ -1,6 +1,6 @@
 import pdb
 import sys
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -13,31 +13,21 @@ except ImportError:
 from sqlalchemy import event
 
 
-def copy_metadata(metadata, prefix='', schema=None, metadata_out=None):
-    """
-    Copies tables to new metadata with new schema and/or name prefix.
+# TODO: add a .to_dict() method or a dict-like __getitem__/__setitem__, and
+#   remove value iteration, so that copying a row looks like
+#   Class(inst.to_dict())
+#   or
+#   Class(**inst)
+#   and this works:
+#   for (col, val) in inst:
+#       print col, val
+#
+#   This will affect .from_string (i think) and __init__, and _print_format,
+#   and __str__
+# TODO: add a decorator like
+#   https://blogs.gnome.org/danni/2013/03/07/generating-json-from-sqlalchemy-objects/
 
-    To make a new database with the result, use metadata.create_all(engine).
-    
-    """
-    if not metadata_out:
-        metadata_out = sa.MetaData()
-
-    if schema:
-        metadata_out.schema = schema
-    else:
-        metadata_out.schema = metadata.schema
-
-    # assign new schema to tables
-    for table in metadata.tables.values():
-        table.tometadata(metadata_out, schema=schema)
-
-    # assign prefix to tables
-    for table in metadata_out.tables.values():
-        table.name = prefix + table.name
-        
-    return metadata_out
-
+CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 
 def get_infovals(meta, structure, key):
     """
@@ -85,42 +75,6 @@ def get_infovals(meta, structure, key):
             colnames.append(item)
 
     return colnames, structvals
-
-def attr_generate(cls, attr='keyvalue'):
-    """
-    Decorate a class that contains integer 'keyvalue' id attribute with 
-    a next() integer incrementing method.
-
-    Notes
-    -----
-    If your ID instance is in a session, using .next() modifies it, and thus
-    stages it for updating upon the next session transaction (flush or commit).
-    This is bad if it is an existing table you don't have write privileges on.
-
-    Examples
-    --------
-    >>> Lastid, = pisces.get_tables(session.bind, ['lastid'])
-    >>> Lastid = attr_generate(Lastid)
-    >>> orid = Lastid(keyname='orid', keyvalue=1000)
-    >>> orid.next()
-    1001
-    >>> orid.keyvalue
-    1001
-    >>> session.commit() #does nothing b/c orid wasn't added
-    >>> orid = session.query(Lastid).filter(Lastid.keyname == 'orid').first()
-    >>> orid.keyvalue
-    10
-    >>> orid.next()
-    11
-    >>> session.commit() #updates orid in the database
-
-    """
-    def next(self):
-        """Set and return the next integer value of 'keyvalue'."""
-        setattr(self, attr, getattr(self, attr) + 1)
-        return getattr(self, attr)
-    cls.next = next
-    return cls
 
 
 def string_formatter(meta, structure):
@@ -331,39 +285,6 @@ def from_string(cls, line, default_on_error=None):
 
     return cls(*vals)
 
-def from_function(cls, function, *args, **kwargs):
-    """
-    Create a list of instances from a custom function.
-
-    Parameters
-    ----------
-    function : function
-        A user-supplied function that takes *args, and *kwargs as arguments,
-        and returns a list of dictionaries: 
-
-        [dictionaries] = function(*args, *kwargs)  
-
-        The dictionary keys are column names, and the values are row values.
-        Each dictionary is unpacked into the class constructor to make a class
-        instance.
-
-    Returns
-    -------
-    list
-        A list of class (row) instances, populated from the dictionaries
-        returned by the user-supplied function.
-
-    Examples
-    --------
-    >>> from mymodule import sac_to_arrivals, sac_to_origin
-    >>> arrivals = Arrival.from_function(sac_to_arrivals, sacfile)
-    >>> origins = Origin.from_function(sac_to_origin,  sacfile)
-
-    """
-    dict_list = function(*args, **kwargs)
-
-    return [cls(**d) for d in dict_list]
-
 def _getitem(self, i):
     # integer indexing based on column order in __table__
     # helps implement __iter__ behavior as a side-effect
@@ -407,7 +328,6 @@ class PiscesMeta(DeclarativeMeta):
         dct['__eq__'] = _eq
 
         dct['from_string'] = classmethod(from_string)
-        dct['from_function'] = classmethod(from_function)
 
         dct['_column_info_registry'] = {}   #this is a class-level attribute
 
@@ -472,6 +392,7 @@ def parse_float(s):
     return float(s) or None
 
 def parse_int(s):
-    return int(s) or None
+    # XXX: int('0') will fail
+    return int(s)
 
 

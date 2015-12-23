@@ -1,3 +1,4 @@
+from pisces.schema.util import CoreTable
 import pisces.schema.css3 as css3
 
 
@@ -61,3 +62,14 @@ class Wfdisc(css3.Wfdisc):
 class Wftag(css3.Wftag):
     __tablename__ = 'wftag'
 
+
+CORETABLES = {'affiliation': CoreTable('affiliation', css3.Affiliation, Affiliation),
+              'arrival': CoreTable('arrival', css3.Arrival, Arrival),
+              'assoc': CoreTable('assoc', css3.Assoc, Assoc),
+              'event': CoreTable('event', css3.Event, Event),
+              'instrument': CoreTable('instrument', css3.Instrument, Instrument),
+              'lastid': CoreTable('lastid', css3.Lastid, Lastid),
+              'origin': CoreTable('origin', css3.Origin, Origin),
+              'site': CoreTable('site', css3.Site, Site),
+              'sitechan': CoreTable('sitechan', css3.Sitechan, Sitechan),
+              'wfdisc': CoreTable('wfdisc', css3.Wfdisc, Wfdisc)}

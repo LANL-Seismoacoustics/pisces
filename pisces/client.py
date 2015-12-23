@@ -69,7 +69,9 @@ class Client(object):
             Table doesn't exist.
 
         """
-        #XXX: fails for no primary key.  use get_tables syntax.
+        # TODO: add the tables as attributes?
+        # TODO: if isinstance(table, DeclarativeBase): just set it as attribute
+        # XXX: fails for no primary key.  use get_tables syntax.
         for coretable, tablename in tables.iteritems():
             self.tables[coretable] = ps.get_tables(self.session.bind, 
                                                    [tablename], 
