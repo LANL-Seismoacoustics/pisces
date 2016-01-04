@@ -11,7 +11,6 @@ except:
     pass
 
 import os
-import inspect
 import glob
 from numpy.distutils.core import setup, Extension
 
