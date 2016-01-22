@@ -309,8 +309,8 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 <p><img alt="primary tables" src="../data/css3_primary.png" title="primary tables" /></p>
 <h4 id="lookup-tables">Lookup tables</h4>
 <p>(only primary and unique keys are shown)</p>
-<p><img alt="lookup tables" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/source/pages/data/css3_lookup.png" title="lookup tables" /></p>
-<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="https://github.com/jkmacc-LANL/pisces/blob/dev/docs/source/pages/data/Anderson1990.pdf?raw=true" title="Anderson et al. (1990) pdf">PDF (19 MB)</a></p>
+<p><img alt="lookup tables" src="../data/css3_lookup.png" title="lookup tables" /></p>
+<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a href="../data/Anderson1990.pdf?raw=true" title="Anderson et al. (1990) pdf">PDF (19 MB)</a></p>
 <h3 id="the-pisces-implementation">The Pisces implementation</h3>
 <p>Pisces implements CSS 3.0 schema with relatively few constraints:</p>
 <ul>
@@ -332,7 +332,7 @@ In the ORM, **Python classes represent database tables, and instances of that cl
 <h3 id="defining-new-tables">Defining new tables</h3>
 <p>The core tables don't describe everything you might care about, such as stacked cross-correlation functions.
 Here we'll reproduce the "ccwfdisc" cross-correlation descriptor table from <a href="http://www.iris.edu/dms/products/ancc-ciei/">http://www.iris.edu/dms/products/ancc-ciei/</a>, which looks like this <em>(sic)</em>:</p>
-<p><img alt="ccwfdisc table" src="https://raw.github.com/jkmacc-LANL/pisces/dev/docs/source/pages/data/ancc-ciei_table.png" title="ccwfdisc table" /></p>
+<p><img alt="ccwfdisc table" src="../data/ancc-ciei_table.png" title="ccwfdisc table" /></p>
 <p>We'll define our new table in a file "mytables.py" by doing the following:</p>
 <ul>
 <li>Import our css3 prototypes into the <code>css</code> namespace.</li>
