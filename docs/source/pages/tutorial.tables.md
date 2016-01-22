@@ -131,7 +131,7 @@ Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson 
 
 (only primary and unique keys are shown)
 
-![primary tables](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/source/pages/data/css3_primary.png "primary tables")
+![primary tables](data/css3_primary.png "primary tables")
 
 
 #### Lookup tables
