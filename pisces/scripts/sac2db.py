@@ -12,7 +12,7 @@ import sqlalchemy.exc as exc
 import sqlalchemy.orm.exc as oexc
 
 from obspy import read
-from obspy.sac.core import isSAC
+from obspy.io.sac.core import _is_sac
 
 import pisces as ps
 from pisces.util import get_lastids, url_connect
@@ -197,7 +197,7 @@ def get_files(options):
     to use normal shell expansion).
 
     """
-    if len(options.files) == 1 and not isSAC(options.files[0]):
+    if len(options.files) == 1 and not _is_sac(options.files[0]):
         #make a generator of non-blank lines
         try:
             listfile = open(options.files[0], 'r')

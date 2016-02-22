@@ -10,7 +10,7 @@ from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
 
-import obspy.core.util.geodetics as geod
+import obspy.geodetics as geod
 from obspy.core import AttribDict
 from obspy.taup import taup
 

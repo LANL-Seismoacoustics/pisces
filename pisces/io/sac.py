@@ -22,7 +22,7 @@ from collections import OrderedDict
 import functools
 
 from obspy.core import UTCDateTime, AttribDict
-import obspy.core.util.geodetics as geod
+import obspy.geodetics as geod
 
 import pisces.tables.kbcore as kb
 from pisces.io.readwaveform import read_waveform

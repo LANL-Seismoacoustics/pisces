@@ -3,7 +3,7 @@
 Command line script accepts a file name, filename regex, or list of file
 names, and produces a kbcore database from header information therein.  Parses
 trace header information as read by obspy.core read function (which depends on
-obspy.sac, obspy.mseed, ect...).
+obspy.io.sac, obspy.io.mseed, ect...).
 
 April 14, 2015, OM 
 
