@@ -584,7 +584,7 @@ def get_options(db,prefix=None):
 
 
 
-def get_or_create_tables(session, prefix=None, create=True, **tables):
+def get_or_create_tables(session, prefix=None, create=True):
     """
     Load or create canonical ORM KB Core table classes.
 
@@ -636,3 +636,32 @@ def get_or_create_tables(session, prefix=None, create=True, **tables):
     session.commit()
 
     return tables
+
+
+def make_table_names(tables=None, prefix="", owner=None, schema='css3',
+        exclude=None):
+    """
+    Get a suite of table name strings.
+
+    Parameters
+    ----------
+    tables : iterable of str
+        Canonical table name strings.  If omitted, all core tables for the
+        schema are used.
+    prefix : str
+        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
+    owner : str
+        e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
+    schema : str
+        Which set of core tables are being used. "css3" or "kbcore"
+    exclude : iterable of str
+        Canonical table name strings to exclude.  This is applied _after_ the
+        `tables` parameter.
+
+    Returns
+    -------
+    tablenames : list of str
+        The desired formatted table name strings.
+
+    """
+    pass
