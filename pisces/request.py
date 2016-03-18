@@ -11,7 +11,7 @@ from sqlalchemy import func, or_
 from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
 
-from pisces.util import db_connect, make_same_size
+from pisces.util import db_connect
 from pisces.io.trace import wfdisc2trace
 
 

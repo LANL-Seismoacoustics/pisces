@@ -1,15 +1,12 @@
-import sys
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-#from sqlalchemy.ext.declarative import DeferredReflection
 try:
     from sqlalchemy.ext.declarative.api import _declarative_constructor
 except ImportError:
     # not >0.8
     from sqlalchemy.ext.declarative import _declarative_constructor
-from sqlalchemy import event
 
 # NO SELF IMPORTS!
 
