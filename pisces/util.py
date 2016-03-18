@@ -6,7 +6,7 @@ import numpy as np
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
 
@@ -15,7 +15,6 @@ from obspy.core import AttribDict
 from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
-import pisces.schema.kbcore as kba
 
 
 def db_connect(*args, **kwargs):
@@ -101,7 +100,7 @@ def db_connect(*args, **kwargs):
 
     return session
 
-
+# TODO: get rid of two different ways to connect to databases
 def url_connect(url):
     """
     Connect to a database using an RFC-1738 compliant URL, like sqlalchemy's
@@ -146,32 +145,7 @@ def url_connect(url):
 
     return session
 
-
-def table_contains_all(itable, keys):
-     all([key in itable.columns for key in keys])
-
-#def ormtable(fulltablename, base=None):
-#    """
-#    For known schema-qualified tables, use:
-#    Origin = ormtable('global.origin', base=kb.Origin)
-#    For arbitrary tables, use:
-#    MyTable = ormtable('jkmacc.sometable')
-#    For arbitrary tables without Pisces-specific method, use:
-#    MyTable = ormtable('jkmacc.sometable', base=declarative_base())
-#    """
-#
-#    ORMBase = base if base else declarative_base(metaclass=PiscesMeta,
-#                                                 constructor=None)
-#    parents = (ORMBase,)
-#    try:
-#        owner, tablename = fulltable.split('.')
-#    except ValueError:
-#        owner, tablename = None, fulltable
-#    if owner:
-#        parents += declarative_base(metadata=MetaData(schema=owner)),
-#
-#    return type(fulltable.capitalize(), parents, {})
-
+# TODO: rename this to "load_table", and make it work on a single table
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -279,6 +253,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     return outTables
 
 
+# TODO: merge get_tables and make_tables?
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -379,6 +354,7 @@ def gen_id(i=0):
         i += 1
         yield i
 
+# TODO: use ObsPy's new TauPy object thingy for traveltimes
 def travel_times(ref, deg=None, km=None, depth=0.):
     """
     Get *approximate* relative travel time(s).
@@ -509,6 +485,11 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     create : bool
         If True, create ids that don't already exist.
 
+    Returns
+    -------
+    last : obspy.core.AttribDict
+        Attribute-based dictionary of all lastids.
+
 
     Examples
     --------
@@ -557,19 +538,6 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     return last
    
 
-
-#CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
-#              CoreTable('arrival', kba.Arrival, kb.Arrival),
-#              CoreTable('assoc', kba.Assoc, kb.Assoc),
-#              CoreTable('event', kba.Event, kb.Event),
-#              CoreTable('instrument', kba.Instrument, kb.Instrument),
-#              CoreTable('lastid', kba.Lastid, kb.Lastid),
-#              CoreTable('origin', kba.Origin, kb.Origin),
-#              CoreTable('site', kba.Site, kb.Site),
-#              CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
-#              CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
-
-
 def get_options(db,prefix=None):
 	'''
     for coretable in CORETABLES:
@@ -584,17 +552,17 @@ def get_options(db,prefix=None):
 
 
 
-def get_or_create_tables(session, prefix=None, create=True):
+def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
 
     Parameters
     ----------
     session : sqlalchemy.orm.Session
-    prefix : str
-        Table name prefix for core tables, e.g. 'global.' for 'global.<tablename>'
     create : bool
-        If True, create a table that isn't found.
+        If True, create a table object that isn't found.
+    tables
+        Canonical table name / formatted table name keyword pairs.
     
     Also accepted are canonical table name keywords with '[owner.]tablename'
     arguments, which will replace any prefix-based core table names.
@@ -629,39 +597,10 @@ def get_or_create_tables(session, prefix=None, create=True):
             # it's a vanilla table name. just use a pre-packaged table class instead of making one.
             tables[coretable.name] = coretable.table
         else:
-            tables[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
+            tables[coretable.name] = make_table(fulltablename, coretable.prototype)
 
         tables[coretable.name].__table__.create(session.bind, checkfirst=True)
 
     session.commit()
 
     return tables
-
-
-def make_table_names(tables=None, prefix="", owner=None, schema='css3',
-        exclude=None):
-    """
-    Get a suite of table name strings.
-
-    Parameters
-    ----------
-    tables : iterable of str
-        Canonical table name strings.  If omitted, all core tables for the
-        schema are used.
-    prefix : str
-        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
-    owner : str
-        e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
-    schema : str
-        Which set of core tables are being used. "css3" or "kbcore"
-    exclude : iterable of str
-        Canonical table name strings to exclude.  This is applied _after_ the
-        `tables` parameter.
-
-    Returns
-    -------
-    tablenames : list of str
-        The desired formatted table name strings.
-
-    """
-    pass
