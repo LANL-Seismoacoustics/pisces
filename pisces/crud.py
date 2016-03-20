@@ -5,50 +5,67 @@ Module for schema-aware table creation and dropping functions.
 import  pisces.tables.css3 as css3
 import  pisces.tables.kbcore as kb
 
-def format_table_names(*tables, **kwargs):
+def format_table_names(*tablenames, **kwargs):
     """
-    Get a list of table name strings in the format: <owner>.<prefix>table .
+    Get table name strings in the format: <owner.><prefix>tablename.
 
     Parameters
     ----------
-    tables : iterable of str
-        Desired canonical table names.  If omitted, all core tables for the
-        schema are used.
+    tablenames : str
+        Desired table names.  If omitted, a schema must be specified, and all
+        core tables for the schema are returned.
     schema : str  ("css3" or "kbcore")
         Which set of core tables are being used.
-        Default is "css3".
     prefix : str
+        All table names will have the provided prefix.
         e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
     owner : str
         e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
 
     Returns
     -------
-    tablenames : dict
+    formatted_tablenames : dict
         The desired formatted table name strings.
+
+    Raises
+    ------
+    ValueError : unknown schema specified, or tablenames omitted and schema
+                 not specified
 
     """
     prefix = kwargs.pop('prefix', '')
     owner = kwargs.pop('owner', None)
-    schema = kwargs.pop('schema', 'css3')
+    schema = kwargs.pop('schema', None)
 
-    if schema == 'css3':
-        CORETABLES = css3.CORETABLES
-    elif schema == 'kbcore':
-        CORETABLES = kb.CORETABLES
+    if not tablenames:
+        if schema == 'css3':
+            CORETABLES = css3.CORETABLES
+        elif schema == 'kbcore':
+            CORETABLES = kb.CORETABLES
+        else:
+            msg = "Unknown schema: {}".format(schema)
+            raise ValueError(msg)
+
+        tablenames = CORETABLES.keys()
+
+    if owner:
+        fmt = "{owner}.{prefix}{tablename}"
     else:
-        raise ValueError("Unknown schema {}".format(schema))
+        fmt = "{prefix}{tablename}"
 
-    if not tables:
-        tables = CORETABLES.keys()
+    formatted_tablenames = {}
+    for tablename in tablenames:
+        formatted_tablenames[tablename] = fmt.format(owner=owner, prefix=prefix,
+                                                     tablename=tablename)
 
-    tablenames = [
+    return formatted_tablenames
 
-def make_tables(tables=None, schema='kbcore', prefix="", owner=None):
+
+def make_tables(*tables, schema=None, prefix="", owner=None):
     pass
 
 
-def load_tables(session, tables=None, schema='kbcore', prefix="", owner=None):
+def load_tables(session, *tables, schema=None, prefix="", owner=None):
     pass
 
 
