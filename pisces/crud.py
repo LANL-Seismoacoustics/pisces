@@ -5,17 +5,18 @@ Module for schema-aware table creation and dropping functions.
 import  pisces.tables.css3 as css3
 import  pisces.tables.kbcore as kb
 
-def format_table_names(*tablenames, **kwargs):
+def make_table_names(*tables, **kwargs):
     """
     Get table name strings in the format: <owner.><prefix>tablename.
 
     Parameters
     ----------
-    tablenames : str
+    tables : str
         Desired table names.  If omitted, a schema must be specified, and all
         core tables for the schema are returned.
     schema : str  ("css3" or "kbcore")
-        Which set of core tables are being used.
+        Which set of core tables are being used. If omitted, tables must be
+        specified.
     prefix : str
         All table names will have the provided prefix.
         e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
@@ -24,7 +25,7 @@ def format_table_names(*tablenames, **kwargs):
 
     Returns
     -------
-    formatted_tablenames : dict
+    tablenames : tuple 
         The desired formatted table name strings.
 
     Raises
@@ -34,12 +35,13 @@ def format_table_names(*tablenames, **kwargs):
 
     Examples
     --------
-    >>> format_table_names('site', 'origin', owner='global', prefix='TA_')
-    {'site': 'global.TA_site', 'origin': 'global.TA_origin'}
+    >>> make_table_names('site', 'origin', owner='global', prefix='TA_')
+    ('global.TA_site', 'global.TA_origin')
 
-    >>> format_table_names(schema='css3', prefix='TA_')
-    {'affiliation': 'TA_affiliation', 'assoc': 'TA_assoc',
+    >>> make_table_names(schema='css3', prefix='TA_')
+    ('TA_affiliation', 'TA_assoc')
     ...
+
 
     """
     # XXX: is this function really necessary?
@@ -51,7 +53,7 @@ def format_table_names(*tablenames, **kwargs):
         msg = "Unknown keyword(s): {}".format(kwargs.keys())
         raise ValueError(msg)
 
-    if not tablenames:
+    if not tables:
         if schema == 'css3':
             CORETABLES = css3.CORETABLES
         elif schema == 'kbcore':
@@ -60,19 +62,18 @@ def format_table_names(*tablenames, **kwargs):
             msg = "Unknown schema: {}".format(schema)
             raise ValueError(msg)
 
-        tablenames = CORETABLES.keys()
+        tables = CORETABLES.keys()
 
     if owner:
-        fmt = "{owner}.{prefix}{tablename}"
+        fmt = "{owner}.{prefix}{table}"
     else:
-        fmt = "{prefix}{tablename}"
+        fmt = "{prefix}{table}"
 
-    formatted_tablenames = {}
-    for tablename in tablenames:
-        formatted_tablenames[tablename] = fmt.format(owner=owner, prefix=prefix,
-                                                     tablename=tablename)
+    tablenames = {}
+    for table in tables:
+        tablenames[table] = fmt.format(owner=owner, prefix=prefix, table=table)
 
-    return formatted_tablenames
+    return tablenames
 
 
 def make_tables(*tablenames, **kwargs):
