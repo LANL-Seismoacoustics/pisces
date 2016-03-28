@@ -76,22 +76,28 @@ def make_table_names(*tables, **kwargs):
     return tablenames
 
 
-def make_tables(*tablenames, **kwargs):
+def make_tables(*tables, **kwargs):
     """
-    Turn table names into SQLAlchemy ORM table classes.
+    Create mapped SQLAlchemy table classes.
 
     Parameters
     ----------
-    tablenames : str
+    tables : str
         Desired table names.  If omitted, a schema must be specified, and all
         core tables for the schema are returned.
     schema : str  ("css3" or "kbcore")
-        Which set of core tables are being used.
+        Which set of core tables are being used. If omitted, tables must be
+        specified.
     prefix : str
         All table names will have the provided prefix.
         e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
     owner : str
         e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
+
+    Returns
+    -------
+    list
+        Corresponding list of mapped SQLAlchemy table classes.
 
     """
     prefix = kwargs.pop('prefix', '')
@@ -102,11 +108,34 @@ def make_tables(*tablenames, **kwargs):
         msg = "Unknown keyword(s): {}".format(kwargs.keys())
         raise ValueError(msg)
 
-    tablenames = format_table_names(*tablenames, schema=schema, prefix=prefix,
+    tablenames = make_table_names(*tables, schema=schema, prefix=prefix,
                                     owner=owner)
 
 
 def load_tables(session, *tables, schema=None, prefix="", owner=None):
+    """
+    Load mapped SQLAlchemy table classes from existing SQL tables.
+
+    session : sqlalchemy.orm.Session
+        Session connected to the target database.
+    tables : str
+        Desired table names.  If omitted, a schema must be specified, and all
+        core tables for the schema are returned.
+    schema : str  ("css3" or "kbcore")
+        Which set of core tables are being used. If omitted, tables must be
+        specified.
+    prefix : str
+        All table names will have the provided prefix.
+        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
+    owner : str
+        e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
+
+    Returns
+    -------
+    list
+        Corresponding list of mapped SQLAlchemy table classes.
+
+    """
     pass
 
 
