@@ -1,22 +1,43 @@
 """
-Module for schema-aware table creation and dropping functions.
+Module containing functions for in-memory and in-database table creation and
+in-database table dropping.
+
+Supports:
+* table schema/accounts/owners/namespaces. SQLAlchemy calls them "schema."
+* prefixed table names for standard table prototypes
+* loading arbitrary tables from existing database
+* creating standard prototype tables
+
+Supported actions are:
+* creating in-memory canonical tables
+
+
+
+Glossary
+--------
+* table : canonical table name string, like "site"
+* tablename : the fully-qualified table name string (includes any owner, prefix)
+* mapped table : a SQLAlchemy ORM table class
+* table instance / row : an instance of a mapped table
 
 """
-import  pisces.tables.css3 as css3
-import  pisces.tables.kbcore as kb
+# TODO: support plugging in additional schema
+
+import pisces.tables.css3 as css3
+import pisces.tables.kbcore as kb
 
 def make_table_names(*tables, **kwargs):
     """
-    Get table name strings in the format: <owner.><prefix>tablename.
+    Get table name strings in the format: <owner.><prefix>tablename
 
     Parameters
     ----------
     tables : str
         Desired table names.  If omitted, a schema must be specified, and all
-        core tables for the schema are returned.
-    schema : str  ("css3" or "kbcore")
-        Which set of core tables are being used. If omitted, tables must be
-        specified.
+        core tables for the schema are used.
+    schema : str  {'css3', 'kbcore'}
+        Which set of core tables are being used. If omitted, one or more tables
+        must be specified.
     prefix : str
         All table names will have the provided prefix.
         e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
@@ -25,8 +46,8 @@ def make_table_names(*tables, **kwargs):
 
     Returns
     -------
-    tablenames : tuple 
-        The desired formatted table name strings.
+    tablenames : dict
+        The desired formatted table name strings, keyed by canonical name.
 
     Raises
     ------
@@ -36,15 +57,16 @@ def make_table_names(*tables, **kwargs):
     Examples
     --------
     >>> make_table_names('site', 'origin', owner='global', prefix='TA_')
-    ('global.TA_site', 'global.TA_origin')
+    {'site': 'global.TA_site', 'origin': 'global.TA_origin'}
 
     >>> make_table_names(schema='css3', prefix='TA_')
-    ('TA_affiliation', 'TA_assoc')
-    ...
+    {'affiliation': 'TA_affiliation', 'assoc': 'TA_assoc', ...}
 
 
     """
-    # XXX: is this function really necessary?
+    # TODO: is this function really necessary?  remove it.
+    # >>> tables = [owner + '.' + prefix + table.name for table in coretables]
+    # >>> tables = [prefix + table.name for table in coretables]
     prefix = kwargs.pop('prefix', '')
     owner = kwargs.pop('owner', None)
     schema = kwargs.pop('schema', None)
@@ -86,7 +108,7 @@ def make_tables(*tables, **kwargs):
         Desired table names.  If omitted, a schema must be specified, and all
         core tables for the schema are returned.
     schema : str  ("css3" or "kbcore")
-        Which set of core tables are being used. If omitted, tables must be
+        Which set of core tables are being used. If omitted, "tables" must be
         specified.
     prefix : str
         All table names will have the provided prefix.
@@ -96,8 +118,9 @@ def make_tables(*tables, **kwargs):
 
     Returns
     -------
-    list
-        Corresponding list of mapped SQLAlchemy table classes.
+    dict
+        Corresponding dict of mapped SQLAlchemy table classes, keyed by
+        canonical name.
 
     """
     prefix = kwargs.pop('prefix', '')
@@ -109,7 +132,9 @@ def make_tables(*tables, **kwargs):
         raise ValueError(msg)
 
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix,
-                                    owner=owner)
+                                  owner=owner)
+    # have dict of full table names 
+
 
 
 def load_tables(session, *tables, schema=None, prefix="", owner=None):
