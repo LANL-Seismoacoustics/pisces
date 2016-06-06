@@ -701,7 +701,7 @@ def sachdr2wfdisc(header):
     if nwfid not in (SACDEFAULT['nwfid'], None):
         wfdict['wfid'] = nwfid
 
-    wfdict['foff'] = 634
+    wfdict['foff'] = 632
 
     if sys.byteorder == 'little':
         wfdict['datatype'] = 'f4'
