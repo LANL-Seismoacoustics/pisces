@@ -10,5 +10,7 @@ Development Lead
 Contributors
 ------------
 
-* Richard Stead : stead _at_ lanl _dot_ gov
+* Garrett Euler : ggeuler _at_ lanl _dot_ gov
 * Omar Marcillo : omarcillo _at_ lanl _dot_ gov
+* Richard Stead : stead _at_ lanl _dot_ gov
+
