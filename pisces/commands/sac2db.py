@@ -248,6 +248,9 @@ def main(**kwargs):
                 idir = os.path.dirname(os.path.realpath(sacfile))
             else:
                 idir = os.path.dirname(sacfile)
+                # make sure relative paths are non-empty
+                if idir == '':
+                   idir = '.'
             wf.dir = idir
 
         # manage the ids
