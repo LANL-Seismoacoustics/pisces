@@ -21,6 +21,7 @@ Please contribute! Every little bit helps, and credit will always be given.
 # How to Submit a Pull Request
 
 Here's how to set up `pisces` for local development and contributing changes.
+Please see the project Wiki for a description of the git branching model.
 
 1. If you don't yet have collaborator permissions, fork the `pisces` repo on GitHub.
 2. Clone the repo locally.
