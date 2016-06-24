@@ -37,7 +37,6 @@ Here's how to set up `pisces` for local development and contributing changes.
     $ cd pisces/
     $ pip install -e .
     ```
-
     * using `conda`
     ```
     $ conda create -n pisces
