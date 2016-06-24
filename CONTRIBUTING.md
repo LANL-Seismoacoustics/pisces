@@ -55,6 +55,7 @@ Here's how to set up `pisces` for local development and contributing changes.
     $ git checkout -b name-of-your-bugfix-or-feature origin/master
     ```
 5. Commit your changes and push your branch to the remote.
+
     ```
     $ git add <the_file_you_changed> <other_files_you_changed>
     $ git commit -m "Your detailed description of your changes."
