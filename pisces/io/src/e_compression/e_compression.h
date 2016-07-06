@@ -2,7 +2,19 @@
 
 #define EC_H
 
+//Support for different OS - Note: stdint.h is provided in msvs 2013 (12.0) and later.
+#ifdef _WIN32
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+
+typedef __int32 int32_t;
+typedef __int64 int64_t;
+
+#else
 #include <stdint.h>
+#endif
 
 /*
  * Future enhancements could include tests and branches to account for

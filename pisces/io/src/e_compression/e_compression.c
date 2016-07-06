@@ -27,10 +27,18 @@
 #if defined DEBUG && (DEBUG == 1 || DEBUG == 3)
 #include <stdio.h>
 #endif
+
 #include <string.h>
 #include <stdlib.h>
+
+//Support for different OS
+#ifdef _WIN32
+#include <WinSock2.h>
+#pragma comment(lib, "WS2_32.lib")
+#else
 #include <sys/types.h>
 #include <netinet/in.h>
+#endif
 
 #define EC_C
 #include "e_compression.h"
