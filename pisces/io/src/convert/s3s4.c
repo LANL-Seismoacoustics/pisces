@@ -17,9 +17,7 @@ typedef __int64 int64_t;
 
 #include "convert.h"
 
-void
-s3tos4(void *byte, register int32_t n)
-{
+void s3tos4(void *byte, register int32_t n) {
   /*
    * note:
    *    to use this routine, it is assumed byte is allocated
@@ -79,9 +77,7 @@ s3tos4(void *byte, register int32_t n)
   }
 }
 
-void
-s4tos3(void *byte, register int32_t n)
-{
+void s4tos3(void *byte, register int32_t n) {
   /*
    * NOTE - to use this routine, it is assumed that no value
    * in the original 4-byte array exceeds 3 significant bytes of data
