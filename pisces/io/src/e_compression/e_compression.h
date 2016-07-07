@@ -74,15 +74,18 @@ static char *e_messages[] =
 /*
  * functions
  */
-int32_t block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp,
-  int32_t *nbyte);
-int32_t e_decomp(uint32_t *in, int32_t *out, int32_t is, int32_t ib,
-  int32_t o0, int32_t os);
-int32_t e_comp(int32_t *in, uint32_t *out, int32_t is, int32_t *ob, char dt[],
-  int32_t flag);
-int32_t e_decomp_inplace(int32_t *in, int32_t is, int32_t ib, int32_t o0,
-  int32_t os);
-int32_t e_comp_inplace(int32_t *in, int32_t is, int32_t *ob, char dt[],
-  int32_t flag);
+
+ /*
+  * The _declspec(dllexport) statement explicitly tells the compiler to send a function to the .dll.
+  * This is done so that when PythonXX.lib is updated it knows how to find the appropriate functions
+  * when referencing the .pyd.
+  */
+
+_declspec(dllexport) int32_t e_decomp(uint32_t *in, int32_t *out, int32_t is, int32_t ib, int32_t o0, int32_t os);
+_declspec(dllexport) int32_t e_comp(int32_t *in, uint32_t *out, int32_t is, int32_t *ob, char dt[], int32_t flag);
+_declspec(dllexport) int32_t e_decomp_inplace(int32_t *in, int32_t is, int32_t ib, int32_t o0, int32_t os);
+_declspec(dllexport) int32_t e_comp_inplace(int32_t *in, int32_t is, int32_t *ob, char dt[], int32_t flag);
+
+int32_t block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp, int32_t *nbyte);
 
 #endif EC_H
