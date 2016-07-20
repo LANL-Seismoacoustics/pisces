@@ -1,7 +1,4 @@
-language: python
-python:
-  - "2.7"
-  - "3.4"
+language: c
 
 notifications:
   email: false
@@ -44,7 +41,7 @@ install:
   - conda update -q conda
   - env
   - conda create -q -c obspy -n test-environment
-        python=$TRAVIS_PYTHON_VERSION
+        python=$PYTHON_VERSION
         obspy
         sqlalchemy
         nose
@@ -53,8 +50,8 @@ install:
   - conda list
   - git version
   - git fetch origin --tags --unshallow
-  - git remote add obspy git://github.com/obspy/obspy.git
-  - git fetch obspy --tags
+  - git remote add pisces git://github.com/jkmacc-LANL/pisces.git
+  - git fetch pisces --tags
   - git status
   - git branch -vv
   - git remote -vv
@@ -81,26 +78,6 @@ install:
   - git remote -vv
   - pip install --no-deps .
   - git status
-
-# Setup anaconda
-# before_install:
-#   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-#   - chmod +x miniconda.sh
-#   - ./miniconda.sh -b
-#   - export PATH=/home/travis/miniconda/bin:$PATH
-#   - conda update --yes conda
-#   The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-#   - sudo rm -rf /dev/shm
-#   - sudo ln -s /run/shm /dev/shm
-
-# Install packages
-# install:
-#   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose 
-#   - conda install --yes -c obspy obspy
-#   - conda install --yes sqlalchemy=0.9.9
-#   - python setup.py develop
-#     #  - python -c "import sys; print sys.path"
-#     #  - python -c "import os; import pisces; print(os.path.dirname(pisces.__file__))"
 
 script:
   # We change directories to make sure that python won't find the copy
