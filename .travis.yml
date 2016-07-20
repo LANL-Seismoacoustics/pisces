@@ -1,28 +1,111 @@
 language: python
 python:
-  - 2.7
+  - "2.7"
+  - "3.4"
+
 notifications:
   email: false
 
+branches:
+  only:
+    - "master"
+    - "next"
+
+matrix:
+  include:
+    - os: linux
+      env: PYTHON_VERSION=2.7
+    - os: linux
+      env: PYTHON_VERSION=3.4
+    - os: osx
+      env: PYTHON_VERSION=2.7
+    - os: osx
+      env: PYTHON_VERSION=3.4
+
+sudo: false
+
+# much of this is copied from ObsPy:
+# https://github.com/obspy/obspy/blob/master/.travis.yml
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      export OS="MacOSX";
+    else
+      export OS="Linux";
+    fi
+  - if [[ "${PYTHON_VERSION:0:1}" == '2' ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-${OS}-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-${OS}-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - env
+  - conda create -q -c obspy -n test-environment
+        python=$TRAVIS_PYTHON_VERSION
+        obspy
+        sqlalchemy
+        nose
+        Click
+  - source activate test-environment
+  - conda list
+  - git version
+  - git fetch origin --tags --unshallow
+  - git remote add obspy git://github.com/obspy/obspy.git
+  - git fetch obspy --tags
+  - git status
+  - git branch -vv
+  - git remote -vv
+  # try to set correct remote tracking branch (to get branch info in version number of reports)
+  - |
+      if [ "$TRAVIS_PULL_REQUEST" != "false" ]
+        # we're building a pull request, so we need to find out the fork it's coming from through github API
+        then GITHUB_LABEL=`python -c "from urllib import urlopen; import json; print(json.loads(urlopen(\"https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST\").read()).get('head').get('label'))"`
+             export GITHUB_FORK=${GITHUB_LABEL%:*}
+             export GITHUB_REMOTE=${GITHUB_FORK}/pisces
+             export GITHUB_BRANCH=${GITHUB_LABEL#*:}
+        # we're building a branch on the main repo
+        else export GITHUB_REMOTE=$TRAVIS_REPO_SLUG
+             export GITHUB_BRANCH=$TRAVIS_BRANCH
+             export GITHUB_FORK=${TRAVIS_REPO_SLUG%/*}; fi \
+      && echo "$GITHUB_REMOTE $GITHUB_FORK $GITHUB_BRANCH" \
+      && if [ "$GITHUB_FORK" != "pisces" ]
+          then git remote add $GITHUB_FORK git://github.com/$GITHUB_REMOTE; fi \
+      && git fetch $GITHUB_FORK +refs/heads/$GITHUB_BRANCH \
+      && git checkout -b tested_branch \
+      && git branch --set-upstream-to=$GITHUB_FORK/$GITHUB_BRANCH \
+      || echo
+  - git branch -vv
+  - git remote -vv
+  - pip install --no-deps .
+  - git status
+
 # Setup anaconda
-before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda/bin:$PATH
-  - conda update --yes conda
-  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-  # - sudo rm -rf /dev/shm
-  # - sudo ln -s /run/shm /dev/shm
+# before_install:
+#   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+#   - chmod +x miniconda.sh
+#   - ./miniconda.sh -b
+#   - export PATH=/home/travis/miniconda/bin:$PATH
+#   - conda update --yes conda
+#   The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+#   - sudo rm -rf /dev/shm
+#   - sudo ln -s /run/shm /dev/shm
 
 # Install packages
-install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose 
-  - conda install --yes -c obspy obspy
-  - conda install --yes sqlalchemy=0.9.9
-  - python setup.py develop
-    #  - python -c "import sys; print sys.path"
-    #  - python -c "import os; import pisces; print(os.path.dirname(pisces.__file__))"
+# install:
+#   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose 
+#   - conda install --yes -c obspy obspy
+#   - conda install --yes sqlalchemy=0.9.9
+#   - python setup.py develop
+#     #  - python -c "import sys; print sys.path"
+#     #  - python -c "import os; import pisces; print(os.path.dirname(pisces.__file__))"
 
-# command to run tests
-script: nosetests
+script:
+  # We change directories to make sure that python won't find the copy
+  # of obspy in the source directory, see
+  # https://github.com/numpy/numpy/blob/master/.travis.yml#L44
+  - mkdir empty
+  - cd empty
+  - nosetests ../tests
