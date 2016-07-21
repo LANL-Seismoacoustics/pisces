@@ -1,6 +1,10 @@
 # AppVeyor.com is a Continuous Integration service to build and run tests under Windows
 # This appveyor.yml mostly copied from ObsPy
 # https://github.com/obspy/obspy/blob/master/appveyor.yml
+branches:
+  only:
+    - master
+    - next
 
 environment:
   global:
