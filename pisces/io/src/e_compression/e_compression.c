@@ -27,10 +27,19 @@
 #if defined DEBUG && (DEBUG == 1 || DEBUG == 3)
 #include <stdio.h>
 #endif
+
 #include <string.h>
 #include <stdlib.h>
+
+//Support for different OS
+#ifdef _WIN32
+#include <python.h>
+#include <WinSock2.h>
+#pragma comment(lib, "WS2_32.lib")
+#else
 #include <sys/types.h>
 #include <netinet/in.h>
+#endif
 
 #define EC_C
 #include "e_compression.h"
@@ -53,6 +62,18 @@
 #define EC_UNCOMP 0x10000000
 
 #define EC_MAKECHECK(x) ((((x) & 0x00ffffff) << 8) >> 8)
+
+
+/* Python C extensions for Windows expects the symbol initModuleName when building the library.
+* This declaration gives msvc compiler this symbol to compile correctly.
+* Note : This not the documented way to build C extensions for Windows. It is typically expected to
+* use wrapper methods. What this does is prevents a statement such as 'import libecompression' in Python.
+* Instead, the only way to load the library is through a ctypes.CDLL call. Which in this case, is all that
+* is needed as seen in readwaveform.py.
+*/
+#ifdef _WIN32
+void initlibecompression(){}
+#endif
 
 /*
  * e-format in general consists of a series of buffers, each a multiple
@@ -98,10 +119,13 @@
  * into the input buffer.  This requires the user to allocate the input buffer
  * large enough to hold the uncompressed data.
  */
-int32_t
-e_decomp_inplace(int32_t *in, int32_t insamp, int32_t inbyte, int32_t out0,
-  int32_t outsamp)
-{
+
+int32_t e_decomp_inplace(int32_t *in,
+                 int32_t insamp,
+                 int32_t inbyte,
+                 int32_t out0,
+                 int32_t outsamp) {
+
   int32_t *out;
   int32_t ret;
 
@@ -126,10 +150,13 @@ e_decomp_inplace(int32_t *in, int32_t insamp, int32_t inbyte, int32_t out0,
  * number of bytes in the input buffer, the starting sample for output,
  * and requested number of output samples.
  */
-int32_t
-e_decomp(uint32_t *in, int32_t *out, int32_t insamp, int32_t inbyte,
-  int32_t out0, int32_t outsamp)
-{
+
+int32_t e_decomp(uint32_t *in,
+                 int32_t *out,
+                 int32_t insamp,
+                 int32_t inbyte, int32_t out0,
+                 int32_t outsamp) {
+
   static int32_t unbuf[EC_MAX_BUFFER];
   int32_t skipsamp = 0, packsamp, packbyte, bsamp, bbyte, nsamp = 0;
   int32_t unbuf0;
@@ -258,9 +285,11 @@ static int32_t index_map[16] =
  * The output array will contain the data on success, may contain the (failed)
  * data on failure.
  */
-int32_t
-block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp, int32_t *nbyte)
-{
+int32_t block_e_decomp(uint32_t *in,
+                       int32_t *out,
+                       int32_t *nsamp,
+                       int32_t *nbyte) {
+
   int32_t ndiff, check, bytes = 0, samps = 0;
   uint32_t *pout = (uint32_t *)out;
   union {
@@ -499,10 +528,13 @@ block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp, int32_t *nbyte)
  * sure the input buffer is large enough, or that the data contain
  * large sections that are less than 28 bits.
  */
-int32_t
-e_comp_inplace(int32_t *in, int32_t insamp, int32_t *outbytes, char datatype[],
-  int32_t block_flag)
-{
+
+int32_t e_comp_inplace(int32_t *in,
+                       int32_t insamp,
+                       int32_t *outbytes,
+                       char datatype[],
+                       int32_t block_flag) {
+
   uint32_t *out;
   int32_t ret;
   int32_t maxout = (int32_t)(((double)insamp / EC_MAX_BUFFER) + 2) *
@@ -525,10 +557,12 @@ e_comp_inplace(int32_t *in, int32_t insamp, int32_t *outbytes, char datatype[],
  * e_comp compresses an array of s4 data.
  * It assumes that the entire array given as input is to be compressed.
  */
-int32_t
-e_comp(int32_t *in, uint32_t *out, int32_t insamp, int32_t *outbytes,
-  char datatype[], int32_t block_flag)
-{
+int32_t e_comp(int32_t *in,
+               uint32_t *out,
+               int32_t insamp,
+               int32_t *outbytes,
+               char datatype[],
+               int32_t block_flag) {
   int32_t i, j, k;
   int32_t datanum, dchoose;
   int32_t bufbytes, bufints, didsamp, maxsamp, maxdiff, samp0 = 0;
