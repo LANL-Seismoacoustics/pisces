@@ -24,9 +24,9 @@ Repository: <https://github.com/jkmacc-LANL/pisces>
 
 Requires:
 
-* NumPy
 * ObsPy
-* SQLAlchemy\>0.8
+* SQLAlchemy
+* Click
 * C compiler
 
 Install from [PyPI](https://pypi.python.org/pypi):

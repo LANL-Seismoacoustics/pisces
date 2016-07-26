@@ -36,11 +36,12 @@ Please see the project Wiki for a description of the git branching model.
     ```
     $ mkvirtualenv pisces
     $ cd pisces/
+    $ pip install obspy lxml Click
     $ pip install -e .
     ```
     * using `conda`
     ```
-    $ conda create -n pisces
+    $ conda create -n pisces -c obspy obspy lxml Click
     $ cd pisces/
     $ pip install -e .
     ```
