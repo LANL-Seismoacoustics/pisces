@@ -1,6 +1,29 @@
 # Changelog
 
-## 0.2
+## next
+
+
+## 0.2.2
+
+### Changes
+
+* Windows support!  Thanks to @mitchburnett!  e1 and convert C libraries now
+  build (using MSVC).
+* Automated testing on Mac OSX, Linux, and Windows 7, for Python 2.7 and 3.4,
+  thanks to Travis CI and Appveyor.
+
+
+## 0.2.1
+
+### Bug fixes
+
+* Default `wdisc.calib` value is 1, not -1.
+* `foff` value in `sac2db` is 632 instead of 634 (Issue #12)
+* `dir` entry in `sac2db` will be `.` instead of empty if relative paths are
+   requested. (Issue #11)
+
+
+## 0.2.0
 
 ### New Features
 
