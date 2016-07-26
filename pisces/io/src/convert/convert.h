@@ -65,12 +65,12 @@ void i4tos4();
 void s2toi2();
 void s2tos4();
 void s2tot8();
-void s3tos4();
+
 void s4tog2();
 void s4toi2();
 void s4toi4();
 void s4tos2();
-void s4tos3();
+
 void s4tot4();
 void s4tot8();
 void t4toa2();
@@ -85,17 +85,43 @@ void t8tof8();
 void t8tos2();
 void t8tos4();
 void t8tot4();
+    //Support for different OS
+    #ifdef _WIN32
+        _declspec(dllexport) void s3tos4();
+        _declspec(dllexport) void s4tos3();
+    #else
+        void s3tos4();
+        void s4tos3();
+    #endif
 #endif
 
+/*
+  * The _declspec(dllexport) statement explicitly tells the compiler to send a function to the .dll.
+  * This is done so that when PythonXX.lib is updated it knows how to find the appropriate functions
+  * when referencing the .pyd.
+  */
+
 #ifdef __STDC__
-int convdata(void *buf, int n, char *intype, char *outtype);
-int convfunc(char *intype, char *outtype, int *inlen, int *outlen,
-		ConvFunc **func, int *nfunc);
-int convlen(char *typ);
+
+    // Support for different OS
+    #ifdef _WIN32
+        _declspec(dllexport) int convdata(void *buf, int n, char *intype, char *outtype);
+    #else
+        int convdata(void *buf, int n, char *intype, char *outtype);
+    #endif
+
+    int convfunc(char *intype, char *outtype, int *inlen, int *outlen, ConvFunc **func, int *nfunc);
+    int convlen(char *typ);
+
 #else
-int convdata();
-int convfunc();
-int convlen();
+    #ifdef _WIN32
+        _declspec(dllexport) int convdata();
+    #else
+        int convdata();
+    #endif
+
+    int convfunc();
+    int convlen();
 #endif
 
 /*
