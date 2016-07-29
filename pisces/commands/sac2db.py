@@ -195,6 +195,8 @@ def main(**kwargs):
     prefix : str
         Target core tables using 'account.prefix' naming.
     absolute_paths : bool
+    bbfk : bool
+        Pull in deast & dnorth info from user7 & user8 header fields
     file_list : str
         Name of a text file containing full SAC file names.
     files : list
