@@ -17,6 +17,7 @@ import obspy.geodetics as geod
 from obspy.core import AttribDict
 from obspy.taup import taup
 
+from pisces.exc import DeprecatedWarning
 from pisces.schema.util import PiscesMeta
 
 
@@ -188,6 +189,7 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
+@deprecated("get_tables will move to pisces.crud in the next Pisces version.")
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -296,6 +298,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 # TODO: merge get_tables and make_tables?
+@deprecated("make_table will move to pisces.crud in the next Pisces version.")
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -593,7 +596,7 @@ def get_options(db,prefix=None):
 	return options
 
 
-
+@deprecated("get_or_create_tables will move to pisces.crud in the next Pisces version.")
 def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
