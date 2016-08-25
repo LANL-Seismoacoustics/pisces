@@ -139,23 +139,16 @@ def make_tables(*tables, **kwargs):
     >>> tables = make_tables('origin', 'event', schema='kbcore', owner='myowner')
 
     """
+    # if there is an owner or a prefix, the tables need to be created
+    # otherwise, just return the existing ones.
+
     # TODO: find a way to not repeat arguments with all these functions
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
-    schema = kwargs.get('schema', None)
-
-    # resolve table names and schema
-    if not tables and not schema:
-        msg = "If tables are not specified, schema must be specified."
-        raise ValueError(msg)
-
-    if not owner and not prefix:
-        STANDARD_TABLES = True
-    else:
-        STANDARD_TABLES = False
-
-    tablenames = make_table_names(*tables, schema=schema, prefix=prefix,
-                                  owner=owner)
+    try:
+        schema = kwargs['schema']
+    except KeyError:
+        raise ValueError("Schema must be specified.")
 
     if schema == 'css3':
         CORETABLES = css3.CORETABLES
@@ -164,6 +157,15 @@ def make_tables(*tables, **kwargs):
     else:
         msg = "Unknown schema: {}".format(schema)
         raise ValueError(msg)
+
+    unknown_tables = set(tables) - set(CORETABLES.keys())
+    if unknown_tables:
+        msg = "Unknown tables: {}".format(unknown_tables)
+        raise ValueError(msg)
+
+    tablenames = make_table_names(*tables, schema=schema, prefix=prefix,
+                                  owner=owner)
+
 
     if owner:
         parents = (declarative_base(metadata=sa.metaData(schema=owner)), )
