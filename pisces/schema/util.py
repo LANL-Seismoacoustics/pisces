@@ -24,6 +24,7 @@ except ImportError:
 # TODO: add a decorator like
 #   https://blogs.gnome.org/danni/2013/03/07/generating-json-from-sqlalchemy-objects/
 
+# TODO: change 'prototype' and 'table' to 'abstract' and 'concrete'?
 CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 
 def get_infovals(meta, structure, key):
