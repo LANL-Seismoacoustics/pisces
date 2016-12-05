@@ -47,7 +47,8 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     list of wfdisc row objects, or sqlalchemy.orm.Query instance
 
     """
-
+    # seconds in a wfdisc file
+    CHUNKSIZE = 24 * 60 * 60
     q = session.query(wfdisc)
     if wfids is not None:
         q = q.filter(wfdisc.wfid.in_(wfids))
@@ -57,11 +58,11 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
         if chan is not None:
             q = q.filter(wfdisc.chan == chan)
         if [t1, t2].count(None) == 0:
-            q = q.filter(wfdisc.time.between(t1 - 86400, t2))
+            q = q.filter(wfdisc.time.between(t1 - CHUNKSIZE, t2))
             q = q.filter(wfdisc.endtime > t1)
         else:
             if t1 is not None:
-                q = q.filter(wfdisc.time >= t1 - 86400)
+                q = q.filter(wfdisc.time >= t1 - CHUNKSIZE)
                 q = q.filter(wfdisc.endtime > t1)
             if t2 is not None:
                 q = q.filter(wfdisc.time <= t2)
