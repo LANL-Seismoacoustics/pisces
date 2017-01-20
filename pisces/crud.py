@@ -69,7 +69,7 @@ def make_table_names(*tables, **kwargs):
 
 
     """
-    # TODO: is this function really necessary?  remove it.
+    # TODO: is this function really necessary?  remove it?
     # >>> tables = [owner + '.' + prefix + table.name for table in coretables]
     # >>> tables = [prefix + table.name for table in coretables]
     prefix = kwargs.get('prefix', '')
@@ -99,6 +99,66 @@ def make_table_names(*tables, **kwargs):
     return tablenames
 
 
+def split_table_names(*tablenames, **kwargs):
+    """
+    Splits full table names into a (owner, prefix, tablename) 3-tuples.
+
+    Parameters
+    ----------
+    tablenames : str
+    schema : str {'css3', 'kbcore'} Default 'css3'.
+
+    Returns
+    -------
+    list
+        Corresponding list of (owner, prefix, tablename) 3-tuple strings.
+        Empty owner or prefix are ''.
+
+    Examples
+    --------
+    >>> tablenames = ['global.site', 'global.sitechan', 'TA_site',
+    ...               'different_acct.my_origin', 'myfriend.discrim_last']
+    >>> split_table_names(*tablenames)
+    [('global', '', 'site')
+    ('global', '', 'sitechan')
+    ('', 'TA_', 'site')
+    ('different_acct', 'my_', 'origin')
+    ('myfriend', '', 'discrim_last')]
+
+    """
+    schema = kwargs.get('schema', 'css3')
+    if schema == 'css3':
+        schematables = css3.CORETABLES.keys()
+    elif schema == 'kbcore':
+        schematables = kb.CORETABLES.keys()
+    else:
+        msg = "Unknown schema: {}".format(schema)
+        raise ValueError(msg)
+
+    out = []
+    for fulltablename in tablenames:
+        try:
+            owner, prefixed_tablename = fulltablename.split('.')
+        except ValueError:
+            owner = ''
+            prefixed_tablename = fulltablename
+
+        # if a table 'endswith' a table in the schema, the part before is the
+        # table prefix
+        for schematable in schematables:
+            head, sep, tail = prefixed_tablename.rpartition(schematable)
+            if sep and not tail:
+                prefix = head
+                tablename = schematable
+            elif not sep:
+                prefix = ''
+                tablename = tail
+
+        out.append((owner, prefix, tablename))
+
+    return out
+
+
 def make_tables(*tables, **kwargs):
     """
     Create mapped SQLAlchemy ORM table classes.
@@ -111,8 +171,9 @@ def make_tables(*tables, **kwargs):
     Parameters
     ----------
     tables : str
-        Desired table names.  If omitted, a schema must be specified, and all
-        core tables for the schema are returned.
+        Desired table names.  Table name must be known to the schema. 
+        If omitted, a schema must be specified, and all core tables for the
+        schema are returned.
     schema : str  ("css3" or "kbcore")
         Which set of core tables are being used.  Required.
     prefix : str
@@ -129,33 +190,23 @@ def make_tables(*tables, **kwargs):
 
     Examples
     --------
-    >>> # makes CSS3.0 'TA_site' and 'TA_sitechan' mapped classes
+    >>> # makes a dict of CSS3.0 'TA_site' and 'TA_sitechan' mapped classes
     >>> tables = make_tables('site', 'sitechan', schema='css3', prefix='TA_')
 
-    >>> # get all standard kbcore tables
+    >>> # make a dict of all standard kbcore tables
     >>> tables = make_tables(schema='kbcore')
 
-    >>> # get some tables from the 'myowner' account
+    >>> # make a dict of some tables from the 'myowner' account
     >>> tables = make_tables('origin', 'event', schema='kbcore', owner='myowner')
 
     """
+    # if there is an owner or a prefix, the tables need to be created
+    # otherwise, just return the existing ones.
+
     # TODO: find a way to not repeat arguments with all these functions
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
-    schema = kwargs.get('schema', None)
-
-    # resolve table names and schema
-    if not tables and not schema:
-        msg = "If tables are not specified, schema must be specified."
-        raise ValueError(msg)
-
-    if not owner and not prefix:
-        STANDARD_TABLES = True
-    else:
-        STANDARD_TABLES = False
-
-    tablenames = make_table_names(*tables, schema=schema, prefix=prefix,
-                                  owner=owner)
+    schema = kwargs.get('schema', 'css3')
 
     if schema == 'css3':
         CORETABLES = css3.CORETABLES
@@ -165,41 +216,113 @@ def make_tables(*tables, **kwargs):
         msg = "Unknown schema: {}".format(schema)
         raise ValueError(msg)
 
+    non_schema_tables = set(tables) - set(CORETABLES.keys())
+    if non_schema_tables:
+        msg = "Unknown tables: {}".format(non_schema_tables)
+        raise ValueError(msg)
+
+    # I don't use 'owner' here, b/c we will be making classes. 'owner' is used
+    # in making the declarative base class and a non-owner-qualified tablename
+    # is used in the __tablename__
+    tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
+
     if owner:
         parents = (declarative_base(metadata=sa.metaData(schema=owner)), )
     else:
         parents = ()
 
-    # if not standard tables, get the prototype table
-    tables = tablenames.copy()
-    for tabletype, tablename in tables.items():
+    # "out" will hold concrete classes
+    # go through one by one & repace names w/ classes
+    # if a standard table, get the prototype concrete class
+    out = {}
+    for table, tablename in tablenames.items():
+        prototype = CORETABLES[table].prototype
+        # TODO: capitalize tablename?
+        out[table] = type(tablename, parents + (prototype,),
+                          {'__tablename__': tablename})
+
+    return out
 
 
-def load_tables(session, *tables, schema=None, prefix="", owner=None):
+def load_tables(session, *tables, **kwargs):
     """
-    Load mapped SQLAlchemy table classes from existing SQL tables.
+    Load existing database tables into mapped SQLAlchemy table classes.
+
+    This function is not recommended.  Instead, please subclass from an
+    existing abstract table in the schema, or use the SQLAlchemy ORM to create
+    a class for your table.
 
     session : sqlalchemy.orm.Session
         Session connected to the target database.
     tables : str
-        Desired table names.  If omitted, a schema must be specified, and all
-        core tables for the schema are returned.
-    schema : str  ("css3" or "kbcore")
-        Which set of core tables are being used. If omitted, tables must be
-        specified.
-    prefix : str
+        Desired table names.  Names must be part of the schema. If omitted, a
+        schema must be specified, and all core tables for the schema are
+        returned.
+    schema : str  {'css3', 'kbcore'}  Default, 'css3'
+        Which set of core tables are being used.  This is used to associate
+        column names to known Pisces column definitions, so that text file I/O
+        of tables can be supported for a loaded table.
+    prefix : str, optional
         All table names will have the provided prefix.
         e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
-    owner : str
-        e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
+    owner : str, optional
+        e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.  If omitted, 
+        the database default owner/account will be used.
+    primary_keys : dict, optional
+        A mapping of table names to their primary keys of the form,
+        {'tablename1': ['primary_key1', 'primary_key2'], ...}
+        The SQLAlchemy ORM can only reflect/load tables if they have a primary
+        key. If a table is a view or has no primary key, these must be
+        specified explicitly.
 
     Returns
     -------
-    list
-        Corresponding list of mapped SQLAlchemy table classes.
+    dict
+        Corresponding dict of mapped SQLAlchemy table classes, keyed by
+        canonical name.
+
+    Examples
+    --------
+    # load standard tables in 'myaccount' table space
+    >>> tables = load_tables(session, 'site', 'sitechan', 'wfisc',
+                             schema='kbcore', owner='myaccount')
+
+    # load a standard table that has no primary key set
+    >>> tables = load_tables(session, 'site', 
+                             primary_keys={'site', ['sta', 'ondate']})
+
+    # load all standard css3 tables in the default account
+    >>> tables = load_tables(session, schema='css3')
+
+
+    # load a table that is outside of the schema
+    # the table needs to have a primary key defined
+    # this will try to use column definitions known to Pisces for keeping
+    >>> tables = load_tables(session, 'ccwfdisc', owner='myaccount')
 
     """
-    pass
+    # TODO: Use sqlalchemy.ext.automap.automap_base inside this function
+    schema = kwargs.get('schema', 'css3')
+    prefix = kwargs.get('prefix', '')
+    owner = kwargs.get('owner', None)
+
+    if schema == 'css3':
+        CORETABLES = css3.CORETABLES
+    elif schema == 'kbcore':
+        CORETABLES = kb.CORETABLES
+    else:
+        msg = "Unknown schema: {}".format(schema)
+        raise ValueError(msg)
+
+    # I don't use 'owner' here, b/c we will be making classes. 'owner' is used
+    # in making the declarative base class and a non-owner-qualified tablename
+    # is used in the __tablename__
+    tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
+
+    if owner:
+        parents = (declarative_base(metadata=sa.metaData(schema=owner)), )
+    else:
+        parents = ()
 
 
 def init_tables(session, *tables):
