@@ -119,11 +119,8 @@ def split_table_names(*tablenames, **kwargs):
     >>> tablenames = ['global.site', 'global.sitechan', 'TA_site',
     ...               'different_acct.my_origin', 'myfriend.discrim_last']
     >>> split_table_names(*tablenames)
-    [('global', '', 'site')
-    ('global', '', 'sitechan')
-    ('', 'TA_', 'site')
-    ('different_acct', 'my_', 'origin')
-    ('myfriend', '', 'discrim_last')]
+    [('global', '', 'site'), ('global', '', 'sitechan'), ('', 'TA_', 'site'),
+    ('different_acct', 'my_', 'origin'), ('myfriend', '', 'discrim_last')]
 
     """
     schema = kwargs.get('schema', 'css3')
@@ -297,11 +294,11 @@ def load_tables(session, *tables, **kwargs):
 
     # load a table that is outside of the schema
     # the table needs to have a primary key defined
-    # this will try to use column definitions known to Pisces for keeping
+    # this will try to use column info definitions known to Pisces
     >>> tables = load_tables(session, 'ccwfdisc', owner='myaccount')
 
     """
-    # TODO: Use sqlalchemy.ext.automap.automap_base inside this function
+    # TODO: Use sqlalchemy.ext.automap.automap_base inside this function?
     schema = kwargs.get('schema', 'css3')
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
@@ -314,13 +311,12 @@ def load_tables(session, *tables, **kwargs):
         msg = "Unknown schema: {}".format(schema)
         raise ValueError(msg)
 
-    # I don't use 'owner' here, b/c we will be making classes. 'owner' is used
-    # in making the declarative base class and a non-owner-qualified tablename
-    # is used in the __tablename__
+    # I don't use 'owner' here, b/c it will be enforced by the MetaData. Here,
+    # we nust need table names.
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
 
     if owner:
-        parents = (declarative_base(metadata=sa.metaData(schema=owner)), )
+        parents = (declarative_base(metadata=sa.MetaData(schema=owner)), )
     else:
         parents = ()
 
