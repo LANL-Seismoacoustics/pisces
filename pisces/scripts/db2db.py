@@ -1,10 +1,14 @@
 #!/urs/bin/env python
+
+# Ported to Python 3.5.2 on 01/24/17
+# by: Jeremy Webster
+
 """
 flatfiles2db.py
 
 Usage: db2db.py mydb
 
-Converts mydb.wfdisc, mydb.origin, etc… CSS3 text files into wfdisc, origin 
+Converts mydb.wfdisc, mydb.origin, etc… CSS3 text files into wfdisc, origin
 tables in mydb.sqlite database.
 
 """
@@ -20,6 +24,7 @@ db = sys.argv[1]
 
 session = ps.db_connect('sqlite:///' + db + '.sqlite')
 
+
 def fill_table(session, table, Table):
     Table.__table__.create(session.bind, checkfirst=True)
     with open('table', 'r') as f:
@@ -27,6 +32,7 @@ def fill_table(session, table, Table):
             row = Table.from_string(line)
             session.add(row)
         session.commit()
+
 
 for table in glob.glob(db + '.*'):
     if table.endswith('origin'):

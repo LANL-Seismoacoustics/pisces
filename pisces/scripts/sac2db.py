@@ -1,15 +1,16 @@
 #!/usr/bin/env python
+
+# Ported to python 3.5.2 on 01-24-17
+# by: Jeremy Webster
+
 import os
 import sys
 import glob
 from collections import namedtuple
 import argparse
 import imp
-import pdb
 
-from sqlalchemy import create_engine
 import sqlalchemy.exc as exc
-import sqlalchemy.orm.exc as oexc
 
 from obspy import read
 from obspy.io.sac.core import _is_sac
@@ -38,11 +39,15 @@ CORETABLES = [CoreTable('affiliation', kba.Affiliation, kb.Affiliation),
               CoreTable('site', kba.Site, kb.Site),
               CoreTable('sitechan', kba.Sitechan, kb.Sitechan),
               CoreTable('wfdisc', kba.Wfdisc, kb.Wfdisc)]
+# -------------------------------------------------------------------------
+#
+#           HELPER FUNCTIONS
 
-# HELPER FUNCTIONS
+
 def expand_glob(option, opt_str, value, parser):
     """Returns an iglob iterator for file iteration. Good for large file lists."""
     setattr(parser.values, option.dest, glob.iglob(value))
+
 
 def get_parser():
     """
@@ -262,7 +267,7 @@ def get_or_create_tables(options, session, create=True):
 
 
 def dicts2rows(dicts, classes):
-    for table, dcts in dicts.items():
+    for table, dcts in list(dicts.items()):
         cls = classes[table]
         dicts[table] = [cls(**dct) for dct in dcts]
 
@@ -278,7 +283,7 @@ def make_atomic(last, **rows):
     # of _related_ instances from a single SAC header?
     # TODO: check existance of rows before changing their ids.
 
-    #print rows
+    # print rows
     # the order matters here
 
     # for SAC, only 1
@@ -327,6 +332,8 @@ def sac2db(files, url, tables, plugins=None, abs_paths=False):
 
 # TODO: make this main also accept a get_iterable and get_row_dicts functions,
 #   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py
+
+
 def main(argv=None):
     """
     Command-line arguments are created and parsed, fed to functions.
@@ -349,7 +356,7 @@ def main(argv=None):
 
     # for item in iterable:
     for sacfile in files:
-        print sacfile
+        print(sacfile)
 
         # row_dicts = get_row_dicts(item)
 
@@ -357,7 +364,7 @@ def main(argv=None):
 
         # rows needs to be a dict of lists, for make_atomic
         # row_dicts = get_row_dicts(tr.stats.sac) # put in the whole trace, to determine byte order?
-        dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
+        dicts = sac.sachdr2tables(tr.stats.sac, tables=list(tables.keys()))
         # row_instances = dicts_to_instances(row_dicts, tables)
         rows = dicts2rows(dicts, tables)
 
@@ -392,17 +399,17 @@ def main(argv=None):
 
         # add rows to the database
         # XXX: not done very elegantly.  some problem rows are simply skipped.
-        for table, instances in rows.items():
+        for table, instances in list(rows.items()):
             if instances:
                 # could be empty []
                 try:
                     session.add_all(instances)
                     session.commit()
-                except exc.IntegrityError as e:
+                except exc.IntegrityError:
                     # duplicate or nonexistant primary keys
                     session.rollback()
                     print("rollback {}".format(table))
-                except exc.OperationalError as e:
+                except exc.OperationalError:
                     # no such table, or database is locked
                     session.rollback()
                     print("rollback {}".format(table))
