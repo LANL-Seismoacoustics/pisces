@@ -74,8 +74,8 @@ def get_parser():
 
     """
     parser = argparse.ArgumentParser(prog='sac2db',
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            description="""
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description="""
             Write data from SAC files into a database.
 
             Standard lowercase core table names are used by default, but can be
@@ -123,48 +123,49 @@ def get_parser():
             sac2db.py sqlite:///test.sqlite saclist.txt
 
             """,
-            version='0.2')
+                                     version='0.2')
+    
     # ----------------------- Add core table arguments ------------------------
-    #The following loop adds the core table owner/name options.
+    # The following loop adds the core table owner/name options.
     table_group = parser.add_argument_group('table name overriding',
-            "Optionally, override individual standard table names using 'owner.tablename' naming. No owner for sqlite.")
+                                            "Optionally, override individual standard table names using 'owner.tablename' naming. No owner for sqlite.")
     for coretable in CORETABLES:
         table_group.add_argument('--' + coretable.name,
-                            default=None,
-                            metavar='owner.tablename',
-                            dest=coretable.name)
+                                 default=None,
+                                 metavar='owner.tablename',
+                                 dest=coretable.name)
     # -------------------------------------------------------------------------
     parser.add_argument('--plugin',
-            default=None,
-            metavar='path/to/module_file:plugin_function',
-            dest='plugins',
-            action='append',
-            help="For each SAC file, import and execute an additional plugin \
-                  function.  The function must accept keyword arguments that \
-                  include canonical table name keywords and lists of table \
-                  instances as values. ")
+                        default=None,
+                        metavar='path/to/module_file:plugin_function',
+                        dest='plugins',
+                        action='append',
+                        help="For each SAC file, import and execute an additional plugin \
+                              function.  The function must accept keyword arguments that \
+                              include canonical table name keywords and lists of table \
+                              instances as values. ")
 
     parser.add_argument('--prefix',
-            default='',
-            metavar='owner.prefix',
-            dest='prefix',
-            help="Target tables using 'account.prefix naming.'\
-                  e.g. myaccount.test_ will target tables \
-                  like myaccount.test_origin, myaccount.test_sitechan.")
+                        default='',
+                        metavar='owner.prefix',
+                        dest='prefix',
+                        help="Target tables using 'account.prefix naming.'\
+                              e.g. myaccount.test_ will target tables \
+                              like myaccount.test_origin, myaccount.test_sitechan.")
 
     parser.add_argument('--absolute_paths',
-            default=False,
-            help="Write database 'dir' directory entries as absolute paths, not relative.",
-            action='store_true',
-            dest='absolute_paths')
+                        default=False,
+                        help="Write database 'dir' directory entries as absolute paths, not relative.",
+                        action='store_true',
+                        dest='absolute_paths')
 
     parser.add_argument('url',
-            help="SQLAlchemy-style database connection string, such as \
-            sqlite:///mylocaldb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
+                        help="SQLAlchemy-style database connection string, such as \
+                        sqlite:///mylocaldb.sqlite or oracle://myuser@myserver.lanl.gov:8000/mydb")
 
     parser.add_argument('files',
-            nargs='+',
-            help="SAC file names, including shell name expansions.")
+                        nargs='+',
+                        help="SAC file names, including shell name expansions.")
 
     return parser
 
@@ -203,7 +204,7 @@ def get_files(options):
 
     """
     if len(options.files) == 1 and not _is_sac(options.files[0]):
-        #make a generator of non-blank lines
+        # make a generator of non-blank lines
         try:
             listfile = open(options.files[0], 'r')
             files = (line.strip() for line in listfile if line.strip())

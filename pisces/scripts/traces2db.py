@@ -472,7 +472,7 @@ def main(argv=None):
                 if options.l:
                     lfile.close()
 
-                # update lastid table 
+                # update lastid table
                 # XXX: experimental!
                 db.util.update_ids(session, lastid, **last)
 #                for iid in ['arid', 'orid', 'evid', 'wfid', 'chanid', 'inid']:
