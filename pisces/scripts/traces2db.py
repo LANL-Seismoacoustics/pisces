@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# Converted to python 3.5.2 on 01/24/17
+# by Jeremy Webster
+# Note: there are some undefined variable errors in this...need to check it
+
 """
 Command line script accepts a file name, filename regex, or list of file
 names, and produces a kbcore database from header information therein.  Parses
@@ -79,14 +84,14 @@ def reflect_or_create_tables(options):
      """
     tables = {}
     # this list should mirror the command line table options
-    for table in mapfns.keys() + ['lastid']:
+    for table in list(mapfns.keys()) + ['lastid']:
         # if options.all_tables:
         fulltabnm = getattr(options, table, None)
         if fulltabnm:
             try:
                 tables[table] = ps.get_tables(session.bind, [fulltabnm])[0]
             except NoSuchTableError:
-                print "{0} doesn't exist. Adding it.".format(fulltabnm)
+                print("{0} doesn't exist. Adding it.".format(fulltabnm))
                 tables[table] = ps.make_table(fulltabnm, PROTOTYPES[table])
                 tables[table].__table__.create(session.bind, checkfirst=True)
 
@@ -295,7 +300,7 @@ def main(argv=None):
 
         if len(args) > 1:
             """Unknown positional arguments given."""
-            print parser.print_help()
+            print(parser.print_help())
             exit_code = 1
         else:
             # -------- MAKE CONNECTIONS --------
@@ -327,7 +332,7 @@ def main(argv=None):
                 exit_code = 1
             except ValueError:
                 # input neither a file list nor input files
-                print parser.print_help()
+                print(parser.print_help())
                 exit_code = 1
 
             if exit_code != 1:
@@ -352,11 +357,11 @@ def main(argv=None):
 #                    last[iid] = db.gen_id(val)
 
                 # requested tables, minus lastid
-                core_tabs = tables.keys()[:]
+                core_tabs = list(tables.keys())[:]
                 core_tabs.remove('lastid')
                 # -------- ITERATE OVER FILES --------
                 for ifile in files:
-                    print ifile
+                    print(ifile)
                     try:
                         tr = read(ifile, headonly=True)[0]
                         trtables = db.trace2tables(tr, tables=core_tabs)
@@ -388,13 +393,13 @@ def main(argv=None):
                             # arrival.arid
                             for arrival in arrivals:
                                 if not arrival.arid:
-                                    arrival.arid = last.arid.next()
+                                    arrival.arid = next(last.arid)
                         if origin:
                             # origin.orid
                             if not origin.orid:
                                 # XXX: always increments orid.
                                 # combine with table add logic
-                                origin.orid = last.orid.next()
+                                origin.orid = next(last.orid)
 
                         if assocs and arrivals:
                             # assoc.arid
@@ -414,7 +419,7 @@ def main(argv=None):
                             # sitechan.ondate
                             # sitechan.chanid
                             if not sitechan.chanid:
-                                sitechan.chanid = last.chanid.next()
+                                sitechan.chanid = next(last.chanid)
 
                         # if instrument:
                         #    # instrument.inid
@@ -434,11 +439,11 @@ def main(argv=None):
                             else:
                                 wfdisc.dir = os.path.abspath(os.path.dirname(ifile))
                             wfdisc.dfile = os.path.basename(ifile)
-                            wfdisc.wfid = last.wfid.next()
+                            wfdisc.wfid = next(last.wfid)
 
                         # -------- ADD TABLES TO DATABASE --------
 
-                        for tableval in trtables.values():
+                        for tableval in list(trtables.values()):
                             if tableval:
                                 try:
                                     session.add(tableval)
@@ -452,7 +457,7 @@ def main(argv=None):
                                 except IntegrityError as e:
                                     # duplicate or nonexistant primary/unique keys
                                     # TODO: make this more descriptive
-                                    print " Duplicate row in {0}".format(tableval.__table__.name)
+                                    print(" Duplicate row in {0}".format(tableval.__table__.name))
                                     session.rollback()
                                 except OperationalError as e:
                                     # no such table name.  shouldn't happen.
@@ -466,7 +471,7 @@ def main(argv=None):
 
                     except (IOError, TypeError):
                         # can't read file or doesn't exist.
-                        print "Couldn't read file {0}.".format(ifile)
+                        print("Couldn't read file {0}.".format(ifile))
 
                 # close list file here
                 if options.l:
