@@ -1,3 +1,7 @@
+# Converted to Python 3.5.2 on 01-25-17
+# by: Jeremy Webster
+
+
 # coding: utf-8
 """
 Core columns and abstract classes representing the KB Core seismic schema.
@@ -10,14 +14,14 @@ Examples
 Define a site class that points to a 'TA_site' table.
 
 >>> import pisces.schema.kbcore as kb
->>> 
+>>>
 >>> class Site(kb.Site):
 >>>     __tablename__ = 'TA_site'
 
 Define a site class that points to a 'jkmacc.my_site' table.
 
 >>> import pisces.schema.kbcore as kb
->>> 
+>>>
 >>> class Site(kb.Site):
 >>>     __tablename__ = 'jkmacc.my_site'
 
@@ -33,23 +37,23 @@ Define a new abstract class in this schema.
 >>> import sqlalchemy as sa
 >>> from sqlalchemy.ext.declarative import declared_attr
 >>> import pisces.schema.kbcore as kb
->>> 
+>>>
 >>> def strparse(s):
 >>>     return s.strip()
->>> 
+>>>
 >>> class Beam(kb.Base):
 >>>     __abstract__ = True
 >>>     @declared_attr
 >>>     def __table_args__(cls):
 >>>         return (sa.PrimaryKeyConstraint('wfid'),)
->>> 
+>>>
 >>>     wfid = kb.wfid.copy()
 >>>     azimuth = kb.azimuth.copy()
->>>     slo = sa.Column(Float(24), 
+>>>     slo = sa.Column(Float(24),
 >>>         info={'default': -1.0, 'parse': float, 'width': 7, 'format': '7.4f'})
->>>     filter = sa.Column(String(30), 
+>>>     filter = sa.Column(String(30),
 >>>         info={'default': '-', 'parse': strparse, 'width': 30, 'format': '30.30s'})
->>>     recipe = sa.Column(String(15), 
+>>>     recipe = sa.Column(String(15),
 >>>         info={'default': '-', 'parse': strparse, 'width': 15, 'format': '15.15s'})
 >>>     algorithm = kb.algorithm.copy()
 >>>     auth = kb.auth.copy()
@@ -58,24 +62,20 @@ Define a new abstract class in this schema.
 """
 from datetime import datetime
 
-from sqlalchemy import Date, DateTime, Float, Numeric, String, Integer
-from sqlalchemy import Table, event
-from sqlalchemy import Column, Table, func
-from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, Index
+from sqlalchemy import DateTime, Float, String, Integer
+from sqlalchemy import Column
+from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
-from obspy.core import UTCDateTime
-#from pisces.schema.util import ORMParent 
 from pisces.schema.util import PiscesMeta
 from pisces.schema.util import parse_str, parse_int, parse_float
 from pisces.io.trace import wfdisc2trace
 
-#TODO: check __table_args__ syntax for final empty {}
-#TODO: use http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/hybrid.html?
+# TODO: check __table_args__ syntax for final empty {}
+# TODO: use http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/hybrid.html?
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
-#Base = declarative_base(cls=ORMParent, constructor=None)
 
 # COLUMN DEFINITIONS
 # Generic SQLA types, compatible with different backends
@@ -83,7 +83,7 @@ Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 #   and default values for the mapped class representation.
 # XXX: for numeric types, maximum width is not enforced!
 # NOTE: info['dtype'] for floats/ints should match the system default for Python
-#       "{:f}".format(numpyfloat/int) to work, b/c it can use the builtin float 
+#       "{:f}".format(numpyfloat/int) to work, b/c it can use the builtin float
 #       __format__().  use 'float' or 'int'
 #       See:
 #       http://stackoverflow.com/questions/16928644/floats-in-numpy-structured-array-and-native-string-formatting-with-format
@@ -93,12 +93,14 @@ Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 
 # TODO: write a parser that gets the width (and type?) from info['format']
 
-# specialized string parsing functions 
+# specialized string parsing functions
 
 # TODO: use dateutil module to handle wildcard characters, etc.?
 # https://docs.python.org/2.7/library/datetime.html#strftime-strptime-behavior
 # https://docs.python.org/2/library/string.html#format-specification-mini-language
 DATEFMT = '%Y-%m-%d %H:%M:%S'
+
+
 def dtfn(s):
     try:
         val = datetime.strptime(s, DATEFMT)
@@ -106,293 +108,429 @@ def dtfn(s):
         val = None
     return val
 
-algorithm = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
-amp = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.2f'})
-ampid = Column(Integer, nullable=False, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+algorithm = Column(String(15),
+                   info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+
+amp = Column(Float(24),
+             info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.2f'})
+
+ampid = Column(Integer, nullable=False,
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
 amptime = Column(Float(53), info={'default': -9999999999.999, 'parse': parse_float,
-        'dtype': 'float', 'width': 17, 'format': '17.5f'})
-amptype = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-arid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-auth = Column(String(20), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a20', 'width': 20, 'format': '20.20s'})
-azdef = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-azimuth = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-azres = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.1f'})
-band = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-belief = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 4, 'format': '4.2f'})
-calib = Column(Float(24), 
-        info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
-calper = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
-calratio = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
-chan = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-chanid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-clip = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-commid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-conf = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 5, 'format': '5.3f'})
-ctype = Column(String(4), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+                                  'dtype': 'float', 'width': 17, 'format': '17.5f'})
+
+amptype = Column(String(8),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+arid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+auth = Column(String(20),
+              info={'default': '-', 'parse': parse_str, 'dtype': 'a20', 'width': 20, 'format': '20.20s'})
+
+azdef = Column(String(1),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+azimuth = Column(Float(24),
+                 info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+azres = Column(Float(24),
+               info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.1f'})
+
+band = Column(String(1),
+              info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+belief = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 4, 'format': '4.2f'})
+
+calib = Column(Float(24),
+               info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+
+calper = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+
+calratio = Column(Float(24),
+                  info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+
+chan = Column(String(8),
+              info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+chanid = Column(Integer,
+                info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+clip = Column(String(1),
+              info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+commid = Column(Integer,
+                info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+conf = Column(Float(24),
+              info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 5, 'format': '5.3f'})
+
+ctype = Column(String(4),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
 datatype = Column(String(2),
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
-deast = Column(Float(24), 
-        info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-delaz = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-delslo = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-delta = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
-deltaf = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.3f'})
-deltim = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.3f'})
-depdp = Column(Float(24), 
-        info={'default': -999, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-depth = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-descrip = Column(String(50), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
-dfile = Column(String(32), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
-digital = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-dir = Column(String(64), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a64', 'width': 64, 'format': '64.64s'})
-dnorth = Column(Float(24), 
-        info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-dtype = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-duration = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-edepth = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-elev = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-ema = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-emares = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.1f'})
-endtime = Column(Float(53), info={'default':  9999999999.999, 
-    'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
-esaz = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-etype = Column(String(7), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a7', 'width': 7, 'format': '7.7s'})
-evid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-evname = Column(String(32), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
-fm = Column(String(2), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
-foff = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 10, 'format': '10d'})
-grn = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-grname = Column(String(40), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a40', 'width': 40, 'format': '40.40s'})
-hang = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
-inarrival = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-inid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-insname = Column(String(50), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
-instant = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-instype = Column(String(6), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
-iphase = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-jdate = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-keyname = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
-keyvalue = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-lat = Column(Float(53), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.6f'})
-#lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
-#        info={'default': datetime.now, 'dtype': '|O8', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
+                  info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
+
+deast = Column(Float(24),
+               info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+delaz = Column(Float(24),
+               info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+delslo = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+delta = Column(Float(24),
+               info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
+
+deltaf = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.3f'})
+
+deltim = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.3f'})
+
+depdp = Column(Float(24),
+               info={'default': -999, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+depth = Column(Float(24),
+               info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+descrip = Column(String(50),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
+
+dfile = Column(String(32),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
+
+digital = Column(String(1),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+dir = Column(String(64),
+             info={'default': '-', 'parse': parse_str, 'dtype': 'a64', 'width': 64, 'format': '64.64s'})
+
+dnorth = Column(Float(24),
+                info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+dtype = Column(String(1),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+duration = Column(Float(24),
+                  info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+edepth = Column(Float(24),
+                info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+elev = Column(Float(24),
+              info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+ema = Column(Float(24),
+             info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+emares = Column(Float(24),
+                info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.1f'})
+
+endtime = Column(Float(53), info={'default': 9999999999.999,
+                                  'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
+
+esaz = Column(Float(24),
+              info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+etype = Column(String(7),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a7', 'width': 7, 'format': '7.7s'})
+
+evid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+evname = Column(String(32),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
+
+fm = Column(String(2),
+            info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
+
+foff = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 10, 'format': '10d'})
+
+grn = Column(Integer,
+             info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+grname = Column(String(40),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a40', 'width': 40, 'format': '40.40s'})
+
+hang = Column(Float(24),
+              info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
+
+inarrival = Column(String(1),
+                   info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+inid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+insname = Column(String(50),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
+
+instant = Column(String(1),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+instype = Column(String(6),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
+
+iphase = Column(String(8),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+jdate = Column(Integer,
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+keyname = Column(String(15),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+
+keyvalue = Column(Integer,
+                  info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+lat = Column(Float(53),
+             info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.6f'})
+
 lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
-        info={'default': datetime.now, 'parse': dtfn, 'dtype': 'O', 'width': 19, 'format': DATEFMT}) 
-#        info={'default': datetime.now, 'dtype': 'M', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
-lineno = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-logat = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-lon = Column(Float(53), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.6f'})
-#lon = Column(Float(53), 
-#        info={'default': -999.0, 'dtype': 'float', 'width': 11, 'format': '11.6f'})
-magid = Column(Integer, nullable=False, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-magnitude = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+                info={'default': datetime.now, 'parse': dtfn, 'dtype': 'O', 'width': 19, 'format': DATEFMT})
+
+lineno = Column(Integer,
+                info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+logat = Column(Float(24),
+               info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+lon = Column(Float(53),
+             info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.6f'})
+
+magid = Column(Integer, nullable=False,
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+magnitude = Column(Float(24),
+                   info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
 magres = Column(Float(24),
-        info={'default': -999, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-magdef = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-magtype = Column(String(6), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
-mb = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-mbid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-ml = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-mlid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-ms = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-msid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-mmodel = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
-nass = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
-ncalib = Column(Float(24), 
-        info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
-ncalper = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
-ndef = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
-ndp = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
-net = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-netname = Column(String(80), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
-nettype = Column(String(4), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
-nsamp = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-nsta = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-offdate = Column(Integer, 
-        info={'default': 2286324, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-ondate = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-orid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-parid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-per = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-phase = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-prefor = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '9d'})
-qual = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-rect = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.3f'})
-refsta = Column(String(6), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'str', 'width': 6, 'format': '6.6s'})
-remark = Column(String(80), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
-rsptype = Column(String(6), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
-samprate = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.7f'})
-sdepth = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+                info={'default': -999, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+magdef = Column(String(1),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+magtype = Column(String(6),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
+
+mb = Column(Float(24),
+            info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+mbid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+ml = Column(Float(24),
+            info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+mlid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+ms = Column(Float(24),
+            info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+msid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+mmodel = Column(String(15),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+
+nass = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
+
+ncalib = Column(Float(24),
+                info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+
+ncalper = Column(Float(24),
+                 info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+
+ndef = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
+
+ndp = Column(Integer,
+             info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 4, 'format': '4d'})
+
+net = Column(String(8),
+             info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+netname = Column(String(80),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
+
+nettype = Column(String(4),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
+
+nsamp = Column(Integer,
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+nsta = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+offdate = Column(Integer,
+                 info={'default': 2286324, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+ondate = Column(Integer,
+                info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+orid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+parid = Column(Integer,
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+per = Column(Float(24),
+             info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+phase = Column(String(8),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+prefor = Column(Integer,
+                info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '9d'})
+
+qual = Column(String(1),
+              info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+rect = Column(Float(24),
+              info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.3f'})
+
+refsta = Column(String(6),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'str', 'width': 6, 'format': '6.6s'})
+
+remark = Column(String(80),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
+
+rsptype = Column(String(6),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
+
+samprate = Column(Float(24),
+                  info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.7f'})
+
+sdepth = Column(Float(24),
+                info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
 sdobs = Column(Float(24),
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-seaz = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-segtype = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-slodef = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-slores = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-slow = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float','width': 7, 'format': '7.2f'})
-smajax = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-sminax = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
-snr = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.2f'})
-srn = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-srname = Column(String(80), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
-sta = Column(String(6), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
-staname = Column(String(50), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
-stassid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-statype = Column(String(4), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
+               info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+seaz = Column(Float(24),
+              info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+segtype = Column(String(1),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+slodef = Column(String(1),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+slores = Column(Float(24),
+                info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+slow = Column(Float(24),
+              info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+smajax = Column(Float(24),
+                info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+sminax = Column(Float(24),
+                info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
+
+snr = Column(Float(24),
+             info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.2f'})
+
+srn = Column(Integer,
+             info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+
+srname = Column(String(80),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
+
+sta = Column(String(6),
+             info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
+
+staname = Column(String(50),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
+
+stassid = Column(Integer,
+                 info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+statype = Column(String(4),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
+
 stime = Column(Float(24),
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
-strike = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
+               info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
+
+strike = Column(Float(24),
+                info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
+
 stt = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 stx = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 sty = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
-stype = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
+stype = Column(String(1),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
 stz = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 sxx = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 sxy = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 sxz = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 syy = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 syz = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
 szz = Column(Float(24),
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
-tagid = Column(Integer, 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9d'})
-tagname = Column(String(8), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
-time = Column(Float(53), 
-        info={'default': -9999999999.999, 'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
-timedef = Column(String(1), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
-timeres = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
-tshift = Column(Float(24), 
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.2f'})
-uncertainty = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-units = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
-vang = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
-vmodel = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
-wfid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-wgt = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.3f'})
+             info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
+
+tagid = Column(Integer,
+               info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9d'})
+
+tagname = Column(String(8),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
+
+time = Column(Float(53),
+              info={'default': -9999999999.999, 'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
+
+timedef = Column(String(1),
+                 info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+
+timeres = Column(Float(24),
+                 info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
+
+tshift = Column(Float(24),
+                info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.2f'})
+
+uncertainty = Column(Float(24),
+                     info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+
+units = Column(String(15),
+               info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+
+vang = Column(Float(24),
+              info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
+
+vmodel = Column(String(15),
+                info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+
+wfid = Column(Integer,
+              info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+
+wgt = Column(Float(24),
+             info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.3f'})
 
 
 class Affiliation(Base):
@@ -408,12 +546,13 @@ class Affiliation(Base):
     endtime = endtime.copy()
     lddate = lddate.copy()
 
+
 class Amplitude(Base):
     __abstract__ = True
 
     @declared_attr
     def __table_args__(cls):
-        return  (PrimaryKeyConstraint('ampid'),)
+        return (PrimaryKeyConstraint('ampid'),)
 
     ampid = ampid.copy()
     arid = arid.copy()
@@ -440,7 +579,7 @@ class Arrival(Base):
     @declared_attr
     def __table_args__(cls):
         return (PrimaryKeyConstraint('arid'),
-                UniqueConstraint(u'sta', u'time', u'chan', u'iphase', u'auth'),)
+                UniqueConstraint('sta', 'time', 'chan', 'iphase', 'auth'),)
 
     sta = sta.copy()
     time = time.copy()
@@ -475,8 +614,7 @@ class Assoc(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('arid','orid'), 
-                UniqueConstraint('arid'),)
+        return (PrimaryKeyConstraint('arid', 'orid'), UniqueConstraint('arid'),)
 
     arid = arid.copy()
     orid = orid.copy()
@@ -503,9 +641,8 @@ class Event(Base):
     __abstract__ = True
 
     @declared_attr
-    def __table_args__(cls): 
-        return (PrimaryKeyConstraint('evid'), 
-                UniqueConstraint('prefor'),)
+    def __table_args__(cls):
+        return (PrimaryKeyConstraint('evid'), UniqueConstraint('prefor'),)
     evid = evid.copy()
     evname = evname.copy()
     prefor = prefor.copy()
@@ -551,7 +688,7 @@ class Instrument(Base):
 #   https://groups.google.com/forum/#!topic/sqlalchemy/XksPIVYOdSU
 # or something else
 # http://stackoverflow.com/questions/10494033/setting-sqlalchemy-autoincrement-start-value
-#@attr_generate
+# @attr_generate
 class Lastid(Base):
     """
     Store last id values.
@@ -561,10 +698,9 @@ class Lastid(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('keyname'), 
-                UniqueConstraint(u'keyname', u'keyvalue'),)
+        return (PrimaryKeyConstraint('keyname'), UniqueConstraint('keyname', 'keyvalue'),)
 
-    def next(self):
+    def __next__(self):
         self.keyvalue += 1
         return self.keyvalue
 
@@ -578,7 +714,7 @@ class Netmag(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('magid'), 
+        return (PrimaryKeyConstraint('magid'),
                 UniqueConstraint('magid', 'orid'),)
 
     magid = magid.copy()
@@ -643,9 +779,8 @@ class Origin(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (UniqueConstraint('lat','lon','depth','time','auth'), 
-                PrimaryKeyConstraint('orid'),)
-    
+        return (UniqueConstraint('lat', 'lon', 'depth', 'time', 'auth'), PrimaryKeyConstraint('orid'),)
+
     lat = lat.copy()
     lon = lon.copy()
     depth = depth.copy()
@@ -678,7 +813,7 @@ class Remark(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('commid','lineno'),)
+        return (PrimaryKeyConstraint('commid', 'lineno'),)
 
     commid = commid.copy()
     lineno = lineno.copy()
@@ -691,7 +826,7 @@ class Sensor(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('sta','chan','time','endtime'),)
+        return (PrimaryKeyConstraint('sta', 'chan', 'time', 'endtime'),)
 
     sta = sta.copy()
     chan = chan.copy()
@@ -712,7 +847,7 @@ class Site(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('sta','ondate'),)
+        return (PrimaryKeyConstraint('sta', 'ondate'),)
 
     sta = sta.copy()
     ondate = ondate.copy()
@@ -733,7 +868,7 @@ class Sitechan(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (UniqueConstraint('sta','chan','ondate'), 
+        return (UniqueConstraint('sta', 'chan', 'ondate'),
                 PrimaryKeyConstraint('chanid'))
 
     sta = sta.copy()
@@ -792,8 +927,7 @@ class Wfdisc(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (UniqueConstraint('wfid','dir','dfile'), 
-                PrimaryKeyConstraint('wfid'),)
+        return (UniqueConstraint('wfid', 'dir', 'dfile'), PrimaryKeyConstraint('wfid'),)
 
     def to_trace(self):
         """
@@ -833,8 +967,7 @@ class Wftag(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('tagid'), 
-                UniqueConstraint('tagname','tagid','wfid'),)
+        return (PrimaryKeyConstraint('tagid'), UniqueConstraint('tagname', 'tagid', 'wfid'),)
 
     tagname = tagname.copy()
     tagid = tagid.copy()
@@ -844,91 +977,91 @@ class Wftag(Base):
 
 # possibly useful indexes
 # To add, use Index.create(engine)
-#ix_affiliation_stanet = Index(u'ix_affiliation_stanet', 
-#                              Affiliation.__table__.c.sta, 
+# ix_affiliation_stanet = Index(u'ix_affiliation_stanet',
+#                              Affiliation.__table__.c.sta,
 #                              Affiliation.__table__.c.net)
 #
-#ix_amplitude_uk = Index(u'ix_amplitude_uk', 
-#                        Amplitude.__table__.c.arid, 
-#                        Amplitude.__table__.c.amptime, 
-#                        Amplitude.__table__.c.amptype, 
-#                        Amplitude.__table__.c.auth, 
-#                        Amplitude.__table__.c.chan, 
-#                        Amplitude.__table__.c.deltaf, 
-#                        Amplitude.__table__.c.duration, 
-#                        Amplitude.__table__.c.parid, 
-#                        Amplitude.__table__.c.per, 
+# ix_amplitude_uk = Index(u'ix_amplitude_uk',
+#                        Amplitude.__table__.c.arid,
+#                        Amplitude.__table__.c.amptime,
+#                        Amplitude.__table__.c.amptype,
+#                        Amplitude.__table__.c.auth,
+#                        Amplitude.__table__.c.chan,
+#                        Amplitude.__table__.c.deltaf,
+#                        Amplitude.__table__.c.duration,
+#                        Amplitude.__table__.c.parid,
+#                        Amplitude.__table__.c.per,
 #                        Amplitude.__table__.c.time)
 #
-#ix_arrival_uk = Index(u'ix_arrival_uk', 
-#                      Arrival.__table__.c.time, 
-#                      Arrival.__table__.c.sta, 
-#                      Arrival.__table__.c.chan, 
-#                      Arrival.__table__.c.iphase, 
+# ix_arrival_uk = Index(u'ix_arrival_uk',
+#                      Arrival.__table__.c.time,
+#                      Arrival.__table__.c.sta,
+#                      Arrival.__table__.c.chan,
+#                      Arrival.__table__.c.iphase,
 #                      Arrival.__table__.c.auth)
 #
-#ix_event_evid_prefor = Index(u'ix_event_evid_prefor', 
-#                             Event.__table__.c.evid, 
+# ix_event_evid_prefor = Index(u'ix_event_evid_prefor',
+#                             Event.__table__.c.evid,
 #                             Event.__table__.c.prefor)
 #
-#ix_instrument_uk = Index(u'ix_instrument_uk', 
-#                         Instrument.__table__.c.dfile, 
-#                         Instrument.__table__.c.dir, 
-#                         Instrument.__table__.c.instype, 
-#                         Instrument.__table__.c.ncalib, 
+# ix_instrument_uk = Index(u'ix_instrument_uk',
+#                         Instrument.__table__.c.dfile,
+#                         Instrument.__table__.c.dir,
+#                         Instrument.__table__.c.instype,
+#                         Instrument.__table__.c.ncalib,
 #                         Instrument.__table__.c.samprate)
 #
-#ix_netmaguk = Index(u'ix_netmaguk', 
-#                    Netmag.__table__.c.orid, 
-#                    Netmag.__table__.c.magtype, 
+# ix_netmaguk = Index(u'ix_netmaguk',
+#                    Netmag.__table__.c.orid,
+#                    Netmag.__table__.c.magtype,
 #                    Netmag.__table__.c.auth)
 #
-#ix_network_uk = Index(u'ix_network_uk', 
-#                      Network.__table__.c.auth, 
+# ix_network_uk = Index(u'ix_network_uk',
+#                      Network.__table__.c.auth,
 #                      Network.__table__.c.netname)
 #
-#ix_originautheviduk = Index(u'ix_originautheviduk', 
-#                            Origin.__table__.c.evid, 
+# ix_originautheviduk = Index(u'ix_originautheviduk',
+#                            Origin.__table__.c.evid,
 #                            Origin.__table__.c.auth)
 #
-#ix_origin_uk = Index(u'origin_uk', 
-#                     Origin.__table__.c.lat, 
-#                     Origin.__table__.c.lon, 
-#                     Origin.__table__.c.depth, 
-#                     Origin.__table__.c.time, 
+# ix_origin_uk = Index(u'origin_uk',
+#                     Origin.__table__.c.lat,
+#                     Origin.__table__.c.lon,
+#                     Origin.__table__.c.depth,
+#                     Origin.__table__.c.time,
 #                     Origin.__table__.c.auth)
 #
-#ix_b_newsite_onoff_ix = Index(u'ix_b_newsite_onoff', 
-#                              Site.__table__.c.ondate, 
+# ix_b_newsite_onoff_ix = Index(u'ix_b_newsite_onoff',
+#                              Site.__table__.c.ondate,
 #                              Site.__table__.c.offdate)
 #
-#ix_site = Index(u'ix_site', 
-#                Site.__table__.c.sta, 
-#                Site.__table__.c.ondate, 
+# ix_site = Index(u'ix_site',
+#                Site.__table__.c.sta,
+#                Site.__table__.c.ondate,
 #                Site.__table__.c.offdate)
 #
-#ix_sitechan_uk = Index(u'ix_sitechan_uk', 
-#                       Sitechan.__table__.c.sta, 
-#                       Sitechan.__table__.c.chan, 
+# ix_sitechan_uk = Index(u'ix_sitechan_uk',
+#                       Sitechan.__table__.c.sta,
+#                       Sitechan.__table__.c.chan,
 #                       Sitechan.__table__.c.ondate)
 #
-#ix_wfdisc_dirdfile = Index(u'ix_wfdisc_dirdfile', 
-#                           Wfdisc.__table__.c.dfile, 
-#                           Wfdisc.__table__.c.dir, 
+# ix_wfdisc_dirdfile = Index(u'ix_wfdisc_dirdfile',
+#                           Wfdisc.__table__.c.dfile,
+#                           Wfdisc.__table__.c.dir,
 #                           Wfdisc.__table__.c.foff)
 #
-#ix_wfdisc = Index(u'ix_wfdisc', 
-#                  Wfdisc.__table__.c.sta, 
-#                  Wfdisc.__table__.c.jdate, 
-#                  Wfdisc.__table__.c.time, 
-#                  Wfdisc.__table__.c.endtime, 
+# ix_wfdisc = Index(u'ix_wfdisc',
+#                  Wfdisc.__table__.c.sta,
+#                  Wfdisc.__table__.c.jdate,
+#                  Wfdisc.__table__.c.time,
+#                  Wfdisc.__table__.c.endtime,
 #                  Wfdisc.__table__.c.wfid)
 #
-#ix_wfdisc_uk = Index(u'ix_wfdisc_uk', 
-#                     Wfdisc.__table__.c.sta, 
-#                     Wfdisc.__table__.c.chan, 
+# ix_wfdisc_uk = Index(u'ix_wfdisc_uk',
+#                     Wfdisc.__table__.c.sta,
+#                     Wfdisc.__table__.c.chan,
 #                     Wfdisc.__table__.c.time)
 #
-#ix_wfdisc_chanid_instype = Index(u'ix_wfdisc_chanid_instype', 
-#                                 Wfdisc.__table__.c.chanid, 
+# ix_wfdisc_chanid_instype = Index(u'ix_wfdisc_chanid_instype',
+#                                 Wfdisc.__table__.c.chanid,
 #                                 Wfdisc.__table__.c.instype)
