@@ -188,6 +188,9 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
+msg = ("This function is deprecated and will be removed.  "
+       "Please use pisces.crud.load_tables instead.")
+@deprecated(msg)
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
