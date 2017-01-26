@@ -25,6 +25,7 @@ Glossary
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
+from pisces.schema.util import PiscesMeta
 import pisces.tables.css3 as css3
 import pisces.tables.kbcore as kb
 
@@ -51,7 +52,7 @@ def make_table_names(*tables, **kwargs):
 
     Returns
     -------
-    tablenames : dict
+    dict
         The desired formatted table name strings, keyed by canonical name.
 
     Raises
@@ -107,12 +108,15 @@ def split_table_names(*tablenames, **kwargs):
     ----------
     tablenames : str
     schema : str {'css3', 'kbcore'} Default 'css3'.
+    split_prefix : bool, default True
+        If True, return (owner, prefix, tablename) tuples,
+        otherwise return (owner, tablename) tuples.
 
     Returns
     -------
     list
-        Corresponding list of (owner, prefix, tablename) 3-tuple strings.
-        Empty owner or prefix are ''.
+        Corresponding list of (owner, tablename) or (owner, prefix, tablename)
+        tuples strings. Empty owner or prefix are ''.
 
     Examples
     --------
@@ -123,6 +127,7 @@ def split_table_names(*tablenames, **kwargs):
     ('different_acct', 'my_', 'origin'), ('myfriend', '', 'discrim_last')]
 
     """
+    split_prefix = kwargs.pop('split_prefix', True)
     schema = kwargs.get('schema', 'css3')
     if schema == 'css3':
         schematables = css3.CORETABLES.keys()
@@ -140,18 +145,21 @@ def split_table_names(*tablenames, **kwargs):
             owner = ''
             prefixed_tablename = fulltablename
 
-        # if a table 'endswith' a table in the schema, the part before is the
-        # table prefix
-        for schematable in schematables:
-            head, sep, tail = prefixed_tablename.rpartition(schematable)
-            if sep and not tail:
-                prefix = head
-                tablename = schematable
-            elif not sep:
-                prefix = ''
-                tablename = tail
+        out.append((owner, prefixed_tablename))
 
-        out.append((owner, prefix, tablename))
+        if split_prefix:
+            # if a table 'endswith' a table in the schema, the part before is the
+            # table prefix
+            for schematable in schematables:
+                head, sep, tail = prefixed_tablename.rpartition(schematable)
+                if sep and not tail:
+                    prefix = head
+                    tablename = schematable
+                elif not sep:
+                    prefix = ''
+                    tablename = tail
+
+            out.append((owner, prefix, tablename))
 
     return out
 
@@ -224,7 +232,7 @@ def make_tables(*tables, **kwargs):
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
 
     if owner:
-        parents = (declarative_base(metadata=sa.metaData(schema=owner)), )
+        parents = (declarative_base(metadata=sa.metaData(schema=owner)),)
     else:
         parents = ()
 
@@ -282,11 +290,11 @@ def load_tables(session, *tables, **kwargs):
     --------
     # load standard tables in 'myaccount' table space
     >>> tables = load_tables(session, 'site', 'sitechan', 'wfisc',
-                             schema='kbcore', owner='myaccount')
+    ...                      schema='kbcore', owner='myaccount')
 
     # load a standard table that has no primary key set
     >>> tables = load_tables(session, 'site', 
-                             primary_keys={'site', ['sta', 'ondate']})
+    ...                      primary_keys={'site', ['sta', 'ondate']})
 
     # load all standard css3 tables in the default account
     >>> tables = load_tables(session, schema='css3')
@@ -299,10 +307,12 @@ def load_tables(session, *tables, **kwargs):
 
     """
     # TODO: Use sqlalchemy.ext.automap.automap_base inside this function?
+    # TODO: After conversion to Python 3, use something better than **kwargs.
     schema = kwargs.get('schema', 'css3')
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
 
+    # TODO: better schema plugin management here.
     if schema == 'css3':
         CORETABLES = css3.CORETABLES
     elif schema == 'kbcore':
@@ -316,9 +326,14 @@ def load_tables(session, *tables, **kwargs):
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
 
     if owner:
-        parents = (declarative_base(metadata=sa.MetaData(schema=owner)), )
+        parents = (declarative_base(metadata=sa.MetaData(schema=owner),
+                                    constructor=None, metaclass=PiscesMeta),)
     else:
         parents = ()
+
+    colinfo = getattr(base, '_column_info_registry', {})
+
+    table_classes = dict()
 
 
 def init_tables(session, *tables):
