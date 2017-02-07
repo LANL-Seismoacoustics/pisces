@@ -33,7 +33,7 @@ CoreTable = namedtuple('CoreTable', ['name', 'prototype', 'table'])
 
 def get_infovals(meta, structure, key):
     """
-    Get flattened values from column info dictionary for given metadata and 
+    Get flattened values from column info dictionary for given metadata and
     desired structure.
 
     If key is not in column info, None is used.
@@ -48,9 +48,9 @@ def get_infovals(meta, structure, key):
     --------
     >>> from pisces.schema.kbcore import Base
     >>> fields, defaults = get_infovals(Base.metadata, ['site'], 'default')
-    >>> print defaults
+    >>> print(defaults)
     ['-', -1, 2286324, -999.0, -999.0, -999.0, '-', '-', '-', -99999, -99999, <built-in method now of type object at 0x100601060>]
-    >>> print fields
+    >>> print(fields)
     ['sta', 'ondate', 'offdate', 'lat', 'lon', 'elev', 'staname', 'statype', 'refsta', 'dnorth', 'deast', 'lddate']
 
     """
@@ -67,7 +67,7 @@ def get_infovals(meta, structure, key):
 
     structvals = []
     colnames = []
-    for i, item in enumerate(structure):
+    for _, item in enumerate(structure):
         if item in tabledct:
             itabvals = [c.info.get(key, None) for c in tabledct[item].columns]
             structvals.extend(itabvals)

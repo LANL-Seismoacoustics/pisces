@@ -506,7 +506,7 @@ def add_rows(session, rows, recurse=False):
         session.rollback()
         logging.warning(str(e))
     except IntegrityError:
-        print str(e)
+        print(str(e))
         session.rollback()
     finally:
         # always executed
