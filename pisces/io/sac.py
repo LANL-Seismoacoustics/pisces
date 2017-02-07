@@ -348,6 +348,45 @@ def sachdr2site(header):
     return [sitedict] or []
 
 
+def sachdr2arraysite(header):
+    """
+    Provide a SAC header dictionary, get a site table dictionary.
+    This is a slight modification of sachdr2site that handles deast
+    & dnorth being in SAC's user7 & user8 header fields (a poor
+    but documented standard that is the de facto appoach
+    - see SAC's BBFK or ARRAYMAP or BRTT's db2sac in Antelope).
+
+    Note that user7 & user8 are expected to be in km (consistent
+    with SAC expectations).
+
+    """
+    sac_site = [('kstnm', 'sta'),
+                ('stla', 'lat'),
+                ('stlo', 'lon'),
+                ('stel', 'elev'),
+                ('user7','deast'),
+                ('user8','dnorth')]
+
+    sitedict = {}
+    for hdr, col in sac_site:
+        val = header.get(hdr, None)
+        sitedict[col] = val if val != SACDEFAULT[hdr] else None
+
+    # clean up
+    try:
+        sitedict['elev'] /= 1000.0
+    except (TypeError, KeyError):
+        #no 'elev'
+        pass
+
+    sitedict = _cast_float(sitedict, ['lat', 'lon', 'elev', 'deast', 'dnorth'])
+    sitedict = _clean_str(sitedict, ['sta'])
+
+    sitedict['sta'] = sitedict['sta'].strip()[:6]
+
+    return [sitedict] or []
+
+
 def sachdr2sitechan(header):
     """
     Provide a sac header dictionary, get a sitechan table dictionary.
@@ -783,8 +822,11 @@ def site2sachdr(s):
     """
     Accepts a fielded site table row and returns a dictionary of corresponding
     sac header field/value pairs.
+
+    June 13, 2016 - added deast/dnorth output to SAC user7/8 header fields
     """
-    keymap = {'stel': 'elev', 'stal': 'lat', 'stlo': 'lon'}
+    keymap = {'stel': 'elev', 'stal': 'lat', 'stlo': 'lon',
+        'user7': 'deast', 'user8': 'dnorth'}
     hdr = _buildhdr(keymap, s)
     return hdr
 
