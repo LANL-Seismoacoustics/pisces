@@ -1,7 +1,11 @@
+# Converted to python 3.5.2 on 02/07/17
+# By: Jeremy Webster
+
 """
 Common io utilities.
 
 """
+
 
 def _buildhdr(keymap, rec):
     """
@@ -13,17 +17,17 @@ def _buildhdr(keymap, rec):
         rec does not have attributes (is None?)
 
     """
-    #TODO: make keymap optional?
+    # TODO: make keymap optional?
+    # TODO: put this in io.util?
     hdr = {}
-    for key1, key2 in keymap.iteritems():
+    for key1, key2 in keymap.items():
         try:
             hdr[key1] = getattr(rec, key2)
         except AttributeError:
-            #rec doesn't have attribute or rec is None. skip
+            # rec doesn't have attribute or rec is None. skip
             pass
 
     return hdr
-
 
 
 def _map_header(keymap, dold, nulldict=None):
@@ -45,10 +49,10 @@ def _map_header(keymap, dold, nulldict=None):
     Returns: dict
 
     """
-    #TODO: this confusing function should be rewritten  (using defaultdict?)
+    # TODO: this confusing function should be rewritten  (using defaultdict?)
     dnew = {}
     if nulldict:
-        for oldkey, newkey in keymap.iteritems():
+        for oldkey, newkey in keymap.items():
             try:
                 if dold[oldkey] != nulldict[oldkey]:
                     if isinstance(dold[oldkey], str):
@@ -56,10 +60,10 @@ def _map_header(keymap, dold, nulldict=None):
                     else:
                         dnew[newkey] = dold[oldkey]
             except KeyError:
-                #one of the dictionaries doesn't have a key
+                # one of the dictionaries doesn't have a key
                 pass
     else:
-        for oldkey, newkey in keymap.iteritems():
+        for oldkey, newkey in keymap.items():
             try:
                 if isinstance(dold[oldkey], str):
                     dnew[newkey] = dold[oldkey].strip()
@@ -69,4 +73,3 @@ def _map_header(keymap, dold, nulldict=None):
                 pass
 
     return dnew
-

@@ -15,8 +15,13 @@ def wfdisc2obspyhdr(wf):
               'sampling_rate': 'samprate', 'station': 'sta'}
     obshdr = _buildhdr(keymap, wf)
     obshdr['starttime'] = UTCDateTime(float(wf.time))
-    obshdr['delta'] = 1./wf.samprate
+    obshdr['delta'] = 1. / wf.samprate
 
+<<<<<<< HEAD
+=======
+    # endtime?
+
+>>>>>>> =Converted the io directory to py3
     return Stats(header=obshdr)
 
 

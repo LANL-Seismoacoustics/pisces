@@ -1,3 +1,6 @@
+# Converted to python 3.5.2 on 02/07/17
+# By: Jeremy Webster
+
 """
 Conversions between SAC header variables and CSS or KB Core fields.
 
@@ -6,14 +9,14 @@ Converts a SAC header dictionary into a list of table dictionaries and vice-vers
 
 """
 # XXX: currently not working
-# TODO: 
+# TODO:
 #   - remove functions already in pisces.io.trace
 #   - make everything just translate dictionaries, not classes and make
 #     everything less obspy.Trace-centric
 #   - change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
 #   - use pysac (hopefully obspy.io.sac, eventually)
 #   - make a bunch of column/header translation functions, like "kcmpnm_to_chan"
-#     and "chan_to_kcmpnm", and use them in higher-level functions, like 
+#     and "chan_to_kcmpnm", and use them in higher-level functions, like
 #     "sachdr_to_wfdisc" and "wfdisc_to_sachdr".
 
 import sys
@@ -42,41 +45,43 @@ FDEFAULT = -12345.0
 SDEFAULT = '-12345  '
 SLDEFAULT = '-12345          '
 SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
-         'cmpaz': FDEFAULT, 'cmpinc': FDEFAULT, 'delta': FDEFAULT,
-         'depmax': FDEFAULT, 'depmen': FDEFAULT, 'depmin': FDEFAULT,
-         'dist': FDEFAULT, 'e': FDEFAULT, 'evdp': FDEFAULT, 'evla': FDEFAULT,
-         'evlo': FDEFAULT, 'f': FDEFAULT, 'gcarc': FDEFAULT, 'idep': IDEFAULT,
-         'ievreg': IDEFAULT, 'ievtype': IDEFAULT, 'iftype': IDEFAULT,
-         'iinst': IDEFAULT, 'imagsrc': IDEFAULT, 'imagtyp': IDEFAULT,
-         'int1': FDEFAULT, 'iqual': IDEFAULT, 'istreg': IDEFAULT,
-         'isynth': IDEFAULT, 'iztype': IDEFAULT, 'ka': SDEFAULT,
-         'kcmpnm': SDEFAULT, 'kdatrd': SDEFAULT, 'kevnm': SLDEFAULT,
-         'kf': SDEFAULT, 'khole': SDEFAULT, 'kinst': SDEFAULT,
-         'knetwk': SDEFAULT, 'ko': SDEFAULT, 'kstnm': SDEFAULT, 'kt0': SDEFAULT,
-         'kt1': SDEFAULT, 'kt2': SDEFAULT, 'kt3': SDEFAULT, 'kt4': SDEFAULT,
-         'kt5': SDEFAULT, 'kt6': SDEFAULT, 'kt7': SDEFAULT, 'kt8': SDEFAULT,
-         'kt9': SDEFAULT, 'kuser0': SDEFAULT, 'kuser1': SDEFAULT,
-         'kuser2': SDEFAULT, 'lcalda': IDEFAULT, 'leven': IDEFAULT,
-         'lovrok': IDEFAULT, 'lpspol': IDEFAULT, 'mag': FDEFAULT,
-         'nevid': IDEFAULT, 'norid': IDEFAULT, 'npts': IDEFAULT,
-         'nvhdr': IDEFAULT, 'nwfid': IDEFAULT, 'nzhour': IDEFAULT,
-         'nzjday': IDEFAULT, 'nzmin': IDEFAULT, 'nzmsec': IDEFAULT,
-         'nzsec': IDEFAULT, 'nzyear': IDEFAULT, 'o': FDEFAULT,
-         'odelta': FDEFAULT, 'scale': FDEFAULT, 'stdp': FDEFAULT,
-         'stel': FDEFAULT, 'stla': FDEFAULT, 'stlo': FDEFAULT, 't0': FDEFAULT,
-         't1': FDEFAULT, 't2': FDEFAULT, 't3': FDEFAULT, 't4': FDEFAULT,
-         't5': FDEFAULT, 't6': FDEFAULT, 't7': FDEFAULT, 't8': FDEFAULT,
-         't9': FDEFAULT, 'unused10': FDEFAULT, 'unused11': FDEFAULT,
-         'unused12': FDEFAULT, 'unused6': FDEFAULT, 'unused7': FDEFAULT,
-         'unused8': FDEFAULT, 'unused9': FDEFAULT, 'user0': FDEFAULT,
-         'user1': FDEFAULT, 'user2': FDEFAULT, 'user3': FDEFAULT,
-         'user4': FDEFAULT, 'user5': FDEFAULT, 'user6': FDEFAULT,
-         'user7': FDEFAULT, 'user8': FDEFAULT, 'user9': FDEFAULT,
-         'xmaximum': FDEFAULT, 'xminimum': FDEFAULT, 'ymaximum': FDEFAULT,
-         'yminimum': FDEFAULT}
+              'cmpaz': FDEFAULT, 'cmpinc': FDEFAULT, 'delta': FDEFAULT,
+              'depmax': FDEFAULT, 'depmen': FDEFAULT, 'depmin': FDEFAULT,
+              'dist': FDEFAULT, 'e': FDEFAULT, 'evdp': FDEFAULT, 'evla': FDEFAULT,
+              'evlo': FDEFAULT, 'f': FDEFAULT, 'gcarc': FDEFAULT, 'idep': IDEFAULT,
+              'ievreg': IDEFAULT, 'ievtype': IDEFAULT, 'iftype': IDEFAULT,
+              'iinst': IDEFAULT, 'imagsrc': IDEFAULT, 'imagtyp': IDEFAULT,
+              'int1': FDEFAULT, 'iqual': IDEFAULT, 'istreg': IDEFAULT,
+              'isynth': IDEFAULT, 'iztype': IDEFAULT, 'ka': SDEFAULT,
+              'kcmpnm': SDEFAULT, 'kdatrd': SDEFAULT, 'kevnm': SLDEFAULT,
+              'kf': SDEFAULT, 'khole': SDEFAULT, 'kinst': SDEFAULT,
+              'knetwk': SDEFAULT, 'ko': SDEFAULT, 'kstnm': SDEFAULT, 'kt0': SDEFAULT,
+              'kt1': SDEFAULT, 'kt2': SDEFAULT, 'kt3': SDEFAULT, 'kt4': SDEFAULT,
+              'kt5': SDEFAULT, 'kt6': SDEFAULT, 'kt7': SDEFAULT, 'kt8': SDEFAULT,
+              'kt9': SDEFAULT, 'kuser0': SDEFAULT, 'kuser1': SDEFAULT,
+              'kuser2': SDEFAULT, 'lcalda': IDEFAULT, 'leven': IDEFAULT,
+              'lovrok': IDEFAULT, 'lpspol': IDEFAULT, 'mag': FDEFAULT,
+              'nevid': IDEFAULT, 'norid': IDEFAULT, 'npts': IDEFAULT,
+              'nvhdr': IDEFAULT, 'nwfid': IDEFAULT, 'nzhour': IDEFAULT,
+              'nzjday': IDEFAULT, 'nzmin': IDEFAULT, 'nzmsec': IDEFAULT,
+              'nzsec': IDEFAULT, 'nzyear': IDEFAULT, 'o': FDEFAULT,
+              'odelta': FDEFAULT, 'scale': FDEFAULT, 'stdp': FDEFAULT,
+              'stel': FDEFAULT, 'stla': FDEFAULT, 'stlo': FDEFAULT, 't0': FDEFAULT,
+              't1': FDEFAULT, 't2': FDEFAULT, 't3': FDEFAULT, 't4': FDEFAULT,
+              't5': FDEFAULT, 't6': FDEFAULT, 't7': FDEFAULT, 't8': FDEFAULT,
+              't9': FDEFAULT, 'unused10': FDEFAULT, 'unused11': FDEFAULT,
+              'unused12': FDEFAULT, 'unused6': FDEFAULT, 'unused7': FDEFAULT,
+              'unused8': FDEFAULT, 'unused9': FDEFAULT, 'user0': FDEFAULT,
+              'user1': FDEFAULT, 'user2': FDEFAULT, 'user3': FDEFAULT,
+              'user4': FDEFAULT, 'user5': FDEFAULT, 'user6': FDEFAULT,
+              'user7': FDEFAULT, 'user8': FDEFAULT, 'user9': FDEFAULT,
+              'xmaximum': FDEFAULT, 'xminimum': FDEFAULT, 'ymaximum': FDEFAULT,
+              'yminimum': FDEFAULT}
 
 ############################# DECORATORS ######################################
 # Decorator functions allow readable, reusable handling of header values.
+
+
 def cast_to_int(original_func):
     """
     Cast a function's argument to int before the function operates on it, like:
@@ -94,6 +99,7 @@ def cast_to_int(original_func):
     def converter(hdr):
         return original_func(int(hdr))
     return converter
+
 
 def cast_to_float(original_func):
     """
@@ -115,6 +121,7 @@ def cast_to_float(original_func):
         return original_func(float(hdr))
     return converter
 
+
 def strip_string(original_func):
     """
     Strip white space from a function's argument to float before the function
@@ -133,6 +140,7 @@ def strip_string(original_func):
     def converter(hdr):
         return original_func(int(hdr))
     return converter
+
 
 def truncate_string(N):
     def make_func(original_func):
@@ -161,14 +169,18 @@ def swap_if_value(detected_value, return_value):
 def kcmpnm_to_chan(kcmpnm):
     return kcmpnm.strip()[:8]
 
+
 def kevnm_to_evname(kevnm):
     return kevnm.strip()
+
 
 def kinst_to_insname(kinst):
     return kinst.strip()
 
+
 def knetwk_to_net(knetwk):
     return knetwk.strip()[:8]
+
 
 def kstnm_to_sta(kstnm):
     return kstnm.strip()[:6]
@@ -178,14 +190,18 @@ def kstnm_to_sta(kstnm):
 def chan_to_kcmpnm(chan):
     return chan
 
+
 def evname_to_kevnm(evname):
     return evname
+
 
 def insname_to_kinst(insname):
     return insname
 
+
 def net_to_knetwk(net):
     return net
+
 
 def sta_to_kstnm(sta):
     return kstnm
@@ -212,7 +228,7 @@ ENUM_NAMES = {1: 'itime', 2: 'irlim', 3: 'iamph', 4: 'ixy', 5: 'iunkn',
               79: 'ieq2', 80: 'ime', 81: 'iex', 82: 'inu', 83: 'inc', 84: 'io_',
               85: 'il', 86: 'ir', 87: 'it', 88: 'iu', 89: 'ieq3', 90: 'ieq0',
               91: 'iex0', 92: 'iqc', 93: 'iqb0', 94: 'igey', 95: 'ilit',
-              96: 'imet', 97: 'iodor', 103: 'ios'} 
+              96: 'imet', 97: 'iodor', 103: 'ios'}
 
 # ievtyp -> etype
 ETYPEDICT = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
@@ -221,7 +237,7 @@ ETYPEDICT = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
              83: 'mc'}
 
 # evtype -> ievtyp
-IEVTYPDICT = dict((_val,_key) for _key,_val in ETYPEDICT.iteritems())
+IEVTYPDICT = dict((_val, _key) for _key, _val in ETYPEDICT.items())
 #
 # imagsrc -> auth
 AUTHDICT = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD',
@@ -229,18 +245,17 @@ AUTHDICT = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD',
             68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
 #
 # auth -> imagsrc
-IMAGSRCDICT = dict((_val,_key) for _key,_val in AUTHDICT.iteritems())
+IMAGSRCDICT = dict((_val, _key) for _key, _val in AUTHDICT.items())
 
 
 # SAC -> CSS
 def ievreg_to_grn(ievreg):
     return int(ievreg)
 
+
 def ievtyp_to_etype(ievtyp):
     """Provide the ievtyp(e) integer, get the etype string."""
     return ETYPEDICT[ievtyp]
-
-
 
 
 # the following functions accept a SAC header dictionary, and return respective
@@ -277,16 +292,17 @@ def get_sac_reftime(header):
     try:
         reftime = UTCDateTime(year=yr, julday=nzjday, hour=nzhour, minute=nzmin,
                               second=nzsec, microsecond=nzmsec * 1000)
-        #reftime = datetime.datetime(yr, 1, 1, nzhour, nzmin, nzsec, nzmsec * 1000) + \
+        # reftime = datetime.datetime(yr, 1, 1, nzhour, nzmin, nzsec, nzmsec * 1000) + \
         #                            datetime.timedelta(int(nzjday-1))
         # NOTE: epoch seconds can be got by:
         # (reftime - datetime.datetime(1970,1,1)).total_seconds()
-    except ValueError, TypeError:
+    except ValueError:
         # may contain -12345 null values?
         msg = "Invalid or missing time headers."
         raise ValueError(msg)
 
     return reftime
+
 
 def _cast_int(d, keys):
     for key in keys:
@@ -298,6 +314,7 @@ def _cast_int(d, keys):
 
     return d
 
+
 def _cast_float(d, keys):
     for key in keys:
         try:
@@ -308,6 +325,7 @@ def _cast_float(d, keys):
 
     return d
 
+
 def _clean_str(d, keys):
     for key in keys:
         try:
@@ -317,6 +335,7 @@ def _clean_str(d, keys):
             pass
 
     return d
+
 
 def sachdr2site(header):
     """
@@ -337,7 +356,7 @@ def sachdr2site(header):
     try:
         sitedict['elev'] /= 1000.0
     except (TypeError, KeyError):
-        #no 'elev'
+        # no 'elev'
         pass
 
     sitedict = _cast_float(sitedict, ['lat', 'lon', 'elev'])
@@ -406,7 +425,7 @@ def sachdr2sitechan(header):
     try:
         sitechandict['edepth'] /= 1000.0
     except (TypeError, KeyError):
-        #edepth is None or missing
+        # edepth is None or missing
         pass
 
     sitechandict = _cast_float(sitechandict, ['hang', 'vang', 'edepth'])
@@ -414,6 +433,7 @@ def sachdr2sitechan(header):
     sitechandict['sta'] = sitechandict['sta'].strip()[:6]
 
     return [sitechandict] or []
+
 
 def sachdr2affiliation(header):
     sac_affil = [('knetwk', 'net'),
@@ -432,7 +452,7 @@ def sachdr2affiliation(header):
 
 
 def sachdr2instrument(header):
-    #TODO: investigate hdr['resp0-9'] values
+    # TODO: investigate hdr['resp0-9'] values
     sac_instr = [('kinst', 'insname'),
                  ('iinst', 'instype'),
                  ('delta', 'samprate')]
@@ -444,7 +464,7 @@ def sachdr2instrument(header):
 
     # clean up
     try:
-        instrdict['samprate'] = int(round(1.0 / instrdict['samprate'],0))
+        instrdict['samprate'] = int(round(1.0 / instrdict['samprate'], 0))
     except (TypeError, KeyError):
         pass
 
@@ -483,67 +503,67 @@ def sachdr2origin(header):
         val = header.get(hdr, None)
         origindict[col] = val if val != SACDEFAULT[hdr] else None
 
-    #depth
+    # depth
     try:
         origindict['depth'] /= 1000.0
     except (TypeError, KeyError):
-        #evdp is None or mising
+        # evdp is None or mising
         pass
 
-    #etype translations
+    # etype translations
     edict = {37: 'en', 38: 'ex', 39: 'ex', 40: 'qt', 41: 'qt', 42: 'qt',
-            43: 'ec', 72: 'me', 73: 'me', 74: 'me', 75: 'me', 76: 'mb',
-            77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
-            83: 'mc'}
+             43: 'ec', 72: 'me', 73: 'me', 74: 'me', 75: 'me', 76: 'mb',
+             77: 'qt', 78: 'qt', 79: 'qt', 80: 'ex', 81: 'ex', 82: 'en',
+             83: 'mc'}
     try:
         origindict['etype'] = edict[header['ievtype']]
     except (TypeError, KeyError):
-        #ievtyp is None, or not a key in edict
+        # ievtyp is None, or not a key in edict
         pass
 
-    #1:
+    # 1:
     try:
         t = get_sac_reftime(header)
         if header['iztype'] == 11:
-            #reference time is an origin time
+            # reference time is an origin time
             o = header.get('o', None)
             o = o if (o != SACDEFAULT['o']) else 0.0
 
             origindict['time'] = t.timestamp - o
-            origindict['jdate'] = int((t-o).strftime('%Y%j'))
+            origindict['jdate'] = int((t - o).strftime('%Y%j'))
     except (ValueError, KeyError):
         # no trace.stats.sac, no iztype
         pass
 
-    #2: magnitude
+    # 2: magnitude
     magdict = {52: 'mb', 53: 'ms', 54: 'ml'}
     try:
         origindict[magdict[header['imagtyp']]] = header['mag']
     except (ValueError, KeyError):
-        #imagtyp is None or not a key in magdict
+        # imagtyp is None or not a key in magdict
         pass
 
     # is kuser0 is a recognized magnitude type, overwrite mag
-    #XXX: this is a LANL wfdisc2sac thing
+    # XXX: this is a LANL wfdisc2sac thing
     try:
         magtype = header['kuser0'].strip()
-        if magtype in magdict.values():
+        if magtype in list(magdict.values()):
             origindict[magtype] = header['user0']
     except (KeyError, ValueError):
-        #kuser0 is None
+        # kuser0 is None
         pass
 
-    #3: origin author
+    # 3: origin author
     authdict = {58: 'ISC:NEIC', 61: 'PDE', 62: 'ISC', 63: 'REB-ICD',
-            64: 'IUSGS', 65: 'ISC:BERK', 66: 'ICALTECH', 67: 'ILLNL',
-            68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
+                64: 'IUSGS', 65: 'ISC:BERK', 66: 'ICALTECH', 67: 'ILLNL',
+                68: 'IEVLOC', 69: 'IJSOP', 70: 'IUSER', 71: 'IUNKNOWN'}
     try:
         origindict['auth'] = authdict[header['imagsrc']]
     except (KeyError, ValueError):
         # imagsrc not in authdict (i.e. sac default value)
         pass
 
-    #XXX: this is LANL wfdisc2sac thing.  maybe turn it off?
+    # XXX: this is LANL wfdisc2sac thing.  maybe turn it off?
     if header.get('kuser1'):
         origindict['auth'] = header['kuser1']
 
@@ -593,17 +613,17 @@ def sachdr2assoc(header, pickmap=None):
 
     """
     pick2phase = {'t0': 'P', 't1': 'Pn', 't2': 'Pg', 't3': 'S',
-    't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
-    't9': 'pP'}
+                  't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
+                  't9': 'pP'}
 
-    #overwrite defaults with supplied map
+    # overwrite defaults with supplied map
     if pickmap:
         pick2phase.update(pickmap)
 
-    #geographic relations
+    # geographic relations
     # obspy.read tries to calculate these values if lcalca is True and needed
-    #header info is there, so we only need to try to if lcalca is False.
-    #XXX: I just calculate it if no values are currently filled in.
+    # header info is there, so we only need to try to if lcalca is False.
+    # XXX: I just calculate it if no values are currently filled in.
     sac_assoc = [('az', 'esaz'),
                  ('baz', 'seaz'),
                  ('gcarc', 'delta')]
@@ -613,7 +633,7 @@ def sachdr2assoc(header, pickmap=None):
         val = header.get(hdr, None)
         assocdict[col] = val if val != SACDEFAULT[hdr] else None
 
-    #overwrite if any are None
+    # overwrite if any are None
     if not assocdict:
         try:
             delta = geod.locations2degrees(header['stla'], header['stlo'],
@@ -624,7 +644,7 @@ def sachdr2assoc(header, pickmap=None):
             assocdict['seaz'] = seaz
             assocdict['delta'] = delta
         except (ValueError, TypeError):
-            #some sac header values are None
+            # some sac header values are None
             pass
 
     if header.get('kstnm', None):
@@ -633,20 +653,20 @@ def sachdr2assoc(header, pickmap=None):
     orid = header.get('norid', None)
     assocdict['orid'] = orid if orid != SACDEFAULT['norid'] else None
 
-    #now, do the phase arrival mappings
-    #for each pick in hdr, make a separate dictionary containing assocdict plus
-    #the new phase info.
+    # now, do the phase arrival mappings
+    # for each pick in hdr, make a separate dictionary containing assocdict plus
+    # the new phase info.
     assocs = []
     for key in pick2phase:
         kkey = 'k' + key
-        #if there's a value in t[0-9]
+        # if there's a value in t[0-9]
         if header.get(key, None) not in (SACDEFAULT[key], None):
-            #if the phase name kt[0-9] is null
+            # if the phase name kt[0-9] is null
             if header[kkey] == SACDEFAULT[kkey]:
-                #take it from the map
+                # take it from the map
                 iassoc = {'phase': pick2phase[key]}
             else:
-                #take it directly
+                # take it directly
                 iassoc = {'phase': header[kkey]}
 
             iassoc.update(assocdict)
@@ -660,43 +680,45 @@ def sachdr2arrival(header, pickmap=None):
     dictionaries.  Same header->phase mapping applies, unless otherwise stated.
 
     """
-    #puts t[0-9] times into arrival.time if they're not null
-    #puts corresponding kt[0-9] phase name into arrival.iphase
-    #if a kt[0-9] phase name is null and its t[0-9] values isn't,
-    #phase names are pulled from the pick2phase dictionary
+    # puts t[0-9] times into arrival.time if they're not null
+    # puts corresponding kt[0-9] phase name into arrival.iphase
+    # if a kt[0-9] phase name is null and its t[0-9] values isn't,
+    # phase names are pulled from the pick2phase dictionary
     pick2phase = {'t0': 'P', 't1': 'Pn', 't2': 'Pg', 't3': 'S',
-    't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
-    't9': 'pP'}
+                  't4': 'Sn', 't5': 'Sg', 't6': 'Lg', 't7': 'LR', 't8': 'Rg',
+                  't9': 'pP'}
 
     if pickmap:
         pick2phase.update(pickmap)
 
-    #simple translations
+    # simple translations
     arrivaldict = AttribDict()
     if header.get('kstnm', None) not in (SACDEFAULT['kstnm'], None):
         arrivaldict['sta'] = header['kstnm']
     if header.get('kcmpnm', None) not in (SACDEFAULT['kcmpnm'], None):
         arrivaldict['chan'] = header['kcmpnm']
 
-    #phases and arrival times
+    # phases and arrival times
     t0 = get_sac_reftime(header)
     arrivals = []
     for key in pick2phase:
         kkey = 'k' + key
         # if there's a value in t[0-9]
         if header.get('key', None) not in (SACDEFAULT[key], None):
+            # TODO: This seems broken...t isn't defined yet
             itime = t + header[key]
             iarrival = {'time': itime.timestamp,
                         'jdate': int(itime.strftime('%Y%j'))}
-            #if the phase name kt[0-9] is null
+            # if the phase name kt[0-9] is null
             if header[kkey] == SACDEFAULT[kkey]:
-                #take it from the pick2phase map
+                # take it from the pick2phase map
                 iarrival['iphase'] = pick2phase[key]
             else:
-                #take it directly
+                # take it directly
                 iarrival['iphase'] = header[kkey]
 
             iarrival.update(arrivaldict)
+            # TODO: wtf is iassoc??
             arrivals.append(iassoc)
 
     return arrivals
@@ -721,9 +743,9 @@ def sachdr2wfdisc(header):
     wfdict['time'] = starttime.timestamp
     wfdict['endtime'] = endtime.timestamp
     wfdict['jdate'] = int(starttime.strftime('%Y%j'))
-    
+
     wfdict['samprate'] = int(round(1.0 / header['delta']))
-    
+
     kstnm = header.get('kstnm', None)
     if kstnm not in (SACDEFAULT['kstnm'], None):
         wfdict['sta'] = kstnm.strip()[:6]
@@ -793,14 +815,14 @@ def sachdr2tables(header, tables=None):
            'wfdisc': sachdr2wfdisc}
 
     if tables is None:
-        tables = fns.keys()
+        tables = list(fns.keys())
 
 #     for key in header:
 #         if key.startswith('k'):
 #             try:
 #                 header[key] = header[key].strip()[:6]
 
-    #t = AttribDict()
+    # t = AttribDict()
     t = {}
     for table in tables:
         try:
@@ -816,8 +838,8 @@ def sachdr2tables(header, tables=None):
     return t
 
 
-#----------------- CONVERT TABLES TO SAC HEADER DICTIONARY ---------------#
-#TODO: make these functions able to gracefully handle None values as inputs
+# ----------------- CONVERT TABLES TO SAC HEADER DICTIONARY ---------------#
+# TODO: make these functions able to gracefully handle None values as inputs
 def site2sachdr(s):
     """
     Accepts a fielded site table row and returns a dictionary of corresponding
@@ -830,18 +852,22 @@ def site2sachdr(s):
     hdr = _buildhdr(keymap, s)
     return hdr
 
+
 def sitechan2sachdr(sc):
     keymap = {'cmpaz': 'hang', 'cmpinc': 'vang'}
     hdr = _buildhdr(keymap, sc)
     return hdr
+
 
 def affiliation2sachdr(af):
     keymap = {'network': 'net'}
     hdr = _buildhdr(keymap, af)
     return hdr
 
+
 def instrument2sachdr(ins):
     return {}
+
 
 def origin2sachdr(o):
     """
@@ -849,15 +875,18 @@ def origin2sachdr(o):
     corresponding sac header field/value pairs.
     """
     keymap = {'evdp': 'depth', 'evla': 'lat', 'evlo': 'lon', 'kuser1': 'auth',
-        'nevid': 'evid', 'norid': 'orid', 'user0': 'mb'}
+              'nevid': 'evid', 'norid': 'orid', 'user0': 'mb'}
     hdr = _buildhdr(keymap, o)
     return hdr
+
 
 def event2sachdr(evt):
     return {}
 
+
 def assoc2sachdr(asc):
     return {}
+
 
 def arrival2sachdr(ar):
     return {}
@@ -867,17 +896,18 @@ def wfdisc2sachdr(wf):
     pass
 
 
-#functions that accept a table, return a dictionary of sac header values
-#the order of this dictionary matters
+# functions that accept a table, return a dictionary of sac header values
+# the order of this dictionary matters
 KB2SAC = OrderedDict({'site': site2sachdr,
-          'sitechan': sitechan2sachdr,
-          'wfdisc': wfdisc2sachdr,
-          'affiliation': affiliation2sachdr,
-          'instrument': instrument2sachdr,
-          'origin': origin2sachdr,
-          'event': event2sachdr,
-          'assoc': assoc2sachdr,
-          'arrival': arrival2sachdr})
+                      'sitechan': sitechan2sachdr,
+                      'wfdisc': wfdisc2sachdr,
+                      'affiliation': affiliation2sachdr,
+                      'instrument': instrument2sachdr,
+                      'origin': origin2sachdr,
+                      'event': event2sachdr,
+                      'assoc': assoc2sachdr,
+                      'arrival': arrival2sachdr})
+
 
 def tables2sachdr(tables):
     """Returns a sac header dictionary, including default values, from
@@ -887,7 +917,7 @@ def tables2sachdr(tables):
     """
 
     hdr = SACDEFAULT.copy()
-    for table, tabfun in KB2SAC.iteritems():
+    for table, tabfun in KB2SAC.items():
         hdr.update(tabfun(tables.get(table, None)))
 
     return hdr
