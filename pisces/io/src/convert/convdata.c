@@ -54,10 +54,21 @@ struct typeinfo {
 	{T4, 4, 1, 1, s4tot4, t4tos4, t8tot4, t4tot8},
 	{T8, 8, 1, 0, s4tot8, t8tos4,      0,      0}
 };
+
+/* Python C extensions for Windows expects the symbol initModuleName when building the library.
+* This declaration gives msvc compiler this symbol to compile correctly.
+* Note : This not the documented way to build C extensions for Windows. It is typically expected to
+* use wrapper methods. What this does is prevents a statement such as 'import libconvert' in Python.
+* Instead, the only way to load the library is through a ctypes.CDLL call. Which in this case, is all that
+* is needed, as seen in readwaveform.py.
+*/
+#ifdef _WIN32
+void initlibconvert() {}
+#endif
+
 /* note that at least one of have_s4 and have_t8 must be set */
 
-int
-convdata(buf, n, intype, outtype)
+int convdata(buf, n, intype, outtype)
 void *buf;
 int n;
 char *intype, *outtype;
@@ -174,8 +185,7 @@ char *intype, *outtype;
 	return CONV_SUCCESS;
 }
 
-int
-convfunc(intype, outtype, inlen, outlen, func, nfunc)
+int convfunc(intype, outtype, inlen, outlen, func, nfunc)
 char *intype, *outtype;
 int *inlen, *outlen;
 #ifdef __STDC__
@@ -322,8 +332,7 @@ int *nfunc;
 	return CONV_SUCCESS;
 }
 
-int
-convlen(typ)
+int convlen(typ)
 char *typ;
 {
 	union {long l; char c[4];} typeu;

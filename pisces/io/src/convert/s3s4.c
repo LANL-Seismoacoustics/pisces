@@ -1,10 +1,23 @@
+
+//Support for different OS - Note: stdint.h is provided in msvs 2013 (12.0) and later.
+#ifdef _WIN32
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+
+typedef __int8 int8_t;
+typedef __int16 int16_t;
+typedef __int32 int32_t;
+typedef __int64 int64_t;
+
+#else
 #include <stdint.h>
+#endif
 
 #include "convert.h"
 
-void
-s3tos4(void *byte, register int32_t n)
-{
+void s3tos4(void *byte, register int32_t n) {
   /*
    * note:
    *    to use this routine, it is assumed byte is allocated
@@ -64,9 +77,7 @@ s3tos4(void *byte, register int32_t n)
   }
 }
 
-void
-s4tos3(void *byte, register int32_t n)
-{
+void s4tos3(void *byte, register int32_t n) {
   /*
    * NOTE - to use this routine, it is assumed that no value
    * in the original 4-byte array exceeds 3 significant bytes of data

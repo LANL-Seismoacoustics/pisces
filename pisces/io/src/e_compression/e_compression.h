@@ -2,7 +2,19 @@
 
 #define EC_H
 
+//Support for different OS - Note: stdint.h is provided in msvs 2013 (12.0) and later.
+#ifdef _WIN32
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+
+typedef __int32 int32_t;
+typedef __int64 int64_t;
+
+#else
 #include <stdint.h>
+#endif
 
 /*
  * Future enhancements could include tests and branches to account for
@@ -62,15 +74,25 @@ static char *e_messages[] =
 /*
  * functions
  */
-int32_t block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp,
-  int32_t *nbyte);
-int32_t e_decomp(uint32_t *in, int32_t *out, int32_t is, int32_t ib,
-  int32_t o0, int32_t os);
-int32_t e_comp(int32_t *in, uint32_t *out, int32_t is, int32_t *ob, char dt[],
-  int32_t flag);
-int32_t e_decomp_inplace(int32_t *in, int32_t is, int32_t ib, int32_t o0,
-  int32_t os);
-int32_t e_comp_inplace(int32_t *in, int32_t is, int32_t *ob, char dt[],
-  int32_t flag);
+
+ /*
+  * The _declspec(dllexport) statement explicitly tells the compiler to send a function to the .dll.
+  * This is done so that when PythonXX.lib is updated it knows how to find the appropriate functions
+  * when referencing the .pyd.
+  */
+#ifdef _WIN32
+    _declspec(dllexport) int32_t e_decomp(uint32_t *in, int32_t *out, int32_t is, int32_t ib, int32_t o0, int32_t os);
+    _declspec(dllexport) int32_t e_comp(int32_t *in, uint32_t *out, int32_t is, int32_t *ob, char dt[], int32_t flag);
+    _declspec(dllexport) int32_t e_decomp_inplace(int32_t *in, int32_t is, int32_t ib, int32_t o0, int32_t os);
+    _declspec(dllexport) int32_t e_comp_inplace(int32_t *in, int32_t is, int32_t *ob, char dt[], int32_t flag);
+#else
+    int32_t e_decomp(uint32_t *in, int32_t *out, int32_t is, int32_t ib, int32_t o0, int32_t os);
+    int32_t e_comp(int32_t *in, uint32_t *out, int32_t is, int32_t *ob, char dt[], int32_t flag);
+    int32_t e_decomp_inplace(int32_t *in, int32_t is, int32_t ib, int32_t o0, int32_t os);
+    int32_t e_comp_inplace(int32_t *in, int32_t is, int32_t *ob, char dt[], int32_t flag);
+#endif
+
+
+int32_t block_e_decomp(uint32_t *in, int32_t *out, int32_t *nsamp, int32_t *nbyte);
 
 #endif EC_H

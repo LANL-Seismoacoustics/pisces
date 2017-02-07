@@ -7,20 +7,22 @@ command-line interface.  These interfaces functions are organized under a single
 nested interface, which is then exported to the command-line using setuptools
 entry_points.
 
+
+DEVELOPERS:
+To add a subcommand to the main command, do the following:
+1. Add a module file in pisces/commands/ for your implementation
+2. Program your functionality into a single function in your modules, and
+   import it here.  The module should really just be an ordering of Pisces
+   library functions/classes.  The Pisces library functions/classes work with
+   native Python objects. The commands submodules do the business of converting
+   command-line arguments to a useful form for those library functions.
+3. Write a wrapper function for your implementation function here,
+   and decorate it with Click.  The docstring for this wrapper function is the
+   one that is exposed at the command-line.
+   @cli.command('command_name') adds a new "pisces command_name"
+   @cli.group('subcommand_name') adds a new "pisces subcommand_name" subcommand
+
 """
-# DEVELOPERS:
-# To add a subcommand to the main command, do the following:
-# 1. Add a module file in pisces/commands/ for your implementation
-# 2. Program your functionality into a single function in your modules, and
-#    import it here.  The module should really just be an ordering of Pisces
-#    library functions/classes.  The Pisces library functions/classes work with
-#    native Python objects. The commands submodules do the business of converting
-#    command-line arguments to a useful form for those library functions.
-# 3. Write a wrapper function for your implementation function here,
-#    and decorate it with click.  The docstring for this wrapper function is the
-#    one that is exposed at the command-line.
-#    @cli.command('command_name') adds a new "pisces command_name"
-#    @cli.group('subcommand_name') adds a new "pisces subcommand_name" subcommand
 
 import click
 
@@ -114,6 +116,9 @@ def drop_command(**kwargs):
 @click.option('-A', '--absolute_paths', is_flag=True,
               help=("If set, write database 'dir' directory entries as"
                     " absolute paths, not relative."))
+@click.option('--bbfk', is_flag=True,
+              help=("If set, get site.deast and dnorth from SAC user7 & user8"
+                    " header fields."))
 @click.option('-l', '--file_list', type=click.File('r'),
               help="A list file, one file name per line.")
 @click.argument('files', nargs=-1, type=click.Path())
