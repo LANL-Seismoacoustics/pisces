@@ -4,6 +4,8 @@ request.py
 Convenience functions for common queries.
 
 """
+import warnings
+
 import numpy as np
 from sqlalchemy import func, or_
 from obspy.core import UTCDateTime, Stream
@@ -489,6 +491,9 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     wfids : iterable of int, optional
         Wfdisc wfids.  Obviates the above arguments and just returns full Wfdisc
         row waveforms.
+    eps : float
+        If provided, a warning is fired if any Trace is not within eps seconds
+        of starttime and endtime.
 
     Returns
     -------
@@ -529,10 +534,14 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
             st.append(tr)
             # TODO: do arrival stuff here?
 
-    if eps:
+    if all([eps, starttime, endtime]):
         starttimes, endtimes = zip(*[(t.stats.starttime, t.stats.endtime) for t in st])
-        min_t = min(starttimes)
-        max_t = max(endtimes)
+        min_t = float(min(starttimes))
+        max_t = float(max(endtimes))
+        if (abs(min_t - starttime) > eps) or (abs(max_t - endtime) > eps):
+            msg = "Trace times are outside of tolerance: {}".format(eps)
+            warnings.warn(msg)
+
 
     return st
 
