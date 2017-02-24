@@ -9,14 +9,13 @@ from pisces.io.util import _buildhdr
 
 
 def wfdisc2obspyhdr(wf):
-    # trace header
+    """ ObsPy Stats dict from Wfdisc instance.
+    """
     keymap = {'npts': 'nsamp', 'calib': 'calib', 'channel': 'chan',
-            'sampling_rate': 'samprate', 'station': 'sta'}
+              'sampling_rate': 'samprate', 'station': 'sta'}
     obshdr = _buildhdr(keymap, wf)
     obshdr['starttime'] = UTCDateTime(float(wf.time))
     obshdr['delta'] = 1./wf.samprate
-
-    #endtime?
 
     return Stats(header=obshdr)
 
@@ -24,11 +23,17 @@ def wfdisc2obspyhdr(wf):
 def wfdisc2trace(wf):
     """
     Takes a fielded wfdisc row record and produces a minimal obspy Trace with
-    some SAC header fields included.
+    some SAC header fields included, or None.
+
+    Raises
+    ------
+    IOError
+        Can't read the waveform file.
+
     """
     hdr = wfdisc2obspyhdr(wf)
 
-    data = read_waveform(os.sep.join([wf.dir, wf.dfile]), wf.datatype, wf.foff, 
+    data = read_waveform(os.sep.join([wf.dir, wf.dfile]), wf.datatype, wf.foff,
                          wf.nsamp)
 
     if data is not None:

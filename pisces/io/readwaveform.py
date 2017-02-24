@@ -54,6 +54,8 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     ------
     ValueError
         Unrecognized DATATYPE.
+    IOError
+        DATAFILE does not exist.
 
     Notes
     -----

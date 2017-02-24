@@ -4,18 +4,15 @@ request.py
 Convenience functions for common queries.
 
 """
-import math
-
 import numpy as np
 from sqlalchemy import func, or_
 from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
 
-from pisces.util import db_connect
 from pisces.io.trace import wfdisc2trace
 
 
-def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None, 
+def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
                     wfids=None, daylong=False, asquery=False, verbose=False):
     """
     Returns a list of wfdisc records from provided SQLAlchemy ORM mapped
@@ -26,12 +23,12 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     session: bound session instance
     wfdisc: SQLAlchemy mapped wfdisc table
     sta, chan, : str, optional
-        station, channel strings, 
+        station, channel strings,
     t1, t2 : int, optional
         Epoch time window of interest (seconds)
-        Actually searches for wfdisc.time between t1-86400 and t2 and 
+        Actually searches for wfdisc.time between t1-86400 and t2 and
         wfdisc.endtime > t1
-    wfids : list of integers, optional 
+    wfids : list of integers, optional
         wfid integers. Obviates other arguments.
     daylong : bool, optional
         If True, uses a slightly different time query for best results.
@@ -79,9 +76,9 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
 
 
 def distaz_query(records, deg=None, km=None, swath=None):
-    """ 
+    """
     Out-of-database subset based on distances and/or azimuths.
-    
+
     Parameters
     ----------
     records : iterable of objects with lat, lon attribute floats
@@ -460,7 +457,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
         q = q.filter(Arrival.arid.in_(arids))
 
     if orids:
-        q = q.filter(Arrival.arid==Assoc.arid)
+        q = q.filter(Arrival.arid == Assoc.arid)
         q = q.filter(Assoc.orid.in_(orids))
 
     if auth:
@@ -474,10 +471,10 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
     return res
 
 
-def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None, 
-        endtime=None, wfids=None):
+def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
+                  endtime=None, wfids=None, tol=None):
     """
-    Get waveforms.
+    Request waveforms.
 
     Parameters
     ----------
@@ -487,51 +484,68 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     station, channel : str, optional
         Desired station, channel code strings
     starttimes, endtimes : float, optional
-        Epoch start times, end times.  
+        Epoch start times, end times.
         Traces will be cut to these times.
     wfids : iterable of int, optional
         Wfdisc wfids.  Obviates the above arguments and just returns full Wfdisc
         row waveforms.
+    tol : float
+        If provided, a warning is fired if any Trace is not within tol seconds
+        of starttime and endtime.
 
     Returns
     -------
     obspy.Stream
         Traces are merged and cut to requested times.
 
+    Raises
+    ------
+    ValueError
+        Returned Stream contains trace start/end times outside of the tolerance.
+
     """
-    #TODO: add evids= option?, use with stawin= option in .execute method?
-    #TODO: implement get_arrivals if arrivals=True
+    # TODO: add evids= option?, use with stawin= option in .execute method?
+    # TODO: implement get_arrivals if arrivals=True
     Wfdisc = wfdisc
 
     st = Stream()
-    if not wfids:
-        t1 = float(starttime)
-        t2 = float(endtime)
-        sta = station
-        chan = channel
+    if wfids:
+        station = channel = starttime = endtime = None
 
-        t1_utc = UTCDateTime(float(t1))
-        t2_utc = UTCDateTime(float(t2))
+    starttime = float(starttime) if starttime is not None else None
+    endtime = float(endtime) if endtime is not None else None
 
-        wfs = get_wfdisc_rows( session,Wfdisc, sta, chan, t1, t2)
+    t1_utc = UTCDateTime(starttime) if starttime is not None else None
+    t2_utc = UTCDateTime(endtime) if endtime is not None else None
 
-        #TODO: do arrival stuff here
-        for wf in wfs:
-            try:
-                tr = wfdisc2trace(wf)
-                tr.trim(t1_utc, t2_utc)
-                st.append(tr)
-            except AttributeError:
-                #tr is None b/c data couldn't be read
-                pass
-    else:
-        wfs = get_wfdisc_rows( session,Wfdisc, wfids=wfids)
-        for wf in wfs:
-            try:
-                tr = wfdisc2trace(wf)
-                st.append(tr)
-            except AttributeError:
-                pass
+    wfs = get_wfdisc_rows(session, Wfdisc, station, channel, starttime, endtime,
+                          wfids=wfids)
+    # TODO:
+    # Maybe a warning can be fired if the get_waveforms(session, Wfdisc,
+    # starttime=t_S, endtime=t_E) function gets data that does not cover
+    # starttime endtime (within a tolerance)
+    for wf in wfs:
+        try:
+            tr = wfdisc2trace(wf)
+        except IOError:
+            # can't read file
+            tr = None
+
+        if tr:
+            # None utc times will pass through
+            tr.trim(t1_utc, t2_utc)
+            st.append(tr)
+            # TODO: do arrival stuff here?
+
+    if all([tol, starttime, endtime]):
+        starttimes, endtimes = zip(*[(t.stats.starttime, t.stats.endtime) for t in st])
+        min_t = float(min(starttimes))
+        max_t = float(max(endtimes))
+        if (abs(min_t - starttime) > tol) or (abs(max_t - endtime) > tol):
+            msg = "Trace times are outside of tolerance: {}".format(tol)
+            # XXX: change this to a real Pisces exception
+            raise ValueError(msg)
+
 
     return st
 
