@@ -58,7 +58,7 @@ def deprecated(instructions):
 
     return decorator
 
-DEPRMSG = """Warnings can be turned off with:
+TURNOFFWARNINGSMSG = """Warnings can be turned off with:
 import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning
 """
@@ -192,7 +192,7 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
-@deprecated('get_tables is deprecated and will be moved to pisces.crud in next version' + DEPRMSG)
+@deprecated('get_tables is deprecated. It will be load_tables in pisces.crud in next version. ' + TURNOFFWARNINGSMSG)
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -301,7 +301,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 # TODO: merge get_tables and make_tables?
-@deprecated('make_table will be moved to pisces.crud in next version' + DEPRMSG)
+@deprecated('make_table will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -599,7 +599,7 @@ def get_options(db, prefix=None):
     return options
 
 
-@deprecated('get_or_create_tables will be moved to pisces.crud in next version' + DEPRMSG)
+@deprecated('get_or_create_tables will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
