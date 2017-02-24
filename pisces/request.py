@@ -4,8 +4,6 @@ request.py
 Convenience functions for common queries.
 
 """
-import warnings
-
 import numpy as np
 from sqlalchemy import func, or_
 from obspy.core import UTCDateTime, Stream
@@ -474,7 +472,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
 
 
 def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
-                  endtime=None, wfids=None, eps=None):
+                  endtime=None, wfids=None, tol=None):
     """
     Request waveforms.
 
@@ -491,14 +489,19 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     wfids : iterable of int, optional
         Wfdisc wfids.  Obviates the above arguments and just returns full Wfdisc
         row waveforms.
-    eps : float
-        If provided, a warning is fired if any Trace is not within eps seconds
+    tol : float
+        If provided, a warning is fired if any Trace is not within tol seconds
         of starttime and endtime.
 
     Returns
     -------
     obspy.Stream
         Traces are merged and cut to requested times.
+
+    Raises
+    ------
+    ValueError
+        Returned Stream contains trace start/end times outside of the tolerance.
 
     """
     # TODO: add evids= option?, use with stawin= option in .execute method?
@@ -534,13 +537,14 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
             st.append(tr)
             # TODO: do arrival stuff here?
 
-    if all([eps, starttime, endtime]):
+    if all([tol, starttime, endtime]):
         starttimes, endtimes = zip(*[(t.stats.starttime, t.stats.endtime) for t in st])
         min_t = float(min(starttimes))
         max_t = float(max(endtimes))
-        if (abs(min_t - starttime) > eps) or (abs(max_t - endtime) > eps):
-            msg = "Trace times are outside of tolerance: {}".format(eps)
-            warnings.warn(msg)
+        if (abs(min_t - starttime) > tol) or (abs(max_t - endtime) > tol):
+            msg = "Trace times are outside of tolerance: {}".format(tol)
+            # XXX: change this to a real Pisces exception
+            raise ValueError(msg)
 
 
     return st
