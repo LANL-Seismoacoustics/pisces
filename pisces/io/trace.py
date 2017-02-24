@@ -23,7 +23,13 @@ def wfdisc2obspyhdr(wf):
 def wfdisc2trace(wf):
     """
     Takes a fielded wfdisc row record and produces a minimal obspy Trace with
-    some SAC header fields included.
+    some SAC header fields included, or None.
+
+    Raises
+    ------
+    IOError
+        Can't read the waveform file.
+
     """
     hdr = wfdisc2obspyhdr(wf)
 
