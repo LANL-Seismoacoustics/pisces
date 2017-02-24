@@ -621,7 +621,6 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
 
 
 def get_options(db, prefix=None):
-<<<<<<< HEAD
     '''
     for coretable in CORETABLES:
         table_group.add_argument('--' + coretable.name,
