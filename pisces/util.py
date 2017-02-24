@@ -1,6 +1,9 @@
 import logging
 import math
 from getpass import getpass
+import warnings
+import functools
+import inspect
 
 import numpy as np
 import sqlalchemy as sa
@@ -16,6 +19,49 @@ from obspy.taup import taup
 
 from pisces.schema.util import PiscesMeta
 
+
+def deprecated(instructions):
+    """
+    Flags a method as deprecated.
+
+    Parameters
+    ----------
+    instructions : str
+        A human-friendly string of instructions, such as:
+        'Please migrate to add_proxy() ASAP.'
+
+    References
+    ----------
+    https://gist.github.com/kgriffs/8202106
+
+    """
+    def decorator(func):
+        '''This is a decorator which can be used to mark functions
+        as deprecated. It will result in a warning being emitted
+        when the function is used.'''
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            message = 'Call to deprecated function {}. {}'.format(
+                func.__name__,
+                instructions)
+
+            frame = inspect.currentframe().f_back
+
+            warnings.warn_explicit(message,
+                                   category=DeprecationWarning,
+                                   filename=inspect.getfile(frame.f_code),
+                                   lineno=frame.f_lineno)
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+TURNOFFWARNINGSMSG = """Warnings can be turned off with:
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning
+"""
 
 def db_connect(*args, **kwargs):
     """
@@ -126,7 +172,7 @@ def url_connect(url):
 
     Remote Oracle, OS-authenticated (no user or password needs to be specified)
     >>> url_connect('oracle://dbserver.lanl.gov:8080/mydb')
-    
+
     Remote Oracle, password-authenticated (specify user, prompted for password)
     >>> url_connect('oracle://scott@dbserver.lanl.gov:8080/mydb')
     Enter password for scott:
@@ -146,6 +192,7 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
+@deprecated('get_tables is deprecated. It will be load_tables in pisces.crud in next version. ' + TURNOFFWARNINGSMSG)
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -254,6 +301,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 # TODO: merge get_tables and make_tables?
+@deprecated('make_table will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -400,7 +448,7 @@ def travel_times(ref, deg=None, km=None, depth=0.):
             # phase time requested
             if not tt:
                 if not deg:
-                    deg = geod.kilometers2degrees(km)
+                    deg = geod.kilometer2degrees(km)
                 tt = taup.getTravelTimes(deg, depth, model='ak135')
             try:
                 idx = [ph['phase_name'] for ph in tt].index(iref)
@@ -536,22 +584,22 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
         last[lastid.keyname] = lastid
 
     return last
-   
 
-def get_options(db,prefix=None):
-	'''
+
+def get_options(db, prefix=None):
+    '''
     for coretable in CORETABLES:
         table_group.add_argument('--' + coretable.name,
                             default=None,
 							metavar='owner.tablename',
 							dest=coretable.name)
-	'''
-	options={'url':'sqlite:///'+db,'prefix':prefix}
+    '''
+    options={'url':'sqlite:///'+db, 'prefix':prefix}
 
-	return options
+    return options
 
 
-
+@deprecated('get_or_create_tables will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
@@ -563,7 +611,7 @@ def get_or_create_tables(session, create=True, **tables):
         If True, create a table object that isn't found.
     tables
         Canonical table name / formatted table name keyword pairs.
-    
+
     Also accepted are canonical table name keywords with '[owner.]tablename'
     arguments, which will replace any prefix-based core table names.
 
@@ -585,7 +633,7 @@ def get_or_create_tables(session, create=True, **tables):
     tables = {}
     for coretable in CORETABLES:
         # build the table name
-        if options['prefix']==None:
+        if options['prefix'] == None:
             fulltablename = coretable.name
         else:
             fulltablename = prefix + coretable.name
