@@ -17,9 +17,9 @@ from numpy.distutils.core import setup, Extension
 doclines = __doc__.split("\n")
 
 setup(name='pisces-db',
-    version='0.2.2',
+    version='0.2.3',
     description='A Practical Seismological Database Library in Python.',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     author='Jonathan MacCarthy',
     author_email='jkmacc@lanl.gov',
     packages=['pisces','pisces.schema','pisces.io','pisces.tables',
