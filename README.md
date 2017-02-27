@@ -47,6 +47,8 @@ pip install git+https://github.com/jkmacc-LANL/pisces
 
 ### Changes
 
+* `pisces.util.get_tables`, `pisces.util.make_tables`, and
+  `pisces.util.get_or_create_tables` are deprecated and will raise a warning.
 * `pisces.request.get_waveforms` now has a `tol` keyword that will raise an
   exception if any returned waveform is not within `tol` seconds from the
   requested starttime/endtime.
