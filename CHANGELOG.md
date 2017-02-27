@@ -1,6 +1,4 @@
-# Changelog
-
-## next
+# Change Log
 
 
 ## 0.2.2
@@ -8,8 +6,8 @@
 ### Changes
 
 * `pisces.request.get_waveforms` now has a `tol` keyword that will raise an
-  exception if any returned waveform is not within a time tolerance (seconds)
-  from the requested starttime/endtime.
+  exception if any returned waveform is not within `tol` seconds from the
+  requested starttime/endtime.
 * Added `--bbfk` flag to `pisces sac2db`, which uses the broadband f-k (BBFK)
   convention of reading x, y array offset distances in the USER 7, 8 SAC
   header variables and storing them Site.dnorth and Site.deast.
@@ -17,6 +15,11 @@
   build (using MSVC).
 * Automated testing on Mac OSX, Linux, and Windows 7, for Python 2.7 and 3.4,
   thanks to Travis CI and Appveyor.
+* Require ObsPy > 1.0
+
+### Bug fixes
+
+* Fixed sac2db wfdisc.foff (issue #12) and wfdisc.dir (issue #11) handling.
 
 
 ## 0.2.1
