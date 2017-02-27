@@ -1,15 +1,19 @@
-""" 
+"""
 Common io utilities.
 
 """
 
 def _buildhdr(keymap, rec):
-    """ 
+    """
     Map attributes in rec into a dictionary, with keyname translations applied.
-    
+
+    Raises
+    ------
+    AttributeError
+        rec does not have attributes (is None?)
+
     """
     #TODO: make keymap optional?
-    # TODO: put this in io.util?
     hdr = {}
     for key1, key2 in keymap.iteritems():
         try:
@@ -24,7 +28,7 @@ def _buildhdr(keymap, rec):
 
 def _map_header(keymap, dold, nulldict=None):
     """
-    Returns a dictionary of values from dictionary dold, 
+    Returns a dictionary of values from dictionary dold,
     mapped to new key, if provided.
 
     Parameters
@@ -35,7 +39,7 @@ def _map_header(keymap, dold, nulldict=None):
     dold: dict
         The values to hand over.
     nulldict: dict, optional
-        Dictionary representing null values in source dictionary.  
+        Dictionary representing null values in source dictionary.
         Matching values will not be transferred.
 
     Returns: dict

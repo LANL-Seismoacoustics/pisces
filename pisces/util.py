@@ -1,3 +1,37 @@
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# Copyright 2013. Los Alamos National Security, LLC. This material was produced
+# under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National
+# Laboratory (LANL), which is operated by Los Alamos National Security, LLC for
+# the U.S. Department of Energy. The U.S. Government has rights to use, reproduce,
+# and distribute this software. NEITHER THE GOVERNMENT NOR LOS ALAMOS NATIONAL
+# SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY
+# FOR THE USE OF THIS SOFTWARE.  If software is modified to produce derivative
+# works, such modified software should be clearly marked, so as not to confuse it
+# with the version available from LANL.
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+# -----------------------------------------------------------------------------
+"""
+Common utility functions.
+
+"""
 import logging
 import math
 from getpass import getpass
@@ -11,7 +45,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import obspy.geodetics as geod
 from obspy.core import AttribDict
@@ -27,7 +61,7 @@ def deprecated(instructions):
     Parameters
     ----------
     instructions : str
-        A human-friendly string of instructions, such as: 
+        A human-friendly string of instructions, such as:
         'Please migrate to add_proxy() ASAP.'
 
     References
@@ -48,7 +82,7 @@ def deprecated(instructions):
             frame = inspect.currentframe().f_back
 
             warnings.warn_explicit(message,
-                                   category=DeprecatedWarning,
+                                   category=DeprecationWarning,
                                    filename=inspect.getfile(frame.f_code),
                                    lineno=frame.f_lineno)
 
@@ -58,6 +92,10 @@ def deprecated(instructions):
 
     return decorator
 
+TURNOFFWARNINGSMSG = """Warnings can be turned off with:
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning
+"""
 
 def db_connect(*args, **kwargs):
     """
@@ -168,7 +206,7 @@ def url_connect(url):
 
     Remote Oracle, OS-authenticated (no user or password needs to be specified)
     >>> url_connect('oracle://dbserver.lanl.gov:8080/mydb')
-    
+
     Remote Oracle, password-authenticated (specify user, prompted for password)
     >>> url_connect('oracle://scott@dbserver.lanl.gov:8080/mydb')
     Enter password for scott:
@@ -188,9 +226,7 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
-msg = ("This function is deprecated and will be removed.  "
-       "Please use pisces.crud.load_tables instead.")
-@deprecated(msg)
+@deprecated('get_tables is deprecated. It will be load_tables in pisces.crud in next version. ' + TURNOFFWARNINGSMSG)
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -299,6 +335,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 # TODO: merge get_tables and make_tables?
+@deprecated('make_table will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -445,7 +482,7 @@ def travel_times(ref, deg=None, km=None, depth=0.):
             # phase time requested
             if not tt:
                 if not deg:
-                    deg = geod.kilometers2degrees(km)
+                    deg = geod.kilometer2degrees(km)
                 tt = taup.getTravelTimes(deg, depth, model='ak135')
             try:
                 idx = [ph['phase_name'] for ph in tt].index(iref)
@@ -581,22 +618,22 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
         last[lastid.keyname] = lastid
 
     return last
-   
 
-def get_options(db,prefix=None):
-	'''
+
+def get_options(db, prefix=None):
+    '''
     for coretable in CORETABLES:
         table_group.add_argument('--' + coretable.name,
                             default=None,
 							metavar='owner.tablename',
 							dest=coretable.name)
-	'''
-	options={'url':'sqlite:///'+db,'prefix':prefix}
+    '''
+    options={'url':'sqlite:///'+db, 'prefix':prefix}
 
-	return options
+    return options
 
 
-
+@deprecated('get_or_create_tables will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
@@ -608,7 +645,7 @@ def get_or_create_tables(session, create=True, **tables):
         If True, create a table object that isn't found.
     tables
         Canonical table name / formatted table name keyword pairs.
-    
+
     Also accepted are canonical table name keywords with '[owner.]tablename'
     arguments, which will replace any prefix-based core table names.
 
@@ -630,7 +667,7 @@ def get_or_create_tables(session, create=True, **tables):
     tables = {}
     for coretable in CORETABLES:
         # build the table name
-        if options['prefix']==None:
+        if options['prefix'] == None:
             fulltablename = coretable.name
         else:
             fulltablename = prefix + coretable.name
