@@ -7,6 +7,12 @@
 
 ### Changes
 
+* `pisces.request.get_waveforms` now has a `tol` keyword that will raise an
+  exception if any returned waveform is not within a time tolerance (seconds)
+  from the requested starttime/endtime.
+* Added `--bbfk` flag to `pisces sac2db`, which uses the broadband f-k (BBFK)
+  convention of reading x, y array offset distances in the USER 7, 8 SAC
+  header variables and storing them Site.dnorth and Site.deast.
 * Windows support!  Thanks to @mitchburnett!  e1 and convert C libraries now
   build (using MSVC).
 * Automated testing on Mac OSX, Linux, and Windows 7, for Python 2.7 and 3.4,
