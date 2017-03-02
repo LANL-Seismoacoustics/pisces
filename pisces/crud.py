@@ -112,7 +112,7 @@ def make_tables(*tables, **kwargs):
                                     owner=owner)
 
 
-def load_tables(session, *tables, schema=None, prefix="", owner=None):
+def load_tables(session, tables, schema=None, prefix="", owner=None):
     """
     Load mapped SQLAlchemy table classes from existing SQL tables.
 
