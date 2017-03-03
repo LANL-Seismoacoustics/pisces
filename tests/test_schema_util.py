@@ -1,11 +1,13 @@
 import unittest
+
 import nose.tools as t
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.ext.declarative import declared_attr
+
+from pisces import db_connect
 import pisces.schema.util as util
 import pisces.schema.kbcore as kb
-from pisces_gndd import gndd_connect
 
 
 class TestPiscesMeta(unittest.TestCase):
@@ -47,7 +49,7 @@ class TestPiscesMeta(unittest.TestCase):
         class Site(util.ORMBase, DeferredReflection):
             __tablename__ = 'jkmacc.site'
 
-        session = gndd_connect('jkmacc')
+        session = db_connect()
         Site.prepare(session.bind)
 
         self.assertTrue(Site.__tablename__ == 'site')
@@ -83,7 +85,7 @@ def test_normal_declarative():
 @unittest.skip("Not yet implemented.")
 def test_reflected_declarative():
     from pisces.schema.test import PiscesMeta
-    session = gndd_connect('jkmacc')
+    session = db_connect()
     Base = declarative_base(metaclass=PiscesMeta)
     class Site(Base, DeferredReflection):
         __tablename__ = 'site'
@@ -95,7 +97,7 @@ def test_reflected_declarative():
 @unittest.skip("Not yet implemented.")
 def test_reflected_declarative_pk_override():
     from pisces.schema.test import PiscesMeta
-    session = gndd_connect('jkmacc')
+    session = db_connect
     Base = declarative_base(metaclass=PiscesMeta)
     class Sitechan(Base, DeferredReflection):
         __tablename__ = 'sitechan'
