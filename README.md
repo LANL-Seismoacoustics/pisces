@@ -10,7 +10,6 @@ Repository: <https://github.com/jkmacc-LANL/pisces>
 
 [![Build Status](https://travis-ci.org/jkmacc-LANL/pisces.svg?branch=master)](https://travis-ci.org/jkmacc-LANL/pisces)
 [![Build status](https://ci.appveyor.com/api/projects/status/w36hbk96bw9lmrnr/branch/master?svg=true)](https://ci.appveyor.com/project/jkmacc-LANL/pisces/branch/master)
-[![Analytics](https://ga-beacon.appspot.com/UA-48246702-1/pisces/readme)](https://github.com/igrigorik/ga-beacon)
 
 ## Features
 
