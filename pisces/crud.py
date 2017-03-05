@@ -175,8 +175,6 @@ def split_table_names(*tablenames, **kwargs):
             owner = ''
             prefixed_tablename = fulltablename
 
-        out.append((owner, prefixed_tablename))
-
         if split_prefix:
             # if a table 'endswith' a table in the schema, the part before is the
             # table prefix
@@ -190,6 +188,9 @@ def split_table_names(*tablenames, **kwargs):
                     tablename = tail
 
             out.append((owner, prefix, tablename))
+        else:
+            out.append((owner, prefixed_tablename))
+
 
     return out
 
