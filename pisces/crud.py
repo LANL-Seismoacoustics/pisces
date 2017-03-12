@@ -1,33 +1,4 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright 2013. Los Alamos National Security, LLC. This material was produced
-# under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National
-# Laboratory (LANL), which is operated by Los Alamos National Security, LLC for
-# the U.S. Department of Energy. The U.S. Government has rights to use, reproduce,
-# and distribute this software. NEITHER THE GOVERNMENT NOR LOS ALAMOS NATIONAL
-# SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY
-# FOR THE USE OF THIS SOFTWARE.  If software is modified to produce derivative
-# works, such modified software should be clearly marked, so as not to confuse it
-# with the version available from LANL.
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-# -----------------------------------------------------------------------------
 """
 Module containing functions for in-memory and in-database table creation and
 in-database table dropping.
@@ -40,8 +11,6 @@ Supports:
 
 Supported actions are:
 * creating in-memory canonical tables
-
-
 
 Glossary
 --------
@@ -343,15 +312,6 @@ def load_tables(session, *tables, **kwargs):
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
 
-    # TODO: better schema plugin management here.
-    if schema == 'css3':
-        CORETABLES = css3.CORETABLES
-    elif schema == 'kbcore':
-        CORETABLES = kb.CORETABLES
-    else:
-        msg = "Unknown schema: {}".format(schema)
-        raise ValueError(msg)
-
     # I don't use 'owner' here, b/c it will be enforced by the MetaData. Here,
     # we nust need table names.
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
@@ -364,12 +324,55 @@ def load_tables(session, *tables, **kwargs):
 
     colinfo = getattr(base, '_column_info_registry', {})
 
+    metadata = sa.MetaData()
+
     table_classes = dict()
+    for table, tablename in tablenames.items():
+        itable = sa.Table(tablename, metadata, autoload=True,
+                          autoload_with=session.bind, schema=owner)
+        if colinfo:
+            for col in itable.columns:
+                col.info.update(colinfo.get(col.name, {}))
+
+        classdict = {'__table__': itable}
+
+        if primary_keys and tablename in primary_keys:
+            columns = [getattr(itable.columns, key) for key in primary_keys[tablename]]
+            classdict['__mapper_args__'] = {'primary_key': columns}
+
+        ORMTable = type(tablename.capitalize(), parents, classdict)
+
+        table_classes[table] = ORMTable
+
+    return table_classes
 
 
 def init_tables(session, *tables):
-    pass
+    """
+    Create table classes in a database.
+
+    Parameters
+    ----------
+    session : sqlalchemy.orm.Session instance
+    tables : mapped table classes
+
+    """
+    for itable in tables:
+        itable.__table__.create(session.bind)
+    session.commit()
 
 
 def drop_tables(session, *tables):
-    pass
+    """
+    Drop table classes in a database.
+
+    Parameters
+    ----------
+    session : sqlalchemy.orm.Session instance
+    tables : mapped table classes
+
+    """
+    for itable in tables:
+        itable.__table__.drop(session.bind)
+    session.commit()
+
