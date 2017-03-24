@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-Center for Seismic Studies relational database schema 3.0 (CSS3.0)
+Antelope v4.11 Datascope database schema
 
 
 """
