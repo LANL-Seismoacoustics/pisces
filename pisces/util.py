@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Common utility functions.
+
+"""
 import logging
 import math
 from getpass import getpass
@@ -11,7 +16,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.orm.exc import NoResultFound, UnmappedInstanceError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import obspy.geodetics as geod
 from obspy.core import AttribDict
