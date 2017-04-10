@@ -313,6 +313,7 @@ def _update_docstring(cls):
     try:
         s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
     except sa.exc.CompileError:
+        # One or more columns are of a type that doesn't render to strings.
         pass
 
     return s
