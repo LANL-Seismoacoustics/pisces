@@ -310,7 +310,11 @@ def _update_docstring(cls):
     s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.') \
             for c in cls.__table__.columns])
     s += "\n\nFORMAT STRING:\n{}\n".format(cls._format_string)
-    s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
+    try:
+        s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
+    except sa.exc.CompileError:
+        pass
+
     return s
 
 class PiscesMeta(DeclarativeMeta):
