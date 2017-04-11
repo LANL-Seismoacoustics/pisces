@@ -322,7 +322,7 @@ def load_tables(session, *tables, **kwargs):
     else:
         parents = ()
 
-    colinfo = getattr(base, '_column_info_registry', {})
+    colinfo = getattr(parents, '_column_info_registry', {})
 
     metadata = sa.MetaData()
 
