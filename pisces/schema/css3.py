@@ -46,7 +46,7 @@ def dtfn(s):
 algorithm = Column(String(15), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
 amp = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 11, 'format': '11.2f'})
+        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.1f'})
 ampid = Column(Integer, nullable=False, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
 amptime = Column(Float(53), info={'default': -9999999999.999, 
@@ -54,9 +54,9 @@ amptime = Column(Float(53), info={'default': -9999999999.999,
 amptype = Column(String(8), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
 arid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-auth = Column(String(20), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a20', 'width': 20, 'format': '20s'})
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+auth = Column(String(15), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15s'})
 azdef = Column(String(1), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 azimuth = Column(Float(24), 
@@ -84,7 +84,7 @@ commid = Column(Integer,
 conf = Column(Float(24), 
         info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 5, 'format': '5.3f'})
 ctype = Column(String(4), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
 datatype = Column(String(2), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
 deast = Column(Float(24), 
@@ -111,6 +111,8 @@ digital = Column(String(1),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 dir = Column(String(64), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a64', 'width': 64, 'format': '64.64s'})
+dist = Column(Float(24), 
+        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 dnorth = Column(Float(24), 
         info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 dtype = Column(String(1), 
@@ -145,6 +147,12 @@ grname = Column(String(40),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a40', 'width': 40, 'format': '40.40s'})
 hang = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
+imb = Column(Float(24), 
+        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+iml = Column(Float(24), 
+        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
+ims = Column(Float(24), 
+        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 inarrival = Column(String(1), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 inid = Column(Integer, 
@@ -162,8 +170,8 @@ jdate = Column(Integer,
 keyname = Column(String(15), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
 keyvalue = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
-lat = Column(Float(53), 
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+lat = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 #lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
 #        info={'default': datetime.now, 'dtype': '|O8', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
@@ -172,12 +180,14 @@ lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
 #        info={'default': datetime.now, 'dtype': 'M', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
 lineno = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
+location = Column(String(32), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
 logat = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 lon = Column(Float(53), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 magid = Column(Integer, nullable=False, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 magnitude = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 magres = Column(Float(24),
@@ -268,18 +278,18 @@ snr = Column(Float(24),
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.2f'})
 srn = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-srname = Column(String(80), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
+srname = Column(String(40), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a40', 'width': 40, 'format': '40.40s'})
 sta = Column(String(6), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
 staname = Column(String(50), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a50', 'width': 50, 'format': '50.50s'})
 stassid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 statype = Column(String(4), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
 stime = Column(Float(24),
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
+        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.2f'})
 strike = Column(Float(24), 
         info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
 stt = Column(Float(24),
@@ -305,7 +315,7 @@ syz = Column(Float(24),
 szz = Column(Float(24),
         info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
 tagid = Column(Integer, 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9d'})
+        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8d'})
 tagname = Column(String(8), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
 time = Column(Float(53), 
@@ -315,7 +325,7 @@ timedef = Column(String(1),
 timeres = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
 tshift = Column(Float(24), 
-        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.2f'})
+        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
 uncertainty = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 units = Column(String(15), 
@@ -334,12 +344,10 @@ class Affiliation(Base):
     
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('net', 'sta', 'time'),)
+        return (PrimaryKeyConstraint('net', 'sta'),)
 
     net = net.copy()
     sta = sta.copy()
-    time = time.copy()
-    endtime = endtime.copy()
     lddate = lddate.copy()
 
 
@@ -606,7 +614,6 @@ class Remark(Base):
     commid = commid.copy()
     lineno = lineno.copy()
     remark = remark.copy()
-    auth = auth.copy()
     lddate = lddate.copy()
 
 
@@ -690,10 +697,9 @@ class Stamag(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('magid', 'sta', 'arid'),)
+        return (PrimaryKeyConstraint('magid', 'sta'),)
 
     magid = magid.copy()
-    ampid = ampid.copy()
     sta = sta.copy()
     arid = arid.copy()
     orid = orid.copy()
@@ -703,13 +709,35 @@ class Stamag(Base):
     magtype = magtype.copy()
     magnitude = magnitude.copy()
     uncertainty = uncertainty.copy()
-    magres = magres.copy()
-    magdef = magdef.copy()
-    mmodel = mmodel.copy()
     auth = auth.copy()
     commid = commid.copy()
     lddate = lddate.copy()
-
+    
+    
+class Stassoc(Base):
+    __abstract__ = True
+    
+    @declared_attr
+    def __table_args__(cls):
+        return (PrimaryKeyConstraint('stassid'),)
+        
+    stassid = stassid.copy()
+    sta = sta.copy()
+    etype = etype.copy()
+    location = location.copy()
+    dist = dist.copy()
+    azimuth = azimuth.copy()
+    lat = lat.copy()
+    lon = lon.copy()
+    depth = depth.copy()
+    time = time.copy()
+    imb = imb.copy()
+    ims = ims.copy()
+    iml = iml.copy()
+    auth = auth.copy()
+    commid = commid.copy()
+    lddate = lddate.copy()
+        
 
 class Wfdisc(Base):
     __abstract__ = True
