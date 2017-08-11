@@ -1,4 +1,3 @@
-from itertools import izip_longest
 import sqlalchemy as sa
 from sqlalchemy import create_engine, func, or_
 from sqlalchemy.orm import Session
