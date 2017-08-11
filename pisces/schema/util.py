@@ -58,10 +58,10 @@ def get_infovals(meta, structure, key):
     # TODO: make this more efficient
 
     # cache all tables
-    tabledct = dict([(itable.name, itable) for itable in meta.tables.values()])
+    tabledct = dict([(itable.name, itable) for itable in list(meta.tables.values())])
     # cache all unique column info values in metadata in a dict
     colvaldct = {}
-    for t in meta.tables.values():
+    for t in list(meta.tables.values()):
         for c in t.columns:
             colvaldct[c.name] = c.info.get(key, None)
 
@@ -114,9 +114,9 @@ def string_formatter(meta, structure):
     # string_formatter(KBBase.metadata, ['lat','lon']).format(o) # fails
     # o = session.query(Origin.lat, Origin.lon).first()
     # string_formatter(KBBase.metadata, ['lat','lon']).format(o) # succeeds
-    tabledct = dict([(itable.name, itable) for itable in meta.tables.values()])
+    tabledct = dict([(itable.name, itable) for itable in list(meta.tables.values())])
     colfmtdct = {}
-    for t in meta.tables.values():
+    for t in list(meta.tables.values()):
         for c in t.columns:
             colfmtdct[c.name] = c.info.get('format', None)
     structfmt = []
@@ -302,7 +302,7 @@ def _getitem(self, i):
 def _setitem(self, i, val):
     # integer indexing based on column order in __table__
     # helps implement __iter__ behavior as a side-effect
-    colname = self.__table__.columns.keys()[i]
+    colname = list(self.__table__.columns.keys())[i]
     setattr(self, self._attrname[colname], val)
 
 
@@ -378,7 +378,7 @@ class PiscesMeta(DeclarativeMeta):
         super(PiscesMeta, cls).__init__(clsname, parents, dct)
 
         # store Column info dictionary in base._column_info_registry
-        for key, val in dct.iteritems():
+        for key, val in dct.items():
             if isinstance(val, sa.Column):
                 try:
                     cls.__base__.__dict__['_column_info_registry'][key] = val.info
@@ -388,7 +388,7 @@ class PiscesMeta(DeclarativeMeta):
         # for actual ORM classes, add usefull class attributes
         # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
         if hasattr(cls, '__table__'):
-            cls._attrname = {c.name: a for a, c in cls.__mapper__.c.items()}  # {col_name: attr_name}
+            cls._attrname = {c.name: a for a, c in list(cls.__mapper__.c.items())}  # {col_name: attr_name}
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
             cls.__doc__ = _update_docstring(cls)
 
