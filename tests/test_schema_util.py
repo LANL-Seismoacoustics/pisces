@@ -61,7 +61,7 @@ class TestPiscesMeta(unittest.TestCase):
         pass
 
 def test_normal_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class Sitechan(Base):
         __tablename__ = 'sitechan'
@@ -84,7 +84,7 @@ def test_normal_declarative():
 
 @unittest.skip("Not yet implemented.")
 def test_reflected_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     session = db_connect()
     Base = declarative_base(metaclass=PiscesMeta)
     class Site(Base, DeferredReflection):
@@ -96,7 +96,7 @@ def test_reflected_declarative():
 
 @unittest.skip("Not yet implemented.")
 def test_reflected_declarative_pk_override():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     session = db_connect
     Base = declarative_base(metaclass=PiscesMeta)
     class Sitechan(Base, DeferredReflection):
@@ -109,7 +109,7 @@ def test_reflected_declarative_pk_override():
     t.assert_true('chanid' in Sitechan.__table__.primary_key)
 
 def test_schema_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class Sitechan(Base):
         __tablename__ = 'testuser.sitechan'
@@ -132,7 +132,7 @@ def test_schema_declarative():
     t.assert_true(Sitechan.__table__.schema == 'testuser')
 
 def test_abstract_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class AbstractSitechan(Base):
         __abstract__ = True
@@ -159,7 +159,7 @@ def test_abstract_declarative():
     t.assert_true(Sitechan.__table__.name == 'sitechan')
 
 def test_schema_abstract_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class AbstractSitechan(Base):
         __abstract__ = True
@@ -187,7 +187,7 @@ def test_schema_abstract_declarative():
     t.assert_true(Sitechan.__table__.schema == 'testuser')
 
 def test_two_abstract_declarative():
-    from pisces.schema.test import PiscesMeta
+    from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class AbstractSitechan(Base):
         __abstract__ = True
