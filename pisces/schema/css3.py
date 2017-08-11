@@ -756,7 +756,7 @@ class Remark(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('commid', 'lineno'))
+        return (PrimaryKeyConstraint('commid', 'lineno'),)
 
     commid = commid.copy()
     lineno = lineno.copy()
