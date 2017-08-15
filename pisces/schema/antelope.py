@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-Center for Seismic Studies relational database schema 3.0 (CSS3.0)
+Antelope v4.11 Datascope database schema
 
 
 """
@@ -48,7 +48,7 @@ algorithm = Column(String(15),
 amp = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.1f'})
 ampid = Column(Integer, nullable=False, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 amptime = Column(Float(53), info={'default': -9999999999.999, 
         'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
 amptype = Column(String(8), 
@@ -66,13 +66,13 @@ azres = Column(Float(24),
 band = Column(String(1), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 belief = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 4, 'format': '4.2f'})
+        info={'default': -9.99, 'parse': parse_float, 'dtype': 'float', 'width': 4, 'format': '4.2f'})
 calib = Column(Float(24), 
-        info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+        info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.9f'})
 calper = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
 calratio = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
+        info={'default': 1.0, 'parse': parse_float, 'dtype': 'float', 'width': 16, 'format': '16.6f'})
 chan = Column(String(8), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
 chanid = Column(Integer, 
@@ -82,7 +82,7 @@ clip = Column(String(1),
 commid = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 conf = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 5, 'format': '5.3f'})
+        info={'default': 0, 'parse': parse_float, 'dtype': 'float', 'width': 5, 'format': '5.3f'})
 ctype = Column(String(4), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
 datatype = Column(String(2), 
@@ -111,8 +111,6 @@ digital = Column(String(1),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 dir = Column(String(64), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a64', 'width': 64, 'format': '64.64s'})
-dist = Column(Float(24), 
-        info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 dnorth = Column(Float(24), 
         info={'default': 0.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 dtype = Column(String(1), 
@@ -131,8 +129,8 @@ endtime = Column(Float(53), info={'default':  9999999999.999,
         'parse': parse_float, 'dtype': 'float', 'width': 17, 'format': '17.5f'})
 esaz = Column(Float(24), 
         info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-etype = Column(String(7), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a7', 'width': 7, 'format': '7.7s'})
+etype = Column(String(2), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a2', 'width': 2, 'format': '2.2s'})
 evid = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 evname = Column(String(15),
@@ -147,12 +145,6 @@ grname = Column(String(40),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a40', 'width': 40, 'format': '40.40s'})
 hang = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
-imb = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-iml = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-ims = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 inarrival = Column(String(1), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a1', 'width': 1, 'format': '1.1s'})
 inid = Column(Integer, 
@@ -171,7 +163,7 @@ keyname = Column(String(15),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
 keyvalue = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-lat = Column(Float(24), 
+lat = Column(Float(53), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 #lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
 #        info={'default': datetime.now, 'dtype': '|O8', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
@@ -180,8 +172,6 @@ lddate = Column(DateTime, nullable=False, onupdate=datetime.now,
 #        info={'default': datetime.now, 'dtype': 'M', 'width': 17, 'format': '%y-%m-%d %H:%M:%S'}) 
 lineno = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
-location = Column(String(32), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a32', 'width': 32, 'format': '32.32s'})
 logat = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 lon = Column(Float(53), 
@@ -237,7 +227,7 @@ ondate = Column(Integer,
 orid = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 parid = Column(Integer, 
-        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
+        info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 per = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
 phase = Column(String(8), 
@@ -252,6 +242,8 @@ refsta = Column(String(6),
         info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
 remark = Column(String(80), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a80', 'width': 80, 'format': '80.80s'})
+review =  Column(String(4), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a4', 'width': 4, 'format': '4.4s'})
 rsptype = Column(String(6), 
         info={'default': '-', 'parse': parse_str, 'dtype': 'a6', 'width': 6, 'format': '6.6s'})
 samprate = Column(Float(24), 
@@ -275,7 +267,7 @@ smajax = Column(Float(24),
 sminax = Column(Float(24), 
         info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9.4f'})
 snr = Column(Float(24), 
-        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.2f'})
+        info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 10, 'format': '10.5f'})
 srn = Column(Integer, 
         info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 8, 'format': '8d'})
 srname = Column(String(40), 
@@ -325,11 +317,11 @@ timedef = Column(String(1),
 timeres = Column(Float(24), 
         info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 8, 'format': '8.3f'})
 tshift = Column(Float(24), 
-        info={'default': -999.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
+        info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.2f'})
 uncertainty = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 7, 'format': '7.2f'})
-units = Column(String(15), 
-        info={'default': '-', 'parse': parse_str, 'dtype': 'a15', 'width': 15, 'format': '15.15s'})
+units = Column(String(12), 
+        info={'default': '-', 'parse': parse_str, 'dtype': 'a12', 'width': 12, 'format': '12.12s'})
 vang = Column(Float(24), 
         info={'default': -1.0, 'parse': parse_float, 'dtype': 'float', 'width': 6, 'format': '6.1f'})
 vmodel = Column(String(15), 
@@ -344,7 +336,7 @@ class Affiliation(Base):
     
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('net', 'sta'),)
+        return (PrimaryKeyConstraint('net', 'sta', 'time'),)
 
     net = net.copy()
     sta = sta.copy()
@@ -590,6 +582,7 @@ class Origin(Base):
     grn = grn.copy()
     srn = srn.copy()
     etype = etype.copy()
+    review = review.copy()
     depdp = depdp.copy()
     dtype = dtype.copy()
     mb = mb.copy()
@@ -665,7 +658,7 @@ class Sitechan(Base):
     @declared_attr
     def __table_args__(cls):
         return (UniqueConstraint('sta','chan','ondate'),
-                PrimaryKeyConstraint('chanid'),)
+                PrimaryKeyConstraint('sta','chan','ondate','offtime'),)
 
     sta = sta.copy()
     chan = chan.copy()
@@ -697,7 +690,7 @@ class Stamag(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('magid', 'sta'),)
+        return (PrimaryKeyConstraint('magid', 'sta', 'arid'),)
 
     magid = magid.copy()
     sta = sta.copy()
@@ -705,39 +698,13 @@ class Stamag(Base):
     orid = orid.copy()
     evid = evid.copy()
     phase = phase.copy()
-    delta = delta.copy()
     magtype = magtype.copy()
     magnitude = magnitude.copy()
     uncertainty = uncertainty.copy()
     auth = auth.copy()
     commid = commid.copy()
     lddate = lddate.copy()
-    
-    
-class Stassoc(Base):
-    __abstract__ = True
-    
-    @declared_attr
-    def __table_args__(cls):
-        return (PrimaryKeyConstraint('stassid'),)
-        
-    stassid = stassid.copy()
-    sta = sta.copy()
-    etype = etype.copy()
-    location = location.copy()
-    dist = dist.copy()
-    azimuth = azimuth.copy()
-    lat = lat.copy()
-    lon = lon.copy()
-    depth = depth.copy()
-    time = time.copy()
-    imb = imb.copy()
-    ims = ims.copy()
-    iml = iml.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
-        
+
 
 class Wfdisc(Base):
     __abstract__ = True

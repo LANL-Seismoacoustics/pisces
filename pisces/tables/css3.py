@@ -55,6 +55,9 @@ class Sregion(css3.Sregion):
 
 class Stamag(css3.Stamag):
     __tablename__ = 'stamag'
+    
+class Stassoc(css3.Stassoc):
+    __tablename__ = 'stassoc'
 
 class Wfdisc(css3.Wfdisc):
     __tablename__ = 'wfdisc'
