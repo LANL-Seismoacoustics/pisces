@@ -47,27 +47,4 @@ pip install git+https://github.com/jkmacc-LANL/pisces
 ## 0.2.4
 
 * Change package name to "pisces" instead of "pisces-db"
-
-## 0.2.2
-
-### Changes
-
-* `pisces.util.get_tables`, `pisces.util.make_tables`, and
-  `pisces.util.get_or_create_tables` are deprecated and will raise a warning.
-* `pisces.request.get_waveforms` now has a `tol` keyword that will raise an
-  exception if any returned waveform is not within `tol` seconds from the
-  requested starttime/endtime.
-* Added `--bbfk` flag to `pisces sac2db`, which uses the broadband f-k (BBFK)
-  convention of reading x, y array offset distances in the USER 7, 8 SAC
-  header variables and storing them Site.dnorth and Site.deast.
-* Windows support!  Thanks to @mitchburnett!  e1 and convert C libraries now
-  build (using MSVC).
-* Automated testing on Mac OSX, Linux, and Windows 7, for Python 2.7 and 3.4,
-  thanks to Travis CI and Appveyor.
-* Require ObsPy > 1.0
-
-### Bug fixes
-
-* Fixed sac2db wfdisc.foff (issue #12) and wfdisc.dir (issue #11) handling.
-
-
+* Add Antelope Datascope schema/tables.

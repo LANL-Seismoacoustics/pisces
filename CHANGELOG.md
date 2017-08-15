@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.2.4
+
+* Change package name to "pisces" instead of "pisces-db"
+* Add Antelope Datascope schema/tables.
+
 
 ## 0.2.2
 
