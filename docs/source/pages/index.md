@@ -118,7 +118,7 @@ Requires:
 
 Install from [PyPI](https://pypi.python.org/pypi):
 
-    pip install pisces-db
+    pip install pisces
 
 Install current master from GitHub:
 

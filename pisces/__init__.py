@@ -17,7 +17,7 @@ architectures, or licensing concerns.
 
 """
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 from pisces.util import db_connect, get_tables, travel_times, make_table
 from pisces.schema.util import string_formatter

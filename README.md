@@ -31,7 +31,7 @@ Requires:
 Install from [PyPI](https://pypi.python.org/pypi):
 
 ```
-pip install pisces-db
+pip install pisces
 ```
 
 Install current master from GitHub:
@@ -43,6 +43,10 @@ pip install git+https://github.com/jkmacc-LANL/pisces
 # Recent History 
 
 ([full change log](CHANGELOG.md))
+
+## 0.2.4
+
+* Change package name to "pisces" instead of "pisces-db"
 
 ## 0.2.2
 

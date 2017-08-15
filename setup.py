@@ -23,8 +23,8 @@ except ImportError:
 
 doclines = __doc__.split("\n")
 
-setup(name='pisces-db',
-    version='0.2.3',
+setup(name='pisces',
+    version='0.2.4',
     description='A Practical Seismological Database Library in Python.',
     long_description=long_description,
     author='Jonathan MacCarthy',
