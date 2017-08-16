@@ -16,7 +16,7 @@ from numpy.distutils.core import setup, Extension
 
 try:
     import pypandoc
-    long_description=pypandoc.convert('README.md', 'rst').read()
+    long_description=pypandoc.convert_file('README.md', 'rst')
 except ImportError:
     long_description=open('README.md').read()
 
@@ -32,7 +32,7 @@ setup(name='pisces',
     packages=['pisces','pisces.schema','pisces.io','pisces.tables',
               'pisces.commands'],
     url='https://github.com/jkmacc-LANL/pisces',
-    download_url='https://github.com/jkmacc-LANL/pisces/tarball/0.2.2',
+    download_url='https://github.com/jkmacc-LANL/pisces/tarball/0.2.4',
     keywords = ['seismology', 'geophysics', 'database'],
     install_requires=['numpy','obspy>=1.0','sqlalchemy>=0.9','Click'],
     ext_package='pisces.io.lib',
