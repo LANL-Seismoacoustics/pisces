@@ -29,10 +29,12 @@ include pisces/io/src/convert/t4t8.c
 include pisces/io/src/e_compression/e_compression.c
 include pisces/io/src/e_compression/e_compression.h
 include pisces/schema/__init__.py
+include pisces/schema/antelope.py
 include pisces/schema/css3.py
 include pisces/schema/kbcore.py
 include pisces/schema/util.py
 include pisces/tables/__init__.py
+include pisces/tables/antelope.py
 include pisces/tables/css3.py
 include pisces/tables/kbcore.py
 include pisces/commands/__init__.py
