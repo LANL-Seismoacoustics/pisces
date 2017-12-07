@@ -20,7 +20,7 @@ from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import obspy.geodetics as geod
 from obspy.core import AttribDict
-from obspy.taup import taup
+from obspy.taup import TauPyModel
 
 from pisces.schema.util import PiscesMeta
 
@@ -407,7 +407,8 @@ def gen_id(i=0):
         i += 1
         yield i
 
-# TODO: use ObsPy's new TauPy object thingy for traveltimes
+ak135 = TauPyModel(model='ak135')
+
 def travel_times(ref, deg=None, km=None, depth=0.):
     """
     Get *approximate* relative travel time(s).
@@ -454,10 +455,10 @@ def travel_times(ref, deg=None, km=None, depth=0.):
             if not tt:
                 if not deg:
                     deg = geod.kilometer2degrees(km)
-                tt = taup.getTravelTimes(deg, depth, model='ak135')
+                tt = ak135.get_travel_times(depth, deg)
             try:
-                idx = [ph['phase_name'] for ph in tt].index(iref)
-                itt = [ph['time'] for ph in tt][idx]
+                idx = [ph.name for ph in tt].index(iref)
+                itt = [ph.time for ph in tt][idx]
             except ValueError:
                 # phase not found
                 itt = None
