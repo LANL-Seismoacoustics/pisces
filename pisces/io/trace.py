@@ -17,11 +17,6 @@ def wfdisc2obspyhdr(wf):
     obshdr['starttime'] = UTCDateTime(float(wf.time))
     obshdr['delta'] = 1. / wf.samprate
 
-<<<<<<< HEAD
-=======
-    # endtime?
-
->>>>>>> =Converted the io directory to py3
     return Stats(header=obshdr)
 
 
