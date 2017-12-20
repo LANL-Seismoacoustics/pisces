@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.3.0
+
+* Python 3 support!
+* No more Python 2 support
+
 ## 0.2.4
 
 * Change package name to "pisces" instead of "pisces-db"
