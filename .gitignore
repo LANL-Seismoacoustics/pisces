@@ -38,3 +38,9 @@ nosetests.xml
 docs/html
 *.xml
 *.iml
+docs/source/api/_build/
+pisces/scripts
+.cache
+.vscode
+docs/pisces-git-workflow.png
+docs/source/api/README.pdf
