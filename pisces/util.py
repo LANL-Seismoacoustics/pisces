@@ -680,9 +680,9 @@ def load_config(config):
     The config input is a dict-like object of table name keys and class paths.
     This can be a configparser object or a nested dict. The "database" section and "url" key
     are required.  Any additional parameters in the section must be importable
-    module names, with optional SQLAlchemy table class names separated by a colon ":". 
+    module names, with optional SQLAlchemy table class names separated by a colon ":".
     If no class name is provided, a class with the capitalized key name is imported.
-    
+
 
     Examples
     --------
@@ -718,7 +718,7 @@ def load_config(config):
     session = url_connect(URL)
 
     tables = {}
-    for table, classpath in conf.items():
+    for table, classpath in config.items():
         try:
             module_name, class_name = classpath.split(':')
         except ValueError:
