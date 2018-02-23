@@ -663,8 +663,9 @@ def get_or_create_tables(session, create=True, **tables):
 
 def load_config(config):
     """
-    Read a nested dictionary-like object (actual nested dictionary or ConfigParser object)
-    to produce a SQLAlchemy database session and dictionary of database table classes.
+    Take dictionary-like object (actual dictionary or ConfigParser section)
+    to produce a SQLAlchemy database session and dictionary of database table
+    classes.
 
     Parameters
     ----------
@@ -676,9 +677,8 @@ def load_config(config):
     tables : dict
         Keys are canonical table names, values are SQLAlchemy table classes.
 
-    The config input is a dict-like object with a 'database' key, that produces
-    another dictionary of table name keys and class paths.  This can be a
-    configparser object or a nested dict. The "database" section and "url" key
+    The config input is a dict-like object of table name keys and class paths.
+    This can be a configparser object or a nested dict. The "database" section and "url" key
     are required.  Any additional parameters in the section must be importable
     module names, with optional SQLAlchemy table class names separated by a colon ":". 
     If no class name is provided, a class with the capitalized key name is imported.
@@ -696,18 +696,17 @@ def load_config(config):
     mytable = custom_tables:MyCustomTableClass
     arrival = othermodule
 
-    >>> config = {'database': {'url': 'oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname',
-                               'site': 'modulename:SiteClassName',
-                               'wfdisc': 'modulename:Wfdisc_raw',
-                               'mytable': 'custom_tables:MyCustomTableClass',
-                               'arrival': 'othermodule',
-                               }
-                 }
+    >>> config = {'url': 'oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname',
+                  'site': 'modulename:SiteClassName',
+                  'wfdisc': 'modulename:Wfdisc_raw',
+                  'mytable': 'custom_tables:MyCustomTableClass',
+                  'arrival': 'othermodule',
+                  }
     # or
     >>> import configparser
     >>> config = configparser.ConfigParser()
     >>> config.read('pisces.cfg')
-    >>> session, tables = load_config(config)
+    >>> session, tables = load_config(config['database'])
     >>> tables
     ... {'arrival': othermodule.Arrival,
     ... 'mytable': custom_tables.MyCustomTableClass,
@@ -715,11 +714,11 @@ def load_config(config):
     ... 'wfdisc': modulename.Wfdisc_raw}
 
     """
-    URL = config['database'].pop('url')
+    URL = config.pop('url')
     session = url_connect(URL)
 
     tables = {}
-    for table, classpath in conf['database'].items():
+    for table, classpath in conf.items():
         try:
             module_name, class_name = classpath.split(':')
         except ValueError:
@@ -729,6 +728,6 @@ def load_config(config):
         tables[table] = getattr(m, class_name)
 
     # put it back
-    config['database']['url'] = URL
+    config['url'] = URL
 
     return session, tables
