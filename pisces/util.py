@@ -9,6 +9,7 @@ from getpass import getpass
 import warnings
 import functools
 import inspect
+from importlib import import_module
 
 import numpy as np
 import sqlalchemy as sa
@@ -658,3 +659,75 @@ def get_or_create_tables(session, create=True, **tables):
     session.commit()
 
     return tables
+
+
+def load_config(config):
+    """
+    Take dictionary-like object (actual dictionary or ConfigParser section)
+    to produce a SQLAlchemy database session and dictionary of database table
+    classes.
+
+    Parameters
+    ----------
+    config : dict-like
+
+    Returns
+    -------
+    session : SQLAlchemy database session instance
+    tables : dict
+        Keys are canonical table names, values are SQLAlchemy table classes.
+
+    The config input is a dict-like object of table name keys and class paths.
+    This can be a configparser object or a nested dict. The "database" section and "url" key
+    are required.  Any additional parameters in the section must be importable
+    module names, with optional SQLAlchemy table class names separated by a colon ":".
+    If no class name is provided, a class with the capitalized key name is imported.
+
+
+    Examples
+    --------
+    The following inputs should be equivalent.
+
+    # pisces.cfg
+    [database] # required
+    url = oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname # required
+    site = mytablemodule:SiteClassName
+    wfdisc = mytablemodule:WfdiscClassName
+    mytable = custom_tables:MyCustomTableClass
+    arrival = othermodule
+
+    >>> config = {'url': 'oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname',
+                  'site': 'modulename:SiteClassName',
+                  'wfdisc': 'modulename:Wfdisc_raw',
+                  'mytable': 'custom_tables:MyCustomTableClass',
+                  'arrival': 'othermodule',
+                  }
+    # or
+    >>> import configparser
+    >>> config = configparser.ConfigParser()
+    >>> config.read('pisces.cfg')
+    >>> session, tables = load_config(config['database'])
+    >>> tables
+    ... {'arrival': othermodule.Arrival,
+    ... 'mytable': custom_tables.MyCustomTableClass,
+    ... 'site': modulename.SiteClassName,
+    ... 'wfdisc': modulename.Wfdisc_raw}
+
+    """
+    URL = config.pop('url')
+    session = url_connect(URL)
+
+    tables = {}
+    for table, classpath in config.items():
+        try:
+            module_name, class_name = classpath.split(':')
+        except ValueError:
+            module_name, class_name = classpath, table.capitalize()
+
+        m = import_module(module_name)
+        tables[table] = getattr(m, class_name)
+
+    # put it back
+    config['url'] = URL
+
+    return session, tables
