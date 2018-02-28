@@ -4,6 +4,7 @@
 
 * Python 3 support!
 * No more Python 2 support
+* Add the ability to target a database and tables in a config file (see util.load_config).
 
 ## 0.2.4
 
