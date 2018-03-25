@@ -13,8 +13,8 @@ from obspy.io.sac.core import _is_sac
 
 import pisces as ps
 from pisces.util import get_lastids, url_connect
-from pisces.tables.kbcore import CORETABLES
 import pisces.io.sac as sac
+from .util import get_or_create_tables, dicts2rows, get_files
 
 
 def get_plugins(plugins):
@@ -38,91 +38,6 @@ def get_plugins(plugins):
             plugin_functions.append(getattr(mod, fn))
 
     return plugin_functions
-
-
-def get_files(file_list):
-    """
-    Return a sequence of SAC file names from either a list of file names
-    (trivial) or a text file list (presumable because there are too many files
-    to use normal shell expansion).
-
-    """
-    if len(file_list) == 1 and not _is_sac(file_list[0]):
-        #make a generator of non-blank lines
-        try:
-            listfile = open(file_list[0], 'r')
-            files = (line.strip() for line in listfile if line.strip())
-        except IOError:
-            msg = "{0} does not exist.".format(file_list[0])
-            raise IOError(msg)
-    else:
-        files = file_list
-
-    return files
-
-
-# TODO: put in util.py ?
-def get_or_create_tables(session, prefix=None, create=True, **tables):
-    """
-    Load or create canonical ORM KB Core table classes.
-
-    Parameters
-    ----------
-    session : sqlalchemy.orm.Session
-    prefix : str
-        Prefix for canonical table names, e.g. 'myaccount.' or 'TA_' (no owner/schema).
-        Canonical table names are used if no prefix is provided.
-    create : bool
-        If True, create tables that don't yet exist.
-
-    Canonical table keyword/tablename string pairs, such as site='other.site',
-    can override prefix.  For example, you may want to use a different Lastid
-    table, so that ids don't start from 1.
-
-    Returns
-    -------
-    tables : dict
-        A mapping between canonical table names and SQLA declarative classes
-        with the correct __tablename__.
-        e.g. {'origin': Origin, ...}
-
-    """
-    # The Plan:
-    # 1. For each core table, build or get the table name
-    # 2. If it's a vanilla table name, just use a pre-packaged table class
-    # 3. If not, try to autoload it.
-    # 4. If it doesn't exist, make it from a prototype and create it in the database.
-
-    # TODO: check options for which tables to produce.
-
-    if not prefix:
-        prefix = ''
-
-    tabledict = {}
-    for coretable in CORETABLES.values():
-        # build the table name
-        fulltablename = tables.get(coretable.name, prefix + coretable.name)
-
-        # put table classes into the tables dictionary
-        if fulltablename == coretable.name:
-            # it's a vanilla table name. just use a pre-packaged table class instead of making one.
-            tabledict[coretable.name] = coretable.table
-        else:
-            tabledict[coretable.name] = ps.make_table(fulltablename, coretable.prototype)
-
-        tabledict[coretable.name].__table__.create(session.bind, checkfirst=True)
-
-    session.commit()
-
-    return tabledict
-
-
-def dicts2rows(dicts, classes):
-    for table, dcts in dicts.items():
-        cls = classes[table]
-        dicts[table] = [cls(**dct) for dct in dcts]
-
-    return dicts
 
 
 def make_atomic(last, **rows):
@@ -178,9 +93,6 @@ def apply_plugins(plugins, **rows):
     return rows
 
 
-def sac2db(session, tables, files, plugins=None, absolute_paths=False):
-    pass
-
 # TODO: make this main also accept a get_iterable and get_row_dicts functions,
 #   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py
 def main(**kwargs):
@@ -207,7 +119,7 @@ def main(**kwargs):
     session = kwargs['session']
 
     if kwargs.get('file_list'):
-        files = get_files(kwargs['file_list'])
+        files = get_files(kwargs['file_list'], file_check=_is_sac)
     else:
         files = kwargs['files']
 
@@ -224,10 +136,9 @@ def main(**kwargs):
 
         tr = read(sacfile, format='SAC', debug_headers=True)[0]
 
+        # sachdr2tables produces table dictionaries
         # rows needs to be a dict of lists, for make_atomic
-        # row_dicts = get_row_dicts(tr.stats.sac) # put in the whole trace, to determine byte order?
         dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
-        # row_instances = dicts_to_instances(row_dicts, tables)
         rows = dicts2rows(dicts, tables)
 
         # manage dir, dfile, datatype

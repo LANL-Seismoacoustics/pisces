@@ -29,6 +29,7 @@ import click
 from pisces import __version__
 from pisces.util import url_connect
 from pisces.commands import sac2db
+from pisces.commands import mseed2db
 
 def split_commas(ctx, param, value):
     """
@@ -104,11 +105,6 @@ def drop_command(**kwargs):
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
 @click.argument('DB', envvar='PISCESDB')
-@click.option('-t', '--tables',
-              help=("Comma-separated (no spaces), list of tables to create.  "
-                    "Default is all core tables with standard names."),
-              metavar="owner.tablename[,...]",
-              callback=split_commas)
 @click.option('-p', '--prefix', default="",
               help=("Target tables using 'account.prefix naming.  "
                     "e.g. myaccount.test_ will target tables like "
@@ -131,14 +127,17 @@ def sac2db_command(**kwargs):
     numbering will follow the Lastid table, if one is found, otherwise it will
     start from 1.
 
+    \b
     Examples
     --------
     # use standard table names to local test.sqlite file
     pisces sac2db sqlite:///test.sqlite datadir/*.sac
 
+    \b
     # prefix all tables in an oracle account with prefix my_, prompt for password
     pisces sac2db --prefix my_ oracle://user@server.domain.com:port/dbname datadir/*.sac
 
+    \b
     # if there are too many SAC files for the shell to handle, use a list:
     find datadir -name "*.sac" -print > saclist.txt
     sac2db.py sqlite:///test.sqlite saclist.txt
@@ -153,64 +152,85 @@ def sac2db_command(**kwargs):
 
 # ------------------------------- MSEED2DB ------------------------------------
 @cli.command('mseed2db')
-@click.argument('DB')
+@click.argument('DB', envvar='PISCESDB')
+@click.option('-p', '--prefix', default="",
+              help=("Target tables using 'account.prefix naming.  "
+                    "e.g. myaccount.test_ will target tables like "
+                    "myaccount.test_origin, myaccount.test_sitechan."))
+@click.option('-A', '--absolute_paths', is_flag=True,
+              help=("If set, write database 'dir' directory entries as"
+                    " absolute paths, not relative."))
+@click.option('-l', '--file_list', type=click.File('r'),
+              help="A list file, one file name per line.")
+@click.argument('files', nargs=-1, type=click.Path())
 def mseed2db_command(**kwargs):
     """
     Scrape MSEED files into database tables.
 
-    Not yet implemented.
+    MSEED files may be used to produce the following tables: Wfdisc, Site,
+    Sitechan, and Lastid.  Id numbering will follow the Lastid table,
+    if one is found, otherwise it will start from 1.
+
+    \b
+    Notes
+    -----
+    The datatype in the wfdisc table will be "sd", which is _not_ a standard
+    datatype.  It will unpack into int32 arrays if pisces.io.readwaveform is used.
+    The miniSEED header is very minimal, so it will not produce site and sitechan
+    entries that incomplete.  Notably, site will not have coordinates in it.
 
     """
-    print("mseed2db: {}".format(kwargs))
+    session = url_connect(kwargs['db'])
+    mseed2db.main(session=session, **kwargs)
 
 
 # ------------------------------- QUERY ---------------------------------------
 # This is where elementary querying is done, mostly using pisces.request
 #
-@cli.group('query')
-@click.argument('DB')
-def query(**kwargs):
-    """
-    Perform a basic query.
-
-    Not yet implemented.
-
-    """
-    print("query: {}".format(kwargs))
-
-
-@query.command('stations')
-@click.argument('DB')
-def query_stations(**kwargs):
-    """
-    Query stations from the site table.
-
-    Not yet implemented.
-
-    """
-    print("stations: {}".format(kwargs))
-
-@query.command('events')
-@click.argument('DB')
-def query_events(**kwargs):
-    """
-    Query the origin table for events.
-
-    Not yet implemented.
-
-    """
-    print("events: {}".format(kwargs))
-
-@query.command('waveforms')
-@click.argument('DB')
-def query_waveforms(**kwargs):
-    """
-    Query waveforms from the wfdisc table.
-
-    Not yet implemented.
-
-    """
-    print("waveforms: {}".format(kwargs))
+# @cli.group('query')
+# @click.argument('DB')
+# def query(**kwargs):
+#     """
+#     Perform a basic query.
+# 
+#     Not yet implemented.
+# 
+#     """
+#     print("query: {}".format(kwargs))
+# 
+# 
+# @query.command('stations')
+# @click.argument('DB')
+# def query_stations(**kwargs):
+#     """
+#     Query stations from the site table.
+# 
+#     Not yet implemented.
+# 
+#     """
+#     print("stations: {}".format(kwargs))
+# 
+# @query.command('events')
+# @click.argument('DB')
+# def query_events(**kwargs):
+#     """
+#     Query the origin table for events.
+# 
+#     Not yet implemented.
+# 
+#     """
+#     print("events: {}".format(kwargs))
+# 
+# @query.command('waveforms')
+# @click.argument('DB')
+# def query_waveforms(**kwargs):
+#     """
+#     Query waveforms from the wfdisc table.
+# 
+#     Not yet implemented.
+# 
+#     """
+#     print("waveforms: {}".format(kwargs))
 
 
 if __name__ == '__main__':
