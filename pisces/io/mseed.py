@@ -9,7 +9,7 @@ def mseedhdr2tables(stats, wfdisc=None, site=None, sitechan=None, affiliation=No
     Parameters
     ----------
     stats : obspy.core.Stats instance
-    wfdisc, site, sitechan : SQLAlchemy ORM table classes
+    wfdisc, site, sitechan, affiliation : SQLAlchemy ORM table classes
 
     Returns
     -------
@@ -51,19 +51,26 @@ def mseedhdr2tables(stats, wfdisc=None, site=None, sitechan=None, affiliation=No
     sitechanrow = {'sta': sta,
                    'chan': chan}
     
+    affilrow = {'net': net,
+                'sta': sta}
+    
     # 3.
     if wfdisc:
-        wfdiscrow = wfdisc(**wfdiscrow)
+        wfdiscrow = wfdisc(**wfrow)
     
     if site:
         siterow = site(**siterow)
     
     if sitechan:
         sitechanrow = sitechan(**sitechanrow)
+    
+    if affiliation:
+        affilrow = affiliation(**affilrow)
 
     # 4.
-    rows = {'wfdisc': [wfdisc],
-            'site': [site],
-            'sitechan': [sitechan]}
+    rows = {'wfdisc': [wfdiscrow],
+            'site': [siterow],
+            'sitechan': [sitechanrow],
+            'affiliation': [affilrow]}
     
     return rows
