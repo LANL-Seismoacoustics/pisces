@@ -4,10 +4,35 @@ Module for creating wfdisc rows from miniSEED files.
 """
 import os
 
-from pisces.util import get_lastids, url_connect
-from .util import get_or_create_tables, dicts2rows
+from obspy import read
 
-def main(session, files=None, file_list=None, absolute_paths=False):
+from pisces.util import get_lastids, url_connect
+from .util import get_or_create_tables, dicts2rows, get_files
+
+def make_atomic(last, **rows):
+    """
+    Unify related table instances/row, including: ids, dir, and dfile
+
+    Parameters
+    ----------
+    last : obspy.AttributeDict
+        {'keyvalue': lastid instance, ...}
+    rows : dict
+        {'canonical tablename': [list of row instances], ...}
+        These row instances are related.
+
+    """ 
+    for wfdisc in rows.get('wfdisc', []):
+        wfdisc.wfid = next(last.wfid)
+    
+    for sitechan in rows.get('sitechan', []):
+        # XXX: this is wrong, as each new sitechan doesn't automatically get a
+        # new chanid, but we accept this for now, since duplicate sitechans
+        # will be rejected upon database write.
+        sitechan.chanid = next(last.chanid)
+
+
+def main(session, files=None, file_list=None, prefix=None, absolute_paths=False):
     """
     session : SQLAlchemy.orm.Session instance
     tables : list
@@ -22,9 +47,9 @@ def main(session, files=None, file_list=None, absolute_paths=False):
     else:
         files = files
 
-    tables = get_or_create_tables(session, create=True)
+    tables = get_or_create_tables(session, prefix=prefix, create=True)
 
-    lastids = ['arid', 'chanid', 'evid', 'orid', 'wfid']
+    lastids = ['chanid', 'wfid']
     last = get_lastids(session, tables['lastid'], lastids, create=True)
 
     for msfile in files:
@@ -38,12 +63,12 @@ def main(session, files=None, file_list=None, absolute_paths=False):
         # order, with enough header information to calculate that.
         foff = 0
         for tr in st:
-            dicts = mseed.mseedhdr2tables(tr.stats, wfdisc=tables['wfdisc'],
-                                          site=tables['site'], sitechan=tables['sitechan'])
+            rows = mseed.mseedhdr2tables(tr.stats, wfdisc=tables['wfdisc'],
+                                         site=tables['site'], sitechan=tables['sitechan'])
 
             foff += tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
-            dicts['wfdisc'][0].foff = foff
-            dicts['wfdisc'][0].dfile = os.path.basename(msfile)
+            rows['wfdisc'][0].foff = foff
+            rows['wfdisc'][0].dfile = os.path.basename(msfile)
             
             if absolute_paths:
                 idir = os.path.dirname(os.path.realpath(msfile))
@@ -52,14 +77,10 @@ def main(session, files=None, file_list=None, absolute_paths=False):
                 # make sure relative paths are non-empty
                 if idir == '':
                    idir = '.'
-            dicts['wfdisc'][0].dir = idir
+            rows['wfdisc'][0].dir = idir
 
         # manage the ids
         make_atomic(last, **rows)
-
-        # plugins = get_plugins(options)
-
-        # rows = apply_plugins(plugins, **rows)
 
         # add rows to the database
         # XXX: not done very elegantly.  some problem rows are simply skipped.
