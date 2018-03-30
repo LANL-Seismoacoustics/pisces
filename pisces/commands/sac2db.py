@@ -43,10 +43,15 @@ def get_plugins(plugins):
 def make_atomic(last, **rows):
     """
     Unify related table instances/row, including: ids, dir, and dfile
+
+    Parameters
+    ----------
+    last : obspy.AttributeDict
+        {'keyvalue': lastid instance, ...}
+    rows : dict
+        {'canonical tablename': [list of row instances], ...} of _related_
+        instances from a single SAC header?
     """
-    # last is an AttributeDict of {'keyvalue': lastid instance, ...}
-    # rows is a dictionary of {'canonical tablename': [list of instances], ...}
-    # of _related_ instances from a single SAC header?
     # TODO: check existance of rows before changing their ids.
 
     #print rows
