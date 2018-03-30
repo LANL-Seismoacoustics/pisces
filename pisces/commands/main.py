@@ -163,7 +163,7 @@ def sac2db_command(**kwargs):
 @click.option('-A', '--absolute_paths', is_flag=True, help=absolute_paths_help)
 @click.option('-l', '--file_list', type=click.File('r'), help=file_list_help)
 @click.argument('files', nargs=-1, type=click.Path())
-def mseed2db_command(files, file_list, prefix, absolute_paths):
+def mseed2db_command(db, files, file_list, prefix, absolute_paths):
     """
     Scrape MSEED files into database tables.
 
@@ -180,8 +180,8 @@ def mseed2db_command(files, file_list, prefix, absolute_paths):
     entries that are incomplete.  Notably, site will not have coordinates in it.
 
     """
-    session = url_connect(kwargs['db'])
-    mseed2db.main(session=session, files, files_list, prefix, absolute_paths)
+    session = url_connect(db)
+    mseed2db.main(session, files, file_list, prefix, absolute_paths)
 
 
 # ------------------------------- QUERY ---------------------------------------

@@ -5,9 +5,11 @@ Module for creating wfdisc rows from miniSEED files.
 import os
 
 from obspy import read
+import sqlalchemy.exc as exc
 
 from pisces.util import get_lastids, url_connect
 from .util import get_or_create_tables, dicts2rows, get_files
+import pisces.io.mseed as mseed
 
 def make_atomic(last, **rows):
     """
@@ -64,7 +66,8 @@ def main(session, files=None, file_list=None, prefix=None, absolute_paths=False)
         foff = 0
         for tr in st:
             rows = mseed.mseedhdr2tables(tr.stats, wfdisc=tables['wfdisc'],
-                                         site=tables['site'], sitechan=tables['sitechan'])
+                                         site=tables['site'], sitechan=tables['sitechan'],
+                                         affiliation=tables['affiliation'])
 
             foff += tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
             rows['wfdisc'][0].foff = foff
@@ -79,22 +82,22 @@ def main(session, files=None, file_list=None, prefix=None, absolute_paths=False)
                    idir = '.'
             rows['wfdisc'][0].dir = idir
 
-        # manage the ids
-        make_atomic(last, **rows)
+            # manage the ids
+            make_atomic(last, **rows)
 
-        # add rows to the database
-        # XXX: not done very elegantly.  some problem rows are simply skipped.
-        for table, instances in rows.items():
-            if instances:
-                # could be empty []
-                try:
-                    session.add_all(instances)
-                    session.commit()
-                except exc.IntegrityError as e:
-                    # duplicate or nonexistant primary keys
-                    session.rollback()
-                    print("rollback {}".format(table))
-                except exc.OperationalError as e:
-                    # no such table, or database is locked
-                    session.rollback()
+            # add rows to the database
+            # XXX: not done very elegantly.  some problem rows are simply skipped.
+            for table, instances in rows.items():
+                if instances:
+                    # could be empty []
+                    try:
+                        session.add_all(instances)
+                        session.commit()
+                    except exc.IntegrityError as e:
+                        # duplicate or nonexistant primary keys
+                        session.rollback()
+                        print("rollback {}".format(table))
+                    except exc.OperationalError as e:
+                        # no such table, or database is locked
+                        session.rollback()
                     print("rollback {}".format(table))
