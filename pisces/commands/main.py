@@ -52,6 +52,14 @@ def split_commas(ctx, param, value):
 # the way "git" works.  Also, since click.option doesn't support help=, we
 # document common arguments, like URL, in the main function.
 
+
+# common help flags
+prefix_help = ("Target tables using 'account.prefix naming.  e.g. myaccount.test_ "
+               "will target tables like myaccount.test_origin, myaccount.test_sitechan.")
+absolute_paths_help = ("If set, write database 'dir' directory entries as "
+                       "absolute paths, not relative.")
+file_list_help = "A list file, one file name per line."
+
 # "group" means that the command/function can take sub-commands
 @click.group(context_settings={'help_option_names': ['-h', '--help']})
 @click.version_option(__version__, '-V', '--version')
@@ -105,18 +113,12 @@ def drop_command(**kwargs):
 # ------------------------------- SAC2DB --------------------------------------
 @cli.command('sac2db')
 @click.argument('DB', envvar='PISCESDB')
-@click.option('-p', '--prefix', default="",
-              help=("Target tables using 'account.prefix naming.  "
-                    "e.g. myaccount.test_ will target tables like "
-                    "myaccount.test_origin, myaccount.test_sitechan."))
-@click.option('-A', '--absolute_paths', is_flag=True,
-              help=("If set, write database 'dir' directory entries as"
-                    " absolute paths, not relative."))
+@click.option('-p', '--prefix', default="", help=prefix_help)
+@click.option('-A', '--absolute_paths', is_flag=True, help=absolute_paths_help)
 @click.option('--bbfk', is_flag=True,
               help=("If set, get site.deast and dnorth from SAC user7 & user8"
                     " header fields."))
-@click.option('-l', '--file_list', type=click.File('r'),
-              help="A list file, one file name per line.")
+@click.option('-l', '--file_list', type=click.File('r'), help=file_list_help)
 @click.argument('files', nargs=-1, type=click.Path())
 def sac2db_command(**kwargs):
     """
@@ -143,6 +145,10 @@ def sac2db_command(**kwargs):
     sac2db.py sqlite:///test.sqlite saclist.txt
 
     """
+    # TODO: make this and mseed2db do more file handling here.  The main functions
+    # should really be handling traces if possible, so they can be used more
+    # broadly in the main library
+
     # common local functions
     session = url_connect(kwargs['db'])
 
@@ -153,17 +159,11 @@ def sac2db_command(**kwargs):
 # ------------------------------- MSEED2DB ------------------------------------
 @cli.command('mseed2db')
 @click.argument('DB', envvar='PISCESDB')
-@click.option('-p', '--prefix', default="",
-              help=("Target tables using 'account.prefix naming.  "
-                    "e.g. myaccount.test_ will target tables like "
-                    "myaccount.test_origin, myaccount.test_sitechan."))
-@click.option('-A', '--absolute_paths', is_flag=True,
-              help=("If set, write database 'dir' directory entries as"
-                    " absolute paths, not relative."))
-@click.option('-l', '--file_list', type=click.File('r'),
-              help="A list file, one file name per line.")
+@click.option('-p', '--prefix', default="", help=prefix_help)
+@click.option('-A', '--absolute_paths', is_flag=True, help=absolute_paths_help)
+@click.option('-l', '--file_list', type=click.File('r'), help=file_list_help)
 @click.argument('files', nargs=-1, type=click.Path())
-def mseed2db_command(**kwargs):
+def mseed2db_command(files, file_list, prefix, absolute_paths):
     """
     Scrape MSEED files into database tables.
 
@@ -176,12 +176,12 @@ def mseed2db_command(**kwargs):
     -----
     The datatype in the wfdisc table will be "sd", which is _not_ a standard
     datatype.  It will unpack into int32 arrays if pisces.io.readwaveform is used.
-    The miniSEED header is very minimal, so it will not produce site and sitechan
-    entries that incomplete.  Notably, site will not have coordinates in it.
+    The miniSEED header is very minimal, so it will produce site and sitechan
+    entries that are incomplete.  Notably, site will not have coordinates in it.
 
     """
     session = url_connect(kwargs['db'])
-    mseed2db.main(session=session, **kwargs)
+    mseed2db.main(session=session, files, files_list, prefix, absolute_paths)
 
 
 # ------------------------------- QUERY ---------------------------------------
