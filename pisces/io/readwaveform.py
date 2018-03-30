@@ -8,7 +8,7 @@ Home to read_waveform and all format-specific reading functions.
 from distutils import sysconfig
 import ctypes as C
 import os
-from io import StringIO
+from io import StringIO, BytesIO
 
 import numpy as np
 from obspy.core import read
@@ -26,7 +26,6 @@ NPTYPE = {'t4': '>f4', 't8': '>f8', 's4': '>i4', 's2': '>i2', 's1': '>i1',
           'p8': '<f8', 'p4': '<f4', 't4': '>f4', 'u4': '<f4'}
 
 # ObsPy-supported datatypes
-OBSPYTYPE = {'sd': 'MSEED', 'sc': 'SAC', 'sy': 'SEGY'}
 OBSPYTYPE = {'sc': 'SAC', 'sy': 'SEGY'}
 # NOTE: 'sd' can also mean full SEED.
 
@@ -75,7 +74,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     elif DATATYPE == 'sd':
         # this datatype is not well-suited for a wfdisc, as it supports
         # multiplexing and wfdisc does not
-        data = read_seed(DATAFILE, BYTEOFFSET)
+        data = read_seed(DATAFILE, BYTEOFFSET, NUM)
     elif DATATYPE == 'e1':
         # data = read_e1(DATAFILE, BYTEOFFSET, NUM)
         data = e_compression(DATAFILE, BYTEOFFSET, NUM)
@@ -170,17 +169,24 @@ def e_compression(DATAFILE, BYTEOFFSET, NUM):
     return Y
 
 
-def read_seed(DATAFILE, BYTEOFFSET):
+def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
     """Read a SEED or miniSEED 'sd' datatype.
     """
     if BYTEOFFSET:
         with open(DATAFILE, 'rb') as f0:
             f0.seek(BYTEOFFSET)
-            # TODO: fix this...
-            f1 = StringIO(f0.read())
-            tr = read(f, format='MSEED')[0]  # f1?
+            # unfortunately, this read command reads every header
+            tr = read(f0, format='MSEED', details=True, headonly=True)[0] 
+            f0.seek(BYTEOFFSET)
+            nbytes = tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
+            f = BytesIO(f0.read(nbytes))
+
+        tr = read(f, format='MSEED')[0]
     else:
         tr = read(DATAFILE, format='MSEED')[0]
+    
+    if NUM:
+        assert len(tr.data) == NUM
 
     return tr.data
 
