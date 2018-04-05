@@ -44,6 +44,13 @@ pip install git+https://github.com/jkmacc-LANL/pisces
 
 ([full change log](CHANGELOG.md))
 
+## 0.3.0
+
+* Python 3 support!
+* No more Python 2 support
+* Add the ability to target a database and tables in a config file (see util.load_config).
+
+
 ## 0.2.4
 
 * Change package name to "pisces" instead of "pisces-db"
