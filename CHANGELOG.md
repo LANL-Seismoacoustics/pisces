@@ -1,5 +1,10 @@
 # Change Log
 
+## dev
+
+* `wftag` now parsed as a float instead of an integer in KB Core and CSS3 schemas
+* `Wftag` primary keys are `tagname`, `tagid`, and `wfid` instead of just `tagid`
+
 ## 0.3.0
 
 * Python 3 support!
