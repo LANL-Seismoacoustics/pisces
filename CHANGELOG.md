@@ -1,5 +1,10 @@
 # Change Log
 
+## dev
+
+* `wftag` now parsed as a float instead of an integer in KB Core and CSS3 schemas
+* `Wftag` primary keys are `tagname`, `tagid`, and `wfid` instead of just `tagid`
+
 ## 0.3.1
 
 * Pisces no longer requires compiling and installing C extension modules.
@@ -7,7 +12,6 @@
   with a NumPy-only version.
 * Remove `libecompression` C library, and move it to a separate "e1" package on PyPI.
   It will be installed as an optional dependency by installing with `pip install pisces[e1]`.
-
 ## 0.3.0
 
 * Python 3 support!
