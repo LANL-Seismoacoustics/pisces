@@ -16,7 +16,6 @@ from obspy.core import read
 # C libraries
 ext, = sysconfig.get_config_vars('SO')
 libecomp = C.CDLL(os.path.dirname(__file__) + '/lib/libecompression' + ext)
-libconvert = C.CDLL(os.path.dirname(__file__) + '/lib/libconvert' + ext)
 
 # TODO: implement other datatypes
 
