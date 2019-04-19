@@ -195,7 +195,12 @@ def read_s3(DATAFILE, BYTEOFFSET, NUM):
     Read signed big-endian 3-byte integers into a 4-byte native NumPy array.
 
     """
-    with open (DATAFile, 'rb') as f:
+    try:
+        with open(DATAFILE, 'rb') as f:
+            f.seek(BYTEOFFSET, 0)
+            raw = np.fromfile(f, dtype='u1', count=NUM*3)
+    except TypeError:
+        f = DATAFILE
         f.seek(BYTEOFFSET, 0)
         raw = np.fromfile(f, dtype='u1', count=NUM*3)
 
@@ -203,11 +208,12 @@ def read_s3(DATAFILE, BYTEOFFSET, NUM):
     # for little-endian output, put the empty byte on the left, and fill the
     # right 3 bytes with the raw data, with column order reversed.
     out[:, 1:] = np.flip(raw.reshape((-1, 3)), axis=1)
+    # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
+    out = out.astype('i4')
+
     # now, bit-shift right, which sign-extends the 3 bytes to 4.
     # the empty left byte is re-written correctly by the shift.
-    out = out >> 8
-    # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
-    return out.astype('i4')
+    return out >> 8
 
 
 def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
