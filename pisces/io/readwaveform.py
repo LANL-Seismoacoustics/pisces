@@ -193,32 +193,22 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
 
 def read_s3(DATAFILE, BYTEOFFSET, NUM):
     """
-    Read big-endian 24-bit integers.
-
-    Wrapper for Richard Stead's "s3tos4" C routine.
-
-    Returns 32-bit integer NumPy array.
+    Read signed big-endian 3-byte integers into a 4-byte native NumPy array.
 
     """
-    # open, jump into file
-    with open(DATAFILE, 'rb') as f:
+    with open (DATAFile, 'rb') as f:
         f.seek(BYTEOFFSET, 0)
-        # read NUM 3-byte ints
-        buf = f.read(NUM * 3)
+        raw = np.fromfile(f, dtype='u1', count=NUM*3)
 
-    # embed 3-byte int buffer into the beginning of a 4-byte string container
-    cbuf = C.create_string_buffer(buf, size=NUM * 4)
-
-    # convert int24 buffer to int32 string buffer
-    # int convdata(void *buf, int n, char intype, char outtype)
-    # retval = libconvert.convdata(cbuf, NUM, C.create_string_buffer('s3', 2),
-    #                             C.create_string_buffer('s4', 2))
-    retval = libconvert.s3tos4(cbuf, NUM)
-
-    # return as 4-btye ints
-    return np.fromstring(cbuf.raw, dtype='>i4'), retval
-    # np.frombuffer won't copy the memory, could be useful if fromstring is slow
-    # return np.frombuffer(cbuf, dtype='>i4'), retval
+    out = np.empty((NUM, 4), dtype='u1')
+    # for little-endian output, put the empty byte on the left, and fill the
+    # right 3 bytes with the raw data, with column order reversed.
+    out[:, 1:] = np.flip(raw.reshape((-1, 3)), axis=1)
+    # now, bit-shift right, which sign-extends the 3 bytes to 4.
+    # the empty left byte is re-written correctly by the shift.
+    out = out >> 8
+    # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
+    return out.astype('i4')
 
 
 def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
