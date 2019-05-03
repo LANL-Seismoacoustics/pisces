@@ -175,7 +175,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         with open(DATAFILE, 'rb') as f0:
             f0.seek(BYTEOFFSET)
             # unfortunately, this read command reads every header
-            tr = read(f0, format='MSEED', details=True, headonly=True)[0] 
+            tr = read(f0, format='MSEED', details=True, headonly=True)[0]
             f0.seek(BYTEOFFSET)
             nbytes = tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
             f = BytesIO(f0.read(nbytes))
@@ -183,7 +183,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         tr = read(f, format='MSEED')[0]
     else:
         tr = read(DATAFILE, format='MSEED')[0]
-    
+
     if NUM:
         assert len(tr.data) == NUM
 
@@ -198,22 +198,25 @@ def read_s3(DATAFILE, BYTEOFFSET, NUM):
     try:
         with open(DATAFILE, 'rb') as f:
             f.seek(BYTEOFFSET, 0)
-            raw = np.fromfile(f, dtype='u1', count=NUM*3)
+            u1 = np.fromfile(f, dtype='u1', count=NUM*3)
     except TypeError:
         f = DATAFILE
         f.seek(BYTEOFFSET, 0)
-        raw = np.fromfile(f, dtype='u1', count=NUM*3)
+        u1 = np.fromfile(f, dtype='u1', count=NUM*3)
 
-    out = np.empty((NUM, 4), dtype='u1')
+    prep = np.empty((NUM, 4), dtype='u1')
     # for little-endian output, put the empty byte on the left, and fill the
     # right 3 bytes with the raw data, with column order reversed.
-    out[:, 1:] = np.flip(raw.reshape((-1, 3)), axis=1)
+    prep[:, 1:] = np.flip(u1.reshape((-1, 3)), axis=1)
     # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
-    out = out.astype('i4')
+    i4_unshifted = prep.view('i4')
 
     # now, bit-shift right, which sign-extends the 3 bytes to 4.
     # the empty left byte is re-written correctly by the shift.
-    return out >> 8
+    i4_shifted = i4_unshifted >> 8
+
+    return i4_shifted.squeeze()
+
 
 
 def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
