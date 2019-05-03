@@ -7,7 +7,7 @@ import pisces.io.readwaveform as rwf
 
 
 def test_read_s3():
-    # 100 3-byte samples from an s3 file
+    # 100 big-endian 3-byte samples from an s3 file
     BYTS = (b'\x00\x01\x02\x00\x00\xc4\x00\x00}\x00\x00P\xff\xff\x08\xff\xfe\xfd\x00\x00\xa3\x00'
             b'\x00\xa6\xff\xfe\xca\x00\x00\xca\x00\x01\x9d\xff\xff\x10\xff\xff5\xff\xffT\xff\xffV'
             b'\xff\xff\xce\x00\x00J\x00\x00\xf4\x00\x01g\x00\x01\x7f\x00\x00\x01\xff\xff!\x00\x00='
@@ -23,20 +23,18 @@ def test_read_s3():
             b'\x00\x10\x00\x01\xe8\x00\x01\x15\xff\xff\xcf\x00\x00\xde\x00\x00\x9f\xff\xff\x85\xff'
             b'\xff5\x00\x01\x8f')
 
-    data = np.array([ 258,  196,  125,   80, -248, -259,  163,  166, -310,  202,  413,
-                     -240, -203, -172, -170,  -50,   74,  244,  359,  383,    1, -223,
-                       61,  179,   44,   99,  182,  122, -104, -210,   64,  287,  192,
-                       17,  280,  354,  -55,   20,  321,  369,  117,  -88,  138,  -30,
-                     -239,  269,  134, -269,  217,   73, -207,  477,  371,   81,  427,
-                      176,   27,  176, -249,  -40,  396, -152, -145,   35,  -82,  -59,
-                     -160,   46,  275,  185,   -7,   40,  -62, -279,  -54,  293,  227,
-                     -177, -382,    0,  279,  -85,   65,  101,  -76,   44,   81,  384,
-                     -259, -592,  -83,   16,  488,  277,  -49,  222,  159, -123, -203,
-                      399], dtype=np.int32)
+    # 100 corresponding values from the s3 file
+    data = np.array([258, 196, 125, 80, -248, -259, 163, 166, -310, 202, 413, -240, -203, -172,
+                     -170, -50, 74, 244, 359, 383, 1, -223, 61, 179, 44, 99, 182, 122, -104, -210,
+                     64, 287, 192, 17, 280, 354, -55, 20, 321, 369, 117, -88, 138, -30, -239, 269,
+                     134, -269, 217, 73, -207, 477, 371, 81, 427, 176, 27, 176, -249, -40, 396,
+                     -152, -145, 35, -82, -59, -160, 46, 275, 185, -7, 40, -62, -279, -54, 293,
+                     227, -177, -382, 0, 279, -85, 65, 101, -76, 44, 81, 384, -259, -592, -83, 16,
+                     488, 277, -49, 222, 159, -123, -203, 399], dtype=np.int32)
 
-    f = tempfile.SpooledTemporaryFile()
-    f.write(BYTS)
-    f.seek(0)
-    s3 = rwf.read_s3(f, 0, 100)
-    assert assert_array_equal(s3, data)
-    f.close()
+    with tempfile.SpooledTemporaryFile() as f:
+        f.write(BYTS)
+        f.seek(0)
+        s3 = rwf.read_s3(f, 0, 100)
+
+    assert_array_equal(s3, data)
