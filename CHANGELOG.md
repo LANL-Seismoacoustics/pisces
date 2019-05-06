@@ -1,5 +1,10 @@
 # Change Log
 
+## master
+
+* Remove `libconvert` C library, and replace it's only exposed function (`s3tos4`)
+  with a NumPy-only version.
+
 ## 0.3.0
 
 * Python 3 support!
