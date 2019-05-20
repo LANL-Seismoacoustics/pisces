@@ -16,7 +16,6 @@ from obspy.core import read
 # C libraries
 ext, = sysconfig.get_config_vars('SO')
 libecomp = C.CDLL(os.path.dirname(__file__) + '/lib/libecompression' + ext)
-libconvert = C.CDLL(os.path.dirname(__file__) + '/lib/libconvert' + ext)
 
 # TODO: implement other datatypes
 
@@ -176,7 +175,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         with open(DATAFILE, 'rb') as f0:
             f0.seek(BYTEOFFSET)
             # unfortunately, this read command reads every header
-            tr = read(f0, format='MSEED', details=True, headonly=True)[0] 
+            tr = read(f0, format='MSEED', details=True, headonly=True)[0]
             f0.seek(BYTEOFFSET)
             nbytes = tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
             f = BytesIO(f0.read(nbytes))
@@ -184,7 +183,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         tr = read(f, format='MSEED')[0]
     else:
         tr = read(DATAFILE, format='MSEED')[0]
-    
+
     if NUM:
         assert len(tr.data) == NUM
 
@@ -193,32 +192,31 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
 
 def read_s3(DATAFILE, BYTEOFFSET, NUM):
     """
-    Read big-endian 24-bit integers.
-
-    Wrapper for Richard Stead's "s3tos4" C routine.
-
-    Returns 32-bit integer NumPy array.
+    Read signed big-endian 3-byte integers into a 4-byte native NumPy array.
 
     """
-    # open, jump into file
-    with open(DATAFILE, 'rb') as f:
+    try:
+        with open(DATAFILE, 'rb') as f:
+            f.seek(BYTEOFFSET, 0)
+            u1 = np.fromfile(f, dtype='u1', count=NUM*3)
+    except TypeError:
+        f = DATAFILE
         f.seek(BYTEOFFSET, 0)
-        # read NUM 3-byte ints
-        buf = f.read(NUM * 3)
+        u1 = np.fromfile(f, dtype='u1', count=NUM*3)
 
-    # embed 3-byte int buffer into the beginning of a 4-byte string container
-    cbuf = C.create_string_buffer(buf, size=NUM * 4)
+    prep = np.empty((NUM, 4), dtype='u1')
+    # for little-endian output, put the empty byte on the left, and fill the
+    # right 3 bytes with the raw data, with column order reversed.
+    prep[:, 1:] = np.flip(u1.reshape((-1, 3)), axis=1)
+    # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
+    i4_unshifted = prep.view('i4')
 
-    # convert int24 buffer to int32 string buffer
-    # int convdata(void *buf, int n, char intype, char outtype)
-    # retval = libconvert.convdata(cbuf, NUM, C.create_string_buffer('s3', 2),
-    #                             C.create_string_buffer('s4', 2))
-    retval = libconvert.s3tos4(cbuf, NUM)
+    # now, bit-shift right, which sign-extends the 3 bytes to 4.
+    # the empty left byte is re-written correctly by the shift.
+    i4_shifted = i4_unshifted >> 8
 
-    # return as 4-btye ints
-    return np.fromstring(cbuf.raw, dtype='>i4'), retval
-    # np.frombuffer won't copy the memory, could be useful if fromstring is slow
-    # return np.frombuffer(cbuf, dtype='>i4'), retval
+    return i4_shifted.squeeze()
+
 
 
 def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
