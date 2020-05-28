@@ -5,18 +5,18 @@
 Home to read_waveform and all format-specific reading functions.
 
 """
-from distutils import sysconfig
 import ctypes as C
 import os
-from io import StringIO, BytesIO
+from io import BytesIO
 
 import numpy as np
 from obspy.core import read
 
-# C libraries
-ext, = sysconfig.get_config_vars('SO')
-libecomp = C.CDLL(os.path.dirname(__file__) + '/lib/libecompression' + ext)
-libconvert = C.CDLL(os.path.dirname(__file__) + '/lib/libconvert' + ext)
+try:
+    from e1 import e_compression
+    E1_INSTALLED = True
+except ImportError:
+    E1_INSTALLED = False
 
 # TODO: implement other datatypes
 
@@ -43,6 +43,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
          's1', 'sd', 'e1', 'sc', 'sy'}
         Data type string (from wfdisc.datatype).
         'sd', 'sc', and 'sy' are SEED/miniSEED, SAC, and SEGY
+        'e1' requires installation of the "e1" python module.
     BYTEOFFSET : int
         Number of bytes from beginning of file.
     NUM : int
@@ -77,7 +78,11 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
         data = read_seed(DATAFILE, BYTEOFFSET, NUM)
     elif DATATYPE == 'e1':
         # data = read_e1(DATAFILE, BYTEOFFSET, NUM)
-        data = e_compression(DATAFILE, BYTEOFFSET, NUM)
+        if not E1_INSTALLED:
+            msg = "'e1' module not installed."
+            raise ValueError(msg)
+        else:
+            data = e_compression(DATAFILE, BYTEOFFSET, NUM)
     elif DATATYPE == 's3':
         data, flag = read_s3(DATAFILE, BYTEOFFSET, NUM)
     else:
@@ -90,85 +95,6 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     return data
 
 
-def e_compression(DATAFILE, BYTEOFFSET, NUM):
-    """Wrapper to e1 decompression routine.
-
-    Parameters
-    ----------
-    DATAFILE: string
-        Full path to e1 file.
-    BYTEOFFSET: int
-        Number of bytes to start of the data.
-    NUM: int
-        Number of expected samples.
-
-    Returns
-    -------
-    data: numpy.array (rank 1) of int32
-        Uncompressed data vector.
-    retval: int
-        Return value/code. One of the following:
-
-        * 0: 'EC_SUCCESS',
-        * 1: 'EC_FAILED',
-        * 2: 'EC_LENGTH_ERROR',
-        * 3: 'EC_SAMP_ERROR',
-        * 4: 'EC_DIFF_ERROR',
-        * 5: 'EC_CHECK_ERROR',
-        * 6: 'EC_ARG_ERROR',
-        * 7: 'EC_TYPE_ERROR',
-        * 8: 'EC_MEMORY_ERROR'
-
-    Raises
-    ------
-    ValueError : BYTEOFFSET exceeds file size.
-
-    Notes
-    -----
-    e1 decompression C library is written by Richard Stead, LANL.
-
-    """
-    # int32_t
-    # e_decomp_inplace(int32_t *in, int32_t insamp, int32_t inbyte, int32_t out0,
-    #   int32_t outsamp)
-    # libecomp.e_decomp_inplace.restype = C.c_int
-
-    # int32_t
-    # e_decomp(uint32_t *in, int32_t *out, int32_t insamp, int32_t inbyte,
-    #  int32_t out0, int32_t outsamp)
-    libecomp.e_decomp.restype = C.c_int
-
-    # open file, query size, jump to offset
-    f = open(DATAFILE, 'rb')
-    flen = os.stat(DATAFILE).st_size
-    if flen < BYTEOFFSET:
-        raise ValueError("BYTEOFFSET exceeds file size.")
-    f.seek(BYTEOFFSET)
-    flen -= BYTEOFFSET
-    # flen is capped at 5*NUM
-    flen = 5 * NUM if flen > 5 * NUM else flen
-
-    # Read the entire compressed chunk
-    # w = (int32_t *)malloc((int)((flen + 3) / 4) * 4)
-    # read(fd, w, flen)
-    w = np.fromfile(f, count=flen, dtype=np.int32)  # XXX: check this
-    f.close()
-
-    Y = np.zeros(NUM, dtype=np.int32, order='C')
-
-    # library call
-    # replaces the first NUM values in w with decompressed values
-    # retval = libecomp.e_decomp_inplace(w.ctypes.data_as(C.POINTER(C.c_int32)),
-    #                                   NUM, flen, 0, NUM)
-    retval = libecomp.e_decomp(w.ctypes.data_as(C.POINTER(C.c_uint32)),
-                               Y.ctypes.data_as(C.POINTER(C.c_int32)), NUM,
-                               flen, 0, NUM)
-
-    # return w[0:NUM].copy(), retval
-    # return w.copy(), retval
-    return Y
-
-
 def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
     """Read a SEED or miniSEED 'sd' datatype.
     """
@@ -176,7 +102,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         with open(DATAFILE, 'rb') as f0:
             f0.seek(BYTEOFFSET)
             # unfortunately, this read command reads every header
-            tr = read(f0, format='MSEED', details=True, headonly=True)[0] 
+            tr = read(f0, format='MSEED', details=True, headonly=True)[0]
             f0.seek(BYTEOFFSET)
             nbytes = tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
             f = BytesIO(f0.read(nbytes))
@@ -184,7 +110,7 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
         tr = read(f, format='MSEED')[0]
     else:
         tr = read(DATAFILE, format='MSEED')[0]
-    
+
     if NUM:
         assert len(tr.data) == NUM
 
@@ -193,32 +119,31 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
 
 def read_s3(DATAFILE, BYTEOFFSET, NUM):
     """
-    Read big-endian 24-bit integers.
-
-    Wrapper for Richard Stead's "s3tos4" C routine.
-
-    Returns 32-bit integer NumPy array.
+    Read signed big-endian 3-byte integers into a 4-byte native NumPy array.
 
     """
-    # open, jump into file
-    with open(DATAFILE, 'rb') as f:
+    try:
+        with open(DATAFILE, 'rb') as f:
+            f.seek(BYTEOFFSET, 0)
+            u1 = np.fromfile(f, dtype='u1', count=NUM*3)
+    except TypeError:
+        f = DATAFILE
         f.seek(BYTEOFFSET, 0)
-        # read NUM 3-byte ints
-        buf = f.read(NUM * 3)
+        u1 = np.fromfile(f, dtype='u1', count=NUM*3)
 
-    # embed 3-byte int buffer into the beginning of a 4-byte string container
-    cbuf = C.create_string_buffer(buf, size=NUM * 4)
+    prep = np.empty((NUM, 4), dtype='u1')
+    # for little-endian output, put the empty byte on the left, and fill the
+    # right 3 bytes with the raw data, with column order reversed.
+    prep[:, 1:] = np.flip(u1.reshape((-1, 3)), axis=1)
+    # now, reinterpret and copy the shifted n x 4 as 4-byte signed integers
+    i4_unshifted = prep.view('i4')
 
-    # convert int24 buffer to int32 string buffer
-    # int convdata(void *buf, int n, char intype, char outtype)
-    # retval = libconvert.convdata(cbuf, NUM, C.create_string_buffer('s3', 2),
-    #                             C.create_string_buffer('s4', 2))
-    retval = libconvert.s3tos4(cbuf, NUM)
+    # now, bit-shift right, which sign-extends the 3 bytes to 4.
+    # the empty left byte is re-written correctly by the shift.
+    i4_shifted = i4_unshifted >> 8
 
-    # return as 4-btye ints
-    return np.fromstring(cbuf.raw, dtype='>i4'), retval
-    # np.frombuffer won't copy the memory, could be useful if fromstring is slow
-    # return np.frombuffer(cbuf, dtype='>i4'), retval
+    return i4_shifted.squeeze()
+
 
 
 def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):

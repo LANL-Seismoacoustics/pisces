@@ -1,1 +1,0 @@
-gcc -Wall -fPIC -shared -dynamiclib -lm -I. -arch i386 -arch x86_64 -g *.c -o ../../lib/libconvert.dylib

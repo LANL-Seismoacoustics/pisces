@@ -1,5 +1,13 @@
 # Change Log
 
+## master
+
+* Pisces no longer requires compiling and installing C extension modules.
+* Remove `libconvert` C library, and replace it's only exposed function (`s3tos4`)
+  with a NumPy-only version.
+* Remove `libecompression` C library, and move it to a separate "e1" package on PyPI.
+  It will be installed as an optional dependency by installing with `pip install pisces[e1]`.
+
 ## 0.3.0
 
 * Python 3 support!
