@@ -1,6 +1,6 @@
 # Change Log
 
-## master
+## 0.3.1
 
 * Pisces no longer requires compiling and installing C extension modules.
 * Remove `libconvert` C library, and replace it's only exposed function (`s3tos4`)
@@ -18,7 +18,6 @@
 
 * Change package name to "pisces" instead of "pisces-db"
 * Add Antelope Datascope schema/tables.
-
 
 ## 0.2.2
 
