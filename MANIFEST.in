@@ -23,8 +23,3 @@ include pisces/tables/kbcore.py
 include pisces/commands/__init__.py
 include pisces/commands/main.py
 include pisces/commands/sac2db.py
-include pisces_db.egg-info/PKG-INFO
-include pisces_db.egg-info/SOURCES.txt
-include pisces_db.egg-info/dependency_links.txt
-include pisces_db.egg-info/requires.txt
-include pisces_db.egg-info/top_level.txt
