@@ -57,6 +57,10 @@ pip install git+https://github.com/LANL-Seismoacoustics/pisces
 
 ([full change log](CHANGELOG.md))
 
+## 0.3.2
+
+* Correct links in setup.py
+
 ## 0.3.1
 
 * Pisces no longer requires compiling and installing C extension modules.
