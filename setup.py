@@ -25,7 +25,7 @@ setup(name='pisces',
       packages=['pisces','pisces.schema','pisces.io','pisces.tables',
                 'pisces.commands'],
       url='https://github.com/LANL-Seismoacoustics/pisces',
-      download_url='https://github.com/LANL-Seismoacoustics/pisces/tarball/0.3.1',
+      download_url='https://github.com/LANL-Seismoacoustics/pisces/tarball/0.3.2',
       keywords = ['seismology', 'geophysics', 'database'],
       install_requires=['numpy','obspy>=1.0','sqlalchemy>=1.0','Click'],
       extras_require={
