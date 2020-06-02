@@ -79,7 +79,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     elif DATATYPE == 'e1':
         # data = read_e1(DATAFILE, BYTEOFFSET, NUM)
         if not E1_INSTALLED:
-            msg = "'e1' module not installed."
+            msg = "'e1' module not installed.  Visit https://github.com/LANL-Seismoacoustics/e1 for details."
             raise ValueError(msg)
         else:
             data = e_compression(DATAFILE, BYTEOFFSET, NUM)
