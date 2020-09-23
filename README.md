@@ -8,7 +8,8 @@ Documentation: <http://jkmacc-lanl.github.io/pisces>
 
 Repository: <https://github.com/jkmacc-LANL/pisces>
 
-![Build Status](https://github.com/LANL-Seismoacoustics/pisces/workflows/python-packages/badge.svg?branch=master)
+![Build Status](https://github.com/LANL-Seismoacoustics/pisces/workflows/Python%20package/badge.svg?branch=master)
+
 
 ## Features
 
