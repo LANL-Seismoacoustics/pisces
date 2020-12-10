@@ -4,9 +4,9 @@ Pisces is a Python library that connects your geophysical analysis environment
 to a SQL database that uses the Center for Seismic Studies (CSS) 3.0 or NNSA KB
 Core table schema.
 
-Documentation: <http://jkmacc-lanl.github.io/pisces>
+Documentation: <https://lanl-seismoacoustics.github.io/pisces>
 
-Repository: <https://github.com/jkmacc-LANL/pisces>
+Repository: <https://github.com/lanl-seismoacoustics/pisces/>
 
 ![Build Status](https://github.com/LANL-Seismoacoustics/pisces/workflows/Python%20package/badge.svg?branch=master)
 
