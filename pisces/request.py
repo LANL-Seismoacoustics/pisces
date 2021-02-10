@@ -365,7 +365,7 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     q = session.query(Site)
 
     if stations:
-        q = q.filter(Site.sta.in_(sta))
+        q = q.filter(Site.sta.in_(stations))
 
     if nets:
         q = q.join(Affiliation, Affiliation.sta==Site.sta)
@@ -376,7 +376,7 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
 
     if channels:
         q = q.join(Sitechan, Sitechan.sta==Site.sta)
-        if isinstance(chans, str):
+        if isinstance(channels, str):
             #interpret string as regexp
             q = q.filter(func.regexp_like(Sitechan.chan, channnels))
         else:
