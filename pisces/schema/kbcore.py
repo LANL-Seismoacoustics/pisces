@@ -497,7 +497,7 @@ szz = Column(Float(24),
              info={'default': -100000000, 'parse': parse_float, 'dtype': 'float', 'width': 15, 'format': '15.4f'})
 
 tagid = Column(Integer,
-               info={'default': -1, 'parse': parse_float, 'dtype': 'float', 'width': 9, 'format': '9d'})
+               info={'default': -1, 'parse': parse_int, 'dtype': 'int', 'width': 9, 'format': '9d'})
 
 tagname = Column(String(8),
                  info={'default': '-', 'parse': parse_str, 'dtype': 'a8', 'width': 8, 'format': '8.8s'})
@@ -967,7 +967,7 @@ class Wftag(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('tagid'), UniqueConstraint('tagname', 'tagid', 'wfid'),)
+        return (PrimaryKeyConstraint('tagname', 'tagid', 'wfid'),)
 
     tagname = tagname.copy()
     tagid = tagid.copy()
