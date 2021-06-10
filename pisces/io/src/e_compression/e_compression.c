@@ -64,15 +64,36 @@
 #define EC_MAKECHECK(x) ((((x) & 0x00ffffff) << 8) >> 8)
 
 
-/* Python C extensions for Windows expects the symbol initModuleName when building the library.
-* This declaration gives msvc compiler this symbol to compile correctly.
-* Note : This not the documented way to build C extensions for Windows. It is typically expected to
-* use wrapper methods. What this does is prevents a statement such as 'import libecompression' in Python.
-* Instead, the only way to load the library is through a ctypes.CDLL call. Which in this case, is all that
-* is needed as seen in readwaveform.py.
+/* Initialize a bare-bones Python module. This module isn't meant to be used directly, but rather it is
+* interacted with through a ctypes.CDLL call. However, particularly on Windows, a module definition is
+* required to get this file to compile.
 */
 #ifdef _WIN32
-void initlibecompression(){}
+PyMODINIT_FUNC PyInit__libe1(void)
+{
+  /* define a basic PyObject with just a name and docstring */
+  PyObject *m;
+  static struct PyModuleDef mdef = {
+    PyModuleDef_HEAD_INIT,
+    "_libe1",                       /* name */
+     "Library for e1 compression",  /* docstring */
+     -1,                            /* size */
+     NULL,                          /* methods */
+     NULL,                          /* reload */
+     NULL,                          /* traverse */
+     NULL,                          /* clear */
+     NULL                           /* free */
+  };
+  
+  /* create the module described above */
+  m = PyModule_Create(&mdef);
+  
+  /* return */
+  if (!m)
+    return NULL;
+  else
+    return m;
+}
 #endif
 
 /*
