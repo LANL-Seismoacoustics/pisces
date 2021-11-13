@@ -6,11 +6,9 @@ from collections import namedtuple
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 try:
-    from sqlalchemy.ext.declarative.api import _declarative_constructor
+    from sqlalchemy.orm import as_declarative
 except ImportError:
-    # not >0.8
-    from sqlalchemy.ext.declarative import _declarative_constructor
-
+    from sqlalchemy.ext.declarative.api import _declarative_constructor
 # NO SELF IMPORTS!
 
 # TODO: add a .to_dict() method or a dict-like __getitem__/__setitem__, and
@@ -178,7 +176,10 @@ def _init(self, *args, **kwargs):
     else:
         # keyword value instantiation
         # use SQLA's keyword constructor, then replace None attribute values with defaults
-        _declarative_constructor(self, **kwargs)
+        try:
+            as_declarative(self, **kwargs)
+        except NameError:
+            _declarative_constructor(self, **kwargs)
         for c, ival in [(col, getattr(self, self._attrname[col.name], None)) for col in self.__table__.columns]:
             dflt = c.info.get('default', None)
             if ival is None:
