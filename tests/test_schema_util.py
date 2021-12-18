@@ -31,7 +31,8 @@ class TestPiscesMeta(unittest.TestCase):
             lddate = sa.Column(sa.DateTime)
 
     def test_qualified_tablename_abstract(self):
-
+        """ Table names provided like 'schema.tablename' are correctly parsed.
+        """
         class Sitechan(kb.Sitechan):
             __tablename__ = 'test.sitechan'
 
@@ -187,6 +188,8 @@ def test_schema_abstract_declarative():
     t.assert_true(Sitechan.__table__.schema == 'testuser')
 
 def test_two_abstract_declarative():
+    """ Make sure that more than one concreted table can be created from a single abstract one.
+    """
     from pisces.schema.util import PiscesMeta
     Base = declarative_base(metaclass=PiscesMeta)
     class AbstractSitechan(Base):
@@ -219,6 +222,34 @@ def test_two_abstract_declarative():
     t.assert_true(JSitechan.__table__.name == 'sitechan')
     t.assert_true(JSitechan.__table__.schema == 'testuser')
 
+def test_PiscesMeta_init_reserved_column_name():
+    """ Use the e.g. Sitechan._attrname dict for 
+    """
+    from pisces.schema.util import PiscesMeta
+    Base = declarative_base(metaclass=PiscesMeta)
+    class AbstractSitechan(Base):
+        __abstract__ = True
+        @declared_attr
+        def __table_args__(cls):
+            return (sa.UniqueConstraint('sta','chan','ondate'),
+                    sa.PrimaryKeyConstraint('chanid'))
+        sta = sa.Column(sa.String(6))
+        chan = sa.Column(sa.String(8))
+        ondate = sa.Column(sa.Integer)
+        chanid = sa.Column(sa.Integer)
+        offdate = sa.Column(sa.Integer)
+        ctype = sa.Column(sa.String(4))
+        edepth = sa.Column(sa.Float(24))
+        hang = sa.Column(sa.Float(24))
+        vang = sa.Column(sa.Float(24))
+        descrip = sa.Column(sa.String(50))
+        _yield = sa.Column('yield', sa.Float(24))
+        lddate = sa.Column(sa.DateTime)
+
+    class Sitechan(AbstractSitechan):
+        __tablename__ = 'sitechan'
+
+    assert('yield' in Sitechan._attrname)
 
 if __name__ == '__main__':
     unittest.main()
