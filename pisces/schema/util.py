@@ -391,7 +391,8 @@ class PiscesMeta(DeclarativeMeta):
         # for actual ORM classes, add usefull class attributes
         # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
         if hasattr(cls, '__table__'):
-            cls._attrname = {c.name: a for a, c in list(cls.__mapper__.c.items())}  # {col_name: attr_name}
+            #cls._attrname = {c.name: a for a, c in list(cls.__mapper__.c.items())}  # {col_name: attr_name}
+            cls._attrname = {c.name: c.key for c in cls.__mapper__.columns}
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
             cls.__doc__ = _update_docstring(cls)
 
