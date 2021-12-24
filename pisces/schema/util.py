@@ -6,8 +6,10 @@ from collections import namedtuple
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 try:
-    from sqlalchemy.orm import as_declarative
+    # sa-14
+    from sqlalchemy.orm import as_declarative, registry
 except ImportError:
+    # sa-13
     from sqlalchemy.ext.declarative.api import _declarative_constructor
 # NO SELF IMPORTS!
 
@@ -389,7 +391,14 @@ class PiscesMeta(DeclarativeMeta):
         # for actual ORM classes, add usefull class attributes
         # "cls._attrname" is a dictionary that gives attribute name for _attrname['column name']
         if hasattr(cls, '__table__'):
-            cls._attrname = {c.name: a for a, c in list(cls.__mapper__.c.items())}  # {col_name: attr_name}
+            # from https://docs.sqlalchemy.org/en/14/orm/mapping_api.html#sqlalchemy.orm.mapper
+            '''
+            Changed in version 1.4: The mapper() function should not be 
+            called directly for classical mapping; for a classical mapping 
+            configuration, use the registry.map_imperatively() method. The 
+            mapper() function may become private in a future release.
+            '''
+            cls._attrname = {c.name: c.key for c in cls.__mapper__.columns}
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
             cls.__doc__ = _update_docstring(cls)
 
