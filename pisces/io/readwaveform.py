@@ -84,7 +84,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
         else:
             data = e_compression(DATAFILE, BYTEOFFSET, NUM)
     elif DATATYPE == 's3':
-        data, flag = read_s3(DATAFILE, BYTEOFFSET, NUM)
+        data = read_s3(DATAFILE, BYTEOFFSET, NUM)
     else:
         raise ValueError("Unrecognized data format: {0}".format(DATATYPE))
 
