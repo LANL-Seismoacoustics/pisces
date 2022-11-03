@@ -6,6 +6,9 @@ from collections import namedtuple
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 try:
+    from sqlalchemy.orm.decl_base import _declarative_constructor
+except ModuleNotFoundError:
+    # 1.3 to 0.8
     from sqlalchemy.ext.declarative.api import _declarative_constructor
 except ImportError:
     # not >0.8
