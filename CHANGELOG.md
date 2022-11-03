@@ -1,7 +1,8 @@
 # Change Log
 
-## dev
+## master/main
 
+* fix bug in `io.readwaveform.read_s3` where too many return values were expected. (Issue #46)
 * `wftag` now parsed as a float instead of an integer in KB Core and CSS3 schemas
 * `Wftag` primary keys are `tagname`, `tagid`, and `wfid` instead of just `tagid`
 
