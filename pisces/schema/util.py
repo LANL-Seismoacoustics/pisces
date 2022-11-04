@@ -4,7 +4,7 @@
 from collections import namedtuple
 
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import DeclarativeMeta, declarative_base
 try:
     from sqlalchemy.orm.decl_base import _declarative_constructor
 except ModuleNotFoundError:

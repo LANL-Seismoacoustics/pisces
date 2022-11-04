@@ -2,7 +2,8 @@ import unittest
 
 import nose.tools as t
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
+from sqlalchemy.ext.declarative import DeferredReflection
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
 from pisces import db_connect
