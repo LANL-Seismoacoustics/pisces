@@ -2,6 +2,13 @@
 
 ## master/main
 
+* Bump required SQLAlchemy version to add least 1.4
+* Updated import locations of `sqlalchemy.ext.declarative.api` functions to `sqlalchemy.orm`
+* Changed the `Column.copy()` method to `Column._copy()` in `pisces.schema.antelope.py`, 
+  `pisces.schema.css3.py`, and `pisces.schema.kbcore.py`.  This remove deprecation warnings.
+
+## 0.3.2
+
 * fix bug in `io.readwaveform.read_s3` where too many return values were expected. (Issue #46)
 * `wftag` now parsed as a float instead of an integer in KB Core and CSS3 schemas
 * `Wftag` primary keys are `tagname`, `tagid`, and `wfid` instead of just `tagid`
