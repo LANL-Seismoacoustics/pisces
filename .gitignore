@@ -1,0 +1,6 @@
+.DS_Store
+build
+*.so
+*.o
+__pycache__
+.vscode
