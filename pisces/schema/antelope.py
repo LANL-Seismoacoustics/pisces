@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import Date, DateTime, Float, Numeric, String, Integer
 from sqlalchemy import Column, Table, func
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, Index
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
 from obspy.core import UTCDateTime

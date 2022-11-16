@@ -65,7 +65,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Float, String, Integer
 from sqlalchemy import Column
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
 from pisces.schema.util import PiscesMeta
