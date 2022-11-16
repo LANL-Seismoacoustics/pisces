@@ -2,6 +2,7 @@
 
 ## master/main
 
+## 0.4.0
 * Bump required SQLAlchemy version to add least 1.4
 * Updated import locations of `sqlalchemy.ext.declarative.api` functions to `sqlalchemy.orm`
 * Changed the `Column.copy()` method to `Column._copy()` in `pisces.schema.antelope.py`, 
