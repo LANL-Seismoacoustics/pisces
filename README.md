@@ -52,31 +52,3 @@ Install current master from GitHub:
 ```
 pip install git+https://github.com/LANL-Seismoacoustics/pisces
 ```
-
-# Recent History 
-
-([full change log](CHANGELOG.md))
-
-## 0.3.2
-
-* Correct links in setup.py
-
-## 0.3.1
-
-* Pisces no longer requires compiling and installing C extension modules.
-* Remove `libconvert` C library, and replace it's only exposed function (`s3tos4`)
-  with a NumPy-only version.
-* Remove `libecompression` C library, and move it to a separate "e1" package on PyPI.
-  It will be installed as an optional dependency by installing with `pip install pisces[e1]`.
-
-## 0.3.0
-
-* Python 3 support!
-* No more Python 2 support
-* Add the ability to target a database and tables in a config file (see util.load_config).
-
-
-## 0.2.4
-
-* Change package name to "pisces" instead of "pisces-db"
-* Add Antelope Datascope schema/tables.
