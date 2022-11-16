@@ -22,7 +22,7 @@ Glossary
 """
 # TODO: support plugging in additional schema
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 from pisces.schema.util import PiscesMeta
 import pisces.tables.css3 as css3

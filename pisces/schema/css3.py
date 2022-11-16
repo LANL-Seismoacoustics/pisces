@@ -11,7 +11,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Float, String, Integer
 from sqlalchemy import Column
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
 from obspy.core import UTCDateTime
@@ -497,9 +497,9 @@ class Affiliation(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('net', 'sta'),)
 
-    net = net.copy()
-    sta = sta.copy()
-    lddate = lddate.copy()
+    net = net._copy()
+    sta = sta._copy()
+    lddate = lddate._copy()
 
 
 class Amplitude(Base):
@@ -509,23 +509,23 @@ class Amplitude(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('ampid'),)
 
-    ampid = ampid.copy()
-    arid = arid.copy()
-    parid = parid.copy()
-    chan = chan.copy()
-    amp = amp.copy()
-    per = per.copy()
-    snr = snr.copy()
-    amptime = amptime.copy()
-    time = time.copy()
-    duration = duration.copy()
-    deltaf = deltaf.copy()
-    amptype = amptype.copy()
-    units = units.copy()
-    clip = clip.copy()
-    inarrival = inarrival.copy()
-    auth = auth.copy()
-    lddate = lddate.copy()
+    ampid = ampid._copy()
+    arid = arid._copy()
+    parid = parid._copy()
+    chan = chan._copy()
+    amp = amp._copy()
+    per = per._copy()
+    snr = snr._copy()
+    amptime = amptime._copy()
+    time = time._copy()
+    duration = duration._copy()
+    deltaf = deltaf._copy()
+    amptype = amptype._copy()
+    units = units._copy()
+    clip = clip._copy()
+    inarrival = inarrival._copy()
+    auth = auth._copy()
+    lddate = lddate._copy()
 
 
 class Arrival(Base):
@@ -536,32 +536,32 @@ class Arrival(Base):
         return (PrimaryKeyConstraint('arid'),
                 UniqueConstraint('sta', 'time', 'chan', 'iphase', 'auth'),)
 
-    sta = sta.copy()
-    time = time.copy()
-    arid = arid.copy()
-    jdate = jdate.copy()
-    stassid = stassid.copy()
-    chanid = chanid.copy()
-    chan = chan.copy()
-    iphase = iphase.copy()
-    stype = stype.copy()
-    deltim = deltim.copy()
-    azimuth = azimuth.copy()
-    delaz = delaz.copy()
-    slow = slow.copy()
-    delslo = delslo.copy()
-    ema = ema.copy()
-    rect = rect.copy()
-    amp = amp.copy()
-    per = per.copy()
-    logat = logat.copy()
-    clip = clip.copy()
-    fm = fm.copy()
-    snr = snr.copy()
-    qual = qual.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    sta = sta._copy()
+    time = time._copy()
+    arid = arid._copy()
+    jdate = jdate._copy()
+    stassid = stassid._copy()
+    chanid = chanid._copy()
+    chan = chan._copy()
+    iphase = iphase._copy()
+    stype = stype._copy()
+    deltim = deltim._copy()
+    azimuth = azimuth._copy()
+    delaz = delaz._copy()
+    slow = slow._copy()
+    delslo = delslo._copy()
+    ema = ema._copy()
+    rect = rect._copy()
+    amp = amp._copy()
+    per = per._copy()
+    logat = logat._copy()
+    clip = clip._copy()
+    fm = fm._copy()
+    snr = snr._copy()
+    qual = qual._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Assoc(Base):
@@ -571,25 +571,25 @@ class Assoc(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('arid', 'orid'), UniqueConstraint('arid'), )
 
-    arid = arid.copy()
-    orid = orid.copy()
-    sta = sta.copy()
-    phase = phase.copy()
-    belief = belief.copy()
-    delta = delta.copy()
-    seaz = seaz.copy()
-    esaz = esaz.copy()
-    timeres = timeres.copy()
-    timedef = timedef.copy()
-    azres = azres.copy()
-    azdef = azdef.copy()
-    slores = slores.copy()
-    slodef = slodef.copy()
-    emares = emares.copy()
-    wgt = wgt.copy()
-    vmodel = vmodel.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    arid = arid._copy()
+    orid = orid._copy()
+    sta = sta._copy()
+    phase = phase._copy()
+    belief = belief._copy()
+    delta = delta._copy()
+    seaz = seaz._copy()
+    esaz = esaz._copy()
+    timeres = timeres._copy()
+    timedef = timedef._copy()
+    azres = azres._copy()
+    azdef = azdef._copy()
+    slores = slores._copy()
+    slodef = slodef._copy()
+    emares = emares._copy()
+    wgt = wgt._copy()
+    vmodel = vmodel._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Event(Base):
@@ -599,12 +599,12 @@ class Event(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('evid'), UniqueConstraint('prefor'),)
 
-    evid = evid.copy()
-    evname = evname.copy()
-    prefor = prefor.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    evid = evid._copy()
+    evname = evname._copy()
+    prefor = prefor._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Gregion(Base):
@@ -614,9 +614,9 @@ class Gregion(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('grn'),)
 
-    grn = grn.copy()
-    grname = grname.copy()
-    lddate = lddate.copy()
+    grn = grn._copy()
+    grname = grname._copy()
+    lddate = lddate._copy()
 
 
 class Instrument(Base):
@@ -626,18 +626,18 @@ class Instrument(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('inid'),)
 
-    inid = inid.copy()
-    insname = insname.copy()
-    instype = instype.copy()
-    band = band.copy()
-    digital = digital.copy()
-    samprate = samprate.copy()
-    ncalib = ncalib.copy()
-    ncalper = ncalper.copy()
-    dir = dir.copy()
-    dfile = dfile.copy()
-    rsptype = rsptype.copy()
-    lddate = lddate.copy()
+    inid = inid._copy()
+    insname = insname._copy()
+    instype = instype._copy()
+    band = band._copy()
+    digital = digital._copy()
+    samprate = samprate._copy()
+    ncalib = ncalib._copy()
+    ncalper = ncalper._copy()
+    dir = dir._copy()
+    dfile = dfile._copy()
+    rsptype = rsptype._copy()
+    lddate = lddate._copy()
 
 
 class Lastid(Base):
@@ -647,9 +647,9 @@ class Lastid(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('keyname'), UniqueConstraint('keyname', 'keyvalue'),)
 
-    keyname = keyname.copy()
-    keyvalue = keyvalue.copy()
-    lddate = lddate.copy()
+    keyname = keyname._copy()
+    keyvalue = keyvalue._copy()
+    lddate = lddate._copy()
 
 
 class Netmag(Base):
@@ -660,17 +660,17 @@ class Netmag(Base):
         return (PrimaryKeyConstraint('magid'),
                 UniqueConstraint('magid', 'orid'),)
 
-    magid = magid.copy()
-    net = net.copy()
-    orid = orid.copy()
-    evid = evid.copy()
-    magtype = magtype.copy()
-    nsta = nsta.copy()
-    magnitude = magnitude.copy()
-    uncertainty = uncertainty.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    magid = magid._copy()
+    net = net._copy()
+    orid = orid._copy()
+    evid = evid._copy()
+    magtype = magtype._copy()
+    nsta = nsta._copy()
+    magnitude = magnitude._copy()
+    uncertainty = uncertainty._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Network(Base):
@@ -680,12 +680,12 @@ class Network(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('net'),)
 
-    net = net.copy()
-    netname = netname.copy()
-    nettype = nettype.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    net = net._copy()
+    netname = netname._copy()
+    nettype = nettype._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Origerr(Base):
@@ -695,26 +695,26 @@ class Origerr(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('orid'),)
 
-    orid = orid.copy()
-    sxx = sxx.copy()
-    syy = syy.copy()
-    szz = szz.copy()
-    stt = stt.copy()
-    sxy = sxy.copy()
-    sxz = sxz.copy()
-    syz = syz.copy()
-    stx = stx.copy()
-    sty = sty.copy()
-    stz = stz.copy()
-    sdobs = sdobs.copy()
-    smajax = smajax.copy()
-    sminax = sminax.copy()
-    strike = strike.copy()
-    sdepth = sdepth.copy()
-    stime = stime.copy()
-    conf = conf.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    orid = orid._copy()
+    sxx = sxx._copy()
+    syy = syy._copy()
+    szz = szz._copy()
+    stt = stt._copy()
+    sxy = sxy._copy()
+    sxz = sxz._copy()
+    syz = syz._copy()
+    stx = stx._copy()
+    sty = sty._copy()
+    stz = stz._copy()
+    sdobs = sdobs._copy()
+    smajax = smajax._copy()
+    sminax = sminax._copy()
+    strike = strike._copy()
+    sdepth = sdepth._copy()
+    stime = stime._copy()
+    conf = conf._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Origin(Base):
@@ -724,31 +724,31 @@ class Origin(Base):
     def __table_args__(cls):
         return (UniqueConstraint('lat', 'lon', 'depth', 'time', 'auth'), PrimaryKeyConstraint('orid'))
 
-    lat = lat.copy()
-    lon = lon.copy()
-    depth = depth.copy()
-    time = time.copy()
-    orid = orid.copy()
-    evid = evid.copy()
-    jdate = jdate.copy()
-    nass = nass.copy()
-    ndef = ndef.copy()
-    ndp = ndp.copy()
-    grn = grn.copy()
-    srn = srn.copy()
-    etype = etype.copy()
-    depdp = depdp.copy()
-    dtype = dtype.copy()
-    mb = mb.copy()
-    mbid = mbid.copy()
-    ms = ms.copy()
-    msid = msid.copy()
-    ml = ml.copy()
-    mlid = mlid.copy()
-    algorithm = algorithm.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    lat = lat._copy()
+    lon = lon._copy()
+    depth = depth._copy()
+    time = time._copy()
+    orid = orid._copy()
+    evid = evid._copy()
+    jdate = jdate._copy()
+    nass = nass._copy()
+    ndef = ndef._copy()
+    ndp = ndp._copy()
+    grn = grn._copy()
+    srn = srn._copy()
+    etype = etype._copy()
+    depdp = depdp._copy()
+    dtype = dtype._copy()
+    mb = mb._copy()
+    mbid = mbid._copy()
+    ms = ms._copy()
+    msid = msid._copy()
+    ml = ml._copy()
+    mlid = mlid._copy()
+    algorithm = algorithm._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Remark(Base):
@@ -758,10 +758,10 @@ class Remark(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('commid', 'lineno'),)
 
-    commid = commid.copy()
-    lineno = lineno.copy()
-    remark = remark.copy()
-    lddate = lddate.copy()
+    commid = commid._copy()
+    lineno = lineno._copy()
+    remark = remark._copy()
+    lddate = lddate._copy()
 
 
 class Sensor(Base):
@@ -771,18 +771,18 @@ class Sensor(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('sta', 'chan', 'time', 'endtime'),)
 
-    sta = sta.copy()
-    chan = chan.copy()
-    time = time.copy()
-    endtime = endtime.copy()
-    inid = inid.copy()
-    chanid = chanid.copy()
-    jdate = jdate.copy()
-    calratio = calratio.copy()
-    calper = calper.copy()
-    tshift = tshift.copy()
-    instant = instant.copy()
-    lddate = lddate.copy()
+    sta = sta._copy()
+    chan = chan._copy()
+    time = time._copy()
+    endtime = endtime._copy()
+    inid = inid._copy()
+    chanid = chanid._copy()
+    jdate = jdate._copy()
+    calratio = calratio._copy()
+    calper = calper._copy()
+    tshift = tshift._copy()
+    instant = instant._copy()
+    lddate = lddate._copy()
 
 
 class Site(Base):
@@ -792,18 +792,18 @@ class Site(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('sta', 'ondate'),)
 
-    sta = sta.copy()
-    ondate = ondate.copy()
-    offdate = offdate.copy()
-    lat = lat.copy()
-    lon = lon.copy()
-    elev = elev.copy()
-    staname = staname.copy()
-    statype = statype.copy()
-    refsta = refsta.copy()
-    dnorth = dnorth.copy()
-    deast = deast.copy()
-    lddate = lddate.copy()
+    sta = sta._copy()
+    ondate = ondate._copy()
+    offdate = offdate._copy()
+    lat = lat._copy()
+    lon = lon._copy()
+    elev = elev._copy()
+    staname = staname._copy()
+    statype = statype._copy()
+    refsta = refsta._copy()
+    dnorth = dnorth._copy()
+    deast = deast._copy()
+    lddate = lddate._copy()
 
 
 class Sitechan(Base):
@@ -814,17 +814,17 @@ class Sitechan(Base):
         return (UniqueConstraint('sta', 'chan', 'ondate'),
                 PrimaryKeyConstraint('chanid'),)
 
-    sta = sta.copy()
-    chan = chan.copy()
-    ondate = ondate.copy()
-    chanid = chanid.copy()
-    offdate = offdate.copy()
-    ctype = ctype.copy()
-    edepth = edepth.copy()
-    hang = hang.copy()
-    vang = vang.copy()
-    descrip = descrip.copy()
-    lddate = lddate.copy()
+    sta = sta._copy()
+    chan = chan._copy()
+    ondate = ondate._copy()
+    chanid = chanid._copy()
+    offdate = offdate._copy()
+    ctype = ctype._copy()
+    edepth = edepth._copy()
+    hang = hang._copy()
+    vang = vang._copy()
+    descrip = descrip._copy()
+    lddate = lddate._copy()
 
 
 class Sregion(Base):
@@ -834,9 +834,9 @@ class Sregion(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('srn'),)
 
-    srn = srn.copy()
-    srname = srname.copy()
-    lddate = lddate.copy()
+    srn = srn._copy()
+    srname = srname._copy()
+    lddate = lddate._copy()
 
 
 class Stamag(Base):
@@ -846,19 +846,19 @@ class Stamag(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('magid', 'sta'),)
 
-    magid = magid.copy()
-    sta = sta.copy()
-    arid = arid.copy()
-    orid = orid.copy()
-    evid = evid.copy()
-    phase = phase.copy()
-    delta = delta.copy()
-    magtype = magtype.copy()
-    magnitude = magnitude.copy()
-    uncertainty = uncertainty.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    magid = magid._copy()
+    sta = sta._copy()
+    arid = arid._copy()
+    orid = orid._copy()
+    evid = evid._copy()
+    phase = phase._copy()
+    delta = delta._copy()
+    magtype = magtype._copy()
+    magnitude = magnitude._copy()
+    uncertainty = uncertainty._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
     
     
 class Stassoc(Base):
@@ -868,22 +868,22 @@ class Stassoc(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('stassid'),)
         
-    stassid = stassid.copy()
-    sta = sta.copy()
-    etype = etype.copy()
-    location = location.copy()
-    dist = dist.copy()
-    azimuth = azimuth.copy()
-    lat = lat.copy()
-    lon = lon.copy()
-    depth = depth.copy()
-    time = time.copy()
-    imb = imb.copy()
-    ims = ims.copy()
-    iml = iml.copy()
-    auth = auth.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    stassid = stassid._copy()
+    sta = sta._copy()
+    etype = etype._copy()
+    location = location._copy()
+    dist = dist._copy()
+    azimuth = azimuth._copy()
+    lat = lat._copy()
+    lon = lon._copy()
+    depth = depth._copy()
+    time = time._copy()
+    imb = imb._copy()
+    ims = ims._copy()
+    iml = iml._copy()
+    auth = auth._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
         
 
 class Wfdisc(Base):
@@ -904,26 +904,26 @@ class Wfdisc(Base):
         """
         return wfdisc2trace(self)
 
-    sta = sta.copy()
-    chan = chan.copy()
-    time = time.copy()
-    wfid = wfid.copy()
-    chanid = chanid.copy()
-    jdate = jdate.copy()
-    endtime = endtime.copy()
-    nsamp = nsamp.copy()
-    samprate = samprate.copy()
-    calib = calib.copy()
-    calper = calper.copy()
-    instype = instype.copy()
-    segtype = segtype.copy()
-    datatype = datatype.copy()
-    clip = clip.copy()
-    dir = dir.copy()
-    dfile = dfile.copy()
-    foff = foff.copy()
-    commid = commid.copy()
-    lddate = lddate.copy()
+    sta = sta._copy()
+    chan = chan._copy()
+    time = time._copy()
+    wfid = wfid._copy()
+    chanid = chanid._copy()
+    jdate = jdate._copy()
+    endtime = endtime._copy()
+    nsamp = nsamp._copy()
+    samprate = samprate._copy()
+    calib = calib._copy()
+    calper = calper._copy()
+    instype = instype._copy()
+    segtype = segtype._copy()
+    datatype = datatype._copy()
+    clip = clip._copy()
+    dir = dir._copy()
+    dfile = dfile._copy()
+    foff = foff._copy()
+    commid = commid._copy()
+    lddate = lddate._copy()
 
 
 class Wftag(Base):
@@ -933,7 +933,7 @@ class Wftag(Base):
     def __table_args__(cls):
         return (PrimaryKeyConstraint('tagname', 'tagid', 'wfid'),)
 
-    tagname = tagname.copy()
-    tagid = tagid.copy()
-    wfid = wfid.copy()
-    lddate = lddate.copy()
+    tagname = tagname._copy()
+    tagid = tagid._copy()
+    wfid = wfid._copy()
+    lddate = lddate._copy()
