@@ -503,7 +503,7 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     # TODO: implement get_arrivals if arrivals=True
     Wfdisc = wfdisc
 
-    st = Stream()
+    # st = Stream()
     if wfids:
         station = channel = starttime = endtime = None
 
@@ -546,7 +546,8 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     ValueError:
         Returned Stream contains trace start/end times outside of the tolerance.
     """
-
+    st = Stream()
+    
     for wf in wf_rows:
         try:
             tr = wfdisc2trace(wf)
