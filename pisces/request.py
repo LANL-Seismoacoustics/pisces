@@ -547,7 +547,7 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
         Returned Stream contains trace start/end times outside of the tolerance.
     """
 
-    for wf in wfs:
+    for wf in wf_rows:
         try:
             tr = wfdisc2trace(wf)
         except IOError:
