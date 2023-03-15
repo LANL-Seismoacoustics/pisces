@@ -332,7 +332,7 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
         (startdate, enddate) or [startdate, enddate]
         startdate and enddate are integer julian days of when you want stations (YYYYddd).  
         If stations were moved one or more times in the time_span, you will 
-        get multiple copies of the station with updated gps times. If you want to be 
+        get multiple copies of the station with updated gps values. If you want to be 
         guaranteed a specific station at a specific time, startdate and enddate must 
         both be included, even if they are the same.
 
@@ -371,7 +371,12 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     q = session.query(Site)
 
     if stations:
-        q = q.filter(Site.sta.in_(stations))
+        # get station info
+        if "%" in stations:
+            # Load data specified with a while card (e.g., 'I26H%') via a Site table query
+            q = q.filter(Site.sta.contains(stations))
+        else:
+            q = q.filter(Site.sta.in_(stations))
 
     if nets:
         q = q.join(Affiliation, Affiliation.sta==Site.sta)
