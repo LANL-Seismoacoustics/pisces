@@ -293,7 +293,7 @@ def get_events(session, origin, event=None, region=None, deg=None, km=None,
 
 def get_stations(session, site, sitechan=None, affiliation=None, stations=None, 
         channels=None, nets=None, loc=None, region=None, deg=None, km=None, 
-        swath=None, stime=None, asquery=False):
+        swath=None, time_span=None, asquery=False):
     """
     Build common queries for stations.
 
@@ -328,6 +328,13 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
         Useful if additional you desire additional sorting of filtering, or
         if you have your own in-database geographic query function(s).  If 
         supplied, deg, km, and/or swath are ignored in the returned query.
+    time_span : tuple or list
+        (startdate, enddate) or [startdate, enddate]
+        startdate and enddate are integer julian days of when you want stations (YYYYddd).  
+        If stations were moved one or more times in the time_span, you will 
+        get multiple copies of the station with updated gps values. If you want to be 
+        guaranteed a specific station at a specific time, startdate and enddate must 
+        both be included, even if they are the same.
 
     Notes
     -----
@@ -360,13 +367,12 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     Affiliation = affiliation
 
     d = deg
-    t = stime
 
     q = session.query(Site)
 
     if stations:
-        q = q.filter(Site.sta.in_(stations))
-
+        q = q.filter(or_(*[Site.sta.like(stas) for stas in stations]))
+        
     if nets:
         q = q.join(Affiliation, Affiliation.sta==Site.sta)
         if isinstance(nets, list):
@@ -378,10 +384,17 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
         q = q.join(Sitechan, Sitechan.sta==Site.sta)
         if isinstance(channels, str):
             #interpret string as regexp
-            q = q.filter(func.regexp_like(Sitechan.chan, channnels))
+            q = q.filter(func.regexp_like(Sitechan.chan, channels))
         else:
             q = q.filter(Sitechan.chan.in_(channels))
-    
+
+    if time_span:
+        start_date, end_date = time_span  # start and end days of time period to get stations from
+        if start_date is not None:
+            q = q.filter(Site.ondate <= start_date)
+        if end_date is not None:
+            q = q.filter(Site.offdate >= end_date)
+
     q = geographic_query(q, Site, region=region, asquery=True)
 
     if asquery:
