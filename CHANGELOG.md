@@ -2,6 +2,21 @@
 
 ## master/main
 
+
+## 0.4.1
+
+* Drop testing on Python 3.6, add 3.9 and 3.10
+* Drop AppVeyor for testing on Windows, use GitHub Actions instead
+* The unimplemented `stime` keyword in `pisces.request.get_stations` has been replaced
+  with `time_span`, which accepts time ranges as YYYYddd julian dates.
+* Fixed typo in `pisces.request.get_stations` implementation of `nets` keyword.
+* New handling of wildcards in `pisces.request.get_stations`
+* Fixed typo in `pisces.request.get_stations` implementation of `channels` keyword.
+* Fixed typo in `pisces.requests.wfdisc_rows_to_stream` 😳 Yikes!
+* New contributor Samuel Chodur!
+* Use GitHub Actions for wheels and releases to PyPI
+* Add `asquery` option to `pisces.request.get_waveforms`
+
 ## 0.4.0
 * Bump required SQLAlchemy version to add least 1.4
 * Updated import locations of `sqlalchemy.ext.declarative.api` functions to `sqlalchemy.orm`
