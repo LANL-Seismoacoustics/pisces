@@ -485,7 +485,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
 
 
 def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
-                  endtime=None, wfids=None, tol=None):
+                  endtime=None, wfids=None, tol=None, asquery=False):
     """
     Request waveforms.
 
@@ -505,6 +505,9 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     tol : float
         If provided, a warning is fired if any Trace is not within tol seconds
         of starttime and endtime.
+    asquery : bool, optional
+        Return the query object instead of the results.  Default, False.
+        Useful if additional you desire additional sorting of filtering.
 
     Returns
     -------
@@ -527,9 +530,14 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     t2_utc = UTCDateTime(endtime) if endtime is not None else None
 
     wfs = get_wfdisc_rows(session, Wfdisc, station, channel, starttime, endtime,
-                          wfids=wfids)
+                          wfids=wfids, asquery=asquery)
 
-    return wfdisc_rows_to_stream(wfs, t1_utc, t2_utc, tol=tol)
+    if asquery:
+        res = wfs
+    else:
+        res = wfdisc_rows_to_stream(wfs, t1_utc, t2_utc, tol=tol)
+
+    return res
     
 
 def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
