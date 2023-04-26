@@ -100,7 +100,7 @@ def distaz_query(records, deg=None, km=None, swath=None):
 
     """
     #initial True array to propagate through multiple logical AND comparisons
-    mask0 = np.ones(len(records), dtype=np.bool)
+    mask0 = np.ones(len(records), dtype=bool)
 
     if deg:
         dgen = (geod.locations2degrees(irec.lat, irec.lon, deg[0], deg[1]) \
@@ -574,6 +574,7 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
             tr = wfdisc2trace(wf)
         except IOError:
             # can't read file
+            # XXX: wow, why the hell would I let unreadable traces slip past
             tr = None
 
         if tr:
