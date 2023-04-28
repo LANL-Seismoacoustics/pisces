@@ -10,7 +10,7 @@ from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
 
 from pisces.io.trace import wfdisc2trace
-
+from pisces.util import make_wildcard_list
 
 def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
                     wfids=None, daylong=False, asquery=False, verbose=False):
@@ -51,9 +51,11 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
         q = q.filter(wfdisc.wfid.in_(wfids))
     else:
         if sta is not None:
-            q = q.filter(wfdisc.sta == sta)
+            sta = make_wildcard_list(sta)
+            q = q.filter(or_(*[wfdisc.sta.like(stas) for stas in sta]))
         if chan is not None:
-            q = q.filter(wfdisc.chan == chan)
+            chan = make_wildcard_list(chan)
+            q = q.filter(or_(*[wfdisc.chan.like(chans) for chans in chan]))
         if [t1, t2].count(None) == 0:
             q = q.filter(wfdisc.time.between(t1 - CHUNKSIZE, t2))
             q = q.filter(wfdisc.endtime > t1)
@@ -367,26 +369,22 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     Affiliation = affiliation
 
     d = deg
-
+    
     q = session.query(Site)
-
+    
     if stations:
+        stations = make_wildcard_list(stations)
         q = q.filter(or_(*[Site.sta.like(stas) for stas in stations]))
         
     if nets:
+        nets = make_wildcard_list(nets)
         q = q.join(Affiliation, Affiliation.sta==Site.sta)
-        if isinstance(nets, list):
-            q = q.filter(Affiliation.net.in_(nets))
-        else:
-            q = q.filter(func.regexp_like(Affiliation.net, nets))
+        q = q.filter(or_(*[Affiliation.net.like(net) for net in nets]))
 
     if channels:
+        channels = make_wildcard_list(channels)
         q = q.join(Sitechan, Sitechan.sta==Site.sta)
-        if isinstance(channels, str):
-            #interpret string as regexp
-            q = q.filter(func.regexp_like(Sitechan.chan, channels))
-        else:
-            q = q.filter(Sitechan.chan.in_(channels))
+        q = q.filter(or_(*[Sitechan.chan.like(chans) for chans in channels]))
 
     if time_span:
         start_date, end_date = time_span  # start and end days of time period to get stations from
@@ -449,13 +447,16 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
     q = session.query(Arrival)
 
     if stations:
-        q = q.filter(Arrival.sta.in_(stations))
+        stations = make_wildcard_list(stations)
+        q = q.filter(or_(*[Arrival.sta.like(stas) for stas in stations]))
 
     if channels:
-        q = q.filter(Arrival.chan.in_(channels))
+        channels = make_wildcard_list(channels)
+        q = q.filter(or_(*[Arrival.chan.like(chans) for chans in channels]))
 
     if phases:
-        q = q.filter(Arrival.iphase.in_(phase))
+        phases = make_wildcard_list(phases)
+        q = q.filter(or_(*[Arrival.iphase.like(phase) for phase in phases]))
 
     if t:
         if t.count(None) == 0:
@@ -474,7 +475,8 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
         q = q.filter(Assoc.orid.in_(orids))
 
     if auth:
-        q = q.filter(Arrival.auth.in_(auth))
+        auth = make_wildcard_list(auth)
+        q = q.filter(or_(*[Arrival.auth.like(author) for author in auth]))
 
     if asquery:
         res = q
