@@ -24,7 +24,7 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     wfdisc: SQLAlchemy mapped wfdisc table
     sta, chan, : str, optional
         station, channel strings,
-    t1, t2 : int, optional
+    t1, t2 : float, optional
         Epoch time window of interest (seconds)
         Actually searches for wfdisc.time between t1-86400 and t2 and
         wfdisc.endtime > t1
