@@ -22,13 +22,16 @@ from pisces.io.trace import wfdisc2trace
 
 log = logging.getLogger(__name__)
 
-def _glob_to_like(text, escape='\\'):
-    # replace string '*' or '?' glob characters with SQL '%' or '_' LIKE characters,
-    # escaping any existing literal '%' or '_' characters.
-    text = text.replace('_', escape + '_').replace('?', '_')
-    text = text.replace('%', escape + '%').replace('*', '%')
+# client = DBClient(session_or_config_or_URI, **tables)
+# get network-level info for stations containing BH? in a region. 
+# returns joined sitechan, site, affil, and network
+# q = client.stations(region=[W, E, S, N], channels='BH?').networks(pref_nets=('II','IU','ISC'))
+# get responses for all BH? stations in II
+# q = client.networks(networks=['II']).stations(channels='BH?').responses()
 
-    return text
+
+def _None_if_none(iterable):
+    return None if all([val is None for val in iterable]) else iterable
 
 
 def origins_to_fdsntext(origins, header=False):
@@ -40,6 +43,7 @@ def origins_to_fdsntext(origins, header=False):
     header_string = '#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName'
 
     """
+    header_string = "EventID | Time | Latitude | Longitude | Depth/km | Author | Catalog | Contributor | ContributorID | MagType | Magnitude | MagAuthor | EventLocationName"
     # this needs to get MagType in there
     origin_columns = ('orid', 'time', 'lat', 'lon', 'depth', 'auth', 'auth',
                       'auth', 'orid', 'mb', 'mb', 'auth', 'grn')
@@ -120,24 +124,12 @@ class Client(object):
             Table doesn't exist.
 
         """
-        # TODO: add the tables as attributes?
-        # TODO: if isinstance(table, DeclarativeBase): just set it as attribute
-        # XXX: fails for no primary key.  use get_tables syntax.
-        for coretable, tablename in tables.iteritems():
-            self.tables[coretable] = ps.get_tables(self.session.bind, 
-                                                   [tablename], 
-                                                   metadata=self.metadata)[0]
-        
-    def get_events(self, region=None, deg=None, km=None, swath=None, mag=None, 
-            depth=None, etype=None, orids=None, evids=None, prefor=False):
-        """ Get Origin table rows.
+        metadata = sa.MetaData(self.session.bind)
+        for tablename, table in tables.items():
+            # TODO: use stuff in crud.py here instead.
+            self.tables[tablename] = ps.get_tables(self.session.bind, [table],
+                                                   metadata=metadata)[0]
 
-        For further explanation, see: pisces.request.get_events
-
-        """
-        #origin = getattr(self, 'origin', None)
-        origin = self.tables.get('origin')
-        origin = self.tables.get('event', None)
 
         recs = req.get_events(self.session, origin, event=event, region=region, 
                               deg=deg, km=km, swath=swath, mag=mag, depth=depth,
@@ -150,35 +142,167 @@ class Client(object):
         """
         Get Site table rows.
 
-        For further explanation, see: pisces.request.get_stations
+        >>> cat = client.get_events(eventid=609301)
+
+        The return value is a :class:`~obspy.core.event.Catalog` object
+        which can contain any number of events.
+
+        >>> t1 = UTCDateTime("2001-01-07T00:00:00")
+        >>> t2 = UTCDateTime("2001-01-07T03:00:00")
+        >>> cat = client.get_events(starttime=t1, endtime=t2, minmagnitude=4,
+        ...                         catalog="ISC")
+        >>> print(cat)
+        3 Event(s) in Catalog:
+        2001-01-07T02:55:59.290000Z |  +9.801,  +76.548 | 4.9 mb
+        2001-01-07T02:35:35.170000Z | -21.291,  -68.308 | 4.4 mb
+        2001-01-07T00:09:25.630000Z | +22.946, -107.011 | 4.0 mb
+
+        starttime : obspy.core.utcdatetime.UTCDateTime, optional
+            Limit to events on or after the specified start time.
+        endtime : obspy.core.utcdatetime.UTCDateTime optional
+            Limit to events on or before the specified end time.
+        minlatitude : float, optional
+            Limit to events with a latitude larger than the specified minimum.
+        maxlatitude : float, optional
+            Limit to events with a latitude smaller than the specified
+            maximum.
+        minlongitude : float, optional
+            Limit to events with a longitude larger than the specified
+            minimum.
+        maxlongitude : float, optional
+            Limit to events with a longitude smaller than the specified
+            maximum.
+        latitude : float, optional
+            Specify the latitude to be used for a radius search.
+        longitude : float, optional
+            Specify the longitude to the used for a radius search.
+        minradius : float, optional
+            Limit to events within the specified minimum number of degrees
+            from the geographic point defined by the latitude and longitude
+            parameters.
+        maxradius : float, optional
+            Limit to events within the specified maximum number of degrees
+            from the geographic point defined by the latitude and longitude
+            parameters.
+        mindepth : float, optional
+            Limit to events with depth, in kilometers, larger than the
+            specified minimum.
+        maxdepth : float, optional
+            Limit to events with depth, in kilometers, smaller than the
+            specified maximum.
+        minmagnitude : float, optional
+            Limit to events with a magnitude larger than the specified
+            minimum.
+        maxmagnitude : float, optional
+            Limit to events with a magnitude smaller than the specified
+            maximum.
+        magnitudetype : str, optional
+            Specify a magnitude type to use for testing the minimum and
+            maximum limits.
+        includeallorigins : bool, optional
+            Specify if all origins for the event should be included. Default
+            returns the preferred origin only.
+            Requires Event table.
+        includeallmagnitudes : bool, optional
+            Specify if all magnitudes for the event should be included,
+            default is data center dependent but is suggested to be the
+            preferred magnitude only.
+            Requires Netmag table.
+        includearrivals : bool, optional
+            Specify if phase arrivals should be included.
+            Requires Assoc and Arrival tables.
+        eventid : int, optional
+            Select a specific event by ID (evid).
+        limit : int, optional
+            Limit the results to the specified number of events.
+        offset : int, optional
+            Return results starting at the event count specified, starting
+            at 1.
+        orderby : str, optional
+            Order the result by time or magnitude with the following
+            possibilities:
+
+            * time: order by origin descending time
+            * time-asc: order by origin ascending time
+            * magnitude: order by descending magnitude
+            * magnitude-asc: order by ascending magnitude
+
+        catalog : str, optional
+            Limit to events from a specified catalog
+            Looks for catalog inside of origin.auth.
+        contributor : str, optional
+            Limit to events contributed by a specified contributor.
+            Looks for contributer inside of origin.auth.
+        updatedafter : obspy.core.utcdatetime.UTCDateTime, optional
+            Limit to events updated after the specified time.
+        eventid : str
+            One or more comma-separated evids: '1234' or '1234,5678'
+        filename : str or file
+            If given, the downloaded data will be saved there instead of being
+            parse to an ObsPy object. Thus it will contain the raw data from
+            the webservices.
+        format : str ["xml" (StationXML) | "text" (FDSN station text format) | query (raw SQLAlchey query)]
+            The format in which to request station information. 
+
+        Any additional keyword arguments will be passed to the webservice as
+        additional arguments. If you pass one of the default parameters and the
+        webservice does not support it, a warning will be issued. Passing any
+        non-default parameters that the webservice does not support will raise
+        an error.
 
         """
-        site = self.tables.get('site')
-        sitechan = self.tables.get('sitechan', None)
-        affiliation = self.tables.get('affiliation', None)
+        # the plan:
+        #   1) translate FDSN arguments to request.get_events arguments
+        #       Translate any search radius to a worst-case-scenario degrees search radius (equator),
+        #       do a box region first, followed by a smaller in-memory kilometer radius restriction.
+        #   2) perform query using request module
+        #   3) for format=translate request results to Catalog/QuakeML or EventTXT
 
         recs = req.get_stations(self.session, site, sitechan=sitechan, 
                 affiliation=affiliation, stations=stations, channels=channels,
                 nets=nets, loc=loc, region=region, deg=deg, km=km, swath=swath,
                 stime=stime)
 
-        return recs
+        # Origin filters
+        time_span = _None_if_none((starttime, endtime))
+        region = _None_if_none((minlongitude, maxlongitude, minlatitude, maxlatitude))
+        radius = _None_if_none((latitude, longitude, minradius, maxradius))
+        depth = _None_if_none((mindepth, maxdepth))
 
+        if region and radius:
+            msg = "Incompatible inputs: using both lat/lon and radius ranges not allowed"
+            raise ValueError(msg)
 
-        # TODO: check that magnitudetype is in Origin, if not includeallmagnitudes
-
+        # Event filters
         prefor = includeallorigins or False
-        orids = None
 
-        if eventid:
-            evids = [eventid]
-        else:
+        # turn string event IDs into integer evid list
+        try:
+            evids = eventid.split(',')
+        except AttributeError:
             evids = None
 
-        # TODO: get netmag in get_events
-        q = req.get_events(self.session, Origin, Event, region=region, deg=deg,
-                           km=km, depth=depth, etime=etime, orids=orids,
-                           evids=evids, prefor=prefor, asquery=True)
+        # Netmag filters
+        mag = _None_if_none((minmagnitude, maxmagnitude))
+        # if magnitudetype isn't in Origin, we'll need Netmag
+        # TODO: we need remove case-sensitivity here.
+        if magnitudetype:
+            useNetmag = True if magnitudetype not in Origin.__tables__.columns else False
+        else:
+            useNetmag = False
+
+        # we may need _all_ of Netmag
+        useAllNetMag = includeallmagnitudes
+        magtype = magnitudetype
+
+
+        q = req.get_events(self.session, Origin, Event, region=region, radius=radius, depth=depth, 
+                           time_span=time_span, evids=evids, prefor=prefor)
+        
+        # q = req.get_magnitudes(Origin, Netmag, query=None, **magnitudes)
+        q = req.get_magnitudes(Origin, Netmag, 
+        
+        
 
         # magnitude
         if any([magnitudetype, minmagnitude, maxmagnitude]):
