@@ -2,6 +2,8 @@
 
 ## master/main
 
+* Replace deprecated `._copy()` method on SQLAlchemy columns with `deepcopy`
+* New contributor Brady Spears!
 
 ## 0.4.1
 
