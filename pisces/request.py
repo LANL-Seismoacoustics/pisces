@@ -634,3 +634,183 @@ def get_ids(session, lastid, ids, detach=False):
         session.expunge_all(out)
 
     return out
+
+def query_network(session, network, nets=None, affiliation=None, stas=None, time_=None, endtime=None, site_query = None, site_name = None):
+    """
+    Parameters
+    ----------
+    session : sqlalchemy.orm.session instance, bound
+    network : 
+    nets : 
+    affiliation : 
+    stas :
+    time_ :
+    endtime : 
+    pref_nets : 
+    with_query :
+    site_name :  
+    Returns
+    -------
+    query
+        sdfs
+    
+    Notes:
+    ------
+    If input into get_networks is a query, an affiliation table must be provided and the query must contain a site table to be
+    joined on affiliation.sta == site.sta .
+
+    Results cannot be filtered with a station list if affiliation table is not provided.
+    """
+    if site_query:
+        if not affiliation:
+            raise NameError('Affiliation table must be provided when get_networks is given a query as input')   
+
+        if not site_name:
+            raise NameError('Site table name required to join to affiliation on column sta')
+
+        q = site_query
+
+        for i in range(len(q.column_descriptions)):
+            if q.column_descriptions[i]['name'] == site_name:
+                site = q.column_descriptions[i]['entity']
+
+        q = q.add_entity(affiliation)
+        q = q.join(affiliation, affiliation.sta == site.sta)
+        q = q.add_entity(network)
+        q = q.join(network, network.net == affiliation.net)
+
+    else:
+        q = session.query(network)
+        if affiliation:
+            q = q.add_entity(affiliation)
+            q = q.join(affiliation, affiliation.net==network.net)
+
+    if nets:
+        networks = make_wildcard_list(nets)
+        q = q.filter(or_(*[network.net.like(net) for net in nets]))
+
+    if stas:
+        if not affiliation:
+            raise NameError('Affiliation table required to filter Network table from station list')
+        stations = make_wildcard_list(stas)
+        q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
+
+    if time_:
+        if not affiliation:
+            raise NameError('Affiliation table required to use starttime filtering')
+        q = q.filter(time_.timestamp < affiliation.endtime)
+
+    if endtime:
+        if not affiliation:
+            raise NameError('Affiliation table required to use endtime filtering')
+        q = q.filter(endtime.timestamp > affiliation.time)
+
+    return q
+
+
+def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__':
+ #   if pref_nets:
+ #       staList = q[0].affiliation.sta
+ #       for i in range(q.count()):
+ #           tempSta = q[i].affiliation.sta
+ #           if tempSta not in staList:
+ #               staList.append(tempSta)
+ #       
+ #       for i in range(len(staList)):
+ #           for i in range(len(pref_nets)):
+    return q
+
+def check_orphan_stas():
+    return
+
+def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, network_query = None, affiliation_name = None, response_query = None, sensor_name = None):
+    """
+    Parameters
+    ----------
+    session : sqlalchemy.orm.session instance, bound
+    site : 
+    sitechan : 
+    stas : 
+    chans :
+    time_ :
+    endtime :  
+    with_query :
+    affiliation_name :
+    sensor_name:
+
+    Returns
+    -------
+    query
+        sdfs
+    
+    Notes:
+    ------
+    
+    """
+    if network_query and response_query:
+
+        q = network_query
+
+        if affiliation_name:
+            affiliation = None
+            for i in range(len(q.column_descriptions)):
+                if q.column_descriptions[i]['name'] == affiliation_name:
+                    affiliation = q.column_descriptions[i]['entity']
+            if affiliation:
+                q = q.add_entity(site)
+                q = q.join(site, site.sta == affiliation.sta)
+            else:
+                raise NameError('No affiliation type table matching provided affiliation_name found in input query.  Site query was not joined with network query')
+        else:
+            raise NameError("Affiliation table name must bep provided to join network and site queries")
+           
+        if sensor_name:
+            if not sitechan:
+                raise NameError("No sitechan provided to join to sensor on chanid column.")
+            sensor = None
+            for i in range(len(q.column_descriptions)):
+                if q.column_descriptions[i]['name'] == sensor_name:
+                    affiliation = q.column_descriptions[i]['entity']
+            if sensor:
+                q = q.add_entity(sitechan)
+                q = q.join(site, sitechan.chanid == sensor.chanid)
+                q = q.add_entity(site)
+                q = q.join(site, sitechan.sta == site.sta)
+            else:
+                raise NameError('No affiliation type table matching provided affiliation_name found in input query.  Site query was not joined with network query')
+        else:
+            raise NameError("Affiliation table name must bep provided to join network and site queries")
+            
+
+    elif network_query and not response_query:
+    
+    elif response_query and not network_query:
+
+    else:
+        q = session.query(site)
+        if sitechan:
+            q = q.add_entity(sitechan)
+            q = q.join(sitechan, sitechan.sta==site.sta)
+
+    if stas:
+        stations = make_wildcard_list(stas)
+        q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
+
+    if chans:
+        if not sitechan:
+            raise NameError('Sitechan table required to filter site table by channels)
+        stations = make_wildcard_list(stas)
+        q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
+
+    if time_:
+        # make time_ julian day here
+        q = q.filter(time_.timestamp < affiliation.endtime)
+
+    if endtime:
+        # make endtime julian day here
+        q = q.filter(endtime.timestamp > affiliation.time)
+
+    return q
+
+def query_responses(session, sensor, instrument, stations=None, channels=None, starttime=None, endtime=None, with_query = None, site_name = None):
+    return
