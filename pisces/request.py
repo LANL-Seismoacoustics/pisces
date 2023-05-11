@@ -708,7 +708,7 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
     return q
 
 
-def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__':
+def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__'):
  #   if pref_nets:
  #       staList = q[0].affiliation.sta
  #       for i in range(q.count()):
@@ -783,9 +783,9 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
             
 
     elif network_query and not response_query:
-    
+        pass
     elif response_query and not network_query:
-
+        pass
     else:
         q = session.query(site)
         if sitechan:
@@ -798,7 +798,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
 
     if chans:
         if not sitechan:
-            raise NameError('Sitechan table required to filter site table by channels)
+            raise NameError('Sitechan table required to filter site table by channels')
         stations = make_wildcard_list(stas)
         q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
 
