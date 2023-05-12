@@ -635,7 +635,7 @@ def get_ids(session, lastid, ids, detach=False):
 
     return out
 
-def query_network(session, network, nets=None, affiliation=None, stas=None, time_=None, endtime=None, site_query = None, site_name = None):
+def query_network(session, network, nets=None, affiliation=None, stas=None, time_=None, endtime=None, with_query = None):
     """
     Parameters
     ----------
@@ -661,23 +661,26 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
 
     Results cannot be filtered with a station list if affiliation table is not provided.
     """
-    if site_query:
+    if with_query:
         if not affiliation:
             raise NameError('Affiliation table must be provided when get_networks is given a query as input')   
 
-        if not site_name:
-            raise NameError('Site table name required to join to affiliation on column sta')
+        q = with_query
 
-        q = site_query
+        site = None
 
         for i in range(len(q.column_descriptions)):
-            if q.column_descriptions[i]['name'] == site_name:
-                site = q.column_descriptions[i]['entity']
-
-        q = q.add_entity(affiliation)
-        q = q.join(affiliation, affiliation.sta == site.sta)
-        q = q.add_entity(network)
-        q = q.join(network, network.net == affiliation.net)
+            checkEntity = q.column_descriptions[i]['entity']
+            if checkEntity.__table__.name == 'site':
+                site = checkEntity
+        
+        if site:
+            q = q.add_entity(affiliation)
+            q = q.join(affiliation, affiliation.sta == site.sta)
+            q = q.add_entity(network)
+            q = q.join(network, network.net == affiliation.net)
+        else:
+            raise NameError('No site table present in input query for join to affiliation table on column sta')
 
     else:
         q = session.query(network)
@@ -723,7 +726,7 @@ def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_c
 def check_orphan_stas():
     return
 
-def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, network_query = None, affiliation_name = None, response_query = None, sensor_name = None):
+def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, with_query = None):
     """
     Parameters
     ----------
@@ -747,45 +750,44 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
     ------
     
     """
-    if network_query and response_query:
+    if with_query:
 
-        q = network_query
+        q = with_query:
+        
+        affiliation = None
+        sensor = None
 
-        if affiliation_name:
+        for i in range(len(q.column_descriptions)):
+            checkEntity = q.column_descriptions[i]['entity']
+            if checkEntity.__table__.name == 'affiliation':
+                affiliation = checkEntity
+            if checkEntity.__table__.name == 'sensor':
+                sensor = checkEntity
+        
+        if affiliation and sensor:
             affiliation = None
-            for i in range(len(q.column_descriptions)):
-                if q.column_descriptions[i]['name'] == affiliation_name:
-                    affiliation = q.column_descriptions[i]['entity']
-            if affiliation:
-                q = q.add_entity(site)
-                q = q.join(site, site.sta == affiliation.sta)
-            else:
-                raise NameError('No affiliation type table matching provided affiliation_name found in input query.  Site query was not joined with network query')
-        else:
-            raise NameError("Affiliation table name must bep provided to join network and site queries")
-           
-        if sensor_name:
-            if not sitechan:
-                raise NameError("No sitechan provided to join to sensor on chanid column.")
-            sensor = None
-            for i in range(len(q.column_descriptions)):
-                if q.column_descriptions[i]['name'] == sensor_name:
-                    affiliation = q.column_descriptions[i]['entity']
-            if sensor:
+            raise UserWarning("Affiliation and sensor tables both present in provided tables and site cannot be joined to both.  Joining on sensor.")
+        
+        if affiliation:
+            q = q.add_entity(site)
+            q = q.join(site, affiliation.sta == site.sta)
+            if sitechan:
                 q = q.add_entity(sitechan)
-                q = q.join(site, sitechan.chanid == sensor.chanid)
-                q = q.add_entity(site)
-                q = q.join(site, sitechan.sta == site.sta)
-            else:
-                raise NameError('No affiliation type table matching provided affiliation_name found in input query.  Site query was not joined with network query')
-        else:
-            raise NameError("Affiliation table name must bep provided to join network and site queries")
-            
+                q = q.join(sitechan, site.sta == sitechan.sta)
 
-    elif network_query and not response_query:
-        pass
-    elif response_query and not network_query:
-        pass
+        elif sensor:
+            if sitechan:
+                q = q.add_entity(sitechan)
+                q = q.join(sitechan, sitechan.chanid == sensor.chanid)
+                q = q.add_entity(site)
+                q = q.join(site, site.sta = sensor.sta)
+            else:
+                q = q.add_entity(site)
+                q =q.join(site, site.sta == sensor.sta)
+                raise UserWarning("No sitechan specified, joining site to sensor on column sta")
+        else: 
+            raise NameError("No affiliation or sensor table in provided in input query for join to site")
+         
     else:
         q = session.query(site)
         if sitechan:
@@ -794,13 +796,13 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
 
     if stas:
         stations = make_wildcard_list(stas)
-        q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
+        q = q.filter(or_(*[site.sta.like(sta) for sta in stas]))
 
     if chans:
         if not sitechan:
             raise NameError('Sitechan table required to filter site table by channels')
         stations = make_wildcard_list(stas)
-        q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
+        q = q.filter(or_(*[sitechan.chan.like(chan) for chan in stchansas]))
 
     if time_:
         # make time_ julian day here
