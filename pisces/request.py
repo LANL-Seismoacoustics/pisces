@@ -669,9 +669,9 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
 
         site = None
 
-        for i in range(len(q.column_descriptions)):
-            checkEntity = q.column_descriptions[i]['entity']
-            if checkEntity.__table__.name == 'site':
+        for i in q.column_descriptions:
+            checkEntity = i['entity']
+            if checkEntity._tabletype == 'Site':
                 site = checkEntity
         
         if site:
@@ -752,16 +752,16 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
     """
     if with_query:
 
-        q = with_query:
+        q = with_query
         
         affiliation = None
         sensor = None
 
-        for i in range(len(q.column_descriptions)):
-            checkEntity = q.column_descriptions[i]['entity']
-            if checkEntity.__table__.name == 'affiliation':
+        for i in q.column_descriptions:
+            checkEntity = i['entity']
+            if checkEntity._tabletype == 'Affiliation':
                 affiliation = checkEntity
-            if checkEntity.__table__.name == 'sensor':
+            if checkEntity._tabletype == 'Sensor':
                 sensor = checkEntity
         
         if affiliation and sensor:
@@ -780,7 +780,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
                 q = q.add_entity(sitechan)
                 q = q.join(sitechan, sitechan.chanid == sensor.chanid)
                 q = q.add_entity(site)
-                q = q.join(site, site.sta = sensor.sta)
+                q = q.join(site, site.sta == sensor.sta)
             else:
                 q = q.add_entity(site)
                 q =q.join(site, site.sta == sensor.sta)
@@ -801,8 +801,8 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
     if chans:
         if not sitechan:
             raise NameError('Sitechan table required to filter site table by channels')
-        stations = make_wildcard_list(stas)
-        q = q.filter(or_(*[sitechan.chan.like(chan) for chan in stchansas]))
+        stations = make_wildcard_list(chans)
+        q = q.filter(or_(*[sitechan.chan.like(chan) for chan in chans]))
 
     if time_:
         # make time_ julian day here
