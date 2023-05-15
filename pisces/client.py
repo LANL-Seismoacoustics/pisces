@@ -18,20 +18,20 @@ class Client(object):
 
         Parameters
         ----------
-        backend: string, optional
+        backend : string, optional
             One of the SQLAlchemy connection strings from 
             http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls
-        user: string, optional
+        user : string, optional
             Not required for sqlite.
-        psswd: string, optional
+        psswd : string, optional
             Not needed for sqlite. Prompted if needed and not provided.
-        server: string, optional
+        server : string, optional
             Database host server.
-        port: string or integer, optional
+        port : string or integer, optional
             Port on remote server.
-        instance: string, optional
+        instance : string, optional
             For sqlite, this is the database file name.
-        conn: string, optional
+        conn : string, optional
             A fully-formed SQLAlchemy style connection string.
         session : sqlalchemy.orm.Session
             An existing session instance.
