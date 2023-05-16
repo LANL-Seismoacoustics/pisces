@@ -4,3 +4,4 @@ build
 *.o
 __pycache__
 .vscode
+apidocs
