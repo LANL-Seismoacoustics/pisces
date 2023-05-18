@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath('../../pisces'))
 # You should see rst files created in the docs/source/ folder
 
 templates_path = ['_templates']
-exclude_patterns = []
+exclude_patterns = ['_cli.rst']
 
 extensions = [
         "sphinx.ext.autodoc",
@@ -35,6 +35,7 @@ extensions = [
         "numpydoc",
         ]
 autosummary_generate = False
+suppress_warnings = ["myst.header"]
 # autodoc2_render_plugin = "myst"
 # autodoc2_packages = [
 #      {
