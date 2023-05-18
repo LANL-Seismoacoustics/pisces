@@ -30,7 +30,7 @@ Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack i
 :hidden: true
 
 overview.md
-quickstart.md
+installation.md
 ```
 
 ```{toctree}
