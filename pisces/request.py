@@ -1,7 +1,5 @@
 """
-request.py
-
-Convenience functions for common queries.
+Convenience functions for building common queries.
 
 """
 import numpy as np

@@ -1,5 +1,5 @@
 """
-Helper functions for comman-line utilities.
+Helper functions for command-line utilities.
 
 """
 from pisces.tables.kbcore import CORETABLES

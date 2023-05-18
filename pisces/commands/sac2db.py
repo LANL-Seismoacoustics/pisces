@@ -1,3 +1,7 @@
+"""
+Functions that support bulk conversion of SAC files to database tables.
+
+"""
 import os
 import sys
 import glob

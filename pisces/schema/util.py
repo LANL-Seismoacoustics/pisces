@@ -1,3 +1,7 @@
+"""
+Helper functions for maintaining database schema.
+
+"""
 # Converted to Python 3.5.2 on 01/25/17
 # by: Jeremy Webster
 

@@ -1,3 +1,7 @@
+"""
+Support for mapping miniSEED data into database tables.
+
+"""
 
 def mseedhdr2tables(stats, wfdisc=None, site=None, sitechan=None, affiliation=None):
     """

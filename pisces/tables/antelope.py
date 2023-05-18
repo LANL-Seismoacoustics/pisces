@@ -1,3 +1,7 @@
+"""
+Concrete canonical tables for Antelope schema.
+
+"""
 from pisces.schema.util import CoreTable
 import pisces.schema.antelope as antelope
 

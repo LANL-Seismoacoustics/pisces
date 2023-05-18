@@ -1,3 +1,7 @@
+"""
+Concrete canonical tables for KB Core schema.
+
+"""
 from pisces.schema.util import CoreTable
 import pisces.schema.kbcore as kb
 
