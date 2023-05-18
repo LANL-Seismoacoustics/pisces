@@ -24,4 +24,4 @@ livehtml:
 
 apidocs:
 	sphinx-apidoc -d 2 -Mef -t templates -o $(SOURCEDIR)/apidocs ../pisces
-	cat _cli.rxt >> $(SOURCEDIR)/apidocs/pisces.commands.rst
+	cat _cli.rst >> $(SOURCEDIR)/apidocs/pisces.commands.rst
