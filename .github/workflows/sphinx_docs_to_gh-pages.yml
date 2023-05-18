@@ -17,8 +17,8 @@ jobs:
       - name: Make conda environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 3.10    # Python version to build the html sphinx documentation
-          environment-file: environment-dev.yaml    # Path to the documentation conda environment
+          python-version: 3.10
+          environment-file: environment-dev.yaml
           auto-update-conda: false
           auto-activate-base: false
           show-channel-urls: true
@@ -30,7 +30,7 @@ jobs:
           make apidocs && make html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' }} # must be publishing master/main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/build/html
