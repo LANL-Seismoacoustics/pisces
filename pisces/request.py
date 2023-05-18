@@ -670,30 +670,23 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
         q = with_query
 
         site = None
-<<<<<<< HEAD
         sitechan = None
         sensor = None
-=======
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
 
         for i in q.column_descriptions:
             checkEntity = i['entity']
             if checkEntity._tabletype == 'Site':
                 site = checkEntity
-<<<<<<< HEAD
             if checkEntity._tabletype == 'Sitechan':
                 sitechan = checkEntity
             if checkEntity._tabletype == 'Sensor':
                 sensor = checkEntity
-=======
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
         
         if site:
             q = q.add_entity(affiliation)
             q = q.join(affiliation, affiliation.sta == site.sta)
             q = q.add_entity(network)
             q = q.join(network, network.net == affiliation.net)
-<<<<<<< HEAD
 
         elif sitechan:
             q = q.add_entity(affiliation)
@@ -711,10 +704,6 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
 
         else:
             raise NameError('No table with a sta column on which to join Affiliation is in the provided query')
-=======
-        else:
-            raise NameError('No site table present in input query for join to affiliation table on column sta')
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
 
     else:
         q = session.query(network)
@@ -723,21 +712,13 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
             q = q.join(affiliation, affiliation.net==network.net)
 
     if nets:
-<<<<<<< HEAD
         nets = make_wildcard_list(nets)
-=======
-        networks = make_wildcard_list(nets)
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
         q = q.filter(or_(*[network.net.like(net) for net in nets]))
 
     if stas:
         if not affiliation:
             raise NameError('Affiliation table required to filter Network table from station list')
-<<<<<<< HEAD
         stas = make_wildcard_list(stas)
-=======
-        stations = make_wildcard_list(stas)
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
         q = q.filter(or_(*[affiliation.sta.like(sta) for sta in stas]))
 
     if time_:
@@ -753,24 +734,6 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
     return q
 
 
-<<<<<<< HEAD
-=======
-def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__'):
- #   if pref_nets:
- #       staList = q[0].affiliation.sta
- #       for i in range(q.count()):
- #           tempSta = q[i].affiliation.sta
- #           if tempSta not in staList:
- #               staList.append(tempSta)
- #       
- #       for i in range(len(staList)):
- #           for i in range(len(pref_nets)):
-    return q
-
-def check_orphan_stas():
-    return
-
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
 def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, with_query = None):
     """
     Parameters
@@ -810,7 +773,6 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
                 sensor = checkEntity
         
         if affiliation and sensor:
-<<<<<<< HEAD
             q = q.add_entity(site)
             q = q.join(site, affiliation.sta == site.sta)
             if sitechan:
@@ -822,12 +784,6 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
                 warnings.warn("No sitechan specified, joining site to sensor on column sta")
 
         elif  affiliation:
-=======
-            affiliation = None
-            raise UserWarning("Affiliation and sensor tables both present in provided tables and site cannot be joined to both.  Joining on sensor.")
-        
-        if affiliation:
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
             q = q.add_entity(site)
             q = q.join(site, affiliation.sta == site.sta)
             if sitechan:
@@ -843,11 +799,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
             else:
                 q = q.add_entity(site)
                 q =q.join(site, site.sta == sensor.sta)
-<<<<<<< HEAD
                 warnings.warn("No sitechan specified, joining site to sensor on column sta")
-=======
-                raise UserWarning("No sitechan specified, joining site to sensor on column sta")
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
         else: 
             raise NameError("No affiliation or sensor table in provided in input query for join to site")
          
@@ -858,11 +810,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
             q = q.join(sitechan, sitechan.sta==site.sta)
 
     if stas:
-<<<<<<< HEAD
         stas = make_wildcard_list(stas)
-=======
-        stations = make_wildcard_list(stas)
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
         q = q.filter(or_(*[site.sta.like(sta) for sta in stas]))
 
     if chans:
@@ -872,7 +820,6 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
         q = q.filter(or_(*[sitechan.chan.like(chan) for chan in chans]))
 
     if time_:
-<<<<<<< HEAD
         jultime_ = int(time_.strftime('%Y%j'))
         q = q.filter(jultime_ < site.offdate)
 
@@ -976,16 +923,3 @@ def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_c
 
 def check_orphan_stas():
     return
-=======
-        # make time_ julian day here
-        q = q.filter(time_.timestamp < affiliation.endtime)
-
-    if endtime:
-        # make endtime julian day here
-        q = q.filter(endtime.timestamp > affiliation.time)
-
-    return q
-
-def query_responses(session, sensor, instrument, stations=None, channels=None, starttime=None, endtime=None, with_query = None, site_name = None):
-    return
->>>>>>> 84765b7c57819eacf128c3d04e935cccd05bedad
