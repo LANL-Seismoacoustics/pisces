@@ -51,8 +51,6 @@ tutorial/flatfiles.md
 :caption: Reference
 
 about/license.md
-about/roadmap.md
+about/changelog.md
 API Documentation <apidocs/modules.rst>
 ```
-<!-- apidocs/index -->
-<!-- about/changelog.md -->
