@@ -1,3 +1,7 @@
+"""
+Functions in support of CLI database creation.
+
+"""
 
 #def dbinit(db,prefix):
 #    """

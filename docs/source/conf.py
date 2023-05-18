@@ -27,13 +27,14 @@ exclude_patterns = []
 
 extensions = [
         "sphinx.ext.autodoc",
-        # "sphinx.ext.autosummary",
+        "sphinx.ext.autosummary",
         "sphinx.ext.viewcode",
         "sphinx_click",
         "myst_parser",
         # "autodoc2",
         "numpydoc",
         ]
+autosummary_generate = False
 # autodoc2_render_plugin = "myst"
 # autodoc2_packages = [
 #      {

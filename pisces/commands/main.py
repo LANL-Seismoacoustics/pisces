@@ -1,5 +1,5 @@
 """
-Command-line interface to common Pisces functionality.
+The main entrypoint to the Pisces CLI.
 
 This module imports functions from elsewhere in Pisces, wraps them inside local
 functions to perform certain common tasks, and uses Click to provide a

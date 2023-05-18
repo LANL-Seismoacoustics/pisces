@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Common utility functions.
+Common Pisces utility functions.
 
 """
 import logging

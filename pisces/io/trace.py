@@ -1,5 +1,5 @@
 """
-Conversions between Trace objects and table-like objects.
+Conversions between ObsPy Trace objects and table-like objects.
 
 """
 import os

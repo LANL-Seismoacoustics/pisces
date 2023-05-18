@@ -1,3 +1,7 @@
+"""
+Concrete canonical tables for CSS3.0 schema.
+
+"""
 from pisces.schema.util import CoreTable
 import pisces.schema.css3 as css3
 

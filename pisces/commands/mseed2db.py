@@ -1,5 +1,5 @@
 """
-Module for creating wfdisc rows from miniSEED files.
+Functions that support bulk conversion of miniSEED files to database tables.
 
 """
 import os
