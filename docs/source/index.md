@@ -29,7 +29,6 @@ Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack i
 ```{toctree}
 :hidden: true
 
-Home <self>
 overview.md
 quickstart.md
 ```
@@ -53,6 +52,7 @@ tutorial/flatfiles.md
 
 about/license.md
 about/roadmap.md
-apidocs/index
+API Documentation <apidocs/modules.rst>
 ```
+<!-- apidocs/index -->
 <!-- about/changelog.md -->
