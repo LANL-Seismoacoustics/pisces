@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Overview &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'overview';</script>
+    <link rel="icon" href="_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Pisces" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/overview.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Overview</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-tables">Define tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-py">mytables.py</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-tables">Importing tables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#querying-tables">Querying tables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-a-waveform">Get a waveform</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h1>
+<section id="define-tables">
+<h2>Define tables<a class="headerlink" href="#define-tables" title="Permalink to this heading">#</a></h2>
+<p>Name your Center for Seismic Studies (CSS) 3.0 tables in a module (e.g. mytables.py),
+inheriting structure and constraints.
+This just needs to be done once per table name.</p>
+<section id="mytables-py">
+<h3>mytables.py<a class="headerlink" href="#mytables-py" title="Permalink to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces.schema.css3</span> <span class="k">as</span> <span class="nn">css</span>
+
+<span class="k">class</span> <span class="nc">Affiliation</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Affiliation</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;affiliation&#39;</span>
+
+<span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Site</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;site&#39;</span>
+
+<span class="k">class</span> <span class="nc">Origin</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Origin</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;origin&#39;</span>
+
+<span class="k">class</span> <span class="nc">Wfdisc</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Wfdisc</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;Wfdisc&#39;</span>
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="importing-tables">
+<h2>Importing tables<a class="headerlink" href="#importing-tables" title="Permalink to this heading">#</a></h2>
+<p>Import your tables.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytables</span> <span class="kn">import</span> <span class="n">Site</span><span class="p">,</span> <span class="n">Origin</span>
+<span class="kn">from</span> <span class="nn">mytables</span> <span class="kn">import</span> <span class="n">Affiliation</span> <span class="k">as</span> <span class="n">Affil</span>
+</pre></div>
+</div>
+<p>Import/reflect arbitrary existing database tables.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces</span> <span class="k">as</span> <span class="nn">ps</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">db_connect</span><span class="p">(</span><span class="s1">&#39;sqlite:///mydb.sqlite&#39;</span><span class="p">)</span>
+<span class="n">sometable</span><span class="p">,</span> <span class="n">othertable</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sometable&#39;</span><span class="p">,</span><span class="s1">&#39;othertable&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="querying-tables">
+<h2>Querying tables<a class="headerlink" href="#querying-tables" title="Permalink to this heading">#</a></h2>
+<p>Query all stations from the CREST seismic deployment, using SQLAlchemy</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Site</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">ondate</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">2008001</span><span class="p">,</span> <span class="mi">2008365</span><span class="p">))</span>
+<span class="n">csites</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="n">Affil</span><span class="o">.</span><span class="n">sta</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Affil</span><span class="o">.</span><span class="n">net</span> <span class="o">==</span> <span class="s1">&#39;XP&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Query for western US earthquakes, using a Pisces query builder</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces.request</span> <span class="k">as</span> <span class="nn">req</span>
+<span class="n">wus_quakes</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Origin</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">115</span><span class="p">,</span> <span class="o">-</span><span class="mi">105</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">mag</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mb&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">)})</span>
+</pre></div>
+</div>
+<p>Add Albuquerque ANMO to the site table, and the Chelyabinsk bolide to the origin table.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ANMO</span> <span class="o">=</span> <span class="n">Site</span><span class="p">(</span><span class="n">sta</span><span class="o">=</span><span class="s1">&#39;ANMO&#39;</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="mf">34.9459</span><span class="p">,</span> <span class="n">lon</span><span class="o">=-</span><span class="mf">106.4572</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">1.85</span><span class="p">)</span>
+<span class="n">bolide</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">orid</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="mf">55.15</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mf">61.41</span><span class="p">,</span> <span class="n">mb</span><span class="o">=</span><span class="mf">2.7</span><span class="p">,</span> <span class="n">etype</span><span class="o">=</span><span class="s1">&#39;xm&#39;</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">ANMO</span><span class="p">,</span> <span class="n">bolide</span><span class="p">])</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Edit a Site, delete an Origin.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Site</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="s1">&#39;MK31&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="mf">42.5</span><span class="p">})</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">orid</span> <span class="o">=</span> <span class="mi">1001</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="get-a-waveform">
+<h2>Get a waveform<a class="headerlink" href="#get-a-waveform" title="Permalink to this heading">#</a></h2>
+<p>Get an ObsPy <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.trace.Trace.html#obspy.core.trace.Trace">Trace</a> object from your waveform description (wfdisc) table.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytables</span> <span class="kn">import</span> <span class="n">Wfdisc</span>  
+
+<span class="n">wf</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Wfdisc</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Wfdisc</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="s1">&#39;ANMO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>  
+<span class="n">tr</span> <span class="o">=</span> <span class="n">wf</span><span class="o">.</span><span class="n">to_trace</span><span class="p">()</span>  
+<span class="n">tr</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>  
+</pre></div>
+</div>
+<p><img alt="ANMO waveform" src="_images/ANMO.png" /></p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Pisces</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="installation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-tables">Define tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-py">mytables.py</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-tables">Importing tables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#querying-tables">Querying tables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-a-waveform">Get a waveform</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

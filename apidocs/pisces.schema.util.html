@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pisces.schema.util &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'apidocs/pisces.schema.util';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pisces.tables" href="pisces.tables.html" />
+    <link rel="prev" title="pisces.schema.kbcore" href="pisces.schema.kbcore.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="pisces.html">pisces</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="pisces.schema.html">pisces.schema</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/apidocs/pisces.schema.util.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>pisces.schema.util</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable"><code class="docutils literal notranslate"><span class="pre">CoreTable</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.name"><code class="docutils literal notranslate"><span class="pre">CoreTable.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.prototype"><code class="docutils literal notranslate"><span class="pre">CoreTable.prototype</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.table"><code class="docutils literal notranslate"><span class="pre">CoreTable.table</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.PiscesMeta"><code class="docutils literal notranslate"><span class="pre">PiscesMeta</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.from_string"><code class="docutils literal notranslate"><span class="pre">from_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.get_infovals"><code class="docutils literal notranslate"><span class="pre">get_infovals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_float"><code class="docutils literal notranslate"><span class="pre">parse_float()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_int"><code class="docutils literal notranslate"><span class="pre">parse_int()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_str"><code class="docutils literal notranslate"><span class="pre">parse_str()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_utf"><code class="docutils literal notranslate"><span class="pre">parse_utf()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.string_formatter"><code class="docutils literal notranslate"><span class="pre">string_formatter()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-pisces.schema.util">
+<span id="pisces-schema-util"></span><h1>pisces.schema.util<a class="headerlink" href="#module-pisces.schema.util" title="Permalink to this heading">#</a></h1>
+<p>Helper functions for maintaining database schema.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pisces.schema.util.CoreTable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">CoreTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prototype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pisces.schema.util.CoreTable" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong></dt><dd><p>Alias for field number 0</p>
+</dd>
+<dt><strong>prototype</strong></dt><dd><p>Alias for field number 1</p>
+</dd>
+<dt><strong>table</strong></dt><dd><p>Alias for field number 2</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pisces.schema.util.CoreTable.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pisces.schema.util.CoreTable.name" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pisces.schema.util.CoreTable.prototype">
+<span class="sig-name descname"><span class="pre">prototype</span></span><a class="headerlink" href="#pisces.schema.util.CoreTable.prototype" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pisces.schema.util.CoreTable.table">
+<span class="sig-name descname"><span class="pre">table</span></span><a class="headerlink" href="#pisces.schema.util.CoreTable.table" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pisces.schema.util.PiscesMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">PiscesMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#PiscesMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.PiscesMeta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DeclarativeMeta</span></code></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mro</span></code>(/)</p></td>
+<td><p>Return a type's method resolution order.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.from_string">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_on_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#from_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.from_string" title="Permalink to this definition">#</a></dt>
+<dd><p>Construct a mapped table instance from correctly formatted flat file line.</p>
+<p>Works with fixed-length fields, separated by a single whitespace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>line: str</strong></dt><dd><p>Flat file line (best to remove newline, but maybe not a problem).</p>
+</dd>
+<dt><strong>default_on_error: list, optional</strong></dt><dd><p>Supply a list of column names that return default values if they
+produce an error during parsing (e.g. lddate).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError:  Can’t properly parse the line.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>default_on_error is useful for malformed fields, but it will also mask
+other problems with line parsing. It’s better to pre-process tables 
+to match the table specifications or catch exceptions and isolate 
+these lines.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;TA.site&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;TA.site&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+<span class="go">        for line in ffsite:</span>
+<span class="go">            isite = Site.from_string(line, default_on_error=[&#39;lddate&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.get_infovals">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">get_infovals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#get_infovals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.get_infovals" title="Permalink to this definition">#</a></dt>
+<dd><p>Get flattened values from column info dictionary for given metadata and
+desired structure.</p>
+<p>If key is not in column info, None is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>colnames: list</dt><dd><p>Flattened column names.</p>
+</dd>
+<dt>vals: list</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pisces.schema.kbcore</span> <span class="kn">import</span> <span class="n">Base</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fields</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">get_infovals</span><span class="p">(</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
+<span class="go">[&#39;-&#39;, -1, 2286324, -999.0, -999.0, -999.0, &#39;-&#39;, &#39;-&#39;, &#39;-&#39;, -99999, -99999, &lt;built-in method now of type object at 0x100601060&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+<span class="go">[&#39;sta&#39;, &#39;ondate&#39;, &#39;offdate&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;staname&#39;, &#39;statype&#39;, &#39;refsta&#39;, &#39;dnorth&#39;, &#39;deast&#39;, &#39;lddate&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.parse_float">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">parse_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#parse_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.parse_float" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.parse_int">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">parse_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#parse_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.parse_int" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.parse_str">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">parse_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#parse_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.parse_str" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.parse_utf">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">parse_utf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#parse_utf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.parse_utf" title="Permalink to this definition">#</a></dt>
+<dd><p>Decode a utf-8 encoded string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.schema.util.string_formatter">
+<span class="sig-prename descclassname"><span class="pre">pisces.schema.util.</span></span><span class="sig-name descname"><span class="pre">string_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/schema/util.html#string_formatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.schema.util.string_formatter" title="Permalink to this definition">#</a></dt>
+<dd><p>Get string substitution formatter for given structure and schema.</p>
+<p>If you’re looking for a write_flatfile function, this is it.  It takes
+advantage of native python string formatting and file writing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>meta: sqlalchemy.MetaData</strong></dt><dd><p>Columns in tables must have info={‘format’: ?}</p>
+</dd>
+<dt><strong>structure: iterable of str</strong></dt><dd><p>Strings are known schema objects (tables, columns).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>fmt: str</dt><dd><p>String substitution formatter for provided structure within provided
+schema.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">recs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">,</span> <span class="n">sta</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">sta</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fmt</span> <span class="o">=</span> <span class="n">string_formatter</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;origin_lat_lon.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="go">        for rec in recs:</span>
+<span class="go">            f.write(fmt.format(rec))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pisces.schema.kbcore.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pisces.schema.kbcore</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pisces.tables.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pisces.tables</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable"><code class="docutils literal notranslate"><span class="pre">CoreTable</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.name"><code class="docutils literal notranslate"><span class="pre">CoreTable.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.prototype"><code class="docutils literal notranslate"><span class="pre">CoreTable.prototype</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.CoreTable.table"><code class="docutils literal notranslate"><span class="pre">CoreTable.table</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.PiscesMeta"><code class="docutils literal notranslate"><span class="pre">PiscesMeta</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.from_string"><code class="docutils literal notranslate"><span class="pre">from_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.get_infovals"><code class="docutils literal notranslate"><span class="pre">get_infovals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_float"><code class="docutils literal notranslate"><span class="pre">parse_float()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_int"><code class="docutils literal notranslate"><span class="pre">parse_int()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_str"><code class="docutils literal notranslate"><span class="pre">parse_str()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.parse_utf"><code class="docutils literal notranslate"><span class="pre">parse_utf()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.schema.util.string_formatter"><code class="docutils literal notranslate"><span class="pre">string_formatter()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

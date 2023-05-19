@@ -1,0 +1,599 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Import/Export Flat Files &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/flatfiles';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License" href="../about/license.html" />
+    <link rel="prev" title="Working with Waveforms" href="waveforms.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorial/flatfiles.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Import/Export Flat Files</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import">Import</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ta-site">TA.site</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#export">Export</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ta-origin">TA.origin</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#write-flat-files-from-any-combination-of-columns">Write flat files from any combination of columns</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#adhoc-txt">adhoc.txt</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="import-export-flat-files">
+<h1>Import/Export Flat Files<a class="headerlink" href="#import-export-flat-files" title="Permalink to this heading">#</a></h1>
+<p>Easily go between database objects and text files.</p>
+<hr class="docutils" />
+<section id="import">
+<h2>Import<a class="headerlink" href="#import" title="Permalink to this heading">#</a></h2>
+<p>Many times, database tables are represented as fixed-format text files.
+Pisces makes it easy to go between database objects and these external flat file representations.</p>
+<p>Here, we’ll import the following KB Core Site flat file, “TA.site”.
+Each line in the text file is passed to <code class="docutils literal notranslate"><span class="pre">Site.from_string</span></code>, which is a
+Pisces-specific method that uses the underlying column descriptions in the class
+to interpret lines in the flat file and to populate a Site row instance.
+Finally, <code class="docutils literal notranslate"><span class="pre">session.add(isite)</span></code> and <code class="docutils literal notranslate"><span class="pre">session.commit()</span></code> add and write rows to the
+database.</p>
+<section id="ta-site">
+<h3>TA.site<a class="headerlink" href="#ta-site" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">K02A</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">42.766700</span> <span class="o">-</span><span class="mf">123.489800</span>    <span class="mf">0.9630</span> <span class="n">Glendale</span><span class="p">,</span> <span class="n">Oregon</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>                            <span class="n">ss</span>   <span class="n">K02A</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">I03D</span>    <span class="mi">2009307</span>  <span class="mi">2286324</span>   <span class="mf">43.697200</span> <span class="o">-</span><span class="mf">123.348700</span>    <span class="mf">0.1400</span> <span class="n">Drain</span><span class="p">,</span> <span class="n">OR</span><span class="p">,</span> <span class="n">USA</span>                                     <span class="n">ss</span>   <span class="n">I03D</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">17</span>
+<span class="n">P01C</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">39.469000</span> <span class="o">-</span><span class="mf">123.337500</span>    <span class="mf">0.4409</span> <span class="n">Double</span> <span class="mi">8</span> <span class="n">Ranch</span><span class="p">,</span> <span class="n">Willits</span><span class="p">,</span> <span class="n">California</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>         <span class="n">ss</span>   <span class="n">P01C</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">N02C</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">40.822000</span> <span class="o">-</span><span class="mf">123.305700</span>    <span class="mf">0.7170</span> <span class="n">Big</span> <span class="n">Bar</span><span class="p">,</span> <span class="n">California</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>                         <span class="n">ss</span>   <span class="n">N02C</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">H03A</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">44.676500</span> <span class="o">-</span><span class="mf">123.292300</span>    <span class="mf">0.2143</span> <span class="n">Soap</span> <span class="n">Creek</span> <span class="n">Ranch</span><span class="p">,</span> <span class="n">Albany</span><span class="p">,</span> <span class="n">Oregon</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>            <span class="n">ss</span>   <span class="n">H03A</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">G03A</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">45.315300</span> <span class="o">-</span><span class="mf">123.281100</span>    <span class="mf">0.2080</span> <span class="n">Yamhill</span><span class="p">,</span> <span class="n">Oregon</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>                             <span class="n">ss</span>   <span class="n">G03A</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">I03A</span>         <span class="o">-</span><span class="mi">1</span>  <span class="mi">2286324</span>   <span class="mf">43.972600</span> <span class="o">-</span><span class="mf">123.277700</span>    <span class="mf">0.2057</span> <span class="n">Eugene</span><span class="p">,</span> <span class="n">Oregon</span><span class="p">,</span><span class="n">U</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">A</span><span class="o">.</span>                              <span class="n">ss</span>   <span class="n">I03A</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">15</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span>
+<span class="n">G03D</span>    <span class="mi">2009297</span>  <span class="mi">2286324</span>   <span class="mf">45.211500</span> <span class="o">-</span><span class="mf">123.264100</span>    <span class="mf">0.2220</span> <span class="n">McMinnville</span><span class="p">,</span> <span class="n">OR</span><span class="p">,</span> <span class="n">USA</span>                               <span class="n">ss</span>   <span class="n">G03D</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">17</span>
+<span class="n">D03D</span>    <span class="mi">2010237</span>  <span class="mi">2286324</span>   <span class="mf">47.534700</span> <span class="o">-</span><span class="mf">123.089400</span>    <span class="mf">0.2620</span> <span class="n">Eldon</span><span class="p">,</span> <span class="n">WA</span><span class="p">,</span> <span class="n">USA</span>                                     <span class="n">ss</span>   <span class="n">D03D</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">17</span>
+<span class="n">F04D</span>    <span class="mi">2009318</span>  <span class="mi">2286324</span>   <span class="mf">46.082900</span> <span class="o">-</span><span class="mf">123.010800</span>    <span class="mf">0.2360</span> <span class="n">Rainier</span><span class="p">,</span> <span class="n">OR</span><span class="p">,</span> <span class="n">USA</span>                                   <span class="n">ss</span>   <span class="n">F04D</span>      <span class="mf">0.0000</span>    <span class="mf">0.0000</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">17</span>
+</pre></div>
+</div>
+<p>Read a flat file Site table into a database</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces.schema.kbcore</span> <span class="k">as</span> <span class="nn">kb</span> 
+
+<span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">kb</span><span class="o">.</span><span class="n">Site</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;site&#39;</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;TA.site&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ffsite</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ffsite</span><span class="p">:</span>
+        <span class="n">isite</span> <span class="o">=</span> <span class="n">Site</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">isite</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="export">
+<h2>Export<a class="headerlink" href="#export" title="Permalink to this heading">#</a></h2>
+<p>Next, we’ll write database results to a flat file.  These work because the <code class="docutils literal notranslate"><span class="pre">info</span></code> dictionary in the underlying columns tell the class what the string version of itself should look like.</p>
+<p>Here, we write 30 origins to a flat file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;TA.origin&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fforigin</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">iorigin</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">auth</span> <span class="o">==</span> <span class="s1">&#39;REB-IDC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
+        <span class="n">fforigin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iorigin</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="ta-origin">
+<h3>TA.origin<a class="headerlink" href="#ta-origin" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">6.121700</span>  <span class="mf">130.688500</span>    <span class="mf">0.0000</span>   <span class="mf">954927209.28000</span>    <span class="mi">620218</span>    <span class="mi">316285</span>  <span class="mi">2000096</span>   <span class="mi">60</span>   <span class="mi">40</span>   <span class="o">-</span><span class="mi">1</span>      <span class="mi">280</span>       <span class="mi">24</span> <span class="n">qp</span>      <span class="o">-</span><span class="mf">999.0000</span> <span class="n">g</span>    <span class="mf">5.60</span>    <span class="mi">299796</span>    <span class="mf">4.30</span>    <span class="mi">299797</span>    <span class="mf">6.10</span>    <span class="mi">299795</span> <span class="n">man</span><span class="p">:</span><span class="n">inversion</span>   <span class="n">REB</span><span class="o">-</span><span class="n">IDC</span>                     <span class="o">-</span><span class="mi">1</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+<span class="o">-</span><span class="mf">4.824500</span>  <span class="mf">102.976700</span>   <span class="mf">47.7000</span>   <span class="mf">954988491.91000</span>    <span class="mi">620219</span>    <span class="mi">316334</span>  <span class="mi">2000097</span>   <span class="mi">20</span>   <span class="mi">17</span>   <span class="o">-</span><span class="mi">1</span>      <span class="mi">274</span>       <span class="mi">24</span> <span class="n">qp</span>      <span class="o">-</span><span class="mf">999.0000</span> <span class="n">f</span>    <span class="mf">4.10</span>    <span class="mi">299798</span>    <span class="mf">3.20</span>    <span class="mi">299799</span> <span class="o">-</span><span class="mf">999.00</span>        <span class="o">-</span><span class="mi">1</span> <span class="n">man</span><span class="p">:</span><span class="n">inversion</span>   <span class="n">REB</span><span class="o">-</span><span class="n">IDC</span>                     <span class="o">-</span><span class="mi">1</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+<span class="mf">39.195900</span>   <span class="mf">24.608700</span>    <span class="mf">0.0000</span>   <span class="mf">954974602.21000</span>    <span class="mi">620220</span>    <span class="mi">316319</span>  <span class="mi">2000096</span>   <span class="mi">16</span>   <span class="mi">15</span>   <span class="o">-</span><span class="mi">1</span>      <span class="mi">365</span>       <span class="mi">30</span> <span class="n">qp</span>      <span class="o">-</span><span class="mf">999.0000</span> <span class="n">g</span>    <span class="mf">3.80</span>    <span class="mi">299801</span>    <span class="mf">3.20</span>    <span class="mi">299802</span>    <span class="mf">3.80</span>    <span class="mi">299800</span> <span class="n">man</span><span class="p">:</span><span class="n">inversion</span>   <span class="n">REB</span><span class="o">-</span><span class="n">IDC</span>                     <span class="o">-</span><span class="mi">1</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+<span class="mf">22.291000</span>  <span class="mf">143.776500</span>  <span class="mf">115.8000</span>   <span class="mf">954732444.39000</span>    <span class="mi">620221</span>    <span class="mi">316167</span>  <span class="mi">2000094</span>   <span class="mi">15</span>   <span class="mi">13</span>   <span class="o">-</span><span class="mi">1</span>      <span class="mi">213</span>       <span class="mi">18</span> <span class="n">qp</span>      <span class="o">-</span><span class="mf">999.0000</span> <span class="n">f</span>    <span class="mf">3.50</span>    <span class="mi">299803</span> <span class="o">-</span><span class="mf">999.00</span>        <span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="mf">999.00</span>        <span class="o">-</span><span class="mi">1</span> <span class="n">man</span><span class="p">:</span><span class="n">inversion</span>   <span class="n">REB</span><span class="o">-</span><span class="n">IDC</span>                     <span class="o">-</span><span class="mi">1</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+<span class="o">-</span><span class="mf">9.797000</span>   <span class="mf">66.893100</span>    <span class="mf">0.0000</span>   <span class="mf">954980391.62000</span>    <span class="mi">620222</span>    <span class="mi">316324</span>  <span class="mi">2000097</span>   <span class="mi">19</span>   <span class="mi">11</span>   <span class="o">-</span><span class="mi">1</span>      <span class="mi">429</span>       <span class="mi">33</span> <span class="n">qp</span>      <span class="o">-</span><span class="mf">999.0000</span> <span class="n">g</span>    <span class="mf">4.20</span>    <span class="mi">299804</span>    <span class="mf">4.10</span>    <span class="mi">299805</span> <span class="o">-</span><span class="mf">999.00</span>        <span class="o">-</span><span class="mi">1</span> <span class="n">man</span><span class="p">:</span><span class="n">inversion</span>   <span class="n">REB</span><span class="o">-</span><span class="n">IDC</span>                     <span class="o">-</span><span class="mi">1</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+<section id="write-flat-files-from-any-combination-of-columns">
+<h3>Write flat files from any combination of columns<a class="headerlink" href="#write-flat-files-from-any-combination-of-columns" title="Permalink to this heading">#</a></h3>
+<p>Ad-hoc collections of columns can be also written to well-formed flat files, with the right schema-specific format.
+Queries on specific columns return a list of tuple-like objects called <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/orm/query.html#sqlalchemy.util.KeyedTuple">KeyedTuples</a>,
+where values in individual records can be indexed into like a tuple, e.g. <code class="docutils literal notranslate"><span class="pre">record[0]</span></code>,
+or accessed via attributes, e.g. <code class="docutils literal notranslate"><span class="pre">record.lat,</span> <span class="pre">record.lon</span></code>.</p>
+<p>Let’s write some network-station records to a text file.  First, get the string formatter for the columns you’ll be using.
+<code class="docutils literal notranslate"><span class="pre">string_formatter</span></code> returns the correct format string from the <a class="reference external" href="http://docs.python.org/2/library/string.html#format-specification-mini-language">Python format specification mini-language</a> for the columns you’ll be writing.
+The columns must be known to <code class="docutils literal notranslate"><span class="pre">Base</span></code>.  That is, each column must have been defined in at least one table that inherited from <code class="docutils literal notranslate"><span class="pre">Base</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fmt</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">string_formatter</span><span class="p">(</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;elev&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">fmt</span></code> looks like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;</span><span class="si">{0:8.8s}</span><span class="s2"> </span><span class="si">{1:6.6s}</span><span class="s2"> </span><span class="si">{2:11.6f}</span><span class="s2"> </span><span class="si">{3:11.6f}</span><span class="s2"> </span><span class="si">{4:9.4f}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Now, get the records and write them to file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Affiliation</span><span class="o">.</span><span class="n">net</span><span class="p">,</span> <span class="n">Site</span><span class="o">.</span><span class="n">sta</span><span class="p">,</span> <span class="n">Site</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">Site</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">Site</span><span class="o">.</span><span class="n">elev</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="n">Affiliation</span><span class="o">.</span><span class="n">sta</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Affiliation</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">in_</span><span class="p">([</span><span class="s1">&#39;TA&#39;</span><span class="p">,</span> <span class="s1">&#39;UU&#39;</span><span class="p">]))</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;adhoc.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">netsta</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">netsta</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="adhoc-txt">
+<h4>adhoc.txt<a class="headerlink" href="#adhoc-txt" title="Permalink to this heading">#</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TA</span>       <span class="n">Y53A</span>     <span class="mf">33.855400</span>  <span class="o">-</span><span class="mf">83.583600</span>    <span class="mf">0.2340</span>
+<span class="n">TA</span>       <span class="n">Y54A</span>     <span class="mf">33.862100</span>  <span class="o">-</span><span class="mf">82.688000</span>    <span class="mf">0.1760</span>
+<span class="n">TA</span>       <span class="n">Z38A</span>     <span class="mf">33.259900</span>  <span class="o">-</span><span class="mf">94.985100</span>    <span class="mf">0.1160</span>
+<span class="n">TA</span>       <span class="n">Z49A</span>     <span class="mf">33.194200</span>  <span class="o">-</span><span class="mf">86.531100</span>    <span class="mf">0.1340</span>
+<span class="n">TA</span>       <span class="n">Z50A</span>     <span class="mf">33.254000</span>  <span class="o">-</span><span class="mf">85.922600</span>    <span class="mf">0.3700</span>
+<span class="n">TA</span>       <span class="n">Z51A</span>     <span class="mf">33.316700</span>  <span class="o">-</span><span class="mf">85.174700</span>    <span class="mf">0.2490</span>
+<span class="n">TA</span>       <span class="n">Z52A</span>     <span class="mf">33.189300</span>  <span class="o">-</span><span class="mf">84.417600</span>    <span class="mf">0.2520</span>
+<span class="n">TA</span>       <span class="n">Z53A</span>     <span class="mf">33.280100</span>  <span class="o">-</span><span class="mf">83.571300</span>    <span class="mf">0.1440</span>
+<span class="n">TA</span>       <span class="n">Z54A</span>     <span class="mf">33.236200</span>  <span class="o">-</span><span class="mf">82.841700</span>    <span class="mf">0.1340</span>
+<span class="n">TA</span>       <span class="n">Z55A</span>     <span class="mf">33.221100</span>  <span class="o">-</span><span class="mf">82.135900</span>    <span class="mf">0.1000</span>
+<span class="n">UU</span>       <span class="n">EOCU</span>     <span class="mf">40.777000</span> <span class="o">-</span><span class="mf">111.899100</span>    <span class="mf">1.3560</span>
+<span class="n">UU</span>       <span class="n">QJMH</span>     <span class="mf">40.703500</span> <span class="o">-</span><span class="mf">111.866100</span>    <span class="mf">1.3120</span>
+<span class="n">UU</span>       <span class="n">QJOT</span>     <span class="mf">40.741600</span> <span class="o">-</span><span class="mf">111.493900</span>    <span class="mf">1.9770</span>
+<span class="n">UU</span>       <span class="n">QKSL</span>     <span class="mf">40.377100</span> <span class="o">-</span><span class="mf">111.861000</span>    <span class="mf">1.3790</span>
+<span class="n">UU</span>       <span class="n">QLIN</span>     <span class="mf">40.347200</span> <span class="o">-</span><span class="mf">111.694700</span>    <span class="mf">1.5380</span>
+<span class="n">UU</span>       <span class="n">QMDS</span>     <span class="mf">40.729000</span> <span class="o">-</span><span class="mf">111.816100</span>    <span class="mf">1.4050</span>
+<span class="n">UU</span>       <span class="n">QNRL</span>     <span class="mf">41.740700</span> <span class="o">-</span><span class="mf">111.824900</span>    <span class="mf">1.4070</span>
+<span class="n">UU</span>       <span class="n">QPAY</span>     <span class="mf">40.053000</span> <span class="o">-</span><span class="mf">111.728400</span>    <span class="mf">1.4040</span>
+<span class="n">UU</span>       <span class="n">QPML</span>     <span class="mf">40.057800</span> <span class="o">-</span><span class="mf">111.953900</span>    <span class="mf">1.3340</span>
+<span class="n">UU</span>       <span class="n">QRJG</span>     <span class="mf">40.260900</span> <span class="o">-</span><span class="mf">111.632700</span>    <span class="mf">1.5300</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="waveforms.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Working with Waveforms</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../about/license.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import">Import</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ta-site">TA.site</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#export">Export</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ta-origin">TA.origin</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#write-flat-files-from-any-combination-of-columns">Write flat files from any combination of columns</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#adhoc-txt">adhoc.txt</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

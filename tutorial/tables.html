@@ -1,0 +1,827 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>The Database &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/tables';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using the Database" href="queries.html" />
+    <link rel="prev" title="Installation" href="../installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorial/tables.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Database</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-core-tables">The core tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-tables">Primary tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lookup-tables">Lookup tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pisces-implementation">The Pisces implementation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extending-the-schema">Extending the schema</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-new-tables">Defining new tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-py">mytables.py</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-info">Column info</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-table">Create a table</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-new-prototype-tables">Defining new prototype tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-abs-py">mytables_abs.py</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables2-py">mytables2.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="the-database">
+<h1>The Database<a class="headerlink" href="#the-database" title="Permalink to this heading">#</a></h1>
+<p>Learn about the tables, how to create them, and how to make new tables.</p>
+<hr class="docutils" />
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
+<p>Pisces uses relational database tables to represent station, event, and waveform information.
+One can think of database tables as a collection of inter-related sheets in an Excel spreadsheet, each holding columns and rows of data.
+The specific tables Pisces uses are defined in the Center for Seismic Studies (CSS) 3.0 seismic schema, and implemented in an SQL relational database.</p>
+<p>SQL databases are ubiquitous, and describing them in detail is beyond the scope of this tutorial.
+For further guidance or tutorials, please consult the <a class="reference external" href="https://www.google.com/search?client=opera&amp;amp;q=sql+databases&amp;amp;sourceid=opera&amp;amp;ie=UTF-8&amp;amp;oe=UTF-8">web</a>.
+Before continuing, however, here are two things to remember:</p>
+<ol class="arabic">
+<li><p><strong>You don’t have to write SQL.</strong></p>
+<p>Pisces uses the <a class="reference external" href="http://www.sqlalchemy.org">SQLAlchemy</a> package (SQLA) and its <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html">Object Relational Mapper</a> to represent database tables.</p>
+<blockquote>
+<div><p>The SQLAlchemy Object Relational Mapper presents a method of associating user-defined Python classes with database tables, and instances of those classes (objects) with rows in their corresponding tables. –<cite>Mike Beyer</cite>, creator SQLAlchemy</p>
+</div></blockquote>
+<p>In other words, we can work with familiar Python concepts (classes, instances, and methods) instead of writing SQL (though you can still write SQL if you want).
+This doesn’t mean you can <em>ignore</em> the SQL-ness of your database.
+You should understand the concepts, you just don’t have to write and manage SQL strings.</p>
+</li>
+<li><p><strong>You don’t have to install a relational database management system (DBMS).</strong></p>
+<p>You already have one.
+<a class="reference external" href="http://www.sqlite.org">SQLite</a> is part of the Python Standard Library, and SQLAlchemy is compatible with SQLite.
+SQLA is also compatible with <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/dialects/">many</a> other database backends, so you could scale up and use Oracle or PostgreSQL if it makes sense for your project, <em>and you wouldn’t have to change your code</em>.</p>
+</li>
+</ol>
+<!--
+Here are some definitions, if you're not familiar with databases.
+
+**Column**
+:   A bit of data you want to store, defined by data type (float, string, etc.), range, null/default values, etc.
+
+**Table**
+:   A collection of related columns, plus maybe some rules about rows in the table.
+
+**Schema**
+:   A collection of related tables and how the tables relate.
+
+**Relational Database**
+:   An actual implementation of related tables on a system.
+
+**Structured Query Language (SQL)**
+:   A standardized language for querying, joining, and defining database tables.
+    It looks like `select * from origin where lat between 100 and 105 and mb > 4.5`.
+
+**Relational Database Management System (RDMS)**
+:   The software that executes SQL to work with your database.
+    Examples include MySQL, Oracle, PostgreSQL, and SQLite.
+
+Further questions about SQL and relational databases are directed to our [FAQ](https://www.google.com/search?client=opera&q=sql+databases&sourceid=opera&ie=UTF-8&oe=UTF-8).
+-->
+</section>
+<hr class="docutils" />
+<section id="the-core-tables">
+<h2>The core tables<a class="headerlink" href="#the-core-tables" title="Permalink to this heading">#</a></h2>
+<p>Pisces comes with the 20 prototype tables defined in the CSS 3.0 seismic schema.
+These are described in detail in the original specification (Anderson et al., 1990).
+Below are the entity-relationship diagrams for the CSS 3.0 schema from Anderson et al. (1990).</p>
+<!--
+**affiliation**
+:   Network station affiliations
+
+**arrival**
+:   Summary information on a seismic arrival
+
+**assoc**
+:   Data associating arrivals with origins
+
+**event**
+:   Event identification
+
+**instrument**
+:   Generic (default) calibration information about a station
+
+**lastid**
+:   Counter values (Last value used for keys)
+
+**netmag**
+:   Network magnitude
+
+**network**
+:   Network description and identification
+
+**origerr**
+:   Summary of errors in origin estimations
+
+**origin**
+:   Data on event location and confidence bounds
+
+**remark**
+:   Comments
+
+**sensor**
+:   Specific calibration information for physical channels
+
+**site**
+:   Station location information
+
+**sitechan**
+:   Station-channel information
+
+**sregion**
+:   Seismic region
+
+**stamag**
+:   Station magnitude
+
+**stassoc**
+:   Arrivals from a single station grouped into an event
+
+**wfdisc**
+:   Waveform file header and descriptive information
+
+**wftag**
+:   Waveform mapping file
+
+**wftape**
+:   Waveform tape file header and descriptive information (not generally used)
+-->
+<section id="primary-tables">
+<h3>Primary tables<a class="headerlink" href="#primary-tables" title="Permalink to this heading">#</a></h3>
+<p>(only primary and unique keys are shown)</p>
+<p><img alt="primary tables" src="../_images/css3_primary.png" /></p>
+</section>
+<section id="lookup-tables">
+<h3>Lookup tables<a class="headerlink" href="#lookup-tables" title="Permalink to this heading">#</a></h3>
+<p>(only primary and unique keys are shown)</p>
+<p><img alt="lookup tables" src="../_images/css3_lookup.png" /></p>
+<p>Anderson, J., Farrell, W. E., Garcia, K., Given, J., and Swanger, H. (1990). Center for Seismic Studies version 3 database: Schema reference manual. Technical Report C90-01, Center for Seismic Studies, 1300 N. 17th Street, Suite 1450, Arlington, Virginia 22209-3871. <a class="reference download internal" download="" href="../_downloads/b9b3de5d9ce9f31565f98fbbb41858ef/Anderson1990.pdf"><span class="xref download myst">PDF (19 MB)</span></a></p>
+</section>
+<section id="the-pisces-implementation">
+<h3>The Pisces implementation<a class="headerlink" href="#the-pisces-implementation" title="Permalink to this heading">#</a></h3>
+<p>Pisces implements CSS 3.0 schema with relatively few constraints:</p>
+<ul class="simple">
+<li><p>Primary keys and unique keys are defined, but foreign keys are not. All joins must be explicit.</p></li>
+<li><p>ids (e.g. orid, wfid) are not automatically incremented. You must use a counter and the “lastid” table.</p></li>
+<li><p>There are no indexes (internal database structures that speed up queries on certain columns or sets of columns).</p></li>
+<li><p>Any column can take an NA value, which will be assigned if not otherwise specified.</p></li>
+</ul>
+<p>This is done to offer users the flexibility to maintain a database to a level of rigor commensurate with the project.
+A single-user with a 2-year project database may only ever use the origin, wfdisc, arrival, and assoc tables, and doesn’t want to deal with foreign keys,
+whereas a multi-user global database may need to populate most/all tables and use consistent ids.
+Both are possible.</p>
+<!--
+In the ORM, **Python classes represent database tables, and instances of that class represent rows in a table.**
+-->
+</section>
+</section>
+<hr class="docutils" />
+<section id="extending-the-schema">
+<h2>Extending the schema<a class="headerlink" href="#extending-the-schema" title="Permalink to this heading">#</a></h2>
+<section id="defining-new-tables">
+<h3>Defining new tables<a class="headerlink" href="#defining-new-tables" title="Permalink to this heading">#</a></h3>
+<p>The core tables don’t describe everything you might care about, such as stacked cross-correlation functions.
+Here we’ll reproduce the “ccwfdisc” cross-correlation descriptor table from <a class="reference external" href="http://www.iris.edu/dms/products/ancc-ciei/">http://www.iris.edu/dms/products/ancc-ciei/</a>, which looks like this <em>(sic)</em>:</p>
+<p><img alt="ccwfdisc table" src="../_images/ancc-ciei_table.png" /></p>
+<p>We’ll define our new table in a file “mytables.py” by doing the following:</p>
+<ul class="simple">
+<li><p>Import our css3 prototypes into the <code class="docutils literal notranslate"><span class="pre">css</span></code> namespace.</p></li>
+<li><p>Inherit from <code class="docutils literal notranslate"><span class="pre">css.Base</span></code>, so that the Ccwfdisc table is a proper SQLAlchemy table,
+and so that the <code class="docutils literal notranslate"><span class="pre">info=</span></code> dictionaries are used properly in Pisces</p></li>
+<li><p>Name the table with <code class="docutils literal notranslate"><span class="pre">__tablename__</span></code></p></li>
+<li><p>Specify the primary and unique constraints with <code class="docutils literal notranslate"><span class="pre">__table_args__</span></code>.
+Each table needs at least a primary key constraint.</p></li>
+<li><p>Re-use a number of known columns with <code class="docutils literal notranslate"><span class="pre">.copy()</span></code></p></li>
+<li><p>Define new columns, including the <code class="docutils literal notranslate"><span class="pre">info</span></code> dictionary for Pisces.</p></li>
+</ul>
+<section id="mytables-py">
+<h4>mytables.py<a class="headerlink" href="#mytables-py" title="Permalink to this heading">#</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="k">as</span> <span class="nn">sa</span>
+<span class="kn">import</span> <span class="nn">pisces.schema.css3</span> <span class="k">as</span> <span class="nn">css</span>
+
+<span class="k">class</span> <span class="nc">Ccwfdisc</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;ccwfdisc&#39;</span>
+    <span class="n">__table_args__</span> <span class="o">=</span> <span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">PrimaryKeyConstraint</span><span class="p">(</span><span class="s1">&#39;wfid&#39;</span><span class="p">),</span> 
+                        <span class="n">sa</span><span class="o">.</span><span class="n">UniqueConstraint</span><span class="p">(</span><span class="s1">&#39;wfid&#39;</span><span class="p">,</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span> <span class="s1">&#39;dfile&#39;</span><span class="p">))</span>
+
+    <span class="n">sta1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">net1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sta2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">net2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">chan1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">chan2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">wfid</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">wfid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">endtime</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">endtime</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">nsamp</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">nsamp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">samprate</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">samprate</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">snrn</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;snrn&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;16.6f&#39;</span><span class="p">)</span>
+    <span class="n">snrp</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;snrp&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;16.6f&#39;</span><span class="p">)</span>
+    <span class="n">sdate</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sdate&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;8d&#39;</span><span class="p">)</span>
+    <span class="n">edate</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;edate&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;8d&#39;</span><span class="p">)</span>
+    <span class="n">stdays</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;stdays&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span>
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;6d&#39;</span><span class="p">))</span>
+    <span class="nb">range</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;10.3f&#39;</span><span class="p">)</span>
+    <span class="n">tsnorm</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;tsnorm&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">53</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;14.4f&#39;</span><span class="p">)</span>
+    <span class="n">datatype</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">dir</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">dfile</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">dfile</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">foff</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">foff</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lddate</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">lddate</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="column-info">
+<h3>Column info<a class="headerlink" href="#column-info" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">info</span></code> dictionary for each column needs the following entries, at minimum:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">default</span></code>: The value used for the column when it is otherwise not specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parse</span></code>: A callable that accepts the fixed-width string and returns the right type for the database.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">format</span></code>: The column’s external format, from the Python <a class="reference external" href="http://docs.python.org/2/library/string.html#format-specification-mini-language">string format specification mini-language</a>.</p></li>
+</ul>
+<p>There are some differences between the Fortran-style “external format” and those used by Python.
+In Python, the type characters may be different from Fortran, and they always follow the width.
+See the following table for a few examples:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Description</p></th>
+<th class="head text-center"><p>Fortran</p></th>
+<th class="head text-center"><p>Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>6-character string</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">a6</span></code></p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">6.6s</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>8-digit integer</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">i8</span></code></p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">8d</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="create-a-table">
+<h3>Create a table<a class="headerlink" href="#create-a-table" title="Permalink to this heading">#</a></h3>
+<p>To create the table in a database, just use SQLAlchemy syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="k">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">mytables</span> <span class="kn">import</span> <span class="n">Ccwfdisc</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///mydatabase.sqlite&#39;</span><span class="p">)</span>
+
+<span class="n">Ccwfdisc</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For every ORM class, there is a hidden <code class="docutils literal notranslate"><span class="pre">__table__</span></code> object that has a <code class="docutils literal notranslate"><span class="pre">create</span></code> method.
+This method accepts an <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html">Engine</a> instance that points to a specific database, where it will be created.</p>
+</section>
+<section id="defining-new-prototype-tables">
+<h3>Defining new prototype tables<a class="headerlink" href="#defining-new-prototype-tables" title="Permalink to this heading">#</a></h3>
+<p>You can use the previous table with any database, as long as the table will be called “ccwfdisc”.
+If you want to re-use this table structure across multiple table names without having to repeat the previous definition each time, you’ll need to define a new <em>prototype table</em> (<a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/declarative.html#abstract">abstract table</a> in SQLAlchemy).</p>
+<p>This is how the “ccwfdisc” table would be defined, as a new prototype.</p>
+<section id="mytables-abs-py">
+<h4>mytables_abs.py<a class="headerlink" href="#mytables-abs-py" title="Permalink to this heading">#</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="k">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declared_attr</span>
+<span class="kn">import</span> <span class="nn">pisces.schema.css3</span> <span class="k">as</span> <span class="nn">css</span>
+
+<span class="k">class</span> <span class="nc">Ccwfdisc</span><span class="p">(</span><span class="n">css</span><span class="o">.</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__abstract__</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@declared_attr</span>
+    <span class="k">def</span> <span class="nf">__table_args__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span>  <span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">PrimaryKeyConstraint</span><span class="p">(</span><span class="s1">&#39;wfid&#39;</span><span class="p">),</span> 
+                    <span class="n">sa</span><span class="o">.</span><span class="n">UniqueConstraint</span><span class="p">(</span><span class="s1">&#39;wfid&#39;</span><span class="p">,</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span> <span class="s1">&#39;dfile&#39;</span><span class="p">))</span>
+
+    <span class="n">sta1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">net1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sta2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">sta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">net2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">chan1</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">chan2</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">chan</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">wfid</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">wfid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">endtime</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">endtime</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">nsamp</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">nsamp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">samprate</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">samprate</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">snrn</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;snrn&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;16.6f&#39;</span><span class="p">)</span>
+    <span class="n">snrp</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;snrp&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;16.6f&#39;</span><span class="p">)</span>
+    <span class="n">sdate</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sdate&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;8d&#39;</span><span class="p">)</span>
+    <span class="n">edate</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;edate&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;8d&#39;</span><span class="p">)</span>
+    <span class="n">stdays</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;stdays&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span>
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;6d&#39;</span><span class="p">))</span>
+    <span class="nb">range</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;10.3f&#39;</span><span class="p">)</span>
+    <span class="n">tsnorm</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;tsnorm&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">53</span><span class="p">),</span> 
+        <span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">,</span><span class="s1">&#39;parse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;14.4f&#39;</span><span class="p">)</span>
+    <span class="n">datatype</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">dir</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">dfile</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">dfile</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">foff</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">foff</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lddate</span> <span class="o">=</span> <span class="n">css</span><span class="o">.</span><span class="n">lddate</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The differences are minor:</p>
+<ul class="simple">
+<li><p>use <code class="docutils literal notranslate"><span class="pre">__abstract__</span> <span class="pre">=</span> <span class="pre">True</span></code> instead of assigning a <code class="docutils literal notranslate"><span class="pre">__tablename__</span></code></p></li>
+<li><p>use the <code class="docutils literal notranslate"><span class="pre">&#64;declared_attr</span></code> decorator with a <code class="docutils literal notranslate"><span class="pre">__table_args__</span></code> <em>function</em> that <em>returns</em> the constraint tuple.</p></li>
+</ul>
+<p>And this is how the prototype would be implemented and re-used in two different tables, ‘ccwfdisc’ and ‘TA_ccwfdisc’.</p>
+</section>
+<section id="mytables2-py">
+<h4>mytables2.py<a class="headerlink" href="#mytables2-py" title="Permalink to this heading">#</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mytables_abs</span> <span class="k">as</span> <span class="nn">ab</span>
+
+<span class="k">class</span> <span class="nc">Ccwfdisc</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">Ccwfdisc</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;ccwfdisc&#39;</span>
+
+<span class="k">class</span> <span class="nc">TA_Ccwfdisc</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">Ccwfdisc</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;TA_ccwfdisc&#39;</span>
+</pre></div>
+</div>
+<p>These two tables look the same, have different names, and can reside in the same database.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="queries.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Using the Database</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-core-tables">The core tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-tables">Primary tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lookup-tables">Lookup tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pisces-implementation">The Pisces implementation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extending-the-schema">Extending the schema</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-new-tables">Defining new tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-py">mytables.py</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-info">Column info</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-table">Create a table</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-new-prototype-tables">Defining new prototype tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables-abs-py">mytables_abs.py</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mytables2-py">mytables2.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

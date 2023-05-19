@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pisces.commands.util &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pisces/commands/util';</script>
+    <link rel="icon" href="../../../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for pisces.commands.util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Helper functions for command-line utilities.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">pisces.tables.kbcore</span> <span class="kn">import</span> <span class="n">CORETABLES</span>
+
+
+<div class="viewcode-block" id="get_or_create_tables"><a class="viewcode-back" href="../../../apidocs/pisces.commands.util.html#pisces.commands.util.get_or_create_tables">[docs]</a><span class="k">def</span> <span class="nf">get_or_create_tables</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">tables</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load or create canonical ORM KB Core table classes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session</span>
+<span class="sd">    prefix : str</span>
+<span class="sd">        Prefix for canonical table names, e.g. &#39;myaccount.&#39; or &#39;TA_&#39; (no owner/schema).</span>
+<span class="sd">        Canonical table names are used if no prefix is provided.</span>
+<span class="sd">    create : bool</span>
+<span class="sd">        If True, create tables that don&#39;t yet exist.</span>
+
+<span class="sd">    Canonical table keyword/tablename string pairs, such as site=&#39;other.site&#39;,</span>
+<span class="sd">    can override prefix.  For example, you may want to use a different Lastid</span>
+<span class="sd">    table, so that ids don&#39;t start from 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tables : dict</span>
+<span class="sd">        A mapping between canonical table names and SQLA declarative classes</span>
+<span class="sd">        with the correct __tablename__.</span>
+<span class="sd">        e.g. {&#39;origin&#39;: Origin, ...}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The Plan:</span>
+    <span class="c1"># 1. For each core table, build or get the table name</span>
+    <span class="c1"># 2. If it&#39;s a vanilla table name, just use a pre-packaged table class</span>
+    <span class="c1"># 3. If not, try to autoload it.</span>
+    <span class="c1"># 4. If it doesn&#39;t exist, make it from a prototype and create it in the database.</span>
+
+    <span class="c1"># TODO: check options for which tables to produce.</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prefix</span><span class="p">:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">tabledict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coretable</span> <span class="ow">in</span> <span class="n">CORETABLES</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="c1"># build the table name</span>
+        <span class="n">fulltablename</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># put table classes into the tables dictionary</span>
+        <span class="k">if</span> <span class="n">fulltablename</span> <span class="o">==</span> <span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="c1"># it&#39;s a vanilla table name. just use a pre-packaged table class instead of making one.</span>
+            <span class="n">tabledict</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">coretable</span><span class="o">.</span><span class="n">table</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tabledict</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">make_table</span><span class="p">(</span><span class="n">fulltablename</span><span class="p">,</span> <span class="n">coretable</span><span class="o">.</span><span class="n">prototype</span><span class="p">)</span>
+
+        <span class="n">tabledict</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="n">checkfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">tabledict</span></div>
+
+
+<div class="viewcode-block" id="dicts2rows"><a class="viewcode-back" href="../../../apidocs/pisces.commands.util.html#pisces.commands.util.dicts2rows">[docs]</a><span class="k">def</span> <span class="nf">dicts2rows</span><span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="n">classes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expands lists of table dictionaries into table class instances.</span>
+
+<span class="sd">    dicts : dict</span>
+<span class="sd">        Keys are canonical table names, values are lists of row dicts for that table.</span>
+<span class="sd">    classes : dict</span>
+<span class="sd">        Keys are canonical table names, values are table classes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">dcts</span> <span class="ow">in</span> <span class="n">dicts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
+        <span class="n">dicts</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">dct</span><span class="p">)</span> <span class="k">for</span> <span class="n">dct</span> <span class="ow">in</span> <span class="n">dcts</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dicts</span></div>
+
+<div class="viewcode-block" id="get_files"><a class="viewcode-back" href="../../../apidocs/pisces.commands.util.html#pisces.commands.util.get_files">[docs]</a><span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="n">file_list</span><span class="p">,</span> <span class="n">file_check</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a sequence of file names from either a list of file names</span>
+<span class="sd">    (trivial) or a text file list (presumable because there are too many files</span>
+<span class="sd">    to use normal shell expansion).</span>
+
+<span class="sd">    Optionally, supply a file_check function that accepts a file name, and returns</span>
+<span class="sd">    a boolean True if the file is the desired format.  This only checks the first</span>
+<span class="sd">    file, and raises an IOError if False, assuming all subsequent files will be</span>
+<span class="sd">    the wrong format.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_check</span><span class="p">(</span><span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1">#make a generator of non-blank lines</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">listfile</span><span class="p">:</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">listfile</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> does not exist.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">file_list</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

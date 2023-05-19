@@ -1,0 +1,863 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pisces.io.sac &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'apidocs/pisces.io.sac';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pisces.io.trace" href="pisces.io.trace.html" />
+    <link rel="prev" title="pisces.io.readwaveform" href="pisces.io.readwaveform.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="pisces.html">pisces</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="pisces.io.html">pisces.io</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/apidocs/pisces.io.sac.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>pisces.io.sac</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.affiliation2sachdr"><code class="docutils literal notranslate"><span class="pre">affiliation2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.arrival2sachdr"><code class="docutils literal notranslate"><span class="pre">arrival2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.assoc2sachdr"><code class="docutils literal notranslate"><span class="pre">assoc2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.cast_to_float"><code class="docutils literal notranslate"><span class="pre">cast_to_float()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.cast_to_int"><code class="docutils literal notranslate"><span class="pre">cast_to_int()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.chan_to_kcmpnm"><code class="docutils literal notranslate"><span class="pre">chan_to_kcmpnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.event2sachdr"><code class="docutils literal notranslate"><span class="pre">event2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.evname_to_kevnm"><code class="docutils literal notranslate"><span class="pre">evname_to_kevnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.get_sac_reftime"><code class="docutils literal notranslate"><span class="pre">get_sac_reftime()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.ievreg_to_grn"><code class="docutils literal notranslate"><span class="pre">ievreg_to_grn()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.ievtyp_to_etype"><code class="docutils literal notranslate"><span class="pre">ievtyp_to_etype()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.insname_to_kinst"><code class="docutils literal notranslate"><span class="pre">insname_to_kinst()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.instrument2sachdr"><code class="docutils literal notranslate"><span class="pre">instrument2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kcmpnm_to_chan"><code class="docutils literal notranslate"><span class="pre">kcmpnm_to_chan()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kevnm_to_evname"><code class="docutils literal notranslate"><span class="pre">kevnm_to_evname()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kinst_to_insname"><code class="docutils literal notranslate"><span class="pre">kinst_to_insname()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.knetwk_to_net"><code class="docutils literal notranslate"><span class="pre">knetwk_to_net()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kstnm_to_sta"><code class="docutils literal notranslate"><span class="pre">kstnm_to_sta()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.net_to_knetwk"><code class="docutils literal notranslate"><span class="pre">net_to_knetwk()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.origin2sachdr"><code class="docutils literal notranslate"><span class="pre">origin2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2affiliation"><code class="docutils literal notranslate"><span class="pre">sachdr2affiliation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2arraysite"><code class="docutils literal notranslate"><span class="pre">sachdr2arraysite()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2arrival"><code class="docutils literal notranslate"><span class="pre">sachdr2arrival()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2assoc"><code class="docutils literal notranslate"><span class="pre">sachdr2assoc()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2event"><code class="docutils literal notranslate"><span class="pre">sachdr2event()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2instrument"><code class="docutils literal notranslate"><span class="pre">sachdr2instrument()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2origin"><code class="docutils literal notranslate"><span class="pre">sachdr2origin()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2site"><code class="docutils literal notranslate"><span class="pre">sachdr2site()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2sitechan"><code class="docutils literal notranslate"><span class="pre">sachdr2sitechan()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2tables"><code class="docutils literal notranslate"><span class="pre">sachdr2tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2wfdisc"><code class="docutils literal notranslate"><span class="pre">sachdr2wfdisc()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.site2sachdr"><code class="docutils literal notranslate"><span class="pre">site2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sitechan2sachdr"><code class="docutils literal notranslate"><span class="pre">sitechan2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sta_to_kstnm"><code class="docutils literal notranslate"><span class="pre">sta_to_kstnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.strip_string"><code class="docutils literal notranslate"><span class="pre">strip_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.swap_if_value"><code class="docutils literal notranslate"><span class="pre">swap_if_value()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.tables2sachdr"><code class="docutils literal notranslate"><span class="pre">tables2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.truncate_string"><code class="docutils literal notranslate"><span class="pre">truncate_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.wfdisc2sachdr"><code class="docutils literal notranslate"><span class="pre">wfdisc2sachdr()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-pisces.io.sac">
+<span id="pisces-io-sac"></span><h1>pisces.io.sac<a class="headerlink" href="#module-pisces.io.sac" title="Permalink to this heading">#</a></h1>
+<p>Conversions between SAC header variables and CSS or KB Core fields.</p>
+<p>Converts a SAC header dictionary into a list of table dictionaries and vice-versa.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.affiliation2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">affiliation2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">af</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#affiliation2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.affiliation2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.arrival2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">arrival2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#arrival2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.arrival2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.assoc2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">assoc2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#assoc2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.assoc2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.cast_to_float">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">cast_to_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#cast_to_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.cast_to_float" title="Permalink to this definition">#</a></dt>
+<dd><p>Cast a function’s argument to float before the function operates on it, like:</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@cast_to_float</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">stla_to_lat</span><span class="p">(</span><span class="n">stla</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">stla</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lat</span> <span class="o">=</span> <span class="n">stla_to_lat</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">12.3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+<span class="go">float</span>
+<span class="go"># not numpy.float32</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.cast_to_int">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">cast_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#cast_to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.cast_to_int" title="Permalink to this definition">#</a></dt>
+<dd><p>Cast a function’s argument to int before the function operates on it, like:</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@cast_to_int</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">nwfid_to_wfid</span><span class="p">(</span><span class="n">nwfid</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">nwfid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nwfid_to_wfid</span><span class="p">(</span><span class="mf">12.3</span><span class="p">)</span>
+<span class="go">12</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.chan_to_kcmpnm">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">chan_to_kcmpnm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#chan_to_kcmpnm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.chan_to_kcmpnm" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.event2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">event2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#event2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.event2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.evname_to_kevnm">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">evname_to_kevnm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#evname_to_kevnm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.evname_to_kevnm" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.get_sac_reftime">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">get_sac_reftime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#get_sac_reftime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.get_sac_reftime" title="Permalink to this definition">#</a></dt>
+<dd><p>Get SAC header reference time as a UTCDateTime instance from a SAC header
+dictionary.</p>
+<p>If using ObsPy to read the SAC file, use debug_headers=True to get the full
+header, including nz time headers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.ievreg_to_grn">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">ievreg_to_grn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ievreg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#ievreg_to_grn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.ievreg_to_grn" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.ievtyp_to_etype">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">ievtyp_to_etype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ievtyp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#ievtyp_to_etype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.ievtyp_to_etype" title="Permalink to this definition">#</a></dt>
+<dd><p>Provide the ievtyp(e) integer, get the etype string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.insname_to_kinst">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">insname_to_kinst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">insname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#insname_to_kinst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.insname_to_kinst" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.instrument2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">instrument2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ins</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#instrument2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.instrument2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.kcmpnm_to_chan">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">kcmpnm_to_chan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kcmpnm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#kcmpnm_to_chan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.kcmpnm_to_chan" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.kevnm_to_evname">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">kevnm_to_evname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kevnm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#kevnm_to_evname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.kevnm_to_evname" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.kinst_to_insname">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">kinst_to_insname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kinst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#kinst_to_insname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.kinst_to_insname" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.knetwk_to_net">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">knetwk_to_net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">knetwk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#knetwk_to_net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.knetwk_to_net" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.kstnm_to_sta">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">kstnm_to_sta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kstnm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#kstnm_to_sta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.kstnm_to_sta" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.net_to_knetwk">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">net_to_knetwk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#net_to_knetwk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.net_to_knetwk" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.origin2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">origin2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#origin2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.origin2sachdr" title="Permalink to this definition">#</a></dt>
+<dd><p>Accepts a fielded origin table record and produces a dictionary of
+corresponding sac header field/value pairs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2affiliation">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2affiliation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2affiliation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2affiliation" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2arraysite">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2arraysite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2arraysite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2arraysite" title="Permalink to this definition">#</a></dt>
+<dd><p>Provide a SAC header dictionary, get a site table dictionary.
+This is a slight modification of sachdr2site that handles deast
+&amp; dnorth being in SAC’s user7 &amp; user8 header fields (a poor
+but documented standard that is the de facto appoach
+- see SAC’s BBFK or ARRAYMAP or BRTT’s db2sac in Antelope).</p>
+<p>Note that user7 &amp; user8 are expected to be in km (consistent
+with SAC expectations).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2arrival">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2arrival</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2arrival"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2arrival" title="Permalink to this definition">#</a></dt>
+<dd><p>Similar to sachdr2assoc, but produces a list of up to 10 Arrival
+dictionaries.  Same header-&gt;phase mapping applies, unless otherwise stated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2assoc">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2assoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2assoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2assoc" title="Permalink to this definition">#</a></dt>
+<dd><p>Takes a sac header dictionary, and produces a list of up to 10
+Assoc instances. Header-&gt;phase mappings follow SAC2000, i.e.:</p>
+<ul class="simple">
+<li><p>t0: P</p></li>
+<li><p>t1: Pn</p></li>
+<li><p>t2: Pg</p></li>
+<li><p>t3: S</p></li>
+<li><p>t4: Sn</p></li>
+<li><p>t5: Sg</p></li>
+<li><p>t6: Lg</p></li>
+<li><p>t7: LR</p></li>
+<li><p>t8: Rg</p></li>
+<li><p>t9: pP</p></li>
+</ul>
+<p>An alternate mapping for some or all picks can be supplied, however,
+as a dictionary of strings in the above form.</p>
+<p>Note: arid values will not be filled in, so do:
+&gt;&gt;&gt; for assoc in kbio.tables[‘assoc’]:</p>
+<blockquote>
+<div><p>assoc.arid = lastarid+1
+lastarid += 1</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2event">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2event" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2instrument">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2instrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2instrument" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2origin">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2origin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2origin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2origin" title="Permalink to this definition">#</a></dt>
+<dd><p>Provide a sac header dictionary, get a filled origin table dictionary.
+A few things:
+1) If sac reference time isn’t event-based, origin time is unknown
+2) magnitude is taken first from hdr[‘mag’], hdr[‘imagtyp’] if defined,</p>
+<blockquote>
+<div><p>then replaced by hdr[‘user0’],hdr[‘kuser0’]</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>sac moment, duration, and user-defined magnitude headers aren’t
+put into the origin table</p></li>
+<li><p>origin.auth is taken first from hdr[‘imagsrc’], then replaced by
+hdr[‘kuser1’] if defined.  the imagsrc-&gt;auth translations are:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>INEIC -&gt; ISC:NEIC</p></li>
+<li><p>IPDE -&gt; PDE</p></li>
+<li><p>IISC -&gt; ISC</p></li>
+<li><p>IBRK -&gt; ISC:BERK</p></li>
+<li><p>IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -&gt; unchanged</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2site">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2site" title="Permalink to this definition">#</a></dt>
+<dd><p>Provide a SAC header dictionary, get a site table dictionary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2sitechan">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2sitechan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2sitechan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2sitechan" title="Permalink to this definition">#</a></dt>
+<dd><p>Provide a sac header dictionary, get a sitechan table dictionary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2tables">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2tables" title="Permalink to this definition">#</a></dt>
+<dd><p>Scrape SAC header dictionary into database table dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>header</strong><span class="classifier">dict</span></dt><dd><p>SAC header</p>
+</dd>
+<dt><strong>tables</strong><span class="classifier">list/tuple of strings, optional</span></dt><dd><p>Table name strings to return.
+Default, [‘affiliation’, ‘arrival’, ‘assoc’, ‘event’, ‘instrument’,
+‘origin’, ‘site’, ‘sitechan’, ‘wfdisc’]</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary of lists of table dictionaries.  If only default
+values are found for a table, it is omitted.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Some things must be checked or filled in before adding to a database:
+- affiliation.time, endtime
+- arrival.arid
+- assoc.orid, arid
+- event.prefor, evid
+- instrument.inid, dir, dfile, rsptype
+- site.ondate
+- sitechan.ondate, chanid
+- wfdisc.dir, dfile, foff, datetype, wfid</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sachdr2wfdisc">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sachdr2wfdisc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sachdr2wfdisc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sachdr2wfdisc" title="Permalink to this definition">#</a></dt>
+<dd><p>Produce wfdisc kbcore table instance from sac header dictionary.
+Clearly this will be a skeleton instance, as the all-important ‘dir’ and
+‘dfile’ and ‘datatype’ must be filled in later.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.site2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">site2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#site2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.site2sachdr" title="Permalink to this definition">#</a></dt>
+<dd><p>Accepts a fielded site table row and returns a dictionary of corresponding
+sac header field/value pairs.</p>
+<p>June 13, 2016 - added deast/dnorth output to SAC user7/8 header fields</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sitechan2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sitechan2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sitechan2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sitechan2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.sta_to_kstnm">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">sta_to_kstnm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#sta_to_kstnm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.sta_to_kstnm" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.strip_string">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">strip_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#strip_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.strip_string" title="Permalink to this definition">#</a></dt>
+<dd><p>Strip white space from a function’s argument to float before the function
+operates on it, like:</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@strip_string</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">kcmpnm_to_chan</span><span class="p">(</span><span class="n">kcmpnm</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">kcmpnm</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kclmpnm_to_chan</span><span class="p">(</span><span class="s1">&#39; my_too_long_component &#39;</span><span class="p">)</span>
+<span class="go">&#39;my_too&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.swap_if_value">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">swap_if_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detected_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#swap_if_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.swap_if_value" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.tables2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">tables2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#tables2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.tables2sachdr" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a sac header dictionary, including default values, from
+current table instances.  SAC reference time is, in order of availability,
+origin time (origin.time), first sample time (wfdisc.time).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.truncate_string">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">truncate_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#truncate_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.truncate_string" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.io.sac.wfdisc2sachdr">
+<span class="sig-prename descclassname"><span class="pre">pisces.io.sac.</span></span><span class="sig-name descname"><span class="pre">wfdisc2sachdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/io/sac.html#wfdisc2sachdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.io.sac.wfdisc2sachdr" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pisces.io.readwaveform.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pisces.io.readwaveform</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pisces.io.trace.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pisces.io.trace</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.affiliation2sachdr"><code class="docutils literal notranslate"><span class="pre">affiliation2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.arrival2sachdr"><code class="docutils literal notranslate"><span class="pre">arrival2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.assoc2sachdr"><code class="docutils literal notranslate"><span class="pre">assoc2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.cast_to_float"><code class="docutils literal notranslate"><span class="pre">cast_to_float()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.cast_to_int"><code class="docutils literal notranslate"><span class="pre">cast_to_int()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.chan_to_kcmpnm"><code class="docutils literal notranslate"><span class="pre">chan_to_kcmpnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.event2sachdr"><code class="docutils literal notranslate"><span class="pre">event2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.evname_to_kevnm"><code class="docutils literal notranslate"><span class="pre">evname_to_kevnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.get_sac_reftime"><code class="docutils literal notranslate"><span class="pre">get_sac_reftime()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.ievreg_to_grn"><code class="docutils literal notranslate"><span class="pre">ievreg_to_grn()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.ievtyp_to_etype"><code class="docutils literal notranslate"><span class="pre">ievtyp_to_etype()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.insname_to_kinst"><code class="docutils literal notranslate"><span class="pre">insname_to_kinst()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.instrument2sachdr"><code class="docutils literal notranslate"><span class="pre">instrument2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kcmpnm_to_chan"><code class="docutils literal notranslate"><span class="pre">kcmpnm_to_chan()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kevnm_to_evname"><code class="docutils literal notranslate"><span class="pre">kevnm_to_evname()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kinst_to_insname"><code class="docutils literal notranslate"><span class="pre">kinst_to_insname()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.knetwk_to_net"><code class="docutils literal notranslate"><span class="pre">knetwk_to_net()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.kstnm_to_sta"><code class="docutils literal notranslate"><span class="pre">kstnm_to_sta()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.net_to_knetwk"><code class="docutils literal notranslate"><span class="pre">net_to_knetwk()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.origin2sachdr"><code class="docutils literal notranslate"><span class="pre">origin2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2affiliation"><code class="docutils literal notranslate"><span class="pre">sachdr2affiliation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2arraysite"><code class="docutils literal notranslate"><span class="pre">sachdr2arraysite()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2arrival"><code class="docutils literal notranslate"><span class="pre">sachdr2arrival()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2assoc"><code class="docutils literal notranslate"><span class="pre">sachdr2assoc()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2event"><code class="docutils literal notranslate"><span class="pre">sachdr2event()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2instrument"><code class="docutils literal notranslate"><span class="pre">sachdr2instrument()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2origin"><code class="docutils literal notranslate"><span class="pre">sachdr2origin()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2site"><code class="docutils literal notranslate"><span class="pre">sachdr2site()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2sitechan"><code class="docutils literal notranslate"><span class="pre">sachdr2sitechan()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2tables"><code class="docutils literal notranslate"><span class="pre">sachdr2tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sachdr2wfdisc"><code class="docutils literal notranslate"><span class="pre">sachdr2wfdisc()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.site2sachdr"><code class="docutils literal notranslate"><span class="pre">site2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sitechan2sachdr"><code class="docutils literal notranslate"><span class="pre">sitechan2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.sta_to_kstnm"><code class="docutils literal notranslate"><span class="pre">sta_to_kstnm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.strip_string"><code class="docutils literal notranslate"><span class="pre">strip_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.swap_if_value"><code class="docutils literal notranslate"><span class="pre">swap_if_value()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.tables2sachdr"><code class="docutils literal notranslate"><span class="pre">tables2sachdr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.truncate_string"><code class="docutils literal notranslate"><span class="pre">truncate_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.io.sac.wfdisc2sachdr"><code class="docutils literal notranslate"><span class="pre">wfdisc2sachdr()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

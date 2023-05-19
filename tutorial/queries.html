@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Using the Database &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/queries';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Working with Waveforms" href="waveforms.html" />
+    <link rel="prev" title="The Database" href="tables.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tables.html">The Database</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorial/queries.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Using the Database</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-tables">Loading Tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-your-defined-tables">Import your defined tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbitrary-tables">Arbitrary tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#tables-must-have-a-primary-key">Tables must have a primary key</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbitrary-enhanced-tables">Arbitrary enhanced tables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#querying-tables">Querying Tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#query-builders">Query-builders</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#editing-tables">Editing tables</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="using-the-database">
+<h1>Using the Database<a class="headerlink" href="#using-the-database" title="Permalink to this heading">#</a></h1>
+<p>Load, query, join, write, and copy tables.</p>
+<hr class="docutils" />
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
+<p>In this tutorial, we’ll make a database connection, load or import tables, and work with them.</p>
+<p>To begin, we’ll make a database connection.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces</span> <span class="k">as</span> <span class="nn">ps</span>
+
+<span class="c1"># connect with Oracle</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">db_connect</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s1">&#39;scott&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;oracle&#39;</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="s1">&#39;my.server.edu&#39;</span><span class="p">,</span> 
+                        <span class="n">port</span><span class="o">=</span><span class="mi">1521</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="s1">&#39;mydb&#39;</span><span class="p">)</span>
+
+<span class="c1"># connect with sqlite </span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">db_connect</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">&#39;sqlite&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="s1">&#39;/path/to/mydb.sqlite&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>You’ll need to substitute in your own username, of course.</em></p>
+<p><code class="docutils literal notranslate"><span class="pre">db_connect</span></code> will prompt you for your password and returns a SQLAlchemy
+<a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html">Session</a>
+instance, which manages database transactions. It can also take a single
+fully-qualified database URL (e.g. <code class="docutils literal notranslate"><span class="pre">oracle://scott:tiger&#64;my.server.edu:1521/mydb</span></code> or
+<code class="docutils literal notranslate"><span class="pre">sqlite:///path/to/mydb.sqlite</span></code>), which is passed to
+<a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/core/engines.html#sqlalchemy.create_engine"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.create_engine</span></code></a>.
+The returned session is bound to the database through the <code class="docutils literal notranslate"><span class="pre">.bind</span></code> attribute,
+which is a SQLAlchemy <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html">Engine</a> instance that specifies the database
+location and drivers.</p>
+</section>
+<hr class="docutils" />
+<section id="loading-tables">
+<h2>Loading Tables<a class="headerlink" href="#loading-tables" title="Permalink to this heading">#</a></h2>
+<p>Tables can be loaded in one of three ways:</p>
+<ol class="arabic simple">
+<li><p>Imported from your own table definition modules</p></li>
+<li><p>Arbitrary tables reflected from the database</p></li>
+<li><p>Arbitrary tables reflected from the database, with enhancements</p></li>
+</ol>
+<p>Number 1 is the recommended way, as it returns a class with useful methods like <code class="docutils literal notranslate"><span class="pre">to_trace</span></code> for waveform tables, default value instantiation, and easy flat file conversion.
+Number 2 returns a class with none of the above enhancements.
+It is good for quick table loading when you have no prior knowledge of the table or you don’t have a table prototype to use for it.
+Number 3 returns a class with default value instantiation and easy flat file <em>writing</em>, but no other Pisces-specific class methods.</p>
+<section id="import-your-defined-tables">
+<h3>Import your defined tables<a class="headerlink" href="#import-your-defined-tables" title="Permalink to this heading">#</a></h3>
+<p>Import tables/classes from modules where you previously defined them, as in the [previous tutorial page](Using the Database).
+This is the preferred way to load tables, as it offers the most flexibility and functionality.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">from</span> <span class="n">mytables</span> <span class="kn">import</span> <span class="nn">Site</span><span class="o">,</span> <span class="nn">Wfdisc</span><span class="o">,</span> <span class="nn">Origin</span>
+</pre></div>
+</div>
+</section>
+<section id="arbitrary-tables">
+<h3>Arbitrary tables<a class="headerlink" href="#arbitrary-tables" title="Permalink to this heading">#</a></h3>
+<p>If you only know the table name (and account), you can load a table using <code class="docutils literal notranslate"><span class="pre">get_tables</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Oracle account.table syntax</span>
+<span class="n">Site</span><span class="p">,</span> <span class="n">Affil</span><span class="p">,</span> <span class="n">Origin</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;user.site&#39;</span><span class="p">,</span> <span class="s1">&#39;user.affiliation&#39;</span><span class="p">,</span> 
+                                                    <span class="s1">&#39;user.origin&#39;</span><span class="p">])</span>
+
+<span class="c1"># SQLite syntax, no account</span>
+<span class="n">Site</span><span class="p">,</span> <span class="n">Affil</span><span class="p">,</span> <span class="n">Origin</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;affiliation&#39;</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Loaded tables are just Python classes defined using <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/orm/">SQLAlchemy’s Object Relational Mapper (ORM)</a>.
+Table classes loaded together share a <code class="docutils literal notranslate"><span class="pre">.metadata</span></code>.
+<a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/core/metadata.html#sqlalchemy.schema.MetaData">MetaData</a>
+is a Python representation of underlying SQL objects, and can be used to
+issue create/add/drop statements to the database. To add tables loaded
+later to the same MetaData, use the <code class="docutils literal notranslate"><span class="pre">metadata=</span></code> flag with the existing
+instance from one of the earlier-loaded tables:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Wfdisc</span><span class="p">,</span> <span class="n">Assoc</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;user.wfdisc&#39;</span><span class="p">,</span> <span class="s1">&#39;user.assoc&#39;</span><span class="p">],</span> <span class="n">metadata</span><span class="o">=</span><span class="n">Site</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+
+<span class="c1"># check the table names in the metadata</span>
+<span class="nb">print</span> <span class="n">Site</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Tables present in your MetaData can be seen in its <code class="docutils literal notranslate"><span class="pre">.tables</span></code> dictionary:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;user.affiliation&#39;</span><span class="p">,</span>  <span class="s1">&#39;user.site&#39;</span><span class="p">,</span>  <span class="s1">&#39;user.wfdisc&#39;</span><span class="p">,</span>  <span class="s1">&#39;user.origin&#39;</span><span class="p">,</span>  <span class="s1">&#39;user.assoc&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="tables-must-have-a-primary-key">
+<h4>Tables must have a primary key<a class="headerlink" href="#tables-must-have-a-primary-key" title="Permalink to this heading">#</a></h4>
+<p>SQLAlchemy’s ORM needs a primary key for the <code class="docutils literal notranslate"><span class="pre">session</span></code> to keep track of rows. If a database table is actually just a view of other tables, or a primary key was never specified,
+we can specify the primary key in a dictionary and the <code class="docutils literal notranslate"><span class="pre">primary_keys=</span></code> keyword.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">Sitechan</span><span class="p">,</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;user.sitechan&#39;</span><span class="p">])</span>
+<span class="k">except</span> <span class="n">ArgumentError</span><span class="p">:</span>
+    <span class="c1"># failed because user.sitechan has no primary key.  we can force one with primary_keys</span>
+    <span class="n">Sitechan</span><span class="p">,</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;user.sitechan&#39;</span><span class="p">],</span> 
+                                <span class="n">primary_keys</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user.sitechan&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;chanid&#39;</span><span class="p">]})</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="arbitrary-enhanced-tables">
+<h3>Arbitrary enhanced tables<a class="headerlink" href="#arbitrary-enhanced-tables" title="Permalink to this heading">#</a></h3>
+<p>When the <code class="docutils literal notranslate"><span class="pre">base=</span></code> option is used with a <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> class that comes with Pisces,
+loaded classes get the following enhancements:</p>
+<ul class="simple">
+<li><p>The default values for all fields in a table row (class instance) are filled whether or not the underlying database defines default values.</p></li>
+<li><p>The class can form its own string representation (flat file row).</p></li>
+<li><p>Instances of the class can iterate over values, and in the correct order.</p></li>
+</ul>
+<p>Note: this will only work if the field names in the table being loaded have been used with this base before.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load table classes, matching column names with those of a known schema</span>
+
+<span class="kn">from</span> <span class="nn">pisces.schema.css3</span> <span class="kn">import</span> <span class="n">Base</span>
+
+<span class="n">Site</span><span class="p">,</span> <span class="n">Affil</span><span class="p">,</span> <span class="n">Origin</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">get_tables</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;global.site&#39;</span><span class="p">,</span><span class="s1">&#39;global.affiliation&#39;</span><span class="p">,</span> <span class="s1">&#39;global.origin&#39;</span><span class="p">],</span> <span class="n">base</span><span class="o">=</span><span class="n">Base</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Base</span></code> is the parent class for all pre-defined table prototypes in a given schema that comes with Pisces.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="querying-tables">
+<h2>Querying Tables<a class="headerlink" href="#querying-tables" title="Permalink to this heading">#</a></h2>
+<p>Querying and editing tables in Pisces is the same as using SQLAlchemy’s
+ORM. Follow SQLAlchemy’s
+<a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_8/orm/tutorial.html">tutorial</a> to
+learn more about how this works.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># query all TA stations installed in 2009</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Site</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">ondate</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">2009001</span><span class="p">,</span> <span class="mi">2009365</span><span class="p">))</span>
+<span class="n">ta_sites</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="n">Affil</span><span class="o">.</span><span class="n">sta</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Affil</span><span class="o">.</span><span class="n">net</span> <span class="o">==</span> <span class="s1">&#39;TA&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="c1"># query for a subset of western US earthquakes, sorted by mb</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">45</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">mb</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">wus_quakes</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">115</span><span class="p">,</span> <span class="o">-</span><span class="mi">105</span><span class="p">))</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">mb</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="c1"># plot &#39;em</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="kn">import</span> <span class="n">Basemap</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">llcrnrlon</span><span class="o">=-</span><span class="mi">130</span><span class="p">,</span> <span class="n">llcrnrlat</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=-</span><span class="mi">80</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">etopo</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">ista</span> <span class="ow">in</span> <span class="n">ta_sites</span><span class="p">:</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">ista</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">ista</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;b^&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="n">wus_quakes</span><span class="p">:</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;r*&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> TA stations and </span><span class="si">{}</span><span class="s2"> quakes mb &gt; 4&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ta_sites</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">wus_quakes</span><span class="p">)))</span>
+</pre></div>
+</div>
+<!-- ![western US](https://raw.github.com/jkmacc-LANL/pisces/dev/docs/source/pages/data/wUS.png "western US") -->
+<p><img alt="western US" src="../_images/wUS.png" /></p>
+<section id="query-builders">
+<h3>Query-builders<a class="headerlink" href="#query-builders" title="Permalink to this heading">#</a></h3>
+<p>Pisces has a set of intuitive query-building functions for common
+seismic queries in <code class="docutils literal notranslate"><span class="pre">pisces.request</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pisces.request</span> <span class="k">as</span> <span class="nn">req</span>
+
+<span class="c1"># repeat the previous query for a subset of western US earthquakes</span>
+<span class="n">wus_quakes</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Origin</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">115</span><span class="p">,</span> <span class="o">-</span><span class="mi">105</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">mag</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mb&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">)})</span>
+
+<span class="c1"># to sort by mb, ask for the query back and do your sort</span>
+<span class="n">wus_quakes</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Origin</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">115</span><span class="p">,</span> <span class="o">-</span><span class="mi">105</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">mag</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mb&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">)},</span> <span class="n">asquery</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">mb</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Pisces uses NumPy/ObsPy to do distance subsets, which are done out-of-database and can be memory intensive.
+They can be done in-database, if you have a stored function “xkm_distance”, for example, that calculates lateral distances.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># stations &lt;= 200 km from lat 42, lon -110, out-of-database</span>
+<span class="n">sites</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_stations</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Site</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="o">-</span><span class="mi">110</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+
+<span class="c1"># in-database &quot;xkm_distance(lat1, lon1, lat2, lon2)&quot; function</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span>
+<span class="n">sites</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_stations</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Site</span><span class="p">,</span> <span class="n">asquery</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">xkm_distance</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">Site</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="o">-</span><span class="mi">110</span><span class="p">)</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="editing-tables">
+<h3>Editing tables<a class="headerlink" href="#editing-tables" title="Permalink to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># add Albuquerque ANMO and the Chelyabinsk bolide</span>
+<span class="n">ANMO</span> <span class="o">=</span> <span class="n">Site</span><span class="p">(</span><span class="n">sta</span><span class="o">=</span><span class="s1">&#39;ANMO&#39;</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="mf">34.9459</span><span class="p">,</span> <span class="n">lon</span><span class="o">=-</span><span class="mf">106.4572</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">1.85</span><span class="p">)</span>
+<span class="n">bolide</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">orid</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="mf">55.15</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mf">61.41</span><span class="p">,</span> <span class="n">mb</span><span class="o">=</span><span class="mf">2.7</span><span class="p">,</span> <span class="n">etype</span><span class="o">=</span><span class="s1">&#39;xm&#39;</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">ANMO</span><span class="p">,</span> <span class="n">bolide</span><span class="p">])</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="c1"># edit a Site, delete an Origin</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Site</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Site</span><span class="o">.</span><span class="n">sta</span> <span class="o">==</span> <span class="s1">&#39;MK31&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="mf">42.5</span><span class="p">})</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Origin</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Origin</span><span class="o">.</span><span class="n">orid</span> <span class="o">=</span> <span class="mi">1001</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that not all fields/attributes were specified when creating “ANMO”
+or “bolide”, but their default values are filled in.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tables.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Database</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="waveforms.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Working with Waveforms</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-tables">Loading Tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-your-defined-tables">Import your defined tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbitrary-tables">Arbitrary tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#tables-must-have-a-primary-key">Tables must have a primary key</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbitrary-enhanced-tables">Arbitrary enhanced tables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#querying-tables">Querying Tables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#query-builders">Query-builders</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#editing-tables">Editing tables</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

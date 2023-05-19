@@ -1,0 +1,1287 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pisces.io.sac &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pisces/io/sac';</script>
+    <link rel="icon" href="../../../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for pisces.io.sac</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Converted to python 3.5.2 on 02/07/17</span>
+<span class="c1"># By: Jeremy Webster</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Conversions between SAC header variables and CSS or KB Core fields.</span>
+
+
+<span class="sd">Converts a SAC header dictionary into a list of table dictionaries and vice-versa.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># XXX: currently not working</span>
+<span class="c1"># TODO:</span>
+<span class="c1">#   - remove functions already in pisces.io.trace</span>
+<span class="c1">#   - make everything just translate dictionaries, not classes and make</span>
+<span class="c1">#     everything less obspy.Trace-centric</span>
+<span class="c1">#   - change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals</span>
+<span class="c1">#   - use pysac (hopefully obspy.io.sac, eventually)</span>
+<span class="c1">#   - make a bunch of column/header translation functions, like &quot;kcmpnm_to_chan&quot;</span>
+<span class="c1">#     and &quot;chan_to_kcmpnm&quot;, and use them in higher-level functions, like</span>
+<span class="c1">#     &quot;sachdr_to_wfdisc&quot; and &quot;wfdisc_to_sachdr&quot;.</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">UTCDateTime</span><span class="p">,</span> <span class="n">AttribDict</span>
+<span class="kn">import</span> <span class="nn">obspy.geodetics</span> <span class="k">as</span> <span class="nn">geod</span>
+
+<span class="kn">import</span> <span class="nn">pisces.tables.kbcore</span> <span class="k">as</span> <span class="nn">kb</span>
+<span class="kn">from</span> <span class="nn">pisces.io.readwaveform</span> <span class="kn">import</span> <span class="n">read_waveform</span>
+<span class="kn">from</span> <span class="nn">pisces.io.util</span> <span class="kn">import</span> <span class="n">_map_header</span><span class="p">,</span> <span class="n">_buildhdr</span>
+
+<span class="c1"># ObsPy default values</span>
+<span class="n">OBSPYDEFAULT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;station&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;channel&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+
+<span class="c1"># TODO: much of this will be superseded by obspy.io.sac</span>
+<span class="c1"># ------------------ CONVERT SAC HEADER DICTIONARY TO TABLES ------------#</span>
+<span class="c1"># SAC default values</span>
+<span class="n">IDEFAULT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">12345</span>
+<span class="n">FDEFAULT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">12345.0</span>
+<span class="n">SDEFAULT</span> <span class="o">=</span> <span class="s1">&#39;-12345  &#39;</span>
+<span class="n">SLDEFAULT</span> <span class="o">=</span> <span class="s1">&#39;-12345          &#39;</span>
+<span class="n">SACDEFAULT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;az&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;cmpaz&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;cmpinc&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;delta&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;depmax&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;depmen&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;depmin&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;evdp&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;evla&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;evlo&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;gcarc&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;idep&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;ievreg&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;ievtype&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;iftype&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;iinst&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;imagsrc&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;imagtyp&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;int1&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;iqual&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;istreg&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;isynth&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;iztype&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;ka&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kcmpnm&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kdatrd&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kevnm&#39;</span><span class="p">:</span> <span class="n">SLDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kf&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;khole&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kinst&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;knetwk&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kstnm&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt0&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kt1&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt2&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt3&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt4&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kt5&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt6&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt7&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kt8&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kt9&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kuser0&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;kuser1&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;kuser2&#39;</span><span class="p">:</span> <span class="n">SDEFAULT</span><span class="p">,</span> <span class="s1">&#39;lcalda&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;leven&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;lovrok&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;lpspol&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;nevid&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;norid&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;npts&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;nvhdr&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;nwfid&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;nzhour&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;nzjday&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;nzmin&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;nzmsec&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;nzsec&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;nzyear&#39;</span><span class="p">:</span> <span class="n">IDEFAULT</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;odelta&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;stdp&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;stel&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;stla&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;stlo&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;t1&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t4&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;t5&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t6&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t7&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;t8&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;t9&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;unused10&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;unused11&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;unused12&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;unused6&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;unused7&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;unused8&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;unused9&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user0&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;user1&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user2&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user3&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;user4&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user5&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user6&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;user7&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user8&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;user9&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;xmaximum&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;xminimum&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span> <span class="s1">&#39;ymaximum&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">,</span>
+              <span class="s1">&#39;yminimum&#39;</span><span class="p">:</span> <span class="n">FDEFAULT</span><span class="p">}</span>
+
+<span class="c1">############################# DECORATORS ######################################</span>
+<span class="c1"># Decorator functions allow readable, reusable handling of header values.</span>
+
+
+<div class="viewcode-block" id="cast_to_int"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.cast_to_int">[docs]</a><span class="k">def</span> <span class="nf">cast_to_int</span><span class="p">(</span><span class="n">original_func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cast a function&#39;s argument to int before the function operates on it, like:</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; @cast_to_int</span>
+<span class="sd">    ... def nwfid_to_wfid(nwfid):</span>
+<span class="sd">    ...     return nwfid</span>
+<span class="sd">    &gt;&gt;&gt; nwfid_to_wfid(12.3)</span>
+<span class="sd">    12</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">hdr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">original_func</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hdr</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">converter</span></div>
+
+
+<div class="viewcode-block" id="cast_to_float"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.cast_to_float">[docs]</a><span class="k">def</span> <span class="nf">cast_to_float</span><span class="p">(</span><span class="n">original_func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cast a function&#39;s argument to float before the function operates on it, like:</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; @cast_to_float</span>
+<span class="sd">    ... def stla_to_lat(stla):</span>
+<span class="sd">    ...     return stla</span>
+<span class="sd">    &gt;&gt;&gt; lat = stla_to_lat(numpy.float32(12.3))</span>
+<span class="sd">    &gt;&gt;&gt; type(lat)</span>
+<span class="sd">    float</span>
+<span class="sd">    # not numpy.float32</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">hdr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">original_func</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hdr</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">converter</span></div>
+
+
+<div class="viewcode-block" id="strip_string"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.strip_string">[docs]</a><span class="k">def</span> <span class="nf">strip_string</span><span class="p">(</span><span class="n">original_func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Strip white space from a function&#39;s argument to float before the function</span>
+<span class="sd">    operates on it, like:</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; @strip_string</span>
+<span class="sd">    ... def kcmpnm_to_chan(kcmpnm):</span>
+<span class="sd">    ...     return kcmpnm[:6]</span>
+<span class="sd">    &gt;&gt;&gt; kclmpnm_to_chan(&#39; my_too_long_component &#39;)</span>
+<span class="sd">    &#39;my_too&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">hdr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">original_func</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hdr</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">converter</span></div>
+
+
+<div class="viewcode-block" id="truncate_string"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.truncate_string">[docs]</a><span class="k">def</span> <span class="nf">truncate_string</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">make_func</span><span class="p">(</span><span class="n">original_func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">func_wrapper</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">val</span><span class="p">[:</span><span class="n">N</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">func_wrapper</span></div>
+
+
+<span class="c1"># decorator for when you find default/null SAC header values</span>
+<span class="c1"># if a value is detected, function returns return_value instead of being executed</span>
+<span class="c1"># XXX: not clear how this could be used with other decorators</span>
+<div class="viewcode-block" id="swap_if_value"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.swap_if_value">[docs]</a><span class="k">def</span> <span class="nf">swap_if_value</span><span class="p">(</span><span class="n">detected_value</span><span class="p">,</span> <span class="n">return_value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_value</span><span class="p">(</span><span class="n">original_func</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">func_wrapper</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="n">detected_value</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">return_value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">func_wrapper</span></div>
+
+
+<span class="c1"># ############################## STRING HEADER CONVERSIONS ####################</span>
+<span class="c1"># SAC -&gt; CSS</span>
+<div class="viewcode-block" id="kcmpnm_to_chan"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.kcmpnm_to_chan">[docs]</a><span class="k">def</span> <span class="nf">kcmpnm_to_chan</span><span class="p">(</span><span class="n">kcmpnm</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">kcmpnm</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="kevnm_to_evname"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.kevnm_to_evname">[docs]</a><span class="k">def</span> <span class="nf">kevnm_to_evname</span><span class="p">(</span><span class="n">kevnm</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">kevnm</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="kinst_to_insname"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.kinst_to_insname">[docs]</a><span class="k">def</span> <span class="nf">kinst_to_insname</span><span class="p">(</span><span class="n">kinst</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">kinst</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="knetwk_to_net"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.knetwk_to_net">[docs]</a><span class="k">def</span> <span class="nf">knetwk_to_net</span><span class="p">(</span><span class="n">knetwk</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">knetwk</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="kstnm_to_sta"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.kstnm_to_sta">[docs]</a><span class="k">def</span> <span class="nf">kstnm_to_sta</span><span class="p">(</span><span class="n">kstnm</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">kstnm</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span></div>
+
+
+<span class="c1"># CSS -&gt; SAC</span>
+<div class="viewcode-block" id="chan_to_kcmpnm"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.chan_to_kcmpnm">[docs]</a><span class="k">def</span> <span class="nf">chan_to_kcmpnm</span><span class="p">(</span><span class="n">chan</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">chan</span></div>
+
+
+<div class="viewcode-block" id="evname_to_kevnm"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.evname_to_kevnm">[docs]</a><span class="k">def</span> <span class="nf">evname_to_kevnm</span><span class="p">(</span><span class="n">evname</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">evname</span></div>
+
+
+<div class="viewcode-block" id="insname_to_kinst"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.insname_to_kinst">[docs]</a><span class="k">def</span> <span class="nf">insname_to_kinst</span><span class="p">(</span><span class="n">insname</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">insname</span></div>
+
+
+<div class="viewcode-block" id="net_to_knetwk"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.net_to_knetwk">[docs]</a><span class="k">def</span> <span class="nf">net_to_knetwk</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">net</span></div>
+
+
+<div class="viewcode-block" id="sta_to_kstnm"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sta_to_kstnm">[docs]</a><span class="k">def</span> <span class="nf">sta_to_kstnm</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">kstnm</span></div>
+
+
+<span class="c1"># ############################## INT HEADER CONVERSIONS #######################</span>
+<span class="c1"># DATA</span>
+<span class="c1">#</span>
+<span class="n">ENUM_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;itime&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;irlim&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;iamph&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;ixy&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;iunkn&#39;</span><span class="p">,</span>
+              <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;idisp&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;ivel&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="s1">&#39;iacc&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;ib&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;iday&#39;</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span>
+              <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;ia&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">:</span> <span class="s1">&#39;it0&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="s1">&#39;it1&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="s1">&#39;it2&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="s1">&#39;it3&#39;</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="s1">&#39;it4&#39;</span><span class="p">,</span>
+              <span class="mi">18</span><span class="p">:</span> <span class="s1">&#39;it5&#39;</span><span class="p">,</span> <span class="mi">19</span><span class="p">:</span> <span class="s1">&#39;it6&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span> <span class="s1">&#39;it7&#39;</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="s1">&#39;it8&#39;</span><span class="p">,</span> <span class="mi">22</span><span class="p">:</span> <span class="s1">&#39;it9&#39;</span><span class="p">,</span>
+              <span class="mi">23</span><span class="p">:</span> <span class="s1">&#39;iradnv&#39;</span><span class="p">,</span> <span class="mi">24</span><span class="p">:</span> <span class="s1">&#39;itannv&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">:</span> <span class="s1">&#39;iradev&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">:</span> <span class="s1">&#39;itanev&#39;</span><span class="p">,</span>
+              <span class="mi">27</span><span class="p">:</span> <span class="s1">&#39;inorth&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">:</span> <span class="s1">&#39;ieast&#39;</span><span class="p">,</span> <span class="mi">29</span><span class="p">:</span> <span class="s1">&#39;ihorza&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">:</span> <span class="s1">&#39;idown&#39;</span><span class="p">,</span> <span class="mi">31</span><span class="p">:</span> <span class="s1">&#39;iup&#39;</span><span class="p">,</span>
+              <span class="mi">32</span><span class="p">:</span> <span class="s1">&#39;illlbb&#39;</span><span class="p">,</span> <span class="mi">33</span><span class="p">:</span> <span class="s1">&#39;iwwsn1&#39;</span><span class="p">,</span> <span class="mi">34</span><span class="p">:</span> <span class="s1">&#39;iwwsn2&#39;</span><span class="p">,</span> <span class="mi">35</span><span class="p">:</span> <span class="s1">&#39;ihglp&#39;</span><span class="p">,</span> <span class="mi">36</span><span class="p">:</span> <span class="s1">&#39;isro&#39;</span><span class="p">,</span>
+              <span class="mi">37</span><span class="p">:</span> <span class="s1">&#39;inucl&#39;</span><span class="p">,</span> <span class="mi">38</span><span class="p">:</span> <span class="s1">&#39;ipren&#39;</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="s1">&#39;ipostn&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="s1">&#39;iquake&#39;</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="s1">&#39;ipreq&#39;</span><span class="p">,</span>
+              <span class="mi">42</span><span class="p">:</span> <span class="s1">&#39;ipostq&#39;</span><span class="p">,</span> <span class="mi">43</span><span class="p">:</span> <span class="s1">&#39;ichem&#39;</span><span class="p">,</span> <span class="mi">44</span><span class="p">:</span> <span class="s1">&#39;iother&#39;</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span> <span class="s1">&#39;igood&#39;</span><span class="p">,</span> <span class="mi">46</span><span class="p">:</span> <span class="s1">&#39;iglch&#39;</span><span class="p">,</span>
+              <span class="mi">47</span><span class="p">:</span> <span class="s1">&#39;idrop&#39;</span><span class="p">,</span> <span class="mi">48</span><span class="p">:</span> <span class="s1">&#39;ilowsn&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">:</span> <span class="s1">&#39;irldta&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">:</span> <span class="s1">&#39;ivolts&#39;</span><span class="p">,</span> <span class="mi">52</span><span class="p">:</span> <span class="s1">&#39;imb&#39;</span><span class="p">,</span>
+              <span class="mi">53</span><span class="p">:</span> <span class="s1">&#39;ims&#39;</span><span class="p">,</span> <span class="mi">54</span><span class="p">:</span> <span class="s1">&#39;iml&#39;</span><span class="p">,</span> <span class="mi">55</span><span class="p">:</span> <span class="s1">&#39;imw&#39;</span><span class="p">,</span> <span class="mi">56</span><span class="p">:</span> <span class="s1">&#39;imd&#39;</span><span class="p">,</span> <span class="mi">57</span><span class="p">:</span> <span class="s1">&#39;imx&#39;</span><span class="p">,</span> <span class="mi">58</span><span class="p">:</span> <span class="s1">&#39;ineic&#39;</span><span class="p">,</span>
+              <span class="mi">59</span><span class="p">:</span> <span class="s1">&#39;ipdeq&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">:</span> <span class="s1">&#39;ipdew&#39;</span><span class="p">,</span> <span class="mi">61</span><span class="p">:</span> <span class="s1">&#39;ipde&#39;</span><span class="p">,</span> <span class="mi">62</span><span class="p">:</span> <span class="s1">&#39;iisc&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">:</span> <span class="s1">&#39;ireb&#39;</span><span class="p">,</span>
+              <span class="mi">64</span><span class="p">:</span> <span class="s1">&#39;iusgs&#39;</span><span class="p">,</span> <span class="mi">65</span><span class="p">:</span> <span class="s1">&#39;ibrk&#39;</span><span class="p">,</span> <span class="mi">66</span><span class="p">:</span> <span class="s1">&#39;icaltech&#39;</span><span class="p">,</span> <span class="mi">67</span><span class="p">:</span> <span class="s1">&#39;illnl&#39;</span><span class="p">,</span> <span class="mi">68</span><span class="p">:</span> <span class="s1">&#39;ievloc&#39;</span><span class="p">,</span>
+              <span class="mi">69</span><span class="p">:</span> <span class="s1">&#39;ijsop&#39;</span><span class="p">,</span> <span class="mi">70</span><span class="p">:</span> <span class="s1">&#39;iuser&#39;</span><span class="p">,</span> <span class="mi">71</span><span class="p">:</span> <span class="s1">&#39;iunknown&#39;</span><span class="p">,</span> <span class="mi">72</span><span class="p">:</span> <span class="s1">&#39;iqb&#39;</span><span class="p">,</span> <span class="mi">73</span><span class="p">:</span> <span class="s1">&#39;iqb1&#39;</span><span class="p">,</span>
+              <span class="mi">74</span><span class="p">:</span> <span class="s1">&#39;iqb2&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">:</span> <span class="s1">&#39;iqbx&#39;</span><span class="p">,</span> <span class="mi">76</span><span class="p">:</span> <span class="s1">&#39;iqmt&#39;</span><span class="p">,</span> <span class="mi">77</span><span class="p">:</span> <span class="s1">&#39;ieq&#39;</span><span class="p">,</span> <span class="mi">78</span><span class="p">:</span> <span class="s1">&#39;ieq1&#39;</span><span class="p">,</span>
+              <span class="mi">79</span><span class="p">:</span> <span class="s1">&#39;ieq2&#39;</span><span class="p">,</span> <span class="mi">80</span><span class="p">:</span> <span class="s1">&#39;ime&#39;</span><span class="p">,</span> <span class="mi">81</span><span class="p">:</span> <span class="s1">&#39;iex&#39;</span><span class="p">,</span> <span class="mi">82</span><span class="p">:</span> <span class="s1">&#39;inu&#39;</span><span class="p">,</span> <span class="mi">83</span><span class="p">:</span> <span class="s1">&#39;inc&#39;</span><span class="p">,</span> <span class="mi">84</span><span class="p">:</span> <span class="s1">&#39;io_&#39;</span><span class="p">,</span>
+              <span class="mi">85</span><span class="p">:</span> <span class="s1">&#39;il&#39;</span><span class="p">,</span> <span class="mi">86</span><span class="p">:</span> <span class="s1">&#39;ir&#39;</span><span class="p">,</span> <span class="mi">87</span><span class="p">:</span> <span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="mi">88</span><span class="p">:</span> <span class="s1">&#39;iu&#39;</span><span class="p">,</span> <span class="mi">89</span><span class="p">:</span> <span class="s1">&#39;ieq3&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">:</span> <span class="s1">&#39;ieq0&#39;</span><span class="p">,</span>
+              <span class="mi">91</span><span class="p">:</span> <span class="s1">&#39;iex0&#39;</span><span class="p">,</span> <span class="mi">92</span><span class="p">:</span> <span class="s1">&#39;iqc&#39;</span><span class="p">,</span> <span class="mi">93</span><span class="p">:</span> <span class="s1">&#39;iqb0&#39;</span><span class="p">,</span> <span class="mi">94</span><span class="p">:</span> <span class="s1">&#39;igey&#39;</span><span class="p">,</span> <span class="mi">95</span><span class="p">:</span> <span class="s1">&#39;ilit&#39;</span><span class="p">,</span>
+              <span class="mi">96</span><span class="p">:</span> <span class="s1">&#39;imet&#39;</span><span class="p">,</span> <span class="mi">97</span><span class="p">:</span> <span class="s1">&#39;iodor&#39;</span><span class="p">,</span> <span class="mi">103</span><span class="p">:</span> <span class="s1">&#39;ios&#39;</span><span class="p">}</span>
+
+<span class="c1"># ievtyp -&gt; etype</span>
+<span class="n">ETYPEDICT</span> <span class="o">=</span> <span class="p">{</span><span class="mi">37</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="mi">38</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span>
+             <span class="mi">43</span><span class="p">:</span> <span class="s1">&#39;ec&#39;</span><span class="p">,</span> <span class="mi">72</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">73</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">74</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">76</span><span class="p">:</span> <span class="s1">&#39;mb&#39;</span><span class="p">,</span>
+             <span class="mi">77</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">78</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">79</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">80</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">81</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">82</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+             <span class="mi">83</span><span class="p">:</span> <span class="s1">&#39;mc&#39;</span><span class="p">}</span>
+
+<span class="c1"># evtype -&gt; ievtyp</span>
+<span class="n">IEVTYPDICT</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">_val</span><span class="p">,</span> <span class="n">_key</span><span class="p">)</span> <span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">ETYPEDICT</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+<span class="c1">#</span>
+<span class="c1"># imagsrc -&gt; auth</span>
+<span class="n">AUTHDICT</span> <span class="o">=</span> <span class="p">{</span><span class="mi">58</span><span class="p">:</span> <span class="s1">&#39;ISC:NEIC&#39;</span><span class="p">,</span> <span class="mi">61</span><span class="p">:</span> <span class="s1">&#39;PDE&#39;</span><span class="p">,</span> <span class="mi">62</span><span class="p">:</span> <span class="s1">&#39;ISC&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">:</span> <span class="s1">&#39;REB-ICD&#39;</span><span class="p">,</span>
+            <span class="mi">64</span><span class="p">:</span> <span class="s1">&#39;IUSGS&#39;</span><span class="p">,</span> <span class="mi">65</span><span class="p">:</span> <span class="s1">&#39;ISC:BERK&#39;</span><span class="p">,</span> <span class="mi">66</span><span class="p">:</span> <span class="s1">&#39;ICALTECH&#39;</span><span class="p">,</span> <span class="mi">67</span><span class="p">:</span> <span class="s1">&#39;ILLNL&#39;</span><span class="p">,</span>
+            <span class="mi">68</span><span class="p">:</span> <span class="s1">&#39;IEVLOC&#39;</span><span class="p">,</span> <span class="mi">69</span><span class="p">:</span> <span class="s1">&#39;IJSOP&#39;</span><span class="p">,</span> <span class="mi">70</span><span class="p">:</span> <span class="s1">&#39;IUSER&#39;</span><span class="p">,</span> <span class="mi">71</span><span class="p">:</span> <span class="s1">&#39;IUNKNOWN&#39;</span><span class="p">}</span>
+<span class="c1">#</span>
+<span class="c1"># auth -&gt; imagsrc</span>
+<span class="n">IMAGSRCDICT</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">_val</span><span class="p">,</span> <span class="n">_key</span><span class="p">)</span> <span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">AUTHDICT</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+
+<span class="c1"># SAC -&gt; CSS</span>
+<div class="viewcode-block" id="ievreg_to_grn"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.ievreg_to_grn">[docs]</a><span class="k">def</span> <span class="nf">ievreg_to_grn</span><span class="p">(</span><span class="n">ievreg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ievreg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ievtyp_to_etype"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.ievtyp_to_etype">[docs]</a><span class="k">def</span> <span class="nf">ievtyp_to_etype</span><span class="p">(</span><span class="n">ievtyp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide the ievtyp(e) integer, get the etype string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ETYPEDICT</span><span class="p">[</span><span class="n">ievtyp</span><span class="p">]</span></div>
+
+
+<span class="c1"># the following functions accept a SAC header dictionary, and return respective</span>
+<span class="c1"># kbcore table instances, assumes default SAC header values set to None</span>
+<div class="viewcode-block" id="get_sac_reftime"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.get_sac_reftime">[docs]</a><span class="k">def</span> <span class="nf">get_sac_reftime</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get SAC header reference time as a UTCDateTime instance from a SAC header</span>
+<span class="sd">    dictionary.</span>
+
+<span class="sd">    If using ObsPy to read the SAC file, use debug_headers=True to get the full</span>
+<span class="sd">    header, including nz time headers.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># &quot;nz&quot; fields are not kept when ObsPy reads a SAC file.  They&#39;re used</span>
+    <span class="c1"># to make &quot;starttime&quot;, then discarded.</span>
+    <span class="c1"># t0 = nzyear + nzjday + nzhour + nzminute + nzsecond + nzmsec*1000</span>
+    <span class="c1"># tr.stats.starttime = t0 + b</span>
+    <span class="c1"># therefore: t0 = starttime - b</span>
+
+    <span class="c1"># TODO: let null nz values be 0?</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">yr</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzyear&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">yr</span> <span class="o">&lt;=</span> <span class="mi">99</span><span class="p">:</span>
+            <span class="n">yr</span> <span class="o">+=</span> <span class="mi">1900</span>
+        <span class="n">nzjday</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzjday&#39;</span><span class="p">]</span>
+        <span class="n">nzhour</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzhour&#39;</span><span class="p">]</span>
+        <span class="n">nzmin</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzmin&#39;</span><span class="p">]</span>
+        <span class="n">nzsec</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzsec&#39;</span><span class="p">]</span>
+        <span class="n">nzmsec</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;nzmsec&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Not enough time information: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">reftime</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">yr</span><span class="p">,</span> <span class="n">julday</span><span class="o">=</span><span class="n">nzjday</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="n">nzhour</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="n">nzmin</span><span class="p">,</span>
+                              <span class="n">second</span><span class="o">=</span><span class="n">nzsec</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="n">nzmsec</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="c1"># reftime = datetime.datetime(yr, 1, 1, nzhour, nzmin, nzsec, nzmsec * 1000) + \</span>
+        <span class="c1">#                            datetime.timedelta(int(nzjday-1))</span>
+        <span class="c1"># NOTE: epoch seconds can be got by:</span>
+        <span class="c1"># (reftime - datetime.datetime(1970,1,1)).total_seconds()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># may contain -12345 null values?</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid or missing time headers.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">reftime</span></div>
+
+
+<span class="k">def</span> <span class="nf">_cast_int</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="c1"># no key, or int(None)</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<span class="k">def</span> <span class="nf">_cast_float</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="c1"># no key, or int(None)</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<span class="k">def</span> <span class="nf">_clean_str</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="c1"># no key, None.strip()</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<div class="viewcode-block" id="sachdr2site"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2site">[docs]</a><span class="k">def</span> <span class="nf">sachdr2site</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a SAC header dictionary, get a site table dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sac_site</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stla&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stlo&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stel&#39;</span><span class="p">,</span> <span class="s1">&#39;elev&#39;</span><span class="p">)]</span>
+
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_site</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">sitedict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># clean up</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;elev&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1000.0</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># no &#39;elev&#39;</span>
+        <span class="k">pass</span>
+
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="n">_cast_float</span><span class="p">(</span><span class="n">sitedict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;elev&#39;</span><span class="p">])</span>
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="n">_clean_str</span><span class="p">(</span><span class="n">sitedict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">])</span>
+
+    <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">sitedict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2arraysite"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2arraysite">[docs]</a><span class="k">def</span> <span class="nf">sachdr2arraysite</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a SAC header dictionary, get a site table dictionary.</span>
+<span class="sd">    This is a slight modification of sachdr2site that handles deast</span>
+<span class="sd">    &amp; dnorth being in SAC&#39;s user7 &amp; user8 header fields (a poor</span>
+<span class="sd">    but documented standard that is the de facto appoach</span>
+<span class="sd">    - see SAC&#39;s BBFK or ARRAYMAP or BRTT&#39;s db2sac in Antelope).</span>
+
+<span class="sd">    Note that user7 &amp; user8 are expected to be in km (consistent</span>
+<span class="sd">    with SAC expectations).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sac_site</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stla&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stlo&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stel&#39;</span><span class="p">,</span> <span class="s1">&#39;elev&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;user7&#39;</span><span class="p">,</span><span class="s1">&#39;deast&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;user8&#39;</span><span class="p">,</span><span class="s1">&#39;dnorth&#39;</span><span class="p">)]</span>
+
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_site</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">sitedict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># clean up</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;elev&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1000.0</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1">#no &#39;elev&#39;</span>
+        <span class="k">pass</span>
+
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="n">_cast_float</span><span class="p">(</span><span class="n">sitedict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="s1">&#39;deast&#39;</span><span class="p">,</span> <span class="s1">&#39;dnorth&#39;</span><span class="p">])</span>
+    <span class="n">sitedict</span> <span class="o">=</span> <span class="n">_clean_str</span><span class="p">(</span><span class="n">sitedict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">])</span>
+
+    <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sitedict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">sitedict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2sitechan"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2sitechan">[docs]</a><span class="k">def</span> <span class="nf">sachdr2sitechan</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a sac header dictionary, get a sitechan table dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sac_sitechan</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">,</span> <span class="s1">&#39;chan&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;cmpaz&#39;</span><span class="p">,</span> <span class="s1">&#39;hang&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;cmpinc&#39;</span><span class="p">,</span> <span class="s1">&#39;vang&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;stdp&#39;</span><span class="p">,</span> <span class="s1">&#39;edepth&#39;</span><span class="p">)]</span>
+
+    <span class="n">sitechandict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_sitechan</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">sitechandict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sitechandict</span><span class="p">[</span><span class="s1">&#39;edepth&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1000.0</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># edepth is None or missing</span>
+        <span class="k">pass</span>
+
+    <span class="n">sitechandict</span> <span class="o">=</span> <span class="n">_cast_float</span><span class="p">(</span><span class="n">sitechandict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hang&#39;</span><span class="p">,</span> <span class="s1">&#39;vang&#39;</span><span class="p">,</span> <span class="s1">&#39;edepth&#39;</span><span class="p">])</span>
+    <span class="n">sitechandict</span> <span class="o">=</span> <span class="n">_clean_str</span><span class="p">(</span><span class="n">sitechandict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">,</span> <span class="s1">&#39;chan&#39;</span><span class="p">])</span>
+    <span class="n">sitechandict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sitechandict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">sitechandict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2affiliation"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2affiliation">[docs]</a><span class="k">def</span> <span class="nf">sachdr2affiliation</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+    <span class="n">sac_affil</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;knetwk&#39;</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">)]</span>
+
+    <span class="n">affildict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_affil</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">affildict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">affildict</span> <span class="o">=</span> <span class="n">_clean_str</span><span class="p">(</span><span class="n">affildict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;sta&#39;</span><span class="p">])</span>
+
+    <span class="n">affildict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">affildict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">affildict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2instrument"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2instrument">[docs]</a><span class="k">def</span> <span class="nf">sachdr2instrument</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+    <span class="c1"># TODO: investigate hdr[&#39;resp0-9&#39;] values</span>
+    <span class="n">sac_instr</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;kinst&#39;</span><span class="p">,</span> <span class="s1">&#39;insname&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;iinst&#39;</span><span class="p">,</span> <span class="s1">&#39;instype&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="s1">&#39;samprate&#39;</span><span class="p">)]</span>
+
+    <span class="n">instrdict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_instr</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">instrdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># clean up</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">instrdict</span><span class="p">[</span><span class="s1">&#39;samprate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">instrdict</span><span class="p">[</span><span class="s1">&#39;samprate&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">instrdict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2origin"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2origin">[docs]</a><span class="k">def</span> <span class="nf">sachdr2origin</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a sac header dictionary, get a filled origin table dictionary.</span>
+<span class="sd">    A few things:</span>
+<span class="sd">    1) If sac reference time isn&#39;t event-based, origin time is unknown</span>
+<span class="sd">    2) magnitude is taken first from hdr[&#39;mag&#39;], hdr[&#39;imagtyp&#39;] if defined,</span>
+<span class="sd">       then replaced by hdr[&#39;user0&#39;],hdr[&#39;kuser0&#39;]</span>
+<span class="sd">    3) sac moment, duration, and user-defined magnitude headers aren&#39;t</span>
+<span class="sd">       put into the origin table</span>
+<span class="sd">    4) origin.auth is taken first from hdr[&#39;imagsrc&#39;], then replaced by</span>
+<span class="sd">       hdr[&#39;kuser1&#39;] if defined.  the imagsrc-&gt;auth translations are:</span>
+
+<span class="sd">     * INEIC -&gt; ISC:NEIC</span>
+<span class="sd">     * IPDE -&gt; PDE</span>
+<span class="sd">     * IISC -&gt; ISC</span>
+<span class="sd">     * IBRK -&gt; ISC:BERK</span>
+<span class="sd">     * IUSGS, ICALTECH, ILLNL, IEVLOC, IJSOP, IUSER, IUNKNOWN -&gt; unchanged</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># simple SAC translations</span>
+    <span class="n">sac_origin</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;evla&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s1">&#39;evlo&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s1">&#39;norid&#39;</span><span class="p">,</span> <span class="s1">&#39;orid&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s1">&#39;nevid&#39;</span><span class="p">,</span> <span class="s1">&#39;evid&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s1">&#39;ievreg&#39;</span><span class="p">,</span> <span class="s1">&#39;grn&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s1">&#39;evdp&#39;</span><span class="p">,</span> <span class="s1">&#39;depth&#39;</span><span class="p">)]</span>
+
+    <span class="n">origindict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_origin</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># depth</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1000.0</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># evdp is None or mising</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># etype translations</span>
+    <span class="n">edict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">37</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="mi">38</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">39</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">41</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span>
+             <span class="mi">43</span><span class="p">:</span> <span class="s1">&#39;ec&#39;</span><span class="p">,</span> <span class="mi">72</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">73</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">74</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span> <span class="mi">76</span><span class="p">:</span> <span class="s1">&#39;mb&#39;</span><span class="p">,</span>
+             <span class="mi">77</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">78</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">79</span><span class="p">:</span> <span class="s1">&#39;qt&#39;</span><span class="p">,</span> <span class="mi">80</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">81</span><span class="p">:</span> <span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="mi">82</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+             <span class="mi">83</span><span class="p">:</span> <span class="s1">&#39;mc&#39;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;etype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ievtype&#39;</span><span class="p">]]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># ievtyp is None, or not a key in edict</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># 1:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">get_sac_reftime</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;iztype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+            <span class="c1"># reference time is an origin time</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">o</span> <span class="k">if</span> <span class="p">(</span><span class="n">o</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">])</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+            <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">o</span>
+            <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;jdate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%j&#39;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># no trace.stats.sac, no iztype</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># 2: magnitude</span>
+    <span class="n">magdict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">52</span><span class="p">:</span> <span class="s1">&#39;mb&#39;</span><span class="p">,</span> <span class="mi">53</span><span class="p">:</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="mi">54</span><span class="p">:</span> <span class="s1">&#39;ml&#39;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="n">magdict</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;imagtyp&#39;</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="c1"># imagtyp is None or not a key in magdict</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># is kuser0 is a recognized magnitude type, overwrite mag</span>
+    <span class="c1"># XXX: this is a LANL wfdisc2sac thing</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">magtype</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;kuser0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">magtype</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">magdict</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">origindict</span><span class="p">[</span><span class="n">magtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;user0&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="c1"># kuser0 is None</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># 3: origin author</span>
+    <span class="n">authdict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">58</span><span class="p">:</span> <span class="s1">&#39;ISC:NEIC&#39;</span><span class="p">,</span> <span class="mi">61</span><span class="p">:</span> <span class="s1">&#39;PDE&#39;</span><span class="p">,</span> <span class="mi">62</span><span class="p">:</span> <span class="s1">&#39;ISC&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">:</span> <span class="s1">&#39;REB-ICD&#39;</span><span class="p">,</span>
+                <span class="mi">64</span><span class="p">:</span> <span class="s1">&#39;IUSGS&#39;</span><span class="p">,</span> <span class="mi">65</span><span class="p">:</span> <span class="s1">&#39;ISC:BERK&#39;</span><span class="p">,</span> <span class="mi">66</span><span class="p">:</span> <span class="s1">&#39;ICALTECH&#39;</span><span class="p">,</span> <span class="mi">67</span><span class="p">:</span> <span class="s1">&#39;ILLNL&#39;</span><span class="p">,</span>
+                <span class="mi">68</span><span class="p">:</span> <span class="s1">&#39;IEVLOC&#39;</span><span class="p">,</span> <span class="mi">69</span><span class="p">:</span> <span class="s1">&#39;IJSOP&#39;</span><span class="p">,</span> <span class="mi">70</span><span class="p">:</span> <span class="s1">&#39;IUSER&#39;</span><span class="p">,</span> <span class="mi">71</span><span class="p">:</span> <span class="s1">&#39;IUNKNOWN&#39;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;auth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">authdict</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;imagsrc&#39;</span><span class="p">]]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="c1"># imagsrc not in authdict (i.e. sac default value)</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># XXX: this is LANL wfdisc2sac thing.  maybe turn it off?</span>
+    <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kuser1&#39;</span><span class="p">):</span>
+        <span class="n">origindict</span><span class="p">[</span><span class="s1">&#39;auth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;kuser1&#39;</span><span class="p">]</span>
+
+    <span class="n">origindict</span> <span class="o">=</span> <span class="n">_cast_float</span><span class="p">(</span><span class="n">origindict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;depth&#39;</span><span class="p">])</span>
+    <span class="n">origindict</span> <span class="o">=</span> <span class="n">_cast_int</span><span class="p">(</span><span class="n">origindict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;evid&#39;</span><span class="p">,</span> <span class="s1">&#39;orid&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">origindict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2event"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2event">[docs]</a><span class="k">def</span> <span class="nf">sachdr2event</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+    <span class="n">sac_event</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;nevid&#39;</span><span class="p">,</span> <span class="s1">&#39;evid&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;kevnm&#39;</span><span class="p">,</span> <span class="s1">&#39;evname&#39;</span><span class="p">)]</span>
+
+    <span class="n">eventdict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_event</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">eventdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">eventdict</span> <span class="o">=</span> <span class="n">_cast_int</span><span class="p">(</span><span class="n">eventdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;evid&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">eventdict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2assoc"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2assoc">[docs]</a><span class="k">def</span> <span class="nf">sachdr2assoc</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">pickmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes a sac header dictionary, and produces a list of up to 10</span>
+<span class="sd">    Assoc instances. Header-&gt;phase mappings follow SAC2000, i.e.:</span>
+
+<span class="sd">    * t0: P</span>
+<span class="sd">    * t1: Pn</span>
+<span class="sd">    * t2: Pg</span>
+<span class="sd">    * t3: S</span>
+<span class="sd">    * t4: Sn</span>
+<span class="sd">    * t5: Sg</span>
+<span class="sd">    * t6: Lg</span>
+<span class="sd">    * t7: LR</span>
+<span class="sd">    * t8: Rg</span>
+<span class="sd">    * t9: pP</span>
+
+<span class="sd">    An alternate mapping for some or all picks can be supplied, however,</span>
+<span class="sd">    as a dictionary of strings in the above form.</span>
+
+<span class="sd">    Note: arid values will not be filled in, so do:</span>
+<span class="sd">    &gt;&gt;&gt; for assoc in kbio.tables[&#39;assoc&#39;]:</span>
+<span class="sd">            assoc.arid = lastarid+1</span>
+<span class="sd">            lastarid += 1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pick2phase</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;t1&#39;</span><span class="p">:</span> <span class="s1">&#39;Pn&#39;</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span><span class="p">:</span> <span class="s1">&#39;Pg&#39;</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span><span class="p">:</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;t4&#39;</span><span class="p">:</span> <span class="s1">&#39;Sn&#39;</span><span class="p">,</span> <span class="s1">&#39;t5&#39;</span><span class="p">:</span> <span class="s1">&#39;Sg&#39;</span><span class="p">,</span> <span class="s1">&#39;t6&#39;</span><span class="p">:</span> <span class="s1">&#39;Lg&#39;</span><span class="p">,</span> <span class="s1">&#39;t7&#39;</span><span class="p">:</span> <span class="s1">&#39;LR&#39;</span><span class="p">,</span> <span class="s1">&#39;t8&#39;</span><span class="p">:</span> <span class="s1">&#39;Rg&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;t9&#39;</span><span class="p">:</span> <span class="s1">&#39;pP&#39;</span><span class="p">}</span>
+
+    <span class="c1"># overwrite defaults with supplied map</span>
+    <span class="k">if</span> <span class="n">pickmap</span><span class="p">:</span>
+        <span class="n">pick2phase</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pickmap</span><span class="p">)</span>
+
+    <span class="c1"># geographic relations</span>
+    <span class="c1"># obspy.read tries to calculate these values if lcalca is True and needed</span>
+    <span class="c1"># header info is there, so we only need to try to if lcalca is False.</span>
+    <span class="c1"># XXX: I just calculate it if no values are currently filled in.</span>
+    <span class="n">sac_assoc</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;az&#39;</span><span class="p">,</span> <span class="s1">&#39;esaz&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;seaz&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;gcarc&#39;</span><span class="p">,</span> <span class="s1">&#39;delta&#39;</span><span class="p">)]</span>
+
+    <span class="n">assocdict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hdr</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sac_assoc</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hdr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">assocdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">hdr</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># overwrite if any are None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">assocdict</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">locations2degrees</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;stla&#39;</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;stlo&#39;</span><span class="p">],</span>
+                                           <span class="n">header</span><span class="p">[</span><span class="s1">&#39;evla&#39;</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;evlo&#39;</span><span class="p">])</span>
+            <span class="n">m</span><span class="p">,</span> <span class="n">seaz</span><span class="p">,</span> <span class="n">esaz</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">gps2DistAzimuth</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;stla&#39;</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;stlo&#39;</span><span class="p">],</span>
+                                                 <span class="n">header</span><span class="p">[</span><span class="s1">&#39;evla&#39;</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;evlo&#39;</span><span class="p">])</span>
+            <span class="n">assocdict</span><span class="p">[</span><span class="s1">&#39;esaz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">esaz</span>
+            <span class="n">assocdict</span><span class="p">[</span><span class="s1">&#39;seaz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seaz</span>
+            <span class="n">assocdict</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="c1"># some sac header values are None</span>
+            <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">assocdict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;kstnm&#39;</span><span class="p">]</span>
+
+    <span class="n">orid</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;norid&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assocdict</span><span class="p">[</span><span class="s1">&#39;orid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">orid</span> <span class="k">if</span> <span class="n">orid</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;norid&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># now, do the phase arrival mappings</span>
+    <span class="c1"># for each pick in hdr, make a separate dictionary containing assocdict plus</span>
+    <span class="c1"># the new phase info.</span>
+    <span class="n">assocs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">pick2phase</span><span class="p">:</span>
+        <span class="n">kkey</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span> <span class="o">+</span> <span class="n">key</span>
+        <span class="c1"># if there&#39;s a value in t[0-9]</span>
+        <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># if the phase name kt[0-9] is null</span>
+            <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="n">kkey</span><span class="p">]</span> <span class="o">==</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">kkey</span><span class="p">]:</span>
+                <span class="c1"># take it from the map</span>
+                <span class="n">iassoc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;phase&#39;</span><span class="p">:</span> <span class="n">pick2phase</span><span class="p">[</span><span class="n">key</span><span class="p">]}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># take it directly</span>
+                <span class="n">iassoc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;phase&#39;</span><span class="p">:</span> <span class="n">header</span><span class="p">[</span><span class="n">kkey</span><span class="p">]}</span>
+
+            <span class="n">iassoc</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">assocdict</span><span class="p">)</span>
+            <span class="n">assocs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iassoc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">assocs</span></div>
+
+
+<div class="viewcode-block" id="sachdr2arrival"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2arrival">[docs]</a><span class="k">def</span> <span class="nf">sachdr2arrival</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">pickmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Similar to sachdr2assoc, but produces a list of up to 10 Arrival</span>
+<span class="sd">    dictionaries.  Same header-&gt;phase mapping applies, unless otherwise stated.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># puts t[0-9] times into arrival.time if they&#39;re not null</span>
+    <span class="c1"># puts corresponding kt[0-9] phase name into arrival.iphase</span>
+    <span class="c1"># if a kt[0-9] phase name is null and its t[0-9] values isn&#39;t,</span>
+    <span class="c1"># phase names are pulled from the pick2phase dictionary</span>
+    <span class="n">pick2phase</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;t1&#39;</span><span class="p">:</span> <span class="s1">&#39;Pn&#39;</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span><span class="p">:</span> <span class="s1">&#39;Pg&#39;</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span><span class="p">:</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;t4&#39;</span><span class="p">:</span> <span class="s1">&#39;Sn&#39;</span><span class="p">,</span> <span class="s1">&#39;t5&#39;</span><span class="p">:</span> <span class="s1">&#39;Sg&#39;</span><span class="p">,</span> <span class="s1">&#39;t6&#39;</span><span class="p">:</span> <span class="s1">&#39;Lg&#39;</span><span class="p">,</span> <span class="s1">&#39;t7&#39;</span><span class="p">:</span> <span class="s1">&#39;LR&#39;</span><span class="p">,</span> <span class="s1">&#39;t8&#39;</span><span class="p">:</span> <span class="s1">&#39;Rg&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;t9&#39;</span><span class="p">:</span> <span class="s1">&#39;pP&#39;</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">pickmap</span><span class="p">:</span>
+        <span class="n">pick2phase</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pickmap</span><span class="p">)</span>
+
+    <span class="c1"># simple translations</span>
+    <span class="n">arrivaldict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;kstnm&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">arrivaldict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;kstnm&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">arrivaldict</span><span class="p">[</span><span class="s1">&#39;chan&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">]</span>
+
+    <span class="c1"># phases and arrival times</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">get_sac_reftime</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">arrivals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">pick2phase</span><span class="p">:</span>
+        <span class="n">kkey</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span> <span class="o">+</span> <span class="n">key</span>
+        <span class="c1"># if there&#39;s a value in t[0-9]</span>
+        <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># TODO: This seems broken...t isn&#39;t defined yet</span>
+            <span class="n">itime</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">iarrival</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">itime</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+                        <span class="s1">&#39;jdate&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">itime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%j&#39;</span><span class="p">))}</span>
+            <span class="c1"># if the phase name kt[0-9] is null</span>
+            <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="n">kkey</span><span class="p">]</span> <span class="o">==</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="n">kkey</span><span class="p">]:</span>
+                <span class="c1"># take it from the pick2phase map</span>
+                <span class="n">iarrival</span><span class="p">[</span><span class="s1">&#39;iphase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pick2phase</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># take it directly</span>
+                <span class="n">iarrival</span><span class="p">[</span><span class="s1">&#39;iphase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="n">kkey</span><span class="p">]</span>
+
+            <span class="n">iarrival</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">arrivaldict</span><span class="p">)</span>
+            <span class="c1"># TODO: wtf is iassoc??</span>
+            <span class="n">arrivals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iassoc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">arrivals</span></div>
+
+
+<div class="viewcode-block" id="sachdr2wfdisc"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2wfdisc">[docs]</a><span class="k">def</span> <span class="nf">sachdr2wfdisc</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Produce wfdisc kbcore table instance from sac header dictionary.</span>
+<span class="sd">    Clearly this will be a skeleton instance, as the all-important &#39;dir&#39; and</span>
+<span class="sd">    &#39;dfile&#39; and &#39;datatype&#39; must be filled in later.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">get_sac_reftime</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">starttime</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="o">!=</span> <span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">])</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">endtime</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="n">e</span>
+
+    <span class="n">wfdict</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;npts&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">starttime</span><span class="o">.</span><span class="n">timestamp</span>
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;endtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">endtime</span><span class="o">.</span><span class="n">timestamp</span>
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;jdate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">starttime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%j&#39;</span><span class="p">))</span>
+
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;samprate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]))</span>
+
+    <span class="n">kstnm</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kstnm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kstnm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;kstnm&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;sta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kstnm</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="n">kcmpnm</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kcmpnm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;kcmpnm&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;chan&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kcmpnm</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;calib&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">nwfid</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nwfid&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwfid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SACDEFAULT</span><span class="p">[</span><span class="s1">&#39;nwfid&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;wfid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwfid</span>
+
+    <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;foff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">632</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">:</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;f4&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wfdict</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;t4&#39;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">wfdict</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="sachdr2tables"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sachdr2tables">[docs]</a><span class="k">def</span> <span class="nf">sachdr2tables</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">tables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrape SAC header dictionary into database table dictionaries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    header : dict</span>
+<span class="sd">        SAC header</span>
+<span class="sd">    tables : list/tuple of strings, optional</span>
+<span class="sd">        Table name strings to return.</span>
+<span class="sd">        Default, [&#39;affiliation&#39;, &#39;arrival&#39;, &#39;assoc&#39;, &#39;event&#39;, &#39;instrument&#39;,</span>
+<span class="sd">        &#39;origin&#39;, &#39;site&#39;, &#39;sitechan&#39;, &#39;wfdisc&#39;]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of lists of table dictionaries.  If only default</span>
+<span class="sd">        values are found for a table, it is omitted.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Some things must be checked or filled in before adding to a database:</span>
+<span class="sd">    - affiliation.time, endtime</span>
+<span class="sd">    - arrival.arid</span>
+<span class="sd">    - assoc.orid, arid</span>
+<span class="sd">    - event.prefor, evid</span>
+<span class="sd">    - instrument.inid, dir, dfile, rsptype</span>
+<span class="sd">    - site.ondate</span>
+<span class="sd">    - sitechan.ondate, chanid</span>
+<span class="sd">    - wfdisc.dir, dfile, foff, datetype, wfid</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;affiliation&#39;</span><span class="p">:</span> <span class="n">sachdr2affiliation</span><span class="p">,</span>
+           <span class="s1">&#39;arrival&#39;</span><span class="p">:</span> <span class="n">sachdr2arrival</span><span class="p">,</span>
+           <span class="s1">&#39;assoc&#39;</span><span class="p">:</span> <span class="n">sachdr2assoc</span><span class="p">,</span>
+           <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">sachdr2event</span><span class="p">,</span>
+           <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">sachdr2instrument</span><span class="p">,</span>
+           <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">sachdr2origin</span><span class="p">,</span>
+           <span class="s1">&#39;site&#39;</span><span class="p">:</span> <span class="n">sachdr2site</span><span class="p">,</span>
+           <span class="s1">&#39;sitechan&#39;</span><span class="p">:</span> <span class="n">sachdr2sitechan</span><span class="p">,</span>
+           <span class="s1">&#39;wfdisc&#39;</span><span class="p">:</span> <span class="n">sachdr2wfdisc</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fns</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1">#     for key in header:</span>
+<span class="c1">#         if key.startswith(&#39;k&#39;):</span>
+<span class="c1">#             try:</span>
+<span class="c1">#                 header[key] = header[key].strip()[:6]</span>
+
+    <span class="c1"># t = AttribDict()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">itab</span> <span class="o">=</span> <span class="n">fns</span><span class="p">[</span><span class="n">table</span><span class="p">](</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">itab</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">itab</span><span class="p">:</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="n">itab</span>
+
+    <span class="c1"># t[table] doesn&#39;t exist if table&#39;s function didn&#39;t return anything</span>
+
+    <span class="k">return</span> <span class="n">t</span></div>
+
+
+<span class="c1"># ----------------- CONVERT TABLES TO SAC HEADER DICTIONARY ---------------#</span>
+<span class="c1"># TODO: make these functions able to gracefully handle None values as inputs</span>
+<div class="viewcode-block" id="site2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.site2sachdr">[docs]</a><span class="k">def</span> <span class="nf">site2sachdr</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Accepts a fielded site table row and returns a dictionary of corresponding</span>
+<span class="sd">    sac header field/value pairs.</span>
+
+<span class="sd">    June 13, 2016 - added deast/dnorth output to SAC user7/8 header fields</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keymap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;stel&#39;</span><span class="p">:</span> <span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="s1">&#39;stal&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;stlo&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user7&#39;</span><span class="p">:</span> <span class="s1">&#39;deast&#39;</span><span class="p">,</span> <span class="s1">&#39;user8&#39;</span><span class="p">:</span> <span class="s1">&#39;dnorth&#39;</span><span class="p">}</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">_buildhdr</span><span class="p">(</span><span class="n">keymap</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdr</span></div>
+
+
+<div class="viewcode-block" id="sitechan2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.sitechan2sachdr">[docs]</a><span class="k">def</span> <span class="nf">sitechan2sachdr</span><span class="p">(</span><span class="n">sc</span><span class="p">):</span>
+    <span class="n">keymap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;cmpaz&#39;</span><span class="p">:</span> <span class="s1">&#39;hang&#39;</span><span class="p">,</span> <span class="s1">&#39;cmpinc&#39;</span><span class="p">:</span> <span class="s1">&#39;vang&#39;</span><span class="p">}</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">_buildhdr</span><span class="p">(</span><span class="n">keymap</span><span class="p">,</span> <span class="n">sc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdr</span></div>
+
+
+<div class="viewcode-block" id="affiliation2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.affiliation2sachdr">[docs]</a><span class="k">def</span> <span class="nf">affiliation2sachdr</span><span class="p">(</span><span class="n">af</span><span class="p">):</span>
+    <span class="n">keymap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="s1">&#39;net&#39;</span><span class="p">}</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">_buildhdr</span><span class="p">(</span><span class="n">keymap</span><span class="p">,</span> <span class="n">af</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdr</span></div>
+
+
+<div class="viewcode-block" id="instrument2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.instrument2sachdr">[docs]</a><span class="k">def</span> <span class="nf">instrument2sachdr</span><span class="p">(</span><span class="n">ins</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="origin2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.origin2sachdr">[docs]</a><span class="k">def</span> <span class="nf">origin2sachdr</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Accepts a fielded origin table record and produces a dictionary of</span>
+<span class="sd">    corresponding sac header field/value pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keymap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;evdp&#39;</span><span class="p">:</span> <span class="s1">&#39;depth&#39;</span><span class="p">,</span> <span class="s1">&#39;evla&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;evlo&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;kuser1&#39;</span><span class="p">:</span> <span class="s1">&#39;auth&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;nevid&#39;</span><span class="p">:</span> <span class="s1">&#39;evid&#39;</span><span class="p">,</span> <span class="s1">&#39;norid&#39;</span><span class="p">:</span> <span class="s1">&#39;orid&#39;</span><span class="p">,</span> <span class="s1">&#39;user0&#39;</span><span class="p">:</span> <span class="s1">&#39;mb&#39;</span><span class="p">}</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">_buildhdr</span><span class="p">(</span><span class="n">keymap</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdr</span></div>
+
+
+<div class="viewcode-block" id="event2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.event2sachdr">[docs]</a><span class="k">def</span> <span class="nf">event2sachdr</span><span class="p">(</span><span class="n">evt</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="assoc2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.assoc2sachdr">[docs]</a><span class="k">def</span> <span class="nf">assoc2sachdr</span><span class="p">(</span><span class="n">asc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="arrival2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.arrival2sachdr">[docs]</a><span class="k">def</span> <span class="nf">arrival2sachdr</span><span class="p">(</span><span class="n">ar</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="wfdisc2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.wfdisc2sachdr">[docs]</a><span class="k">def</span> <span class="nf">wfdisc2sachdr</span><span class="p">(</span><span class="n">wf</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<span class="c1"># functions that accept a table, return a dictionary of sac header values</span>
+<span class="c1"># the order of this dictionary matters</span>
+<span class="n">KB2SAC</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;site&#39;</span><span class="p">:</span> <span class="n">site2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;sitechan&#39;</span><span class="p">:</span> <span class="n">sitechan2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;wfdisc&#39;</span><span class="p">:</span> <span class="n">wfdisc2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;affiliation&#39;</span><span class="p">:</span> <span class="n">affiliation2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">instrument2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">origin2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">event2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;assoc&#39;</span><span class="p">:</span> <span class="n">assoc2sachdr</span><span class="p">,</span>
+                      <span class="s1">&#39;arrival&#39;</span><span class="p">:</span> <span class="n">arrival2sachdr</span><span class="p">})</span>
+
+
+<div class="viewcode-block" id="tables2sachdr"><a class="viewcode-back" href="../../../apidocs/pisces.io.sac.html#pisces.io.sac.tables2sachdr">[docs]</a><span class="k">def</span> <span class="nf">tables2sachdr</span><span class="p">(</span><span class="n">tables</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a sac header dictionary, including default values, from</span>
+<span class="sd">    current table instances.  SAC reference time is, in order of availability,</span>
+<span class="sd">    origin time (origin.time), first sample time (wfdisc.time).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">SACDEFAULT</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">tabfun</span> <span class="ow">in</span> <span class="n">KB2SAC</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">hdr</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tabfun</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="kc">None</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">hdr</span></div>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

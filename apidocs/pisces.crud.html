@@ -1,0 +1,697 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pisces.crud &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'apidocs/pisces.crud';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pisces.request" href="pisces.request.html" />
+    <link rel="prev" title="pisces.client" href="pisces.client.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="pisces.html">pisces</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/apidocs/pisces.crud.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>pisces.crud</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#glossary">Glossary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.drop_tables"><code class="docutils literal notranslate"><span class="pre">drop_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.init_tables"><code class="docutils literal notranslate"><span class="pre">init_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.load_tables"><code class="docutils literal notranslate"><span class="pre">load_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.make_table_names"><code class="docutils literal notranslate"><span class="pre">make_table_names()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.make_tables"><code class="docutils literal notranslate"><span class="pre">make_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.split_table_names"><code class="docutils literal notranslate"><span class="pre">split_table_names()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-pisces.crud">
+<span id="pisces-crud"></span><h1>pisces.crud<a class="headerlink" href="#module-pisces.crud" title="Permalink to this heading">#</a></h1>
+<p>Module containing functions for in-memory and in-database table creation and
+in-database table dropping.</p>
+<p>Supports:
+* table schema/accounts/owners/namespaces. SQLAlchemy calls them “schema.”
+* prefixed table names for standard table prototypes
+* loading arbitrary tables from existing database
+* creating standard prototype tables</p>
+<p>Supported actions are:
+* creating in-memory canonical tables</p>
+<section id="glossary">
+<h2>Glossary<a class="headerlink" href="#glossary" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>table : canonical table name string, like “site” or “origin”</p></li>
+<li><p>tablename : the fully-qualified table name string (includes any owner, prefix)</p></li>
+<li><p>mapped table : a SQLAlchemy ORM table class</p></li>
+<li><p>table instance / row : an instance of a mapped table</p></li>
+</ul>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.drop_tables">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">drop_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#drop_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.drop_tables" title="Permalink to this definition">#</a></dt>
+<dd><p>Drop table classes in a database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.Session instance</span></dt><dd></dd>
+<dt><strong>tables</strong><span class="classifier">mapped table classes</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.init_tables">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">init_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#init_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.init_tables" title="Permalink to this definition">#</a></dt>
+<dd><p>Create table classes in a database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.Session instance</span></dt><dd></dd>
+<dt><strong>tables</strong><span class="classifier">mapped table classes</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.load_tables">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">load_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tables</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#load_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.load_tables" title="Permalink to this definition">#</a></dt>
+<dd><p>Load existing database tables into mapped SQLAlchemy table classes.</p>
+<p>This function is not recommended.  Instead, please subclass from an
+existing abstract table in the schema, or use the SQLAlchemy ORM to create
+a class for your table.</p>
+<dl class="simple">
+<dt>session<span class="classifier">sqlalchemy.orm.Session</span></dt><dd><p>Session connected to the target database.</p>
+</dd>
+<dt>tables<span class="classifier">str</span></dt><dd><p>Desired table names.  Names must be part of the schema. If omitted, a
+schema must be specified, and all core tables for the schema are
+returned.</p>
+</dd>
+<dt>schema<span class="classifier">str  {‘css3’, ‘kbcore’}  Default, ‘css3’</span></dt><dd><p>Which set of core tables are being used.  This is used to associate
+column names to known Pisces column definitions, so that text file I/O
+of tables can be supported for a loaded table.</p>
+</dd>
+<dt>prefix<span class="classifier">str, optional</span></dt><dd><p>All table names will have the provided prefix.
+e.g. “<a href="#id1"><span class="problematic" id="id2">TA_</span></a>” for “TA_origin”, “TA_wfdisc”, etc.</p>
+</dd>
+<dt>owner<span class="classifier">str, optional</span></dt><dd><p>e.g. “myuser” for “myuser.origin”, “myuser.wfdisc”, etc.  If omitted, 
+the database default owner/account will be used.</p>
+</dd>
+<dt>primary_keys<span class="classifier">dict, optional</span></dt><dd><p>A mapping of table names to their primary keys of the form,
+{‘tablename1’: [‘primary_key1’, ‘primary_key2’], …}
+The SQLAlchemy ORM can only reflect/load tables if they have a primary
+key. If a table is a view or has no primary key, these must be
+specified explicitly.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>Corresponding dict of mapped SQLAlchemy table classes, keyed by
+canonical name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p># load standard tables in ‘myaccount’ table space
+&gt;&gt;&gt; tables = load_tables(session, ‘site’, ‘sitechan’, ‘wfisc’,
+…                      schema=’kbcore’, owner=’myaccount’)</p>
+<p># load a standard table that has no primary key set
+&gt;&gt;&gt; tables = load_tables(session, ‘site’, 
+…                      primary_keys={‘site’, [‘sta’, ‘ondate’]})</p>
+<p># load all standard css3 tables in the default account
+&gt;&gt;&gt; tables = load_tables(session, schema=’css3’)</p>
+<p># load a table that is outside of the schema
+# the table needs to have a primary key defined
+# this will try to use column info definitions known to Pisces
+&gt;&gt;&gt; tables = load_tables(session, ‘ccwfdisc’, owner=’myaccount’)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.make_table_names">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">make_table_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tables</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#make_table_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.make_table_names" title="Permalink to this definition">#</a></dt>
+<dd><p>Get table name strings in the format: {owner.}{prefix}tablename</p>
+<p>This function does no checking that supplied table names are in the
+indicated schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tables</strong><span class="classifier">str</span></dt><dd><p>Desired table names.  If omitted, a schema must be specified, and all
+core tables for the schema are used.</p>
+</dd>
+<dt><strong>schema</strong><span class="classifier">str  {‘css3’, ‘kbcore’}</span></dt><dd><p>Which set of core tables are being used. If omitted, one or more tables
+must be specified.</p>
+</dd>
+<dt><strong>prefix</strong><span class="classifier">str</span></dt><dd><p>All table names will have the provided prefix.
+e.g. “<a href="#id3"><span class="problematic" id="id4">TA_</span></a>” for “TA_origin”, “TA_wfdisc”, etc.</p>
+</dd>
+<dt><strong>owner</strong><span class="classifier">str</span></dt><dd><p>e.g. “myuser” for “myuser.origin”, “myuser.wfdisc”, etc.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>The desired formatted table name strings, keyed by canonical name.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ValueError</strong><span class="classifier">unknown schema specified, or tablenames omitted and schema</span></dt><dd><p>not specified</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_table_names</span><span class="p">(</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="s1">&#39;global&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;TA_&#39;</span><span class="p">)</span>
+<span class="go">{&#39;site&#39;: &#39;global.TA_site&#39;, &#39;origin&#39;: &#39;global.TA_origin&#39;}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_table_names</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="s1">&#39;css3&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;TA_&#39;</span><span class="p">)</span>
+<span class="go">{&#39;affiliation&#39;: &#39;TA_affiliation&#39;, &#39;assoc&#39;: &#39;TA_assoc&#39;, ...}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.make_tables">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">make_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tables</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#make_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.make_tables" title="Permalink to this definition">#</a></dt>
+<dd><p>Create mapped SQLAlchemy ORM table classes.</p>
+<p>If no owner or prefix is indicated, the returned tables are the same as
+those in pisces.tables.&lt;schema&gt; .  The user is encouraged to import these
+classes directly. If an owner is indicated, returned tables inhererit from
+the same SQLA declarative base.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tables</strong><span class="classifier">str</span></dt><dd><p>Desired table names.  Table name must be known to the schema. 
+If omitted, a schema must be specified, and all core tables for the
+schema are returned.</p>
+</dd>
+<dt><strong>schema</strong><span class="classifier">str  (“css3” or “kbcore”)</span></dt><dd><p>Which set of core tables are being used.  Required.</p>
+</dd>
+<dt><strong>prefix</strong><span class="classifier">str</span></dt><dd><p>All table names will have the provided prefix.
+e.g. “<a href="#id5"><span class="problematic" id="id6">TA_</span></a>” for “TA_origin”, “TA_wfdisc”, etc.</p>
+</dd>
+<dt><strong>owner</strong><span class="classifier">str</span></dt><dd><p>e.g. “myuser” for “myuser.origin”, “myuser.wfdisc”, etc.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Corresponding dict of mapped SQLAlchemy table classes, keyed by
+canonical name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># makes a dict of CSS3.0 &#39;TA_site&#39; and &#39;TA_sitechan&#39; mapped classes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tables</span> <span class="o">=</span> <span class="n">make_tables</span><span class="p">(</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;sitechan&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="s1">&#39;css3&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;TA_&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># make a dict of all standard kbcore tables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tables</span> <span class="o">=</span> <span class="n">make_tables</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="s1">&#39;kbcore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># make a dict of some tables from the &#39;myowner&#39; account</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tables</span> <span class="o">=</span> <span class="n">make_tables</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="s1">&#39;kbcore&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="s1">&#39;myowner&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.crud.split_table_names">
+<span class="sig-prename descclassname"><span class="pre">pisces.crud.</span></span><span class="sig-name descname"><span class="pre">split_table_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tablenames</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/crud.html#split_table_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.crud.split_table_names" title="Permalink to this definition">#</a></dt>
+<dd><p>Splits full table names into a (owner, prefix, tablename) 3-tuples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tablenames</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>schema</strong><span class="classifier">str {‘css3’, ‘kbcore’} Default ‘css3’.</span></dt><dd></dd>
+<dt><strong>split_prefix</strong><span class="classifier">bool, default True</span></dt><dd><p>If True, return (owner, prefix, tablename) tuples,
+otherwise return (owner, tablename) tuples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list</dt><dd><p>Corresponding list of (owner, tablename) or (owner, prefix, tablename)
+tuples strings. Empty owner or prefix are ‘’.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tablenames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;global.site&#39;</span><span class="p">,</span> <span class="s1">&#39;global.sitechan&#39;</span><span class="p">,</span> <span class="s1">&#39;TA_site&#39;</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="s1">&#39;different_acct.my_origin&#39;</span><span class="p">,</span> <span class="s1">&#39;myfriend.discrim_last&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">split_table_names</span><span class="p">(</span><span class="o">*</span><span class="n">tablenames</span><span class="p">)</span>
+<span class="go">[(&#39;global&#39;, &#39;&#39;, &#39;site&#39;), (&#39;global&#39;, &#39;&#39;, &#39;sitechan&#39;), (&#39;&#39;, &#39;TA_&#39;, &#39;site&#39;),</span>
+<span class="go">(&#39;different_acct&#39;, &#39;my_&#39;, &#39;origin&#39;), (&#39;myfriend&#39;, &#39;&#39;, &#39;discrim_last&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pisces.client.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pisces.client</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pisces.request.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pisces.request</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#glossary">Glossary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.drop_tables"><code class="docutils literal notranslate"><span class="pre">drop_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.init_tables"><code class="docutils literal notranslate"><span class="pre">init_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.load_tables"><code class="docutils literal notranslate"><span class="pre">load_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.make_table_names"><code class="docutils literal notranslate"><span class="pre">make_table_names()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.make_tables"><code class="docutils literal notranslate"><span class="pre">make_tables()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.crud.split_table_names"><code class="docutils literal notranslate"><span class="pre">split_table_names()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

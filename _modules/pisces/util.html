@@ -1,0 +1,1131 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pisces.util &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pisces/util';</script>
+    <link rel="icon" href="../../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for pisces.util</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Common Pisces utility functions.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="k">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">ProgrammingError</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="kn">import</span> <span class="n">UnmappedInstanceError</span>
+
+<span class="kn">import</span> <span class="nn">obspy.geodetics</span> <span class="k">as</span> <span class="nn">geod</span>
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">AttribDict</span>
+<span class="kn">from</span> <span class="nn">obspy.taup</span> <span class="kn">import</span> <span class="n">TauPyModel</span>
+
+<span class="kn">from</span> <span class="nn">pisces.schema.util</span> <span class="kn">import</span> <span class="n">PiscesMeta</span>
+
+
+<div class="viewcode-block" id="deprecated"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.deprecated">[docs]</a><span class="k">def</span> <span class="nf">deprecated</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flags a method as deprecated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    instructions : str</span>
+<span class="sd">        A human-friendly string of instructions, such as:</span>
+<span class="sd">        &#39;Please migrate to add_proxy() ASAP.&#39;</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    https://gist.github.com/kgriffs/8202106</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;This is a decorator which can be used to mark functions</span>
+<span class="sd">        as deprecated. It will result in a warning being emitted</span>
+<span class="sd">        when the function is used.&#39;&#39;&#39;</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Call to deprecated function </span><span class="si">{}</span><span class="s1">. </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">instructions</span><span class="p">)</span>
+
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span>
+
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn_explicit</span><span class="p">(</span><span class="n">message</span><span class="p">,</span>
+                                   <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+                                   <span class="n">filename</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="p">),</span>
+                                   <span class="n">lineno</span><span class="o">=</span><span class="n">frame</span><span class="o">.</span><span class="n">f_lineno</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+<span class="n">TURNOFFWARNINGSMSG</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Warnings can be turned off with:</span>
+<span class="s2">import warnings</span>
+<span class="s2">warnings.filterwarnings(&#39;ignore&#39;, category=DeprecationWarning</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="db_connect"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.db_connect">[docs]</a><span class="k">def</span> <span class="nf">db_connect</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connect to your database.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    backend : string</span>
+<span class="sd">        One of the SQLAlchemy connection strings from</span>
+<span class="sd">        http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html#database-urls</span>
+<span class="sd">    user : string, optional</span>
+<span class="sd">        Not required for sqlite.</span>
+<span class="sd">    passwd : string, optional</span>
+<span class="sd">        Not needed for sqlite. Prompted if needed and not provided.</span>
+<span class="sd">    server : string, optional</span>
+<span class="sd">        Database host server.</span>
+<span class="sd">    port : string or integer, optional</span>
+<span class="sd">        Port on remote server.</span>
+<span class="sd">    instance : string, optional</span>
+<span class="sd">        The database instance.  For sqlite, this is the file name.</span>
+<span class="sd">    conn : string, optional</span>
+<span class="sd">        A fully-formed SQLAlchemy style connection string.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    session : bound SQLAlchemy Session instance</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    1. Connect to a local sqlite database file:</span>
+
+<span class="sd">    &gt;&gt;&gt; meta, session = db_connect(conn=&#39;sqlite:///mydb.sqlite&#39;)</span>
+<span class="sd">    #or</span>
+<span class="sd">    &gt;&gt;&gt; meta, session = db_connect(backend=&#39;sqlite&#39;, instance=&#39;mydb.sqlite&#39;)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For connection string format, see:</span>
+<span class="sd">    http://docs.sqlalchemy.org/en/rel_0_8/core/engines.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#TODO: take advantage of sqlalchemy.engine.url.URL</span>
+    <span class="c1">#XXX: is not protected against using args and kwargs</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;conn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conn&#39;</span><span class="p">):</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conn&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend&#39;</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">psswd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;passwd&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="s1">&#39;sqlite&#39;</span><span class="p">:</span>
+            <span class="n">userpsswd</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">psswd</span><span class="p">:</span>
+                <span class="n">psswd</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter password for </span><span class="si">{0}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="p">))</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">psswd</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter username for given password: &quot;</span><span class="p">)</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">psswd</span><span class="p">:</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">user</span><span class="p">,</span> <span class="n">psswd</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">userpsswd</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span>
+
+        <span class="k">if</span> <span class="n">server</span><span class="p">:</span>
+            <span class="n">serverport</span> <span class="o">=</span> <span class="s1">&#39;@&#39;</span> <span class="o">+</span> <span class="n">server</span>
+            <span class="k">if</span> <span class="n">port</span><span class="p">:</span>
+                <span class="n">serverport</span> <span class="o">+=</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">serverport</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">://</span><span class="si">{1}{2}</span><span class="s2">/</span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">userpsswd</span><span class="p">,</span> <span class="n">serverport</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">session</span></div>
+
+<span class="c1"># TODO: get rid of two different ways to connect to databases</span>
+<div class="viewcode-block" id="url_connect"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.url_connect">[docs]</a><span class="k">def</span> <span class="nf">url_connect</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connect to a database using an RFC-1738 compliant URL, like sqlalchemy&#39;s</span>
+<span class="sd">    create_engine, prompting for a password if a username is supplied.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url : string</span>
+<span class="sd">        A fully-formed SQLAlchemy style connection string.</span>
+<span class="sd">        See http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    session : bound SQLAlchemy Session instance</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    SQLite database file, local:</span>
+<span class="sd">    &gt;&gt;&gt; url_connect(&#39;sqlite:///local/path/to/mydb.sqlite&#39;)</span>
+
+<span class="sd">    SQLite database file, full path:</span>
+<span class="sd">    &gt;&gt;&gt; url_connect(&#39;sqlite:////full/path/to/mydb.sqlite&#39;)</span>
+
+<span class="sd">    Remote Oracle, OS-authenticated (no user or password needs to be specified)</span>
+<span class="sd">    &gt;&gt;&gt; url_connect(&#39;oracle://dbserver.lanl.gov:8080/mydb&#39;)</span>
+
+<span class="sd">    Remote Oracle, password-authenticated (specify user, prompted for password)</span>
+<span class="sd">    &gt;&gt;&gt; url_connect(&#39;oracle://scott@dbserver.lanl.gov:8080/mydb&#39;)</span>
+<span class="sd">    Enter password for scott:</span>
+
+<span class="sd">    Remote Oracle, password-authenticated (password specified)</span>
+<span class="sd">    &gt;&gt;&gt; url_connect(&#39;oracle://scott:tiger@dbserver.lanl.gov:8080/mydb&#39;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">this_url</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">make_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">this_url</span><span class="o">.</span><span class="n">username</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">this_url</span><span class="o">.</span><span class="n">password</span><span class="p">:</span>
+        <span class="n">this_url</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter password for </span><span class="si">{0}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">this_url</span><span class="o">.</span><span class="n">username</span><span class="p">))</span>
+
+    <span class="n">e</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">this_url</span><span class="p">)</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">session</span></div>
+
+<span class="c1"># TODO: rename this to &quot;load_table&quot;, and make it work on a single table</span>
+<div class="viewcode-block" id="get_tables"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.get_tables">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;get_tables is deprecated. It will be load_tables in pisces.crud in next version. &#39;</span> <span class="o">+</span> <span class="n">TURNOFFWARNINGSMSG</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">fulltablenames</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">primary_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflect/load an arbitrary database table as a mapped class.</span>
+
+<span class="sd">    This is a shortcut for SQLAlchemy&#39;s declarative mapping using __table__.</span>
+<span class="sd">    See http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html#using-a-hybrid-approach-with-table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bind : sqlalchemy.engine.base.Engine instance</span>
+<span class="sd">        Engine pointing to the target database.</span>
+<span class="sd">    fulltables : list of strings</span>
+<span class="sd">        Of the form [&#39;owner1.tablename1&#39;, &#39;owner2.tablename2&#39;, ...]</span>
+<span class="sd">        Leave out &#39;owner.&#39; if database doesn&#39;t use owners (sqlite, etc...)</span>
+<span class="sd">    metadata : sqlalchemy.MetaData, optional</span>
+<span class="sd">        MetaData into which reflected Tables go. If not supplied, a new one</span>
+<span class="sd">        is created, accessible from MyTable.metadata on one of the loaded</span>
+<span class="sd">        tables.</span>
+<span class="sd">    primary_keys : dict, optional</span>
+<span class="sd">        Tablename, primary key list pairs of the form,</span>
+<span class="sd">        {&#39;owner1.tablename1&#39;: [&#39;primary_key1&#39;, &#39;primary_key2&#39;]}</span>
+<span class="sd">        These are required if the table is a view or has no primary key.</span>
+<span class="sd">    base : sqlalchemy.ext.declarative.api.DeclarativeMeta, optional</span>
+<span class="sd">        The declarative base the from which loaded table classes will inherit.</span>
+<span class="sd">        The info dictionary of loaded Columns will be updated from those in</span>
+<span class="sd">        the base.  These are used to generate default values and string</span>
+<span class="sd">        representations.  Import from pisces.schema.css3, or extensions thereof.</span>
+<span class="sd">        Default, sqlalchemy.ext.declarative.api.DeclarativeMeta.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Corresponding list of ORM table classes mapped to reflected tables,</span>
+<span class="sd">        Can be used for querying or making row instances.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    sqlalchemy.exc.NoSuchTableError : Table doesn&#39;t exist.</span>
+<span class="sd">    sqlalchemy.exc.InvalidRequestError : Table already loaded in metadata.</span>
+<span class="sd">    sqlalchemy.exc.ArgumentError : Table has no primary key(s).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    In SQLAlchemy, a database account/owner is generally used with the &quot;schema&quot;</span>
+<span class="sd">    keyword argument.</span>
+
+<span class="sd">    For core tables in a Pisces schema, this function isn&#39;t recommended.</span>
+<span class="sd">    Instead, subclass from the known abstract table.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    # for unknown table</span>
+<span class="sd">    &gt;&gt;&gt; import pisces.schema.css3 as css</span>
+<span class="sd">    &gt;&gt;&gt; RandomTable = get_tables(engine, [&#39;randomtable&#39;])</span>
+
+<span class="sd">    # for a known/prototype table</span>
+<span class="sd">    &gt;&gt;&gt; class Site(css.Site):</span>
+<span class="sd">            __tablename__ = &#39;myaccount.my_site_tablename&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bind</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must provide bound metadata or bind.&quot;</span><span class="p">)</span>
+    <span class="c1"># we have metadata</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">bind</span><span class="p">:</span>
+        <span class="n">bind</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">bind</span>
+
+    <span class="n">ORMBase</span> <span class="o">=</span> <span class="n">base</span> <span class="k">if</span> <span class="n">base</span> <span class="k">else</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">PiscesMeta</span><span class="p">,</span>
+                                                 <span class="n">constructor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                 <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">colinfo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s1">&#39;_column_info_registry&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">ORMBase</span><span class="p">,)</span>
+
+
+    <span class="n">outTables</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fulltable</span> <span class="ow">in</span> <span class="n">fulltablenames</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="n">fulltable</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># no owner given</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fulltable</span>
+
+        <span class="c1"># reflect the table</span>
+        <span class="n">itable</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">tablename</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">autoload_with</span><span class="o">=</span><span class="n">bind</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">owner</span><span class="p">)</span>
+
+        <span class="c1"># update reflected table with known schema column info</span>
+        <span class="k">if</span> <span class="n">colinfo</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">itable</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colinfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">{}))</span>
+
+        <span class="n">dct</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;__table__&#39;</span><span class="p">:</span> <span class="n">itable</span><span class="p">}</span>
+        <span class="c1"># put any desired __table_args__: {} here</span>
+
+        <span class="c1"># no primary key, can&#39;t map. spoof primary key mapping from inputs</span>
+        <span class="k">if</span> <span class="n">primary_keys</span> <span class="ow">and</span> <span class="n">fulltable</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">:</span>
+            <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;__mapper_args__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;primary_key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">itable</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">[</span><span class="n">fulltable</span><span class="p">]]}</span>
+
+        <span class="n">ORMTable</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">tablename</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+
+        <span class="n">outTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ORMTable</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">outTables</span></div>
+
+
+<span class="c1"># TODO: merge get_tables and make_tables?</span>
+<div class="viewcode-block" id="make_table"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.make_table">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;make_table will be moved to pisces.crud in next version .&#39;</span> <span class="o">+</span> <span class="n">TURNOFFWARNINGSMSG</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">make_table</span><span class="p">(</span><span class="n">fulltablename</span><span class="p">,</span> <span class="n">prototype</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a new ORM class/model on-the-fly from a prototype.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fulltablename : str</span>
+<span class="sd">        Schema-qualified name of the database table, like &#39;owner.tablename&#39;</span>
+<span class="sd">        or just &#39;tablename&#39;.  The resulting classname will be the capitalized</span>
+<span class="sd">        tablename, like &#39;Tablename&#39;.</span>
+<span class="sd">    prototype : sqlalchemy abstract ORM class</span>
+<span class="sd">        The prototype table class. pisces.schema.css.Site, for example.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    It&#39;s better to declare classes in an external module, and import them.</span>
+<span class="sd">    SQLAlchemy doesn&#39;t let you use the same table names twice, so on-the-fly</span>
+<span class="sd">    class creation and naming is risky:</span>
+
+<span class="sd">    1. You can&#39;t use make_tables again if you accidentally overwrite the</span>
+<span class="sd">       variable you used to hold the class you created.</span>
+<span class="sd">    2. You can&#39;t use make_tables again if you import something from a</span>
+<span class="sd">       script/module where make_tables was used with the same table name.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="n">fulltablename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">owner</span><span class="p">,</span> <span class="n">tablename</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fulltablename</span>
+
+    <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">prototype</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="n">owner</span><span class="p">:</span>
+        <span class="n">OwnerBase</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="n">sa</span><span class="o">.</span><span class="n">MetaData</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="n">owner</span><span class="p">))</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">OwnerBase</span><span class="p">,</span> <span class="n">prototype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="p">(</span><span class="n">prototype</span><span class="p">,)</span>
+
+    <span class="n">dct</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;__tablename__&#39;</span><span class="p">:</span> <span class="n">tablename</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">tablename</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_same_size"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.make_same_size">[docs]</a><span class="k">def</span> <span class="nf">make_same_size</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns numpy arrays the same size as longest inputs.</span>
+<span class="sd">    assume: lat1/lon1 are same size and lat2/lon2 are same size</span>
+<span class="sd">    assume: the smaller of the sizes is a scalar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#TODO: EAFP</span>
+    <span class="n">lon1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon1</span><span class="p">)</span>
+    <span class="n">lat1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span>
+    <span class="n">lon2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon2</span><span class="p">)</span>
+    <span class="n">lat2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+    <span class="c1">#assume: lat1/lon1 are same size and lat2/lon2 are same size</span>
+    <span class="c1">#assume: the smaller of the sizes is a scalar</span>
+    <span class="n">N1</span> <span class="o">=</span> <span class="n">lon1</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">N2</span> <span class="o">=</span> <span class="n">lon2</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">N1</span> <span class="o">&gt;</span> <span class="n">N2</span><span class="p">:</span>
+        <span class="n">lon2</span> <span class="o">=</span> <span class="n">lon2</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+        <span class="n">lat2</span> <span class="o">=</span> <span class="n">lat2</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">N2</span> <span class="o">&gt;</span> <span class="n">N1</span><span class="p">:</span>
+        <span class="n">lon1</span> <span class="o">=</span> <span class="n">lon1</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+        <span class="n">lat1</span> <span class="o">=</span> <span class="n">lat1</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span></div>
+
+
+<div class="viewcode-block" id="gen_id"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.gen_id">[docs]</a><span class="k">def</span> <span class="nf">gen_id</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Produce a generator for sequential integer id values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; lastorid = 7</span>
+<span class="sd">    &gt;&gt;&gt; orid = gen_id(lastorid)</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    8</span>
+<span class="sd">    &gt;&gt;&gt; orid.next()</span>
+<span class="sd">    9</span>
+
+<span class="sd">    Generate more than one at a time:</span>
+
+<span class="sd">    &gt;&gt;&gt; orid, arid, wfid = (gen_id() for id in [&#39;orid&#39;, &#39;arid&#39;, &#39;wfid&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; orid.next(), arid.next()</span>
+<span class="sd">    (1, 1)</span>
+
+<span class="sd">    Dictionary of id generators for desired ids, starting where they left off.</span>
+<span class="sd">    ids not in Lastid will be missing</span>
+
+<span class="sd">    &gt;&gt;&gt; ids = session.query(Lastid).filter(Lastid.keyname.in_([&#39;orid&#39;,&#39;arid&#39;]).all()</span>
+<span class="sd">    &gt;&gt;&gt; last = dict([(id.keyname, gen_id(id.keyvalue)) for id in ids])</span>
+<span class="sd">    &gt;&gt;&gt; last[&#39;orid&#39;].next()</span>
+<span class="sd">    8820005</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">i</span></div>
+
+<span class="n">ak135</span> <span class="o">=</span> <span class="n">TauPyModel</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s1">&#39;ak135&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="travel_times"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.travel_times">[docs]</a><span class="k">def</span> <span class="nf">travel_times</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">km</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get *approximate* relative travel time(s).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ref : list or tuple of strings and/or floats</span>
+<span class="sd">        Reference phase names or horizontal velocities [km/sec].</span>
+<span class="sd">    deg : float, optional</span>
+<span class="sd">        Degrees of arc between two points of interest (spherical earth).</span>
+<span class="sd">    km : float, optional</span>
+<span class="sd">        Horizontal kilometers between two points of interest (spherical earth).</span>
+<span class="sd">    depth : float, optional. default, 0.</span>
+<span class="sd">        Depth (positive down) of event, in kilometers.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        Relative times, in seconds, same length as &quot;ref&quot;. NaN if requested time</span>
+<span class="sd">        is undefined.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Get relative P arrival and 2.7 km/sec surface wave arrival at 35 degrees</span>
+<span class="sd">    distance.</span>
+<span class="sd">    &gt;&gt;&gt; times = travel_times([&#39;P&#39;, 2.7], deg=35.0)</span>
+<span class="sd">    To get absolute window, add the origin time like:</span>
+<span class="sd">    &gt;&gt;&gt; w1, w2 = times + epoch_origin_time</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Either deg or km must be indicated.</span>
+<span class="sd">    The user is responsible for adding/subtracting time (such as origin</span>
+<span class="sd">    time, pre-window noise time, etc.) from those predicted in order to define</span>
+<span class="sd">    a window.</span>
+<span class="sd">    Phase travel times use ak135.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ref</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iref</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># phase time requested</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tt</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">deg</span><span class="p">:</span>
+                    <span class="n">deg</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">kilometer2degrees</span><span class="p">(</span><span class="n">km</span><span class="p">)</span>
+                <span class="n">tt</span> <span class="o">=</span> <span class="n">ak135</span><span class="o">.</span><span class="n">get_travel_times</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">deg</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">ph</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">ph</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">iref</span><span class="p">)</span>
+                <span class="n">itt</span> <span class="o">=</span> <span class="p">[</span><span class="n">ph</span><span class="o">.</span><span class="n">time</span> <span class="k">for</span> <span class="n">ph</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="c1"># phase not found</span>
+                <span class="n">itt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># horizontal velocity</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">km</span><span class="p">:</span>
+                <span class="n">km</span> <span class="o">=</span> <span class="n">deg</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">360.0</span><span class="p">)</span><span class="o">*</span><span class="mf">6371.0</span>
+            <span class="n">itt</span> <span class="o">=</span> <span class="n">km</span><span class="o">/</span><span class="n">iref</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">itt</span>
+
+    <span class="k">return</span> <span class="n">times</span></div>
+
+
+<div class="viewcode-block" id="add_rows"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.add_rows">[docs]</a><span class="k">def</span> <span class="nf">add_rows</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle common errors with logging in SQLAlchemy add_all.</span>
+
+<span class="sd">    Tries to add in bulk.  Failing that, it will rollback and optionally try</span>
+<span class="sd">    to add one at a time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session</span>
+<span class="sd">    rows : list</span>
+<span class="sd">        Mapped table instances.</span>
+<span class="sd">    recurse : bool, optional</span>
+<span class="sd">        After failure, try to add records individually.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    num : int</span>
+<span class="sd">        Number of objects added.  0 if none.</span>
+<span class="sd">    e : exception or None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">ProgrammingError</span><span class="p">,</span> <span class="n">UnmappedInstanceError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># IntegrityError: duplicate row(s)</span>
+        <span class="c1"># ProgrammingError: string encoding problem</span>
+        <span class="c1"># UnmappedInstanceError: tried to add something like a list or None</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># always executed</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="ow">and</span> <span class="n">recurse</span><span class="p">:</span>
+            <span class="c1"># if an exception was thrown and recursion was requested</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">add_rows</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="p">[</span><span class="n">row</span><span class="p">],</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">num</span> <span class="o">+=</span> <span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">num</span><span class="p">,</span> <span class="n">e</span></div>
+
+
+<div class="viewcode-block" id="get_lastids"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.get_lastids">[docs]</a><span class="k">def</span> <span class="nf">get_lastids</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Lastid</span><span class="p">,</span> <span class="n">keynames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expunge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load or create Lastid instances into a convenient and readable</span>
+<span class="sd">    attribute-based dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session instance</span>
+<span class="sd">    Lastid : Lastid table class</span>
+<span class="sd">    ids : list or tuple of strings</span>
+<span class="sd">        Lastid.keyname values to load.</span>
+<span class="sd">    expunge : bool</span>
+<span class="sd">        If True, expunge loaded ids from the session.  This frees you</span>
+<span class="sd">        to modify them without affecting the database from which they</span>
+<span class="sd">        were loaded.  In this case, you&#39;ll have to add them back into a</span>
+<span class="sd">        session and commit them for their changes to be reflected on the</span>
+<span class="sd">        database.</span>
+<span class="sd">    create : bool</span>
+<span class="sd">        If True, create ids that don&#39;t already exist.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    last : obspy.core.AttribDict</span>
+<span class="sd">        Attribute-based dictionary of all lastids.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Get and set lastid values directly by name or by attribute.</span>
+<span class="sd">    &gt;&gt;&gt; last = get_lastids(session, Lastid, [&#39;orid&#39;, &#39;arid&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; last.orid, last[&#39;orid&#39;]</span>
+<span class="sd">    Lastid(keyname=&#39;orid&#39;), Lastid(keyname=&#39;orid&#39;)</span>
+
+<span class="sd">    Test for their existence by name.</span>
+<span class="sd">    &gt;&gt;&gt; &#39;orid&#39; in last</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Use the Lastid&#39;s &#39;next&#39; generator behavior for readable code</span>
+<span class="sd">    &gt;&gt;&gt; next(last.orid)</span>
+<span class="sd">    18</span>
+<span class="sd">    &gt;&gt;&gt; last.orid.keyvalue</span>
+<span class="sd">    18</span>
+
+<span class="sd">    Update your database when you&#39;re done.</span>
+<span class="sd">    &gt;&gt;&gt; session.add_all(ids.values())</span>
+<span class="sd">    &gt;&gt;&gt; session.commit()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">last</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">()</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Lastid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">keynames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lastids</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lastids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">:</span>
+            <span class="n">lastid</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Lastid</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="n">keyname</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">lastid</span><span class="p">:</span>
+                <span class="n">lastids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastid</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">create</span><span class="p">:</span>
+                <span class="n">lastid</span> <span class="o">=</span> <span class="n">Lastid</span><span class="p">(</span><span class="n">keyname</span><span class="o">=</span><span class="n">keyname</span><span class="p">,</span> <span class="n">keyvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lastid</span><span class="p">)</span>
+                <span class="n">lastids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lastid</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">lastid</span> <span class="ow">in</span> <span class="n">lastids</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">expunge</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">expunge</span><span class="p">(</span><span class="n">lastid</span><span class="p">)</span>
+        <span class="n">last</span><span class="p">[</span><span class="n">lastid</span><span class="o">.</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">lastid</span>
+
+    <span class="k">return</span> <span class="n">last</span></div>
+
+
+<div class="viewcode-block" id="get_options"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.get_options">[docs]</a><span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    for coretable in CORETABLES:</span>
+<span class="sd">        table_group.add_argument(&#39;--&#39; + coretable.name,</span>
+<span class="sd">                            default=None,</span>
+<span class="sd">							metavar=&#39;owner.tablename&#39;,</span>
+<span class="sd">							dest=coretable.name)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;url&#39;</span><span class="p">:</span><span class="s1">&#39;sqlite:///&#39;</span><span class="o">+</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;prefix&#39;</span><span class="p">:</span><span class="n">prefix</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">options</span></div>
+
+
+<div class="viewcode-block" id="get_or_create_tables"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.get_or_create_tables">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;get_or_create_tables will be moved to pisces.crud in next version .&#39;</span> <span class="o">+</span> <span class="n">TURNOFFWARNINGSMSG</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_or_create_tables</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">tables</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load or create canonical ORM KB Core table classes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : sqlalchemy.orm.Session</span>
+<span class="sd">    create : bool</span>
+<span class="sd">        If True, create a table object that isn&#39;t found.</span>
+<span class="sd">    tables</span>
+<span class="sd">        Canonical table name / formatted table name keyword pairs.</span>
+
+<span class="sd">    Also accepted are canonical table name keywords with &#39;[owner.]tablename&#39;</span>
+<span class="sd">    arguments, which will replace any prefix-based core table names.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tables : dict</span>
+<span class="sd">        Mapping between canonical table names and SQLA ORM classes.</span>
+<span class="sd">        e.g. {&#39;origin&#39;: MyOrigin, ...}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The Plan:</span>
+    <span class="c1"># 1. For each core table, build or get the table name</span>
+    <span class="c1"># 2. If it&#39;s a vanilla table name, just use a pre-packaged table class</span>
+    <span class="c1"># 3. If not, try to autoload it.</span>
+    <span class="c1"># 4. If it doesn&#39;t exist, make it from a prototype and create it in the database.</span>
+
+    <span class="c1"># TODO: check options for which tables to produce.</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coretable</span> <span class="ow">in</span> <span class="n">CORETABLES</span><span class="p">:</span>
+        <span class="c1"># build the table name</span>
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fulltablename</span> <span class="o">=</span> <span class="n">coretable</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fulltablename</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">coretable</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># fulltablename is either an arbitrary string or prefix + core name, but not None</span>
+
+        <span class="c1"># put table classes into the tables dictionary</span>
+        <span class="k">if</span> <span class="n">fulltablename</span> <span class="o">==</span> <span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="c1"># it&#39;s a vanilla table name. just use a pre-packaged table class instead of making one.</span>
+            <span class="n">tables</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">coretable</span><span class="o">.</span><span class="n">table</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tables</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_table</span><span class="p">(</span><span class="n">fulltablename</span><span class="p">,</span> <span class="n">coretable</span><span class="o">.</span><span class="n">prototype</span><span class="p">)</span>
+
+        <span class="n">tables</span><span class="p">[</span><span class="n">coretable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span> <span class="n">checkfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">tables</span></div>
+
+
+<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take dictionary-like object (actual dictionary or ConfigParser section)</span>
+<span class="sd">    to produce a SQLAlchemy database session and dictionary of database table</span>
+<span class="sd">    classes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : dict-like</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    session : SQLAlchemy database session instance</span>
+<span class="sd">    tables : dict</span>
+<span class="sd">        Keys are canonical table names, values are SQLAlchemy table classes.</span>
+
+<span class="sd">    The config input is a dict-like object of table name keys and class paths.</span>
+<span class="sd">    This can be a configparser object or a nested dict. The &quot;database&quot; section and &quot;url&quot; key</span>
+<span class="sd">    are required.  Any additional parameters in the section must be importable</span>
+<span class="sd">    module names, with optional SQLAlchemy table class names separated by a colon &quot;:&quot;.</span>
+<span class="sd">    If no class name is provided, a class with the capitalized key name is imported.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    The following inputs should be equivalent.</span>
+
+<span class="sd">    # pisces.cfg</span>
+<span class="sd">    [database] # required</span>
+<span class="sd">    url = oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname # required</span>
+<span class="sd">    site = mytablemodule:SiteClassName</span>
+<span class="sd">    wfdisc = mytablemodule:WfdiscClassName</span>
+<span class="sd">    mytable = custom_tables:MyCustomTableClass</span>
+<span class="sd">    arrival = othermodule</span>
+
+<span class="sd">    &gt;&gt;&gt; config = {&#39;url&#39;: &#39;oracle://myuser:mypass@dbserver.someplace.gom:1521/dbname&#39;,</span>
+<span class="sd">                  &#39;site&#39;: &#39;modulename:SiteClassName&#39;,</span>
+<span class="sd">                  &#39;wfdisc&#39;: &#39;modulename:Wfdisc_raw&#39;,</span>
+<span class="sd">                  &#39;mytable&#39;: &#39;custom_tables:MyCustomTableClass&#39;,</span>
+<span class="sd">                  &#39;arrival&#39;: &#39;othermodule&#39;,</span>
+<span class="sd">                  }</span>
+<span class="sd">    # or</span>
+<span class="sd">    &gt;&gt;&gt; import configparser</span>
+<span class="sd">    &gt;&gt;&gt; config = configparser.ConfigParser()</span>
+<span class="sd">    &gt;&gt;&gt; config.read(&#39;pisces.cfg&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; session, tables = load_config(config[&#39;database&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; tables</span>
+<span class="sd">    ... {&#39;arrival&#39;: othermodule.Arrival,</span>
+<span class="sd">    ... &#39;mytable&#39;: custom_tables.MyCustomTableClass,</span>
+<span class="sd">    ... &#39;site&#39;: modulename.SiteClassName,</span>
+<span class="sd">    ... &#39;wfdisc&#39;: modulename.Wfdisc_raw}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">url_connect</span><span class="p">(</span><span class="n">URL</span><span class="p">)</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">classpath</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">classpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">classpath</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+        <span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+
+    <span class="c1"># put it back</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">URL</span>
+
+    <span class="k">return</span> <span class="n">session</span><span class="p">,</span> <span class="n">tables</span></div>
+
+
+<div class="viewcode-block" id="make_wildcard_list"><a class="viewcode-back" href="../../apidocs/pisces.util.html#pisces.util.make_wildcard_list">[docs]</a><span class="k">def</span> <span class="nf">make_wildcard_list</span><span class="p">(</span><span class="n">toList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take a list, tuple, or comma separated string of variables and output a list </span>
+<span class="sd">    with sql wildcards &#39;%&#39; and &#39;_&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    toList : list, tuple, or comma separated string or variables</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nowList: list of variables contained in the toList variable</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># check if toList is a list and if not, make it a list</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">toList</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">nowList</span> <span class="o">=</span> <span class="n">toList</span>
+        
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">toList</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="n">nowList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">toList</span><span class="p">)</span>
+        
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">toList</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">nowList</span> <span class="o">=</span> <span class="n">toList</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;input to function make_wildcard_list is not a list, tuple, or comma separated string of variables&#39;</span><span class="p">)</span>
+            
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nowList</span><span class="p">)):</span>
+       <span class="n">nowList</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">nowList</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">&#39;%&#39;</span><span class="p">)</span>
+       <span class="n">nowList</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">nowList</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> 
+    
+    <span class="k">return</span> <span class="n">nowList</span></div>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

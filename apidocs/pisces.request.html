@@ -1,0 +1,820 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pisces.request &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'apidocs/pisces.request';</script>
+    <link rel="icon" href="../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pisces.util" href="pisces.util.html" />
+    <link rel="prev" title="pisces.crud" href="pisces.crud.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="pisces.html">pisces</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/apidocs/pisces.request.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>pisces.request</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.distaz_query"><code class="docutils literal notranslate"><span class="pre">distaz_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.geographic_query"><code class="docutils literal notranslate"><span class="pre">geographic_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_arrivals"><code class="docutils literal notranslate"><span class="pre">get_arrivals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_ids"><code class="docutils literal notranslate"><span class="pre">get_ids()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_stations"><code class="docutils literal notranslate"><span class="pre">get_stations()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_waveforms"><code class="docutils literal notranslate"><span class="pre">get_waveforms()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_wfdisc_rows"><code class="docutils literal notranslate"><span class="pre">get_wfdisc_rows()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.netstachan_query"><code class="docutils literal notranslate"><span class="pre">netstachan_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.time_query"><code class="docutils literal notranslate"><span class="pre">time_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.wfdisc_rows_to_stream"><code class="docutils literal notranslate"><span class="pre">wfdisc_rows_to_stream()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-pisces.request">
+<span id="pisces-request"></span><h1>pisces.request<a class="headerlink" href="#module-pisces.request" title="Permalink to this heading">#</a></h1>
+<p>Convenience functions for building common queries.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.distaz_query">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">distaz_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#distaz_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.distaz_query" title="Permalink to this definition">#</a></dt>
+<dd><p>Out-of-database subset based on distances and/or azimuths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>records</strong><span class="classifier">iterable of objects with lat, lon attribute floats</span></dt><dd><p>Target of the subset.</p>
+</dd>
+<dt><strong>deg</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr)
+minr, maxr in degrees or None for unconstrained.</p>
+</dd>
+<dt><strong>km</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr)
+minr, maxr in km or None for unconstrained.</p>
+</dd>
+<dt><strong>swath</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(lat, lon, azimuth, tolerance)
+Azimuth (from North) +/-tolerance from lat,lon point in degrees.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list</dt><dd><p>Subset of supplied records.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.geographic_query">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">geographic_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#geographic_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.geographic_query" title="Permalink to this definition">#</a></dt>
+<dd><p>Filter by region (W, E, S, N) [deg] and/or depth range (min, max) [km].</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_arrivals">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_arrivals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrival</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assoc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_arrivals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_arrivals" title="Permalink to this definition">#</a></dt>
+<dd><p>Build common queries for arrivals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stations, channels</strong><span class="classifier">list or tuple of strings</span></dt><dd><p>Desired station, channel strings.</p>
+</dd>
+<dt><strong>arrival: mapped Arrival table class</strong></dt><dd></dd>
+<dt><strong>assoc: mapped Assoc table class, optional</strong></dt><dd></dd>
+<dt><strong>atime</strong><span class="classifier">tuple or list of float, optional</span></dt><dd><p>(tstart, tend) epoch arrival time window. Either can be None.</p>
+</dd>
+<dt><strong>phases: list or tuple of strings</strong></dt><dd><p>Arrival ‘iphase’.</p>
+</dd>
+<dt><strong>arids</strong><span class="classifier">list of integers</span></dt><dd><p>Desired arid numbers.</p>
+</dd>
+<dt><strong>orids</strong><span class="classifier">list of integers</span></dt><dd><p>orids from which associated arrivals will be returned. Requires Assoc
+table.</p>
+</dd>
+<dt><strong>auth</strong><span class="classifier">list/tuple of strings</span></dt><dd><p>Arrival author list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list or sqlalchemy.orm.Query instance</dt><dd><p>Arrival results.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Each argument adds an AND clause to the SQL query.
+Unspecified (keyword) arguments are treated as wildcards.  That is, no
+arguments means, “give me all arrivals everywhere ever.”</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_events">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_events" title="Permalink to this definition">#</a></dt>
+<dd><p>Build common queries for events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.Session instance</span></dt><dd><p>Must be bound.</p>
+</dd>
+<dt><strong>origin</strong><span class="classifier">mapped Origin table class</span></dt><dd></dd>
+<dt><strong>event</strong><span class="classifier">mapped Event table class, optional</span></dt><dd></dd>
+<dt><strong>region</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(W, E, S, N) in degrees. Default, None.</p>
+</dd>
+<dt><strong>deg</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr) . Default, None.
+minr, maxr in degrees or None for unconstrained.</p>
+</dd>
+<dt><strong>km</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr)  Default, None.
+minr, maxr in km or None for unconstrained.</p>
+</dd>
+<dt><strong>swath</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(lat, lon, azimuth, tolerance)
+Azimuth (from North) +/-tolerance from lat,lon point in degrees.
+Not yet implemented.</p>
+</dd>
+<dt><strong>mag</strong><span class="classifier">dict, optional</span></dt><dd><p>{‘type1’: [min1, max1], ‘type2’: [min2, max2], …}
+‘type’ can be ‘mb’, ‘ms’, or ‘ml’.  Produces OR clauses.</p>
+</dd>
+<dt><strong>depth</strong><span class="classifier">tuple or list, optional</span></dt><dd><p>Depth interval [mindep, maxdep] in km.
+Use None for an unconstrained limit.</p>
+</dd>
+<dt><strong>etime</strong><span class="classifier">tuple or list, optional</span></dt><dd><p>(tstart, tend) epoch event time window
+Use None for an unconstrained limit.</p>
+</dd>
+<dt><strong>orids, evids</strong><span class="classifier">list or tuple of int, optional</span></dt><dd><p>orid, evid numbers &lt; 1000 in length
+Evids requires event table.</p>
+</dd>
+<dt><strong>prefor</strong><span class="classifier">bool, optional</span></dt><dd><p>Return preferred origins only. Default False.  Requires event table
+be provided.</p>
+</dd>
+<dt><strong>asquery</strong><span class="classifier">bool, optional</span></dt><dd><p>Return the query object instead of the results.  Default, False.
+Useful if additional you desire additional sorting of filtering, or
+if you have your own in-database geographic query function(s).  If 
+supplied, deg, km, and/or swath are ignored in the returned query.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>sqlalchemy.orm.Query instance</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Each keyword argument corresponds to an AND clause, except ‘mag’ which
+returns OR clauses.  Don’t submit a request containing both ‘evids’ and
+‘orids’ unless you want them joined by an AND clause.  Otherwise process
+them individually, then collate and unique them afterwards.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_ids">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lastid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detach</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_ids" title="Permalink to this definition">#</a></dt>
+<dd><p>Get or create lastid rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.session instance, bound</span></dt><dd></dd>
+<dt><strong>lastid</strong><span class="classifier">sqlalchemy orm mapped lastid table</span></dt><dd></dd>
+<dt><strong>ids</strong><span class="classifier">list</span></dt><dd><p>Desired lastid keyname strings.</p>
+</dd>
+<dt><strong>detach</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, expunge results from session before returning.
+Useful if you don’t have permission on lastid, and don’t want
+session commits to throw a permission error.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list</dt><dd><p>Corresponding existing or new rows from lastid table.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Keyvalue is 0 if id name not present in lastid table.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_stations">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_stations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitechan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">affiliation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_stations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_stations" title="Permalink to this definition">#</a></dt>
+<dd><p>Build common queries for stations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.Session instance</span></dt><dd><p>Must be bound.</p>
+</dd>
+<dt><strong>site</strong><span class="classifier">mapped Site table class</span></dt><dd></dd>
+<dt><strong>sitechan</strong><span class="classifier">mapped Sitechan table class, optional</span></dt><dd></dd>
+<dt><strong>affiliation</strong><span class="classifier">mapped Affiliation table class, optional</span></dt><dd></dd>
+<dt><strong>stations</strong><span class="classifier">list or tuple of strings</span></dt><dd><p>Desired station code strings.</p>
+</dd>
+<dt><strong>channels, nets</strong><span class="classifier">list or tuple of strings, or single regex string, optional</span></dt><dd><p>Desired channel, network code strings or regex</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">list/tuple, optional</span></dt><dd><p>Location code.
+Not yet implemented.</p>
+</dd>
+<dt><strong>region</strong><span class="classifier">tuple or list of numbers, optional</span></dt><dd><p>Geographic (W,E,S,N) in degrees, None values for unconstrained.</p>
+</dd>
+<dt><strong>deg</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr)
+minr, maxr in degrees or None for unconstrained.</p>
+</dd>
+<dt><strong>km</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(centerlat, centerlon, minr, maxr)
+minr, maxr in km or None for unconstrained.</p>
+</dd>
+<dt><strong>swath</strong><span class="classifier">list or tuple of numbers, optional</span></dt><dd><p>(lat, lon, azimuth, tolerance)
+Azimuth (from North) +/-tolerance from lat,lon point in degrees.
+Currently only works in gnem Oracle.</p>
+</dd>
+<dt><strong>asquery</strong><span class="classifier">bool, optional</span></dt><dd><p>Return the query object instead of the results.  Default, False.
+Useful if additional you desire additional sorting of filtering, or
+if you have your own in-database geographic query function(s).  If 
+supplied, deg, km, and/or swath are ignored in the returned query.</p>
+</dd>
+<dt><strong>time_span</strong><span class="classifier">tuple or list</span></dt><dd><p>(startdate, enddate) or [startdate, enddate]
+startdate and enddate are integer julian days of when you want stations (YYYYddd).  
+If stations were moved one or more times in the time_span, you will 
+get multiple copies of the station with updated gps values. If you want to be 
+guaranteed a specific station at a specific time, startdate and enddate must 
+both be included, even if they are the same.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Each parameter produces an AND clause, list parameters produce IN 
+clauses, a regex produces a REGEXP_LIKE clause (Oracle-specific?).</p>
+<p>deg, km, and swath are evaluated out-of-database by evaluating all other 
+flags first, then masking.  This can be memory-intensive.  See “Examples”
+for how to perform in-database distance filters.</p>
+<p>To include channels or networks with your results use asquery=True, and</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="n">Sitechan</span><span class="o">.</span><span class="n">chan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="n">Affiliation</span><span class="o">.</span><span class="n">net</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with the returned query.</p>
+<p class="rubric">Examples</p>
+<p>Use your own in-database distance query function “km_from_point”:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">get_stations</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BHZ&#39;</span><span class="p">],</span> <span class="n">region</span><span class="o">=</span><span class="p">(</span><span class="mi">65</span><span class="p">,</span><span class="mi">75</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">40</span><span class="p">),</span> <span class="n">asquery</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stations</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">km_from_point</span><span class="p">(</span><span class="n">site</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="o">-</span><span class="mi">110</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_waveforms">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfdisc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starttime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_waveforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_waveforms" title="Permalink to this definition">#</a></dt>
+<dd><p>Request waveforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session</strong><span class="classifier">sqlalchemy.orm.Session instance</span></dt><dd><p>Must be bound.</p>
+</dd>
+<dt><strong>wfdisc</strong><span class="classifier">mapped Wfdisc table class</span></dt><dd></dd>
+<dt><strong>station, channel</strong><span class="classifier">str, optional</span></dt><dd><p>Desired station, channel code strings</p>
+</dd>
+<dt><strong>starttimes, endtimes</strong><span class="classifier">float, optional</span></dt><dd><p>Epoch start times, end times.
+Traces will be cut to these times.</p>
+</dd>
+<dt><strong>wfids</strong><span class="classifier">iterable of int, optional</span></dt><dd><p>Wfdisc wfids.  Obviates the above arguments and just returns full Wfdisc
+row waveforms.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float</span></dt><dd><p>If provided, a warning is fired if any Trace is not within tol seconds
+of starttime and endtime.</p>
+</dd>
+<dt><strong>asquery</strong><span class="classifier">bool, optional</span></dt><dd><p>Return the query object instead of the results.  Default, False.
+Useful if additional you desire additional sorting of filtering.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>obspy.Stream</dt><dd><p>Traces are merged and cut to requested times.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.get_wfdisc_rows">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">get_wfdisc_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfdisc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daylong</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#get_wfdisc_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.get_wfdisc_rows" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a list of wfdisc records from provided SQLAlchemy ORM mapped
+wfdisc table, for given station, channel, and time window combination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session: bound session instance</strong></dt><dd></dd>
+<dt><strong>wfdisc: SQLAlchemy mapped wfdisc table</strong></dt><dd></dd>
+<dt><strong>sta, chan,</strong><span class="classifier">str, optional</span></dt><dd><p>station, channel strings,</p>
+</dd>
+<dt><strong>t1, t2</strong><span class="classifier">int, optional</span></dt><dd><p>Epoch time window of interest (seconds)
+Actually searches for wfdisc.time between t1-86400 and t2 and
+wfdisc.endtime &gt; t1</p>
+</dd>
+<dt><strong>wfids</strong><span class="classifier">list of integers, optional</span></dt><dd><p>wfid integers. Obviates other arguments.</p>
+</dd>
+<dt><strong>daylong</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, uses a slightly different time query for best results.
+Not yet implemented (is currently the default behavior).</p>
+</dd>
+<dt><strong>asquery</strong><span class="classifier">bool, optional</span></dt><dd><p>Return the query object instead of the results.  Default, False.
+Useful if additional you desire additional sorting of filtering.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>Print request to the stdout. Not used with asquery=True.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list of wfdisc row objects, or sqlalchemy.orm.Query instance</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.netstachan_query">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">netstachan_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#netstachan_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.netstachan_query" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.time_query">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">time_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daylong</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#time_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.time_query" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pisces.request.wfdisc_rows_to_stream">
+<span class="sig-prename descclassname"><span class="pre">pisces.request.</span></span><span class="sig-name descname"><span class="pre">wfdisc_rows_to_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wf_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pisces/request.html#wfdisc_rows_to_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pisces.request.wfdisc_rows_to_stream" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert wfdisc rows to obspy stream, trim the data to starttime and endtime 
+in the process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>wf_rows</strong></dt><dd><p>Wfdisc rows as generated by get_wfdisc_rows or similar</p>
+</dd>
+<dt><strong>start_t: UTCDateTime</strong></dt><dd><p>Requested start time of the returned traces</p>
+</dd>
+<dt><strong>end_t: UTCDateTime</strong></dt><dd><p>Requested end time of the returned traces</p>
+</dd>
+<dt><strong>tol: float</strong></dt><dd><p>If provided, a warning is fired if any Trace is not within tol seconds 
+of starttime and endtime</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>obspy.Stream</dt><dd><p>Traces are merged and trimmed to requested times</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError:</dt><dd><p>Returned Stream contains trace start/end times outside of the tolerance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pisces.crud.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pisces.crud</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pisces.util.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pisces.util</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.distaz_query"><code class="docutils literal notranslate"><span class="pre">distaz_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.geographic_query"><code class="docutils literal notranslate"><span class="pre">geographic_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_arrivals"><code class="docutils literal notranslate"><span class="pre">get_arrivals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_events"><code class="docutils literal notranslate"><span class="pre">get_events()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_ids"><code class="docutils literal notranslate"><span class="pre">get_ids()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_stations"><code class="docutils literal notranslate"><span class="pre">get_stations()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_waveforms"><code class="docutils literal notranslate"><span class="pre">get_waveforms()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.get_wfdisc_rows"><code class="docutils literal notranslate"><span class="pre">get_wfdisc_rows()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.netstachan_query"><code class="docutils literal notranslate"><span class="pre">netstachan_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.time_query"><code class="docutils literal notranslate"><span class="pre">time_query()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pisces.request.wfdisc_rows_to_stream"><code class="docutils literal notranslate"><span class="pre">wfdisc_rows_to_stream()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

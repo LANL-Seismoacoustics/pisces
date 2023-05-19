@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pisces.commands.sac2db &#8212; Pisces v0.4.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pisces/commands/sac2db';</script>
+    <link rel="icon" href="../../../_static/LANL Logo Ultramarine globe.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/LANL Logo Ultramarine.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/LANL Logo White.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Pisces
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/tables.html">The Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/queries.html">Using the Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/waveforms.html">Working with Waveforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/flatfiles.html">Import/Export Flat Files</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../about/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../apidocs/modules.html">API Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../apidocs/pisces.html">pisces</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.commands.html">pisces.commands</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.create.html">pisces.commands.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.db2db.html">pisces.commands.db2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.drop.html">pisces.commands.drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.main.html">pisces.commands.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.mseed2db.html">pisces.commands.mseed2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.sac2db.html">pisces.commands.sac2db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.commands.util.html">pisces.commands.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.io.html">pisces.io</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.mseed.html">pisces.io.mseed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.readwaveform.html">pisces.io.readwaveform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.sac.html">pisces.io.sac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.trace.html">pisces.io.trace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.io.util.html">pisces.io.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.schema.html">pisces.schema</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.antelope.html">pisces.schema.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.css3.html">pisces.schema.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.kbcore.html">pisces.schema.kbcore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.schema.util.html">pisces.schema.util</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../apidocs/pisces.tables.html">pisces.tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.antelope.html">pisces.tables.antelope</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.css3.html">pisces.tables.css3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../apidocs/pisces.tables.kbcore.html">pisces.tables.kbcore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.client.html">pisces.client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.crud.html">pisces.crud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.request.html">pisces.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../apidocs/pisces.util.html">pisces.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/LANL-seismoacoustics/pisces" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for pisces.commands.sac2db</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions that support bulk conversion of SAC files to database tables.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy.exc</span> <span class="k">as</span> <span class="nn">exc</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="k">as</span> <span class="nn">oexc</span>
+
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">read</span>
+<span class="kn">from</span> <span class="nn">obspy.io.sac.core</span> <span class="kn">import</span> <span class="n">_is_sac</span>
+
+<span class="kn">import</span> <span class="nn">pisces</span> <span class="k">as</span> <span class="nn">ps</span>
+<span class="kn">from</span> <span class="nn">pisces.util</span> <span class="kn">import</span> <span class="n">get_lastids</span><span class="p">,</span> <span class="n">url_connect</span>
+<span class="kn">import</span> <span class="nn">pisces.io.sac</span> <span class="k">as</span> <span class="nn">sac</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">get_or_create_tables</span><span class="p">,</span> <span class="n">dicts2rows</span><span class="p">,</span> <span class="n">get_files</span>
+
+
+<div class="viewcode-block" id="get_plugins"><a class="viewcode-back" href="../../../apidocs/pisces.commands.sac2db.html#pisces.commands.sac2db.get_plugins">[docs]</a><span class="k">def</span> <span class="nf">get_plugins</span><span class="p">(</span><span class="n">plugins</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a list of imported plugin function objects from a list of plugin</span>
+<span class="sd">    strings, like path/to/module_file:plugin_function .</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plugin_functions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">plugins</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">plugin_string</span> <span class="ow">in</span> <span class="n">plugins</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pth</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">plugin_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Must specify plugin like: path/to/modulename:plugin_function&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">pth</span> <span class="o">=</span> <span class="n">pth</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+            <span class="n">modname</span> <span class="o">=</span> <span class="n">pth</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">pathname</span><span class="p">,</span> <span class="n">descr</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">find_module</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">pth</span><span class="p">)</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pathname</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
+            <span class="n">plugin_functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">plugin_functions</span></div>
+
+
+<div class="viewcode-block" id="make_atomic"><a class="viewcode-back" href="../../../apidocs/pisces.commands.sac2db.html#pisces.commands.sac2db.make_atomic">[docs]</a><span class="k">def</span> <span class="nf">make_atomic</span><span class="p">(</span><span class="n">last</span><span class="p">,</span> <span class="o">**</span><span class="n">rows</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Unify related table instances/row, including: ids, dir, and dfile</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    last : obspy.AttributeDict</span>
+<span class="sd">        {&#39;keyvalue&#39;: lastid instance, ...}</span>
+<span class="sd">    rows : dict</span>
+<span class="sd">        {&#39;canonical tablename&#39;: [list of row instances], ...} of _related_</span>
+<span class="sd">        instances from a single SAC header?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: check existance of rows before changing their ids.</span>
+
+    <span class="c1">#print rows</span>
+    <span class="c1"># the order matters here</span>
+
+    <span class="c1"># for SAC, only 1</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="c1"># skips if no &#39;event&#39; key and if &#39;event&#39; value is empty []</span>
+        <span class="c1"># XXX: check for existence first</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">evid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">evid</span><span class="p">)</span>
+
+    <span class="c1"># for SAC, only 1</span>
+    <span class="k">for</span> <span class="n">origin</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="c1"># XXX: check for existance first</span>
+        <span class="n">origin</span><span class="o">.</span><span class="n">orid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">orid</span><span class="p">)</span>
+        <span class="n">origin</span><span class="o">.</span><span class="n">evid</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">evid</span>
+
+    <span class="c1"># for SAC, only 1</span>
+    <span class="k">for</span> <span class="n">affil</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;affiliation&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># for SAC, only 1</span>
+    <span class="k">for</span> <span class="n">sitechan</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sitechan&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="c1"># XXX: check for existance first</span>
+        <span class="n">sitechan</span><span class="o">.</span><span class="n">chanid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">chanid</span><span class="p">)</span>
+
+    <span class="c1"># arrivals correspond to assocs</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">arrival</span><span class="p">,</span> <span class="n">assoc</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;arrival&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assoc&#39;</span><span class="p">,</span> <span class="p">[])):</span>
+        <span class="n">arrival</span><span class="o">.</span><span class="n">arid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">arid</span><span class="p">)</span>
+        <span class="n">arrival</span><span class="o">.</span><span class="n">chanid</span> <span class="o">=</span> <span class="n">sitechan</span><span class="o">.</span><span class="n">chanid</span>
+
+        <span class="n">assoc</span><span class="o">.</span><span class="n">arid</span> <span class="o">=</span> <span class="n">arrival</span><span class="o">.</span><span class="n">arid</span>
+        <span class="n">assoc</span><span class="o">.</span><span class="n">orid</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">orid</span>
+
+    <span class="c1"># for SAC, only 1</span>
+    <span class="k">for</span> <span class="n">wfdisc</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wfdisc&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="n">wfdisc</span><span class="o">.</span><span class="n">wfid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">wfid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_plugins"><a class="viewcode-back" href="../../../apidocs/pisces.commands.sac2db.html#pisces.commands.sac2db.apply_plugins">[docs]</a><span class="k">def</span> <span class="nf">apply_plugins</span><span class="p">(</span><span class="n">plugins</span><span class="p">,</span> <span class="o">**</span><span class="n">rows</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">plugins</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">plugin</span><span class="p">(</span><span class="o">**</span><span class="n">rows</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rows</span></div>
+
+
+<span class="c1"># TODO: make this main also accept a get_iterable and get_row_dicts functions,</span>
+<span class="c1">#   so it can be renamed to iter2db and re-used in a sac2db.py and miniseed2db.py</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../apidocs/pisces.commands.sac2db.html#pisces.commands.sac2db.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command-line arguments are created and parsed, fed to functions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session : SQLAlchemy.orm.Session instance</span>
+<span class="sd">    tables : list</span>
+<span class="sd">        Canonical names for desired database tables.</span>
+<span class="sd">    prefix : str</span>
+<span class="sd">        Target core tables using &#39;account.prefix&#39; naming.</span>
+<span class="sd">    absolute_paths : bool</span>
+<span class="sd">    bbfk : bool</span>
+<span class="sd">        Pull in deast &amp; dnorth info from user7 &amp; user8 header fields</span>
+<span class="sd">    file_list : str</span>
+<span class="sd">        Name of a text file containing full SAC file names.</span>
+<span class="sd">    files : list</span>
+<span class="sd">        List of SAC file names.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sac2db: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_list&#39;</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;file_list&#39;</span><span class="p">],</span> <span class="n">file_check</span><span class="o">=</span><span class="n">_is_sac</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="n">get_or_create_tables</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">lastids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arid&#39;</span><span class="p">,</span> <span class="s1">&#39;chanid&#39;</span><span class="p">,</span> <span class="s1">&#39;evid&#39;</span><span class="p">,</span> <span class="s1">&#39;orid&#39;</span><span class="p">,</span> <span class="s1">&#39;wfid&#39;</span><span class="p">]</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="n">get_lastids</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">tables</span><span class="p">[</span><span class="s1">&#39;lastid&#39;</span><span class="p">],</span> <span class="n">lastids</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># for item in iterable:</span>
+    <span class="k">for</span> <span class="n">sacfile</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sacfile</span><span class="p">)</span>
+
+        <span class="c1"># row_dicts = get_row_dicts(item)</span>
+
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">sacfile</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;SAC&#39;</span><span class="p">,</span> <span class="n">debug_headers</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># sachdr2tables produces table dictionaries</span>
+        <span class="c1"># rows needs to be a dict of lists, for make_atomic</span>
+        <span class="n">dicts</span> <span class="o">=</span> <span class="n">sac</span><span class="o">.</span><span class="n">sachdr2tables</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span><span class="p">,</span> <span class="n">tables</span><span class="o">=</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">dicts2rows</span><span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
+
+        <span class="c1"># manage dir, dfile, datatype</span>
+        <span class="c1"># XXX: hack.  replace with an updated obspy.io.sac later.</span>
+        <span class="n">bo</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span>
+        <span class="k">if</span> <span class="n">bo</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="s1">&#39;f4&#39;</span>
+        <span class="k">elif</span> <span class="n">bo</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="s1">&#39;t4&#39;</span>
+        <span class="k">elif</span> <span class="n">bo</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">:</span>
+                <span class="n">datatype</span> <span class="o">=</span> <span class="s1">&#39;f4&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">datatype</span> <span class="o">=</span> <span class="s1">&#39;t4&#39;</span>
+
+        <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">[</span><span class="s1">&#39;wfdisc&#39;</span><span class="p">]:</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="n">datatype</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">dfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">sacfile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;absolute_paths&#39;</span><span class="p">]:</span>
+                <span class="n">idir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">sacfile</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sacfile</span><span class="p">)</span>
+                <span class="c1"># make sure relative paths are non-empty</span>
+                <span class="k">if</span> <span class="n">idir</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                   <span class="n">idir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+            <span class="n">wf</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="n">idir</span>
+
+        <span class="c1"># manage the ids</span>
+        <span class="n">make_atomic</span><span class="p">(</span><span class="n">last</span><span class="p">,</span> <span class="o">**</span><span class="n">rows</span><span class="p">)</span>
+
+        <span class="c1"># plugins = get_plugins(options)</span>
+
+        <span class="c1"># rows = apply_plugins(plugins, **rows)</span>
+
+        <span class="c1"># add rows to the database</span>
+        <span class="c1"># XXX: not done very elegantly.  some problem rows are simply skipped.</span>
+        <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">instances</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">instances</span><span class="p">:</span>
+                <span class="c1"># could be empty []</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">exc</span><span class="o">.</span><span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># duplicate or nonexistant primary keys</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rollback </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+                <span class="k">except</span> <span class="n">exc</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># no such table, or database is locked</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rollback </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table</span><span class="p">))</span></div>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan MacCarthy
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Jonathan MacCarthy.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
