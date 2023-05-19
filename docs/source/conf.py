@@ -6,18 +6,20 @@
 import os
 import sys
 
+sys.path.insert(0, os.path.abspath('../../pisces'))
+from pisces import __version__
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Pisces'
 copyright = '2023, Jonathan MacCarthy'
 author = 'Jonathan MacCarthy'
-release = 'v0.4.2'
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-sys.path.insert(0, os.path.abspath('../../pisces'))
 
 # sphinx-apidoc -f -o source/ ../pisces/
 # You should see rst files created in the docs/source/ folder
