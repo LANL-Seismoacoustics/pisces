@@ -66,6 +66,8 @@ def get_stations_data(session):
         'ANMO_0': ANMO_0,
         'ANMO_1': ANMO_1,
         'ANMO_2': ANMO_2,
+        'NV32': NV32,
+        'NV33': NV33,
         'SR_ANMO_0': SR_ANMO_0,
         'IU_ANMO_1': IU_ANMO_1,
         'IU_ANMO_2': IU_ANMO_2,
@@ -87,137 +89,10 @@ def jdate(indate: str) -> int:
     # '2002-11-09' -> 2002323
     return int(UTCDateTime(indate).strftime('%Y%j'))
 
-def epochtime(indate: str) -> float:
-    # '2002-11-09' -> 1037668325.0
-    return UTCDateTime(indate).timestamp
-
 def jdate2epoch(jdate: int) -> float:
     # 2002323 -> 1037668325.0
     return UTCDateTime.strptime(str(jdate), '%Y%j').timestamp
     
-
-def literal_sql(engine, statement_or_query):
-    # https://stackoverflow.com/questions/5631078/sqlalchemy-print-the-actual-query
-    # also removes spaces before newlines
-    try:
-        # it's a query
-        statement = statement_or_query.statement
-    except AttributeError:
-        # it was already a statement
-        statement = statement_or_query
-
-    sql = str(statement.compile(engine, compile_kwargs={"literal_binds": True}))
-
-    return sql.replace(" \n", "\n")
-
-
-def clean_and_evaluate(multiline_string, sta, chan, wfids, t1, t2, file_length):
-    """ Remove indentation, extra newlines, and 'f-string-ify' multiline string templates.
-
-    This is done to match SQL strings that SQLAlchemy `statement.compile` returns.
-    See: https://stackoverflow.com/a/53671539/745557
-
-    We use "eval()" with a forced f-string template, so any variables used in the expressions
-    need to be named in the local function scope, and therefore must be passed into the function
-    with a name.
-
-    """
-    cleaned_str = dedent(multiline_string).strip("\n")
-    return eval(f'f"""{cleaned_str}"""')
-
-
-def make_ids(param):
-    return str(param) if isinstance(param, dict) else None
-
-# The following contains a list of 2-tuples, which are fed into the testing function. the first
-# tuple value is a dict of test values for the get_wfdisc_rows, and the second is the expected SQL
-# output, with the expected corresponding variables and expressions.  These SQL strings aren't
-# f-strings, but can contain expressions.
-# get_wfdisc_rows_data = [
-#     (
-#         # sta, chan as scalars
-#         {
-#             'sta': "ANMO",
-#             'chan': "BH1",
-#         },
-#         """
-#         SELECT wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.wfid, wfdisc.chanid, wfdisc.jdate, wfdisc.endtime, wfdisc.nsamp, wfdisc.samprate, wfdisc.calib, wfdisc.calper, wfdisc.instype, wfdisc.segtype, wfdisc.datatype, wfdisc.clip, wfdisc.dir, wfdisc.dfile, wfdisc.foff, wfdisc.commid, wfdisc.lddate
-#         FROM wfdisc
-#         WHERE wfdisc.sta LIKE '{sta}' AND wfdisc.chan LIKE '{chan}'
-#         """
-#     ),
-#     (
-#         # ... time range provided
-#         {
-#             'sta': "ANMO",
-#             'chan': "BH1",
-#             't1': 1241136000.0, 
-#             't2': 1243814400.0, 
-#             'file_length': 24 * 60 * 60, 
-#         },
-#         """
-#         SELECT wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.wfid, wfdisc.chanid, wfdisc.jdate, wfdisc.endtime, wfdisc.nsamp, wfdisc.samprate, wfdisc.calib, wfdisc.calper, wfdisc.instype, wfdisc.segtype, wfdisc.datatype, wfdisc.clip, wfdisc.dir, wfdisc.dfile, wfdisc.foff, wfdisc.commid, wfdisc.lddate
-#         FROM wfdisc
-#         WHERE wfdisc.sta LIKE '{sta}' AND wfdisc.chan LIKE '{chan}' AND wfdisc.time BETWEEN {t1 - file_length} AND {t2} AND wfdisc.endtime > {t1}
-#         """
-#     ),
-#     (
-#         # ... half time range provided
-#         {
-#             'sta': "ANMO",
-#             'chan': "BH1",
-#             't1': 1241136000.0, 
-#             'file_length': 24 * 60 * 60, 
-#         },
-#         """
-#         SELECT wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.wfid, wfdisc.chanid, wfdisc.jdate, wfdisc.endtime, wfdisc.nsamp, wfdisc.samprate, wfdisc.calib, wfdisc.calper, wfdisc.instype, wfdisc.segtype, wfdisc.datatype, wfdisc.clip, wfdisc.dir, wfdisc.dfile, wfdisc.foff, wfdisc.commid, wfdisc.lddate
-#         FROM wfdisc
-#         WHERE wfdisc.sta LIKE '{sta}' AND wfdisc.chan LIKE '{chan}' AND wfdisc.time >= {t1 - file_length} AND wfdisc.endtime > {t1}
-#         """
-#     ),
-#     (
-#         # sta, chan as a list, time range provided
-#         {
-#             'sta': ["ANMO", "TX31"], 
-#             'chan': ["BH1", "BH2"], 
-#         },
-#         """
-#         SELECT wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.wfid, wfdisc.chanid, wfdisc.jdate, wfdisc.endtime, wfdisc.nsamp, wfdisc.samprate, wfdisc.calib, wfdisc.calper, wfdisc.instype, wfdisc.segtype, wfdisc.datatype, wfdisc.clip, wfdisc.dir, wfdisc.dfile, wfdisc.foff, wfdisc.commid, wfdisc.lddate
-#         FROM wfdisc
-#         WHERE (wfdisc.sta LIKE '{sta[0]}' OR wfdisc.sta LIKE '{sta[1]}') AND (wfdisc.chan LIKE '{chan[0]}' OR wfdisc.chan LIKE '{chan[1]}')
-#         """
-#     ),
-#     (
-#         # only wfids provided
-#         {
-#             'wfids': [1, 2, 3, 4]
-#         },
-#         """
-#         SELECT wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.wfid, wfdisc.chanid, wfdisc.jdate, wfdisc.endtime, wfdisc.nsamp, wfdisc.samprate, wfdisc.calib, wfdisc.calper, wfdisc.instype, wfdisc.segtype, wfdisc.datatype, wfdisc.clip, wfdisc.dir, wfdisc.dfile, wfdisc.foff, wfdisc.commid, wfdisc.lddate
-#         FROM wfdisc
-#         WHERE wfdisc.wfid IN ({', '.join([str(wfid) for wfid in wfids])})
-#         """
-#     ),
-# ]
-# @pytest.mark.skip(reason="Fragile test depends on SQL query instead of result.")
-# @pytest.mark.parametrize("data,expected", get_wfdisc_rows_data, ids=make_ids)
-# def test_get_wfdisc_rows(data, expected, session):
-#         # WHERE wfdisc.wfid IN {tuple(wfids)}
-#     # Test without expected exceptions
-#     sta = data.get('sta')
-#     chan = data.get('chan')
-#     wfids = data.get('wfids')
-#     t1 = data.get('t1')
-#     t2 = data.get('t2')
-#     file_length = data.get('file_length')
-
-#     cleaned_expected = clean_and_evaluate(expected, sta, chan, wfids, t1, t2, file_length)
-
-#     q = req.get_wfdisc_rows(session, kb.Wfdisc,
-#         chan=chan, sta=sta, t1=t1, t2=t2, wfids=wfids, asquery=True
-#     )
-#     assert literal_sql(session.bind, q) == cleaned_expected
-
 
 def test_query_network(session, get_stations_data):
     d = get_stations_data
@@ -333,10 +208,21 @@ def test_query_network(session, get_stations_data):
         out[2] == (d['SR'], d['SR_ANMO_0'])
     )
 
+    # without Affiliation provided, time queries should fail
     with pytest.raises(NameError):
-        # without Affiliation provided, time queries should fail
         out = req.query_network(session, Network, endtime=endtime).all()
 
     # if a query object is provided
-    q = session.query(Site).filter(sta='ANMO')
-    out = req.query_network(session, Network, affiliation=Affiliation, )
+    # should append Networks, Affiliations that contain the sta to the result set
+    q = session.query(Site).filter(Site.sta.in_(['NV32', 'NV33']))
+    q = req.query_network(session, Network, affiliation=Affiliation, with_query=q)
+    out = q.order_by(Affiliation.time).all()
+    # expected = [
+    #     (Site(sta='NV33', ondate=1970024), Affiliation(net='IM', sta='NV33', time=-9999999999.999), Network(net='IM')),
+    #     (Site(sta='NV32', ondate=1970024), Affiliation(net='IM', sta='NV32', time=1987200.0), Network(net='IM')),
+    #     ]
+    assert (
+        len(out) == 2 and
+        out[0] == (d['NV33'], d['IM_NV33'], d['IM']) and
+        out[1] == (d['NV32'], d['IM_NV32'], d['IM'])
+    )
