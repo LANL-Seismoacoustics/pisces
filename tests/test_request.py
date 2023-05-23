@@ -1,6 +1,7 @@
 """
 Tests for the pisces.request module
 
+
 """
 from obspy import UTCDateTime
 import pytest
@@ -8,7 +9,8 @@ import pytest
 import pisces.request as req
 from pisces.tables.kbcore import *
 
-def test_query_network(session, get_stations_data):
+def test_query_network_nets(session, get_stations_data):
+    """ Tests involving network-level queries. """
     d = get_stations_data
     
     # All networks are returned if none specified 
@@ -40,6 +42,10 @@ def test_query_network(session, get_stations_data):
         out[0] == (d['IU'], d['IU_ANMO_1']) and
         out[1] == (d['IU'], d['IU_ANMO_2'])
     )
+
+def test_query_network_stas(session, get_stations_data):
+    """ Tests involving station-level queries. """
+    d = get_stations_data
 
     # only one Network for one specific station is included when stas specified
     # and a station is only associated with one network.
@@ -85,6 +91,10 @@ def test_query_network(session, get_stations_data):
         out[1] == (d['IM'], d['IM_NV33'])
     )
 
+def test_query_network_time(session, get_stations_data):
+    """ Tests involving time-based queries. """
+    d = get_stations_data
+
     # get results where network affiliation ends after time_
     # expected = [
     #     (Network(net='IU'), Affiliation(net='IU', sta='ANMO', time=972000000.0)),
@@ -105,7 +115,6 @@ def test_query_network(session, get_stations_data):
         # without Affiliation provided, time queries should fail
         out = req.query_network(session, Network, time_=time_).all()
         
-
     # get results where network affiliation.time < endtime
     # expected = [
     #     (Network(net='IM'), Affiliation(net='IM', sta='NV33', time=-9999999999.999)),
@@ -125,6 +134,11 @@ def test_query_network(session, get_stations_data):
     # without Affiliation provided, time queries should fail
     with pytest.raises(NameError):
         out = req.query_network(session, Network, endtime=endtime).all()
+
+
+def test_query_network_with_query(session, get_stations_data):
+    """ Tests involving queries from queries. """
+    d = get_stations_data
 
     # if a query object is provided
     # should append Networks, Affiliations that contain the sta to the result set
