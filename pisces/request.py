@@ -910,16 +910,7 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
     return q
 
 def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__'):
- #   if pref_nets:
- #       staList = q[0].affiliation.sta
- #       for i in range(q.count()):
- #           tempSta = q[i].affiliation.sta
- #           if tempSta not in staList:
- #               staList.append(tempSta)
- #       
- #       for i in range(len(staList)):
- #           for i in range(len(pref_nets)):
-    return q
+    return 
 
 def check_orphan_stas():
     return
