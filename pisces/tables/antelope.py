@@ -5,28 +5,6 @@ Concrete canonical tables for Antelope schema.
 from pisces.schema.util import CoreTable
 import pisces.schema.antelope as antelope
 
-__all__ = [
-    'Affiliation',
-    'Amplitude',
-    'Arrival',
-    'Assoc',
-    'Event',
-    'Gregion',
-    'Instrument',
-    'Lastid',
-    'Netmag',
-    'Network',
-    'Origerr',
-    'Origin',
-    'Remark',
-    'Sensor',
-    'Site',
-    'Sitechan',
-    'Sregion',
-    'Stamag',
-    'Wfdisc',
-    'Wftag',
-]
 
 class Affiliation(antelope.Affiliation):
     __tablename__ = 'affiliation'
