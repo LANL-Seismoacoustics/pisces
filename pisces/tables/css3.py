@@ -1,6 +1,29 @@
 from pisces.schema.util import CoreTable
 import pisces.schema.css3 as css3
 
+__all__ = [
+    'Affiliation',
+    'Amplitude',
+    'Arrival',
+    'Assoc',
+    'Event',
+    'Gregion',
+    'Instrument',
+    'Lastid',
+    'Netmag',
+    'Network',
+    'Origerr',
+    'Origin',
+    'Remark',
+    'Sensor',
+    'Site',
+    'Sitechan',
+    'Sregion',
+    'Stamag',
+    'Stassoc',
+    'Wfdisc',
+    'Wftag',
+]
 
 class Affiliation(css3.Affiliation):
     __tablename__ = 'affiliation'
