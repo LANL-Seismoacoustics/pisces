@@ -5,6 +5,28 @@ Concrete canonical tables for KB Core schema.
 from pisces.schema.util import CoreTable
 import pisces.schema.kbcore as kb
 
+__all__ = [
+    'Affiliation',
+    'Amplitude',
+    'Arrival',
+    'Assoc',
+    'Event',
+    'Gregion',
+    'Instrument',
+    'Lastid',
+    'Netmag',
+    'Network',
+    'Origerr',
+    'Origin',
+    'Remark',
+    'Sensor',
+    'Sitechan',
+    'Site',
+    'Sregion',
+    'Stamag',
+    'Wfdisc',
+    'Wftag',
+]
 
 class Affiliation(kb.Affiliation):
     __tablename__ = 'affiliation'
