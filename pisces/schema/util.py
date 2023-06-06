@@ -336,6 +336,7 @@ def _update_docstring(cls):
 
     return s
 
+
 class PiscesMeta(DeclarativeMeta):
     def __new__(cls, clsname, parents, dct):
 
@@ -358,7 +359,6 @@ class PiscesMeta(DeclarativeMeta):
         try:
             schema, tablename = dct['__tablename__'].split('.')
             dct['__tablename__'] = tablename
-            dct['_tableowner'] = schema
             SchemaBase = declarative_base(metadata=sa.MetaData(schema=schema))
             # copy the column registry into the new base, for use with DeferredReflection
             for p in parents:
@@ -370,7 +370,6 @@ class PiscesMeta(DeclarativeMeta):
             pass
         except ValueError:
             # not a schema-qualified name
-            dct['_tableowner'] = None
             pass
 
         return super(PiscesMeta, cls).__new__(cls, clsname, parents, dct)
@@ -399,8 +398,6 @@ class PiscesMeta(DeclarativeMeta):
             cls._attrname = {c.name: c.key for c in cls.__mapper__.columns}
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
             cls.__doc__ = _update_docstring(cls)
-            cls._tabletype =  parents[0].__name__
-            cls._tableschema = parents[0].__module__.split('.')[2]
 
 
 # -------- common parser functions for info['parser'] --------
