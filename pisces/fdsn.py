@@ -7,18 +7,14 @@ import logging
 import os
 
 import sqlalchemy as sa
-from sqlalchemy import create_engine, func, or_
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from obspy import Stream
-import sqlalchemy as sa
-from sqlalchemy.orm import Session
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.engine.url import URL, make_url
-from obspy import Stream
+from obspy import Stream, UTCDateTime
 
 import pisces as ps
 import pisces.request as req
 from pisces.io.trace import wfdisc2trace
+from pisces import util
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +75,6 @@ class Client(object):
         --------
         >>> client = Client('sqlite:///local/path/to/mydb.sqlite')
         >>> client = Client('sqlite:////full/path/to/mydb.sqlite', site='mysite')
-        >>> client = Client('oracle://dbserver.somewhere.com:8080/mydb')
-        >>> client = Client('oracle://scott@dbserver.somewhere.com:8080/mydb')
         >>> client = Client('oracle://scott:tiger@dbserver.somewhere.com:8080/mydb')
         >>> client = Client(session)
 
@@ -92,11 +86,11 @@ class Client(object):
         >>> client = Client(session, **tables)
 
         """
-        if kwargs.get('session', None):
-            session = session
-        else:
+        if type(dburl_or_session) is str:
             engine = sa.create_engine(dburl_or_session)
             session = Session(engine)
+        else:
+            session = dburl_or_session
 
         # this is just a test, will fail early if the connection is misconfigured
         session.bind.connect()
@@ -111,36 +105,16 @@ class Client(object):
         return repr_str.format(self.session.bind.url)
 
 
-    def load_tables(self, **tables):
+
+    def get_events(self, starttime=None, endtime=None, minlatitude=None, maxlatitude=None,
+                   minlongitude=None, maxlongitude=None, latitude=None, longitude=None, 
+                   minradius=None, maxradius=None, mindepth=None, maxdepth=None, 
+                   minmagnitude=None, maxmagnitude=None, magnitudetype=None, eventtype=None, 
+                   includeallorigins=None, includeallmagnitudes=None, includearrivals=None, 
+                   eventid=None, limit=None, offset=None, orderby=None, catalog=None, 
+                   contributor=None, updatedafter=None, filename=None, **kwargs):
         """
-        Load core tables.
-
-        Tables are given as key=value pairs as in:
-        load_tables(wfdisc='global.wfdisc_raw', origin='location.origin')
-
-        Raises
-        ------
-        sqlalchemy.exc.NoSuchTableError
-            Table doesn't exist.
-
-        """
-        metadata = sa.MetaData(self.session.bind)
-        for tablename, table in tables.items():
-            # TODO: use stuff in crud.py here instead.
-            self.tables[tablename] = ps.get_tables(self.session.bind, [table],
-                                                   metadata=metadata)[0]
-
-
-        recs = req.get_events(self.session, origin, event=event, region=region, 
-                              deg=deg, km=km, swath=swath, mag=mag, depth=depth,
-                              etime=etime, orids=orids, evids=evids, 
-                              prefor=prefor)
-        return recs
-
-    def get_stations(self, stations=None, channels=None, nets=None, loc=None, 
-            region=None, deg=None, km=None, swath=None, stime=None):
-        """
-        Get Site table rows.
+        Query event data.
 
         >>> cat = client.get_events(eventid=609301)
 
@@ -257,11 +231,12 @@ class Client(object):
         #       do a box region first, followed by a smaller in-memory kilometer radius restriction.
         #   2) perform query using request module
         #   3) for format=translate request results to Catalog/QuakeML or EventTXT
-
-        recs = req.get_stations(self.session, site, sitechan=sitechan, 
-                affiliation=affiliation, stations=stations, channels=channels,
-                nets=nets, loc=loc, region=region, deg=deg, km=km, swath=swath,
-                stime=stime)
+        Origin = self.tables['origin'] #required
+        Event = self.tables.get('event')
+        Netmag = self.tables.get('netmag')
+        Stamag = self.tables.get('stamag')
+        Arrival = self.tables.get('arrival')
+        Assoc = self.tables.get('assoc')
 
         # Origin filters
         time_span = _None_if_none((starttime, endtime))
@@ -274,7 +249,7 @@ class Client(object):
             raise ValueError(msg)
 
         # Event filters
-        prefor = includeallorigins or False
+        prefor = not includeallorigins or False
 
         # turn string event IDs into integer evid list
         try:
@@ -300,9 +275,6 @@ class Client(object):
                            time_span=time_span, evids=evids, prefor=prefor)
         
         # q = req.get_magnitudes(Origin, Netmag, query=None, **magnitudes)
-        q = req.get_magnitudes(Origin, Netmag, 
-        
-        
 
         # magnitude
         if any([magnitudetype, minmagnitude, maxmagnitude]):
@@ -380,33 +352,174 @@ class Client(object):
         return result
 
 
-    def get_stations(self, starttime=None, endtime=None, startbefore=None,
-                     startafter=None, endbefore=None, endafter=None,
-                     network=None, station=None, location=None, channel=None,
-                     minlatitude=None, maxlatitude=None, minlongitude=None,
-                     maxlongitude=None, latitude=None, longitude=None,
-                     minradius=None, maxradius=None, level=None,
-                     includerestricted=None, includeavailability=None,
-                     updatedafter=None, matchtimeseries=None, filename=None,
-                     format="xml", **kwargs):
+    def get_stations(self,
+                     starttime: UTCDateTime = None, 
+                     endtime: UTCDateTime = None,
+                     startbefore: UTCDateTime = None,
+                     startafter: UTCDateTime = None,
+                     endbefore: UTCDateTime = None,
+                     endafter: UTCDateTime = None,
+                     network: str = None,
+                     station: str = None,
+                     location: str = None,
+                     channel: str = None,
+                     minlatitude: float = None,
+                     maxlatitude: float = None,
+                     minlongitude: float = None,
+                     maxlongitude: float = None,
+                     latitude: float = None,
+                     longitude: float = None,
+                     minradius: float = None,
+                     maxradius: float = None,
+                     level: str = None,
+                     includerestricted: bool = None,
+                     includeavailability: bool = None,
+                     updatedafter: UTCDateTime = None,
+                     matchtimeseries: bool = None,
+                     filename: str = None,
+                     format: str = "xml",
+                     **kwargs):
         """
-        Request database arrivals.
+        Query station station data.
+
+        Examples
+        --------
+
+        >>> starttime = UTCDateTime("2001-01-01")
+        >>> endtime = UTCDateTime("2001-01-02")
+        >>> inventory = client.get_stations(network="IU", station="A*",
+        ...                                 starttime=starttime,
+        ...                                 endtime=endtime)
+        >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Inventory created at ...
+            Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
+                        ...
+            Sending institution: IRIS-DMC (IRIS-DMC)
+            Contains:
+                    Networks (1):
+                            IU
+                    Stations (3):
+                            IU.ADK (Adak, Aleutian Islands, Alaska)
+                            IU.AFI (Afiamalu, Samoa)
+                            IU.ANMO (Albuquerque, New Mexico, USA)
+                    Channels (0):
+
+        The result is an `obspy.core.inventory.inventory.Inventory`
+        object which models a StationXML file.
+
+        The `level` argument determines the amount of returned information.
+        `level="station"` is useful for availability queries whereas
+        `level="response"` returns the full response information for the
+        requested channels. `level` can furthermore be set to `"network"`
+        and `"channel"`.
+
+        >>> inventory = client.get_stations(
+        ...     starttime=starttime, endtime=endtime,
+        ...     network="IU", sta="ANMO", loc="00", channel="*Z",
+        ...     level="response")
+        >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Inventory created at ...
+            Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
+                        ...
+            Sending institution: IRIS-DMC (IRIS-DMC)
+            Contains:
+                Networks (1):
+                    IU
+                Stations (1):
+                    IU.ANMO (Albuquerque, New Mexico, USA)
+                Channels (4):
+                    IU.ANMO.00.BHZ, IU.ANMO.00.LHZ, IU.ANMO.00.UHZ,
+                    IU.ANMO.00.VHZ
+
+        Parameters
+        ----------
+        starttime : UTCDateTime
+            Limit to metadata epochs starting on or after the specified start time.
+        endtime : UTCDateTime
+            Limit to metadata epochs ending on or before the specified end time.
+        startbefore : .UTCDateTime
+            Limit to metadata epochs starting before specified time.
+        startafter : UTCDateTime
+            Limit to metadata epochs starting after specified time.
+        endbefore : UTCDateTime
+            Limit to metadata epochs ending before specified time.
+        endafter : UTCDateTime
+            Limit to metadata epochs ending after specified time.
+        network : str
+            Select one or more network codes. Can be SEED network codes or data
+            center defined codes. Multiple codes are comma-separated (e.g.
+            "IU,TA").
+        station : str
+            Select one or more SEED station codes. Multiple codes are comma-separated
+            (e.g. "ANMO,PFO").
+        location : str
+            Select one or more SEED location identifiers. Multiple identifiers
+            are comma-separated (e.g. "00,01").  As a special case "--"
+            (two dashes) will be translated to a string of two space characters
+            to match blank location IDs.
+        channel : str
+            Select one or more SEED channel codes. Multiple codes are
+            comma-separated (e.g. "BHZ,HHZ").
+        minlatitude : float
+            Limit to stations with a latitude larger than the specified minimum.
+        maxlatitude : float
+            Limit to stations with a latitude smaller than the specified maximum.
+        minlongitude : float
+            Limit to stations with a longitude larger than the specified minimum.
+        maxlongitude : float
+            Limit to stations with a longitude smaller than the specified maximum.
+        latitude : float
+            Specify the latitude to be used for a radius search.
+        longitude : float
+            Specify the longitude to be used for a radius search.
+        minradius : float
+            Limit results to stations within the specified minimum number of
+            degrees from the geographic point defined by the latitude and
+            longitude parameters.
+        maxradius : float
+            Limit results to stations within the specified maximum number of
+            degrees from the geographic point defined by the latitude and
+            longitude parameters.
+        level : str
+            Specify the level of detail for the results ("network", "station",
+            "channel", "response"), e.g. specify "response" to get full
+            information including instrument response for each channel.
+        includerestricted : bool
+            Specify if results should include information for restricted stations.
+        includeavailability : bool
+            Specify if results should include information about time series data availability.
+        updatedafter : UTCDateTime
+            Limit to metadata updated after specified date; updates are data center specific.
+        matchtimeseries : bool
+            Only include data for which matching time series data is available.
+        filename : str or file
+            If given, the downloaded data will be saved there instead of being
+            parsed to an ObsPy object. Thus it will contain the raw data from
+            the webservices.
+        format : str
+            The format in which to request station information. "xml"
+            (StationXML) or "text" (FDSN station text format). XML has more
+            information but text is much faster.
+
+        Returns
+        -------
+        Inventory
+            Inventory with requested station information.
+
+        Any additional keyword arguments will be passed to the webservice as
+        additional arguments. If you pass one of the default parameters and the
+        webservice does not support it, a warning will be issued. Passing any
+        non-default parameters that the webservice does not support will raise
+        an error.
         
-        For further explanation, see: pisces.request.get_arrivals
-
         """
-        arrival = self.tables.get('arrival')
-        assoc = self.tables.get('assoc', None)
-
-        recs = get_arrivals(self.session, arrival, assoc=assoc, 
-                            stations=stations, channels=channels, atime=atime, 
-                            phases=phases, arids=arids, orids=orids, auth=auth)
-
-        return recs
+        pass
 
 
-    def get_waveforms(self, station=None, channel=None, starttime=None, 
-            endtime=None, wfids=None):
+    def get_waveforms(self, network, station, location, channel, starttime,
+                      endtime, quality=None, minimumlength=None,
+                      longestonly=None, filename=None, attach_response=False,
+                      **kwargs):
         """
         Get waveforms. 
 
@@ -414,6 +527,8 @@ class Client(object):
 
         The services can deal with UNIX style wildcards.
 
+        >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
+        >>> t2 = t1 + 5
         >>> st = client.get_waveforms("IU", "A*", "1?", "LHZ", t1, t2)
         >>> print(st)  # doctest: +ELLIPSIS
         3 Trace(s) in Stream:
