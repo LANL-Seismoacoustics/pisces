@@ -400,7 +400,7 @@ class PiscesMeta(DeclarativeMeta):
             cls._format_string = string_formatter(cls.__base__.metadata, [c.name for c in cls.__table__.columns])
             cls.__doc__ = _update_docstring(cls)
             cls._tabletype =  parents[0].__name__
-            cls._tableschema = parents[0].__module__.split('.')[2]
+            cls._tableschema = parents[0].__module__.split('.')[-1]
 
 
 # -------- common parser functions for info['parser'] --------
