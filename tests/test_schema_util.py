@@ -1,6 +1,8 @@
-import unittest
+"""
+Test for general schema utility functions and classes.
 
-import nose.tools as t
+"""
+import pytest
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import DeferredReflection
 from sqlalchemy.orm import declarative_base
@@ -8,39 +10,78 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from pisces import db_connect
 import pisces.schema.util as util
-import pisces.schema.kbcore as kb
 
 
-class TestPiscesMeta(unittest.TestCase):
-    def setUp(self):
-        from pisces.schema.util import PiscesMeta
-        Base = declarative_base(metaclass=PiscesMeta)
-        class Sitechan(Base):
-            __tablename__ = 'sitechan'
-            __table_args__ = (sa.UniqueConstraint('sta','chan','ondate'),
-                              sa.PrimaryKeyConstraint('chanid'))
-            sta = sa.Column(sa.String(6))
-            chan = sa.Column(sa.String(8))
-            ondate = sa.Column(sa.Integer)
-            chanid = sa.Column(sa.Integer)
-            offdate = sa.Column(sa.Integer)
-            ctype = sa.Column(sa.String(4))
-            edepth = sa.Column(sa.Float(24))
-            hang = sa.Column(sa.Float(24))
-            vang = sa.Column(sa.Float(24))
-            descrip = sa.Column(sa.String(50))
-            lddate = sa.Column(sa.DateTime)
+@pytest.fixture(scope='function')
+def abstract_sitechan():
+    """ An abstract table inheriting from PiscesMeta. """
+    from pisces.schema.util import PiscesMeta
+    Base = declarative_base(metaclass=PiscesMeta)
+    class AbstractSitechan(Base):
+        __abstract__ = True
+        @declared_attr
+        def __table_args__(cls):
+            return (sa.UniqueConstraint('sta','chan','ondate'),
+                    sa.PrimaryKeyConstraint('chanid'))
+        sta = sa.Column(sa.String(6))
+        chan = sa.Column(sa.String(8))
+        ondate = sa.Column(sa.Integer)
+        chanid = sa.Column(sa.Integer)
+        offdate = sa.Column(sa.Integer)
+        ctype = sa.Column(sa.String(4))
+        edepth = sa.Column(sa.Float(24))
+        hang = sa.Column(sa.Float(24))
+        vang = sa.Column(sa.Float(24))
+        descrip = sa.Column(sa.String(50))
+        lddate = sa.Column(sa.DateTime)
 
-    def test_qualified_tablename_abstract(self):
+    return AbstractSitechan
 
-        class Sitechan(kb.Sitechan):
+@pytest.fixture(scope='function')
+def concrete_sitechan():
+    """ A concrete table inheriting directly from PiscesMeta. """
+    from pisces.schema.util import PiscesMeta
+    Base = declarative_base(metaclass=PiscesMeta)
+    class Sitechan(Base):
+        __tablename__ = 'sitechan'
+        __table_args__ = (sa.UniqueConstraint('sta','chan','ondate'),
+                            sa.PrimaryKeyConstraint('chanid'))
+        sta = sa.Column(sa.String(6))
+        chan = sa.Column(sa.String(8))
+        ondate = sa.Column(sa.Integer)
+        chanid = sa.Column(sa.Integer)
+        offdate = sa.Column(sa.Integer)
+        ctype = sa.Column(sa.String(4))
+        edepth = sa.Column(sa.Float(24))
+        hang = sa.Column(sa.Float(24))
+        vang = sa.Column(sa.Float(24))
+        descrip = sa.Column(sa.String(50))
+        lddate = sa.Column(sa.DateTime)
+
+    return Sitechan
+
+class TestPiscesMeta:
+    def test_qualified_tablename_abstract(self, abstract_sitechan):
+        """ Tables inheriting from abstract tables properly split schema.name """
+
+        class Sitechan(abstract_sitechan):
             __tablename__ = 'test.sitechan'
 
-        self.assertTrue(Sitechan.__table__.name == 'sitechan')
-        self.assertTrue(Sitechan.__table__.schema == 'test')
-        self.assertTrue(Sitechan.__tablename__ == 'sitechan')
+        assert Sitechan.__table__.name == 'sitechan'
+        assert Sitechan.__table__.schema == 'test'
+        assert Sitechan.__tablename__ == 'sitechan'
 
-    @unittest.skip("Not yet implemented.")
+    def test_unqualified_tablename_abstract(self, abstract_sitechan):
+        """ Tables inheriting from abstract tables properly split name """
+
+        class Sitechan(abstract_sitechan):
+            __tablename__ = 'sitechan'
+
+        assert Sitechan.__table__.name == 'sitechan'
+        assert Sitechan.__table__.schema == None
+        assert Sitechan.__tablename__ == 'sitechan'
+
+    @pytest.mark.skip("Not yet implemented.")
     def test_reflect_qualified_tablename(self):
         """
         Reflect an actual schema-qualified database table.
@@ -53,173 +94,57 @@ class TestPiscesMeta(unittest.TestCase):
         session = db_connect()
         Site.prepare(session.bind)
 
-        self.assertTrue(Site.__tablename__ == 'site')
-        self.assertTrue(Site.__table__.name == 'site')
-        self.assertTrue(Site.__table__.schema == 'jkmacc')
+        assert Site.__tablename__ == 'site'
+        assert Site.__table__.name == 'site'
+        assert Site.__table__.schema == 'jkmacc'
 
-    @unittest.skip("Not yet implemented.")
+    @pytest.mark.skip("Not yet implemented.")
     def test_reflect_qualified_tablename_pk(self):
         pass
 
-def test_normal_declarative():
-    from pisces.schema.util import PiscesMeta
-    Base = declarative_base(metaclass=PiscesMeta)
-    class Sitechan(Base):
-        __tablename__ = 'sitechan'
-        __table_args__ = (sa.UniqueConstraint('sta','chan','ondate'),
-                          sa.PrimaryKeyConstraint('chanid'))
-        sta = sa.Column(sa.String(6))
-        chan = sa.Column(sa.String(8))
-        ondate = sa.Column(sa.Integer)
-        chanid = sa.Column(sa.Integer)
-        offdate = sa.Column(sa.Integer)
-        ctype = sa.Column(sa.String(4))
-        edepth = sa.Column(sa.Float(24))
-        hang = sa.Column(sa.Float(24))
-        vang = sa.Column(sa.Float(24))
-        descrip = sa.Column(sa.String(50))
-        lddate = sa.Column(sa.DateTime)
+    def test_qualified_tablename_concrete(self, concrete_sitechan):
+        assert concrete_sitechan.__tablename__ == 'sitechan'
+        assert concrete_sitechan.__table__.name == 'sitechan'
+        assert concrete_sitechan.__table__.schema == None
 
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
+    @pytest.mark.skip("Not yet implemented.")
+    def test_reflected_declarative(self):
+        from pisces.schema.util import PiscesMeta
+        session = db_connect()
+        Base = declarative_base(metaclass=PiscesMeta)
+        class Site(Base, DeferredReflection):
+            __tablename__ = 'site'
+        Site.prepare(session.bind)
 
-@unittest.skip("Not yet implemented.")
-def test_reflected_declarative():
-    from pisces.schema.util import PiscesMeta
-    session = db_connect()
-    Base = declarative_base(metaclass=PiscesMeta)
-    class Site(Base, DeferredReflection):
-        __tablename__ = 'site'
-    Site.prepare(session.bind)
+        assert Site.__tablename__ == 'site'
+        assert Site.__table__.name == 'site'
 
-    t.assert_true(Site.__tablename__ == 'site')
-    t.assert_true(Site.__table__.name == 'site')
+    @pytest.mark.skip("Not yet implemented.")
+    def test_reflected_declarative_pk_override(self):
+        from pisces.schema.util import PiscesMeta
+        session = db_connect
+        Base = declarative_base(metaclass=PiscesMeta)
+        class Sitechan(Base, DeferredReflection):
+            __tablename__ = 'sitechan'
+            __primary_keys__ = ['chanid']
+        Sitechan.prepare(session.bind)
 
-@unittest.skip("Not yet implemented.")
-def test_reflected_declarative_pk_override():
-    from pisces.schema.util import PiscesMeta
-    session = db_connect
-    Base = declarative_base(metaclass=PiscesMeta)
-    class Sitechan(Base, DeferredReflection):
-        __tablename__ = 'sitechan'
-        __primary_keys__ = ['chanid']
-    Sitechan.prepare(session.bind)
-
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
-    t.assert_true('chanid' in Sitechan.__table__.primary_key)
-
-def test_schema_declarative():
-    from pisces.schema.util import PiscesMeta
-    Base = declarative_base(metaclass=PiscesMeta)
-    class Sitechan(Base):
-        __tablename__ = 'testuser.sitechan'
-        __table_args__ = (sa.UniqueConstraint('sta','chan','ondate'),
-                          sa.PrimaryKeyConstraint('chanid'))
-        sta = sa.Column(sa.String(6))
-        chan = sa.Column(sa.String(8))
-        ondate = sa.Column(sa.Integer)
-        chanid = sa.Column(sa.Integer)
-        offdate = sa.Column(sa.Integer)
-        ctype = sa.Column(sa.String(4))
-        edepth = sa.Column(sa.Float(24))
-        hang = sa.Column(sa.Float(24))
-        vang = sa.Column(sa.Float(24))
-        descrip = sa.Column(sa.String(50))
-        lddate = sa.Column(sa.DateTime)
-
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
-    t.assert_true(Sitechan.__table__.schema == 'testuser')
-
-def test_abstract_declarative():
-    from pisces.schema.util import PiscesMeta
-    Base = declarative_base(metaclass=PiscesMeta)
-    class AbstractSitechan(Base):
-        __abstract__ = True
-        @declared_attr
-        def __table_args__(cls):
-            return (sa.UniqueConstraint('sta','chan','ondate'),
-                    sa.PrimaryKeyConstraint('chanid'))
-        sta = sa.Column(sa.String(6))
-        chan = sa.Column(sa.String(8))
-        ondate = sa.Column(sa.Integer)
-        chanid = sa.Column(sa.Integer)
-        offdate = sa.Column(sa.Integer)
-        ctype = sa.Column(sa.String(4))
-        edepth = sa.Column(sa.Float(24))
-        hang = sa.Column(sa.Float(24))
-        vang = sa.Column(sa.Float(24))
-        descrip = sa.Column(sa.String(50))
-        lddate = sa.Column(sa.DateTime)
-
-    class Sitechan(AbstractSitechan):
-        __tablename__ = 'sitechan'
-
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
-
-def test_schema_abstract_declarative():
-    from pisces.schema.util import PiscesMeta
-    Base = declarative_base(metaclass=PiscesMeta)
-    class AbstractSitechan(Base):
-        __abstract__ = True
-        @declared_attr
-        def __table_args__(cls):
-            return (sa.UniqueConstraint('sta','chan','ondate'),
-                    sa.PrimaryKeyConstraint('chanid'))
-        sta = sa.Column(sa.String(6))
-        chan = sa.Column(sa.String(8))
-        ondate = sa.Column(sa.Integer)
-        chanid = sa.Column(sa.Integer)
-        offdate = sa.Column(sa.Integer)
-        ctype = sa.Column(sa.String(4))
-        edepth = sa.Column(sa.Float(24))
-        hang = sa.Column(sa.Float(24))
-        vang = sa.Column(sa.Float(24))
-        descrip = sa.Column(sa.String(50))
-        lddate = sa.Column(sa.DateTime)
-
-    class Sitechan(AbstractSitechan):
-        __tablename__ = 'testuser.sitechan'
-
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
-    t.assert_true(Sitechan.__table__.schema == 'testuser')
-
-def test_two_abstract_declarative():
-    from pisces.schema.util import PiscesMeta
-    Base = declarative_base(metaclass=PiscesMeta)
-    class AbstractSitechan(Base):
-        __abstract__ = True
-        @declared_attr
-        def __table_args__(cls):
-            return (sa.UniqueConstraint('sta','chan','ondate'),
-                    sa.PrimaryKeyConstraint('chanid'))
-        sta = sa.Column(sa.String(6))
-        chan = sa.Column(sa.String(8))
-        ondate = sa.Column(sa.Integer)
-        chanid = sa.Column(sa.Integer)
-        offdate = sa.Column(sa.Integer)
-        ctype = sa.Column(sa.String(4))
-        edepth = sa.Column(sa.Float(24))
-        hang = sa.Column(sa.Float(24))
-        vang = sa.Column(sa.Float(24))
-        descrip = sa.Column(sa.String(50))
-        lddate = sa.Column(sa.DateTime)
-
-    class Sitechan(AbstractSitechan):
-        __tablename__ = 'sitechan'
-
-    class JSitechan(AbstractSitechan):
-        __tablename__ = 'testuser.sitechan'
-
-    t.assert_true(Sitechan.__tablename__ == 'sitechan')
-    t.assert_true(Sitechan.__table__.name == 'sitechan')
-    t.assert_true(JSitechan.__tablename__ == 'sitechan')
-    t.assert_true(JSitechan.__table__.name == 'sitechan')
-    t.assert_true(JSitechan.__table__.schema == 'testuser')
+        assert Sitechan.__tablename__ == 'sitechan'
+        assert Sitechan.__table__.name == 'sitechan'
+        assert 'chanid' in Sitechan.__table__.primary_key
 
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_two_abstract(self, abstract_sitechan):
+        """ No errors when multiple tables are declared in same scope. """
+
+        class Sitechan(abstract_sitechan):
+            __tablename__ = 'sitechan'
+
+        class JSitechan(abstract_sitechan):
+            __tablename__ = 'testuser.sitechan'
+
+        assert Sitechan.__tablename__ == 'sitechan'
+        assert Sitechan.__table__.name == 'sitechan'
+        assert JSitechan.__tablename__ == 'sitechan'
+        assert JSitechan.__table__.name == 'sitechan'
+        assert JSitechan.__table__.schema == 'testuser'
