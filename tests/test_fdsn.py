@@ -27,14 +27,14 @@ def engine():
     return create_engine('sqlite://')
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def tables(engine):
     kb.Site.metadata.create_all(engine) # use the MetaData from any table
     yield
     kb.Site.metadata.drop_all(engine)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def dbsession(engine, tables):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
     connection = engine.connect()
@@ -75,15 +75,17 @@ def test_get_events_defaults(dbsession):
 def test_get_waveforms_defaults(dbsession):
     """ If only required parameters are supplied, a simple request returns a result.
     """
-    a = np.arange(100, dtype='<i4')
+    N = 100
+    fs = 20
+    a = np.arange(N, dtype='<i4')
     t1 = UTCDateTime('2015001')
-    t2 = t1 + 100/20
+    t2 = t1 + N/fs
     fp = tempfile.NamedTemporaryFile()
     a.tofile(fp)
-    affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-100,
-                           endtime=t2.timestamp+100)
+    affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-N,
+                           endtime=t2.timestamp+N)
     wf = kb.Wfdisc(sta='ANMO', chan='BHZ', time=t1.timestamp, endtime=t2.timestamp, 
-                   samprate=20, wfid=1, chanid=2, nsamp=100, foff=0, datatype='i4',
+                   samprate=fs, wfid=1, chanid=2, nsamp=N, foff=0, datatype='i4',
                    dir=os.path.dirname(fp.name), dfile=os.path.basename(fp.name))
     tr = wf.to_trace()
     dbsession.add_all([wf, affil])

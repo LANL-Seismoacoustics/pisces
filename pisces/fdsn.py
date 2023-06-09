@@ -93,7 +93,7 @@ class Client(object):
             session = dburl_or_session
 
         # this is just a test, will fail early if the connection is misconfigured
-        session.bind.connect()
+        # session.bind.connect()
 
         self.session = session
         self.tables = tables
@@ -186,7 +186,7 @@ class Client(object):
             Specify if phase arrivals should be included.
             Requires Assoc and Arrival tables.
         eventid : int, optional
-            Select a specific event by ID (evid).
+            Select a specific event by ID (evid), or comma-separated list of IDs.
         limit : int, optional
             Limit the results to the specified number of events.
         offset : int, optional
@@ -249,12 +249,15 @@ class Client(object):
             raise ValueError(msg)
 
         # Event filters
-        prefor = not includeallorigins or False
+        if includeallorigins in (None, False):
+            prefor = True
+        else:
+            prefor = False
 
         # turn string event IDs into integer evid list
-        try:
-            evids = eventid.split(',')
-        except AttributeError:
+        if eventid:
+            evids = [int(evid) for evid in eventid.split(',')]
+        else:
             evids = None
 
         # Netmag filters
@@ -271,8 +274,8 @@ class Client(object):
         magtype = magnitudetype
 
 
-        q = req.get_events(self.session, Origin, Event, region=region, radius=radius, depth=depth, 
-                           time_span=time_span, evids=evids, prefor=prefor)
+        q = req.get_events(self.session, Origin, Event, region=region, depth=depth, 
+                           etime=time_span, evids=evids, prefor=prefor, asquery=True)
         
         # q = req.get_magnitudes(Origin, Netmag, query=None, **magnitudes)
 
@@ -344,7 +347,7 @@ class Client(object):
         q = q.limit(limit) if limit else q
         q = q.offset(offset) if offset else q
 
-        if 'asquery' in kwargs:
+        if kwargs.get('asquery'):
             result = q
         else:
             result = q.all()
@@ -518,23 +521,13 @@ class Client(object):
 
     def get_waveforms(self, network, station, location, channel, starttime,
                       endtime, quality=None, minimumlength=None,
-                      longestonly=None, filename=None, attach_response=False,
+                      longestonly=None, attach_response=False, asquery=False,
                       **kwargs):
         """
-        Get waveforms. 
-
-        For further explanation, see: pisces.request.get_waveforms
-
-        The services can deal with UNIX style wildcards.
-
-        >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
-        >>> t2 = t1 + 5
-        >>> st = client.get_waveforms("IU", "A*", "1?", "LHZ", t1, t2)
-        >>> print(st)  # doctest: +ELLIPSIS
-        3 Trace(s) in Stream:
-        IU.ADK.10.LHZ  | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
-        IU.AFI.10.LHZ  | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
-        IU.ANMO.10.LHZ | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
+        Get waveforms from the database.
+        
+        Requires the data and response directories in 'dir' and 'dfile' columns
+        to be available/mounted on the client machine.
 
         network : str
             Select one or more network codes. Can be SEED network codes or data
@@ -555,18 +548,40 @@ class Client(object):
         endtime : obspy.core.utcdatetime.UTCDateTime
             Limit results to time series samples on or before the specified end
             time
+        quality : str, optional
+            Select a specific SEED quality indicator, handling is data center
+            dependent. Not currently implemented.
         minimumlength : float, optional
             Limit results to continuous data segments of a minimum length
             specified in seconds.
+        longestonly : bool, optional
+            Limit results to the longest continuous segment per channel.
+        attach_response : bool
+            Specify whether the station web service should be used to
+            automatically attach response information to each trace in the
+            result set. A warning will be shown if a response can not be found.
+            Not currently implemented.
         asquery : bool, optional
             If True, doesn't return a Stream, but instead returns the SQLAlchemy
             Query instance that was produced by the passed parameters.
+            for a channel. Does nothing if output to a file was specified.
 
-        Any additional keyword arguments will be passed to the webservice as
+        Any additional keyword arguments will be passed to the query engine as
         additional arguments. If you pass one of the default parameters and the
-        webservice does not support it, a warning will be issued. Passing any
-        non-default parameters that the webservice does not support will raise
+        query engine does not support it, a warning will be issued. Passing any
+        non-default parameters that the query engine does not support will raise
         an error.
+
+        Examples
+        --------
+        >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
+        >>> t2 = t1 + 5
+        >>> st = client.get_waveforms("IU", "A*", "1?", "LHZ", t1, t2)
+        >>> print(st)  # doctest: +ELLIPSIS
+        3 Trace(s) in Stream:
+        IU.ADK.10.LHZ  | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
+        IU.AFI.10.LHZ  | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
+        IU.ANMO.10.LHZ | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
 
         """
         # Use ``attach_response=True`` to automatically add response information
@@ -580,21 +595,8 @@ class Client(object):
         # <obspy.core.stream.Stream object at ...>
         # >>> st.plot()  # doctest: +SKIP
 
-        # .. plot::
-
-        #     from obspy import UTCDateTime
-        #     from obspy.clients.fdsn import Client
-        #     client = Client("IRIS")
-        #     t = UTCDateTime("2012-12-14T10:36:01.6Z")
-        #     st = client.get_waveforms("TA", "E42A", "*", "BH?", t+300, t+400,
-        #                               attach_response=True)
-        #     st.remove_response(output="VEL")
-        #     st.plot()
-
         # longestonly : bool, optional
         #     Limit results to the longest continuous segment per channel.
-
-        # TODO: this method needs to use request.get_waveforms
 
         Wfdisc = self.tables['wfdisc'] # required
         Affil = self.tables.get('affiliation')
@@ -608,53 +610,64 @@ class Client(object):
         wildcardables = [util.glob_to_like(item) for item in wildcardables]
         network, station, location, channel = wildcardables
 
-        # turn any comma "lists" into Python lists
-        # even single strings are now a single element list
+        # turn any "comma lists" into Python lists
         listables = (network, station, location, channel)
         listables = [listable.split(',') for listable in listables]
         networks, stations, locations, channels = listables
+        # even single strings are now a single element list
 
+        # XXX: we decided not to support this
         # In CSS-like schema, location codes are often just tacked onto channel
         # codes.  channel may now included multiple wildcards.  Do a cartesian
         # product of location codes tacked at the end of channel codes.
-        channels = [chan + loc for chan in channels for loc in locations]
+        # channels = [chan + loc for chan in channels for loc in locations]
 
         t1, t2 = starttime.timestamp, endtime.timestamp
 
         # Build the query
-        # TODO: I need to be using request.get_wfdisc_rows here.
-        #q = req.get_wfdisc_rows(self.session, Wfdisc, t1, t2, asquery=True)
+        q = req.get_wfdisc_rows(self.session, Wfdisc, sta=stations, chan=channel, t1=t1, t2=t2, asquery=True)
 
-        q = self.session.query(Wfdisc)
+        # q = self.session.query(Wfdisc)
 
-        q = q.filter(Wfdisc.sta == Affil.sta)
+        # # apply string filters/expressions
+        # q = q.filter(util.string_expression(Wfdisc.sta, stations))
+        # q = q.filter(util.string_expression(Wfdisc.chan, channels))
 
-        # apply string filters/expressions
-        q = q.filter(util.string_expression(Affil.net, networks))
-        q = q.filter(util.string_expression(Wfdisc.sta, stations))
-        q = q.filter(util.string_expression(Wfdisc.chan, channels))
+        # CHUNKSIZE = 24 * 60 * 60
+        # q = q.filter(Wfdisc.time.between(t1 - CHUNKSIZE, t2))
+        # q = q.filter(Wfdisc.time > t1)
+        # q = q.filter(Wfdisc.time <= t2)
 
-        # TODO: time here
-        CHUNKSIZE = 24 * 60 * 60
-        q = q.filter(Wfdisc.time.between(t1 - CHUNKSIZE, t2))
-        q = q.filter(Wfdisc.time > t1)
-        q = q.filter(Wfdisc.time <= t2)
+        if networks:
+            try:
+                q = q.filter(Wfdisc.sta == Affil.sta)
+                q = q.filter(util.string_expression(Affil.net, networks))
+            except AttributeError:
+                # Affil is None and has no ".sta" or ".net"
+                msg = "No Affiliation table provided for network filtering."
+                log.error(msg)
+                # XXX: change this to pisces.exc.MissingTableError
+                raise ValueError(msg)
 
         if minimumlength:
             q = q.filter((Wfdisc.endtime - Wfdisc.time ) > minimumlength)
 
-        log.debug(util.literal_sql(self.session, q))
+        if asquery:
+            out = q
+        else:
+            out = req.wfdisc_rows_to_stream(q, starttime, endtime)
+        # log.debug(util.literal_sql(self.session, q))
 
-        st = Stream()
-        for wf in q:
-            try:
-                tr = wfdisc2trace(wf)
-                st.append(tr)
-            except IOError:
-                msg = "Unable to read file: dir = {}, dfile = {}"
-                log.error(msg.format(wf.dir, wf.dfile)) # TODO: append action IOError message, too
+        # st = Stream()
+        # for wf in q:
+        #     try:
+        #         tr = wfdisc2trace(wf)
+        #         st.append(tr)
+        #     except IOError:
+        #         msg = "Unable to read file: dir = {}, dfile = {}"
+        #         log.error(msg.format(wf.dir, wf.dfile)) # TODO: append action IOError message, too
 
-        st.trim(starttime, endtime)
-        # TODO: merge them?
+        # st.trim(starttime, endtime)
+        # # TODO: merge them?
 
-        return st
+        return out
