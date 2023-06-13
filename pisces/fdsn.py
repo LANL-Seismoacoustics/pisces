@@ -185,8 +185,9 @@ class Client(object):
         includearrivals : bool, optional
             Specify if phase arrivals should be included.
             Requires Assoc and Arrival tables.
-        eventid : int, optional
+        eventid : str or int, optional
             Select a specific event by ID (evid), or comma-separated list of IDs.
+            e.g. 1234 or '1234,5678'
         limit : int, optional
             Limit the results to the specified number of events.
         offset : int, optional
@@ -209,14 +210,10 @@ class Client(object):
             Looks for contributer inside of origin.auth.
         updatedafter : obspy.core.utcdatetime.UTCDateTime, optional
             Limit to events updated after the specified time.
-        eventid : str
-            One or more comma-separated evids: '1234' or '1234,5678'
-        filename : str or file
-            If given, the downloaded data will be saved there instead of being
-            parse to an ObsPy object. Thus it will contain the raw data from
-            the webservices.
         format : str ["xml" (StationXML) | "text" (FDSN station text format) | query (raw SQLAlchey query)]
             The format in which to request station information. 
+        asquery : bool
+            Return results as a raw SQLAlchemy query instead of the results proper.
 
         Any additional keyword arguments will be passed to the webservice as
         additional arguments. If you pass one of the default parameters and the
@@ -225,12 +222,6 @@ class Client(object):
         an error.
 
         """
-        # the plan:
-        #   1) translate FDSN arguments to request.get_events arguments
-        #       Translate any search radius to a worst-case-scenario degrees search radius (equator),
-        #       do a box region first, followed by a smaller in-memory kilometer radius restriction.
-        #   2) perform query using request module
-        #   3) for format=translate request results to Catalog/QuakeML or EventTXT
         Origin = self.tables['origin'] #required
         Event = self.tables.get('event')
         Netmag = self.tables.get('netmag')
@@ -274,9 +265,9 @@ class Client(object):
         magtype = magnitudetype
 
 
-        q = req.get_events(self.session, Origin, Event, region=region, depth=depth, 
+        q = req.get_events(self.session, Origin, event=Event, region=region, depth=depth, 
                            etime=time_span, evids=evids, prefor=prefor, asquery=True)
-        
+
         # q = req.get_magnitudes(Origin, Netmag, query=None, **magnitudes)
 
         # magnitude
