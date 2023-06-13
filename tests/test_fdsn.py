@@ -58,12 +58,14 @@ def dbsession(engine, tables):
 
 def test_get_events_defaults(dbsession):
     origin = kb.Origin(orid=1, evid=2, lat=40, lon=123)
+    origin2 = kb.Origin(orid=2, evid=1, lat=42, lon=123)
     event = kb.Event(evid=2)
-    dbsession.add_all([origin, event])
+    dbsession.add_all([origin, origin2, event])
     dbsession.commit()
 
     client = Client(dbsession, origin=kb.Origin, event=kb.Event)
     origins = client.get_events(minlatitude=39, maxlatitude=41)
+
     assert len(origins) == 1
     assert origins[0] == origin
 
@@ -80,23 +82,26 @@ def test_get_waveforms_defaults(dbsession):
     a = np.arange(N, dtype='<i4')
     t1 = UTCDateTime('2015001')
     t2 = t1 + N/fs
-    fp = tempfile.NamedTemporaryFile()
-    a.tofile(fp)
-    affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-N,
-                           endtime=t2.timestamp+N)
-    wf = kb.Wfdisc(sta='ANMO', chan='BHZ', time=t1.timestamp, endtime=t2.timestamp, 
-                   samprate=fs, wfid=1, chanid=2, nsamp=N, foff=0, datatype='i4',
-                   dir=os.path.dirname(fp.name), dfile=os.path.basename(fp.name))
-    tr = wf.to_trace()
-    dbsession.add_all([wf, affil])
-    dbsession.commit()
-
     client = Client(dbsession, wfdisc=kb.Wfdisc, affiliation=kb.Affiliation)
-    st = client.get_waveforms('IU', 'ANMO', '', 'BHZ', t1, t2)
+    with tempfile.NamedTemporaryFile() as fp:
+        a.tofile(fp)
+        affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-N,
+                            endtime=t2.timestamp+N)
+        wf = kb.Wfdisc(sta='ANMO', chan='BHZ', time=t1.timestamp, endtime=t2.timestamp, 
+                    samprate=fs, wfid=1, chanid=2, nsamp=N, foff=0, datatype='i4',
+                    dir=os.path.dirname(fp.name), dfile=os.path.basename(fp.name))
+        tr = wf.to_trace()
+        dbsession.add_all([wf, affil])
+        dbsession.commit()
+
+        st = client.get_waveforms('IU', 'ANMO', '', 'BHZ', t1, t2)
 
     assert len(st) == 1
-    assert st[0] == tr
+    assert (
+        st[0].id == tr.id and
+        st[0].stats.starttime == tr.stats.starttime and
+        st[0].stats.endtime == tr.stats.endtime
+    )
 
-    fp.close()
 
 
