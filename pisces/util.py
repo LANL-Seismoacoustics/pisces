@@ -765,3 +765,107 @@ def make_wildcard_list(toList):
        nowList[x] = nowList[x].replace('?','_') 
     
     return nowList
+
+def glob_to_like(text, escape='\\'):
+    """
+    Replace FDSN wildcards to equivalent SQL wildcards.
+
+    Replace '*' or '?' glob characters with SQL '%' or '_' LIKE characters,
+    escaping any existing literal '%' or '_' characters.
+
+    """
+    # TODO: rename fdsn2sql_glob?
+    text = text.replace('_', escape + '_').replace('?', '_')
+    text = text.replace('%', escape + '%').replace('*', '%')
+
+    return text
+
+
+def has_sql_wildcards(text, escape='\\'):
+    """ Test for non-escaped '_' or '%' SQL wildcard characters in a string.
+    """
+    # XXX: fails for '_HZ,B\\_Z' ?
+    has_wildcards = ('_' in text and escape + '_' not in text) or \
+                    ('%' in text and escape + '%' not in text)
+
+    return has_wildcards
+
+
+def string_expression(selectable, string_filters):
+    """
+    Produce a SQLAlchemy filter clause on a given string-type column for a
+    list of string patterns.
+
+    Produces LIKE statements if wildcards are present, IN when a list is present,
+    == when a single non-wildcarded string is present.  Lists may be comma-separated
+    strings.
+
+    Takes a SQLAlchemy selectable (e.g. Site.sta) and a list of strings (e.g.
+    ['MDJ']) and creates the appropriate SQL filter expression on the provided
+    selectable. The string patterns may include LIKE characters '_' and '%'.
+
+    Parameters
+    ----------
+    selectable : sqlalchemy.orm.attributes.InstrumentedAttribute
+        This is simply an ORM Table string-type column, like Site.sta
+    string_filters : list of str
+        List of one or more strings for subsetting, which may include SQL LIKE
+        characters '_' and '%'.  e.g. ['BHZ'], ['%Z', 'BH_'].
+        The easiest way to get this for a string list that may be comma separated
+        (e.g. '%Z,B_N') is to always use '%Z,B_N'.split(',').
+
+    Returns
+    -------
+    expression : SQLAlchemy expression
+        An expression to be applied with query.filter(expression).  Equivalent
+        to a SQL EQUAL, IN, LIKE statement, or an OR statement containing
+        EQUAL, IN, or LIKE statements.
+
+    Examples
+    --------
+    >>> from pisces.tables.css3 import Wfdisc
+    >>> channels = ['%Z', 'B_N', 'HHT']
+    >>> chan_expr = string_expression(Wfdisc.chan, channels)
+    >>> literal_sql(session.bind, chan_expr) # just shows the literal compiled SQL
+    "wfdisc.chan LIKE '%Z' OR wfdisc.chan LIKE 'B_N' OR wfdisc.chan = 'HHT'"
+    >>> wfdisc_rows = session.query(Wfdisc).filter(chan_expr).all()
+
+    """
+    string_filters = string_filters.split(',') if type(string_filters) is str else string_filters
+
+    if len(string_filters) == 1:
+        # don't use OR or IN
+        string_filter = string_filters[0]
+        if has_sql_wildcards(string_filter):
+            expression = selectable.like(string_filter)
+        else:
+            expression = selectable == string_filter
+    else:
+        # use OR (for wildcards) or IN
+        if any([has_sql_wildcards(string_filter) for string_filter in string_filters]):
+            # can't use IN, must use LIKE with OR
+            # produces query.filter(or_(selectable.like(thing1), selectable == thing2, ...))
+            clauses = [selectable.like(string_filter) if has_sql_wildcards(string_filter)
+                       else selectable == string_filter
+                       for string_filter in string_filters]
+            expression = sa.or_(*clauses)
+        else:
+            # no wildcards, can just use in_
+            expression = selectable.in_(string_filters)
+
+    return expression
+
+
+def literal_sql(engine, statement_or_query):
+    # https://stackoverflow.com/questions/5631078/sqlalchemy-print-the-actual-query
+    try:
+        # it's a query
+        statement = statement_or_query.statement
+    except AttributeError:
+        # it was already a statement
+        statement = statement_or_query
+
+    sql = str(statement.compile(engine,
+              compile_kwargs={'literal_binds': True}))
+
+    return sql
