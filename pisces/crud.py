@@ -232,7 +232,7 @@ def make_tables(*tables, **kwargs):
     tablenames = make_table_names(*tables, schema=schema, prefix=prefix)
 
     if owner:
-        parents = (declarative_base(metadata=sa.metaData(schema=owner)),)
+        parents = (declarative_base(metadata=sa.MetaData(schema=owner)),)
     else:
         parents = ()
 
@@ -243,7 +243,7 @@ def make_tables(*tables, **kwargs):
     for table, tablename in tablenames.items():
         prototype = CORETABLES[table].prototype
         # TODO: capitalize tablename?
-        out[table] = type(tablename, parents + (prototype,),
+        out[table] = type(tablename.capitalize(), parents + (prototype,),
                           {'__tablename__': tablename})
 
     return out
