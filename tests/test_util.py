@@ -49,6 +49,10 @@ def test_string_expressions():
     expected = Sitechan.chan.like('BH%')
     assert str(expression) == str(expected)
 
+    expression = util.string_expression(Sitechan.chan, 'BH%')
+    expected = Sitechan.chan.like('BH%')
+    assert str(expression) == str(expected)
+
     channels = ['BHZ', 'LH%']
     expression = util.string_expression(Sitechan.chan, channels)
     expected = sa.or_(Sitechan.chan == 'BHZ', Sitechan.chan.like('LH%'))
