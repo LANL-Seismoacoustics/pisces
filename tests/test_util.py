@@ -3,34 +3,18 @@ Test functions in pisces.util
 
 """
 from configparser import ConfigParser
-import datetime
-
-import pytest
 
 import sqlalchemy as sa
-from obspy import UTCDateTime
 
 import pisces.util as util
-from pisces.tables.css3 import Sitechan
+from pisces.tables.kbcore import Sitechan
 
 
-@pytest.mark.skip(reason="FDSNClient tests")
-def test_datetime_to_epoch():
-    epoch = 1504904052.687516
-
-    dt = datetime.datetime.fromtimestamp(epoch)
-    assert util.datetime_to_epoch(dt) == pytest.approx(epoch)
-
-    utc = UTCDateTime(epoch)
-    assert util.datetime_to_epoch(utc) == pytest.approx(epoch)
-
-@pytest.mark.skip(reason="FDSNClient tests")
 def test_glob_to_like():
     assert util.glob_to_like('BH*') == 'BH%'
     assert util.glob_to_like('BH?') == 'BH_'
     assert util.glob_to_like('BH%') == 'BH\\%'
 
-@pytest.mark.skip(reason="FDSNClient tests")
 def test_has_sql_wildcards():
     assert util.has_sql_wildcards('_HZ')
     assert util.has_sql_wildcards('%HZ')
@@ -45,22 +29,34 @@ def test_make_wildcard_list():
     assert util.make_wildcard_list('*HZ,HHZ') == ['%HZ', 'HHZ']
     assert util.make_wildcard_list(('*HZ', 'HHZ')) == ['%HZ', 'HHZ']
 
-@pytest.mark.skip(reason="FDSNClient tests")
+
 def test_string_expressions():
     expression = util.string_expression(Sitechan.chan, ['BHZ'])
-    assert expression == (Sitechan.chan == 'BHZ')
+    expected = Sitechan.chan == 'BHZ'
+    assert str(expression) == str(expected)
 
     channels = ['BHZ', 'BHN']
     expression = util.string_expression(Sitechan.chan, channels)
-    assert expression == sa.or_(Sitechan.chan.in_(channels))
+    expected = sa.or_(Sitechan.chan.in_(channels))
+    assert str(expression) == str(expected)
+
+    channels = 'BHZ,BHN'
+    expression = util.string_expression(Sitechan.chan, channels)
+    expected = sa.or_(Sitechan.chan.in_(channels.split(',')))
+    assert str(expression) == str(expected)
 
     expression = util.string_expression(Sitechan.chan, ['BH%'])
-    assert expression == Sitechan.chan.like('BH%')
+    expected = Sitechan.chan.like('BH%')
+    assert str(expression) == str(expected)
+
+    expression = util.string_expression(Sitechan.chan, 'BH%')
+    expected = Sitechan.chan.like('BH%')
+    assert str(expression) == str(expected)
 
     channels = ['BHZ', 'LH%']
     expression = util.string_expression(Sitechan.chan, channels)
-    assert expression == sa.or_(Sitechan.chan == 'BHZ',
-                                Sitechan.chan.like('LH%'))
+    expected = sa.or_(Sitechan.chan == 'BHZ', Sitechan.chan.like('LH%'))
+    assert str(expression) == str(expected)
 
 
 def test_load_config_file():
