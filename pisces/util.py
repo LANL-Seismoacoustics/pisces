@@ -9,6 +9,7 @@ from getpass import getpass
 import warnings
 import functools
 import inspect
+import traceback
 from importlib import import_module
 
 import numpy as np
@@ -26,43 +27,29 @@ from obspy.taup import TauPyModel
 from pisces.schema.util import PiscesMeta
 
 
-def deprecated(instructions):
+def deprecated(message: str = ''):
     """
-    Flags a method as deprecated.
-
-    Parameters
-    ----------
-    instructions : str
-        A human-friendly string of instructions, such as:
-        'Please migrate to add_proxy() ASAP.'
-
-    References
-    ----------
-    https://gist.github.com/kgriffs/8202106
-
+    This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used first time and filter is set for show DeprecationWarning.
     """
-    def decorator(func):
-        '''This is a decorator which can be used to mark functions
-        as deprecated. It will result in a warning being emitted
-        when the function is used.'''
+    # https://stackoverflow.com/a/40899499/745557
+    def decorator_wrapper(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            message = 'Call to deprecated function {}. {}'.format(
-                func.__name__,
-                instructions)
-
-            frame = inspect.currentframe().f_back
-
-            warnings.warn_explicit(message,
-                                   category=DeprecationWarning,
-                                   filename=inspect.getfile(frame.f_code),
-                                   lineno=frame.f_lineno)
+        def function_wrapper(*args, **kwargs):
+            current_call_source = '|'.join(traceback.format_stack(inspect.currentframe()))
+            if current_call_source not in function_wrapper.last_call_source:
+                warnings.warn("Function {} is now deprecated! {}".format(func.__name__, message),
+                              category=DeprecationWarning, stacklevel=2)
+                function_wrapper.last_call_source.add(current_call_source)
 
             return func(*args, **kwargs)
 
-        return wrapper
+        function_wrapper.last_call_source = set()
 
-    return decorator
+        return function_wrapper
+    return decorator_wrapper
+
 
 TURNOFFWARNINGSMSG = """Warnings can be turned off with:
 import warnings
@@ -198,7 +185,7 @@ def url_connect(url):
     return session
 
 # TODO: rename this to "load_table", and make it work on a single table
-@deprecated('get_tables is deprecated. It will be load_tables in pisces.crud in next version. ' + TURNOFFWARNINGSMSG)
+@deprecated('This will be load_tables in pisces.crud in next version. ' + TURNOFFWARNINGSMSG)
 def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
                base=None):
     """
@@ -307,7 +294,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
 
 # TODO: merge get_tables and make_tables?
-@deprecated('make_table will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
+@deprecated('This will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def make_table(fulltablename, prototype):
     """
     Create a new ORM class/model on-the-fly from a prototype.
@@ -606,7 +593,7 @@ def get_options(db, prefix=None):
     return options
 
 
-@deprecated('get_or_create_tables will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
+@deprecated('This will be moved to pisces.crud in next version .' + TURNOFFWARNINGSMSG)
 def get_or_create_tables(session, create=True, **tables):
     """
     Load or create canonical ORM KB Core table classes.
@@ -735,7 +722,7 @@ def load_config(config):
 
 def make_wildcard_list(toList):
     """
-    Take a list, tuple, or comma separated string of variables and output a list 
+    Take a list, tuple, or comma separated string of variables and output a list
     with sql wildcards '%' and '_'
 
     Parameters
@@ -747,23 +734,23 @@ def make_wildcard_list(toList):
     nowList: list of variables contained in the toList variable
 
     """
-    
+
     # check if toList is a list and if not, make it a list
     if type(toList) is list:
         nowList = toList
-        
+
     elif type(toList) is tuple:
         nowList = list(toList)
-        
+
     elif type(toList) is str:
         nowList = toList.split(',')
     else:
         raise TypeError('input to function make_wildcard_list is not a list, tuple, or comma separated string of variables')
-            
+
     for x in range(len(nowList)):
        nowList[x] = nowList[x].replace('*','%')
-       nowList[x] = nowList[x].replace('?','_') 
-    
+       nowList[x] = nowList[x].replace('?','_')
+
     return nowList
 
 def glob_to_like(text, escape='\\'):
