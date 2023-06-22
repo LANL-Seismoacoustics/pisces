@@ -817,8 +817,8 @@ def string_expression(selectable, string_filters):
     "wfdisc.chan LIKE '%Z' OR wfdisc.chan LIKE 'B_N' OR wfdisc.chan = 'HHT'"
     >>> wfdisc_rows = session.query(Wfdisc).filter(chan_expr).all()
 
-    """
-    string_filters = string_filters.split(',') if type(string_filters) is str else string_filters
+"""
+    string_filters = string_filters.split(',') if isinstance(string_filters, str) else string_filters
 
     if len(string_filters) == 1:
         # don't use OR or IN
