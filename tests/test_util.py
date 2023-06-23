@@ -7,7 +7,8 @@ from configparser import ConfigParser
 import sqlalchemy as sa
 
 import pisces.util as util
-from pisces.tables.kbcore import Sitechan
+from pisces.tables.kbcore import *
+from pisces import events
 
 
 def test_glob_to_like():
@@ -76,3 +77,40 @@ def test_load_config_dict():
     assert str(session.bind.url) == 'sqlite:///mydb.sqlite'
     assert tables == {}
 
+def test_range_filters():
+    # empty values
+    assert events.range_filters((Site.lat, None, None)) == []
+
+    # min value
+    # don't know how to test equivalence of column expressions, so we test using their rendered SQL
+    observed = events.range_filters((Site.lat, 20, None))
+    expected = [Site.lat >= 20]
+    assert (
+        len(observed) == 1 and
+        observed[0].compare(expected[0])
+    )
+
+    # max value
+    observed = events.range_filters((Site.lat, None, 20))
+    expected = [Site.lat <= 20]
+    assert (
+        len(observed) == 1 and
+        observed[0].compare(expected[0])
+    )
+
+    # between values
+    observed = events.range_filters((Site.lat, 20, 30))
+    expected = [Site.lat.between(20, 30)]
+    assert (
+        len(observed) == 1 and
+        observed[0].compare(expected[0])
+    )
+
+    # multiple restrictions
+    observed = events.range_filters((Site.lat, 20, 30), (Site.lon, None, 42))
+    expected = [Site.lat.between(20, 30), Site.lon <= 42]
+    assert (
+        len(observed) == 2 and
+        observed[0].compare(expected[0]) and
+        observed[1].compare(expected[1])
+    )
