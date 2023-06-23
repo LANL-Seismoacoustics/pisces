@@ -856,3 +856,127 @@ def literal_sql(engine, statement_or_query):
               compile_kwargs={'literal_binds': True}))
 
     return sql
+
+def _get_entities(query, *requested_classes):
+    """
+    Get requested table classes from an existing SQLAlchemy query.
+
+    Parameters
+    ----------
+    query : SQLAlchemy query object
+    requested_classes : strings
+        Canonical table class names, e.g. 'Site', 'Sitechan', 'Sensor'
+
+    Returns
+    -------
+    List of SQLAlchemy ORM class, or None where no preferred tables are found
+
+    Examples
+    --------
+    # if the Sensor class wasn't part of the query.
+    >>> get_preferred_entities(query, 'Site', 'Sitechan', 'Sensor')
+    [Site , Sitechan, None]
+
+    """
+    observed_entities = {
+        d["entity"]._tabletype: d["entity"] for d in query.column_descriptions
+    }
+    return [observed_entities.get(c.capitalize(), None) for c in requested_classes]
+
+
+def range_filters(*restrictions):
+    """Restrict a column to a range.
+
+    Parameters
+    ----------
+    restrictions : iterable of (ORM column, minvalue, maxvalue) tuples
+
+    Returns
+    -------
+    list of SQLAlchemy filter conditions that can be unpacked into an SQLAlchemy
+    filter method, like query.filter(*filters) for AND clauses,
+    or query.filter(or_(*filters)) for OR clauses.
+
+    # e.g.
+    >>> f = range_filters((Origin.lat, -10, 15), (Origin.depth, None, 80))
+    Produces a list containing zero or one filter expressions.
+    It's supplied as a list so it can be applied to a query like:
+    >>> query.filter(*f)
+    which works even if the list is empty (all ranges are None).
+
+    """
+    filters = []
+    for column, mn, mx in restrictions:
+        if mn is not None:
+            if mx is not None:
+                filters.append(column.between(mn, mx))
+            else:
+                filters.append(mn <= column)
+        elif mx is not None:
+            filters.append(column <= mx)
+
+    return filters
+
+
+def distance_filter(
+    big_query, small_query, degrees=None, kilometers=None, yield_per=None, inverse=False
+):
+    """
+    Return a buffered (yield_per) cartesian product of station (includes Site
+    table) query and event query (includes Origin table) results, censored to
+    include only those within (or outside of) the provided distance ranges.
+
+    Parameters
+    ----------
+    big_query : SQLAlchemy query
+        Query whos results you expect to be the larger of the two.
+        This can be batch-realized with the yield_per keyword.
+    small_query : SQLAlchemy query
+        Query whos results you expect to be the smaller of the two.
+        This will be fully realized in-memory.
+    degrees, kilometers : tuple (minradius, maxradius) in degrees, kilometers
+        Values may include None (unbounded).
+        Both keywords can't be used simultaneously.
+    yield_per : int
+        Buffer size (joined rows) of the distance calculation.
+        If None, all results are realized in memory and returned immediately.
+    inverse : bool
+        If True, return results that are _outside_ the provided distance ranges.
+
+    Returns
+    -------
+    list or generator
+        If `yield_per` is provided, results are a generator that iterates to yield
+        an unknown number list of joined result rows that pass the distance filter
+        per iteration, internally processing `yield_per` joined rows at a time.
+        If `yield_per` is None, a list of filtered results is returned directly.
+
+    Notes
+    -----
+    Because this filter must realize query results and do a cartesian join on
+    them, it's safest to batch process the results. This argument specifies the
+    number of rows processed at a time. SQLAlchemy and Oracle, for example, are
+    capable of working with a few thousand results at a time on a reasonable
+    machine, depending on how many joined tables are already in the query
+    objects provided.  Because the function realizes actual query results, the
+    queries provided must be "complete" (i.e. include all the intended SQLAlchemy filters).
+
+    def km_distfn(rows, distrange):
+        lat0, lon0 = row[0].lat, row[0].lon
+        lat1, lon1 = row[1].lat, row[1].lon
+        # calculate kilometers stuff
+        return distrange[0] <= dist_value <= distrange[1]
+
+    def deg_distfn(rows, distrange):
+        lat0, lon0 = row[0].lat, row[0].lon
+        lat1, lon1 = row[1].lat, row[1].lon
+        # calculate degrees stuff
+        return distrange[0] <= dist_value <= distrange[1]
+
+    # this is an iterator that returns one results row at a time.
+    # if yield_per was used, it returns a list of result rows at a time.
+    return filter(distfn, query)
+
+    """
+    pass
+
