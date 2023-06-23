@@ -171,18 +171,14 @@ def range_filters(*restrictions):
     Returns
     -------
     list of SQLAlchemy filter conditions that can be unpacked into an SQLAlchemy
-    filter method, like query.filter(*filters).
+    filter method, like query.filter(*filters) for AND clauses,
+    or query.filter(or_(*filters)) for OR clauses.
 
     # e.g.
-    >>> range_filters((Origin.lat, -10, 15), (Origin.depth, 25, 80))
-
+    >>> f = range_filters((Origin.lat, -10, 15), (Origin.depth, None, 80))
     Produces a list containing zero or one filter expressions.
     It's supplied as a list so it can be applied to a query like:
-    >>> query.filter(*range_filters(...))
-    to produce AND clauses, or
-    >>> from sqlalchemy import or_
-    >>> query.filter(or_(range_filters(...)))
-    to produce OR clauses,
+    >>> query.filter(*f)
     which works even if the list is empty (all ranges are None).
 
     """
@@ -380,7 +376,7 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
     return query
 
 
-def filter_magnitudes(query, **magnitudes_and_tables):
+def filter_magnitudes(query, auth=None, **magnitudes_and_tables):
     """
     Filter an event query by magnitude range using Origin and Netmag or Stamag tables.
 
@@ -390,13 +386,15 @@ def filter_magnitudes(query, **magnitudes_and_tables):
     ----------
     query : SQLAlchemy query object
         Includes Origin[, Netmag, Stamag] tables.
+    auth : str
+        Magnitude author.  Applied to tables in the following priority: Origin, Netmag, Stamag.
     **magnitudes_and_tables :
         magnitudes
         Specify the magtype=(min, max) values for the filter as keyword, 2-tuple pairs,
         e.g. mb=(3.5, 5.5) . If omitted, all found magnitudes will be returned.
+        Magnitude filters are applied to tables in the following priority: Origin, Netmag, Stamag
         Wildcards are accepted, but they must be provided as an expanded dict, like:
-        >>> {'mb': (3, 4), 'mw*': (4, 5.5)}
-        >>> out = query_magnitudes(query, **mags)
+        >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5)})
 
         tables
         If a required ORM table isn't in the SELECT of your query, you can provide it here as a
@@ -421,12 +419,11 @@ def filter_magnitudes(query, **magnitudes_and_tables):
     ...     # Netmag table should've been included, so provide it now.
     ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5), netmag=Netmag)
 
-    Get
-
     """
-    ORIGINMAGS = {'mb', 'ml', 'ms'}
-
-    # get desired tables from the query
+    # the plan:
+    # 1. if there's an Origin table, filter it for the provided magnitudes it contains,
+    #    otherwise filter Netmag, otherwise Stamag
+    # 2. Do natural joins for any tables present
     Origin, Netmag, Stamag = _get_entities(query, "Origin", "Netmag", "Stamag")
 
     # override if provided
@@ -435,20 +432,18 @@ def filter_magnitudes(query, **magnitudes_and_tables):
     Stamag = magnitudes_and_tables.pop("stamag", None) or Stamag
 
     # assumes no extraneous tables/keywords were provided, and all relevent ones are popped off
+    ORIGINMAGS = {'mb', 'ml', 'ms'}
     magnitudes = magnitudes_and_tables
     magtypes = {mag.lower() for mag in magnitudes}
     origin_magtypes = magtypes - ORIGINMAGS
     nonorigin_magtypes = magtypes - origin_magtypes
 
-    # use Origin if for any magtypes are found there.
-    useOrigin = bool(origin_magtypes)
-
     # avoid nonsense inputs
-    if useOrigin and not Origin:
+    if origin_magtypes and not Origin:
         msg = "Origin table required for requested magnitudes."
         raise ValueError(msg)
 
-    if not useOrigin and not any([Netmag, Stamag]):
+    if nonorigin_magtypes and not any([Netmag, Stamag]):
         msg = "Netmag or Stamag table required for requested magnitude(s)."
         raise ValueError(msg)
 
