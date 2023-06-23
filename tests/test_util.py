@@ -7,7 +7,7 @@ from configparser import ConfigParser
 import sqlalchemy as sa
 
 import pisces.util as util
-from pisces.tables.kbcore import Sitechan
+from pisces.tables.kbcore import *
 from pisces import events
 
 

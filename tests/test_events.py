@@ -144,8 +144,8 @@ def test_events_exceptions(session):
     with pytest.raises(ValueError):
         r = events.filter_events(q, orid=[1])
 
-    # Event input with no Event table
-    q = session.query(Origin)
+    # Event input with no Origin or Event table
+    q = session.query(Site)
     with pytest.raises(ValueError):
         r = events.filter_events(q, evid=[1])
 
