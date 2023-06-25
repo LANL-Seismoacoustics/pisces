@@ -238,6 +238,13 @@ def test_magnitude_origin_netmag_stamag(session, eventdata):
         r[0] == (d['origin1'], d['netmag1'], d['stamag3'])
     )
 
+    # sta
+    r = events.filter_magnitudes(q, sta='*2').order_by(Origin.orid).all()
+    assert (
+        len(r) == 1 and
+        r[0] == (d['origin2'], d['netmag2'], d['stamag2'])
+    )
+
     # pop in Netmag
     q = session.query(Origin, Stamag)
 

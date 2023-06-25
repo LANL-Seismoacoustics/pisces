@@ -270,7 +270,7 @@ def filter_events(
     return query
 
 
-def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
+def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tables):
     """
     Filter an event query by magnitude range using Origin, Netmag, and/or Stamag tables.
 
@@ -283,10 +283,12 @@ def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
     ----------
     query : SQLAlchemy query object
         Includes Origin, Netmag, and/or Stamag tables.
+    sta : str
+        Station code, wildcards allowed.  Requies Stamag.
+    net : str
+        Network code, wildcards allowed. Requires Netmag.
     auth : str
         Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
-    net : str
-        Network code, wildcards allowed. Requies Netmag.
     **magnitudes_and_tables :
         Magnitudes
         Specify the magtype=(min, max) values for the filter as keyword, 2-tuple pairs,
@@ -332,6 +334,10 @@ def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
     nonorigin_magtypes = magtypes - {"mb", "ml", "ms"}
 
     # avoid nonsense inputs
+    if sta and not Stamag:
+        msg = "Stamag table required for 'sta' parameter."
+        raise ValueError(msg)
+
     if net and not Netmag:
         msg = "Netmag table required for 'net' parameter."
         raise ValueError(msg)
@@ -359,6 +365,9 @@ def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
     magfilters = []
     if Stamag:
         Magtable = Stamag
+        if sta:
+            stas = make_wildcard_list(sta)
+            query = query.filter(or_(*[Stamag.sta.like(sta) for sta in stas]))
         for magtype, (magmin, magmax) in magnitudes.items():
             magtype = make_wildcard_list(magtype)[0]
             type_filt = Stamag.magtype.like(magtype)
@@ -394,4 +403,6 @@ def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
 
 
 def filter_arrivals(query, phases=None, **tables):
+    """
+    Filter """
     pass
