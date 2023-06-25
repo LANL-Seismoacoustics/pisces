@@ -132,12 +132,24 @@ dbclient.station_query
 ```
 
 """
+from sqlalchemy import or_, and_
 
-from .util import _get_entities, range_filters
+from .util import _get_entities, range_filters, make_wildcard_list
 
 
-def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=None,
-    prefor=False, auth=None, name=None, etype=None, **tables
+# TODO: add Origerr to this?
+def filter_events(
+    query,
+    region=None,
+    time_=None,
+    depth=None,
+    evid=None,
+    orid=None,
+    prefor=False,
+    auth=None,
+    evname=None,
+    etype=None,
+    **tables
 ):
     """Filter an event query using Event, Origin tables.
 
@@ -151,7 +163,7 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
         otherwise they must be provided as keywords (see below).
     region : tuple [Origin]
         (W, E, S, N) inclusive lat/lon box containing int/float/None(unbounded) degrees
-    time : tuple [Origin]
+    time_ : tuple [Origin]
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps
     depth : tuple [Origin]
         (mindepth, maxdepth) inclusive range, in float/int kilometers
@@ -161,7 +173,7 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
         Use only the preferred origin.
     auth : str [Origin]
         Produces an equality clause.
-    name : str [Event]
+    evname : str [Event]
         Produces a CONTAINS clause (looks for input as a substring).
     etype : str [Origin]
         Produces an equality clause.
@@ -208,12 +220,8 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
         msg = "Origin table required."
         raise ValueError(msg)
 
-    if any([name, prefor]) and not Event:
+    if any([evname, prefor]) and not Event:
         msg = "Event table required."
-        raise ValueError(msg)
-
-    if evid and orid:
-        msg = "Choose either evid or orid keywords, not both."
         raise ValueError(msg)
 
     if Event and Origin:
@@ -222,8 +230,9 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
             query = query.filter(Event.prefor == Origin.orid)
 
     # Look for a substring of evname
-    if name:
-        query = query.filter(Event.evname.contains(name))
+    if evname:
+        evname = make_wildcard_list(evname)
+        query = query.filter(or_(*[Event.evname.like(n) for n in evname]))
 
     # prioritize Origin (lowest-granularity table) for common columns.
     evid_auth_table = Origin if Origin else Event
@@ -231,7 +240,8 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
         query = query.filter(evid_auth_table.evid.in_(evid))
 
     if auth:
-        query = query.filter(evid_auth_table.auth == auth)
+        auth = make_wildcard_list(auth)
+        query = query.filter(or_(*[evid_auth_table.auth.like(a) for a in auth]))
 
     if orid:
         query = query.filter(Origin.orid.in_(orid))
@@ -260,34 +270,38 @@ def filter_events( query, region=None, time_=None, depth=None, evid=None, orid=N
     return query
 
 
-def filter_magnitudes(query, auth=None, **magnitudes_and_tables):
+def filter_magnitudes(query, net=None, auth=None, **magnitudes_and_tables):
     """
-    Filter an event query by magnitude range using Origin and Netmag or Stamag tables.
+    Filter an event query by magnitude range using Origin, Netmag, and/or Stamag tables.
+
+    Supplied tables are joined, and filters are applied to the highest-granularity table they can be.
+    e.g. 'mb' would be filtered in Stamag instead of Netmag, Netmag instead of Origin.
 
     Each magnitude provided produces an OR clause in SQL.
 
     Parameters
     ----------
     query : SQLAlchemy query object
-        Includes Origin[, Netmag, Stamag] tables.
+        Includes Origin, Netmag, and/or Stamag tables.
     auth : str
-        Magnitude author.  Applied to tables in the following priority: Origin, Netmag, Stamag.
+        Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
+    net : str
+        Network code, wildcards allowed. Requies Netmag.
     **magnitudes_and_tables :
-        magnitudes
+        Magnitudes
         Specify the magtype=(min, max) values for the filter as keyword, 2-tuple pairs,
         e.g. mb=(3.5, 5.5) . If omitted, all found magnitudes will be returned.
         Magnitude filters are applied to tables in the following priority: Origin, Netmag, Stamag
         Wildcards are accepted, but they must be provided as an expanded dict, like:
-        >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5)})
+        >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
 
-        tables
+        Tables
         If a required ORM table isn't in the SELECT of your query, you can provide it here as a
         keyword argument (e.g. netmag=Netmag). If provided in this way, it won't be returned in the
         result set but is instead just used to filter the result set for the incoming query.
         If you wish a table included in the result set, use the `sqlalchemy.orm.Query.add_entity`
         method prior to calling this function.
         e.g. `q = q.add_entity(Stamag)`
-
 
     Examples
     --------
@@ -304,10 +318,7 @@ def filter_magnitudes(query, auth=None, **magnitudes_and_tables):
     ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5), netmag=Netmag)
 
     """
-    # the plan:
-    # 1. if there's an Origin table, filter it for the provided magnitudes it contains,
-    #    otherwise filter Netmag, otherwise Stamag
-    # 2. Do natural joins for any tables present
+    # XXX: if wildcards and only Origin is present, it should/will fail b/c it'll interpret 'm?', for example, as a non-Origin magtype and want to apply the filter to a different table.
     Origin, Netmag, Stamag = _get_entities(query, "Origin", "Netmag", "Stamag")
 
     # override if provided
@@ -316,26 +327,71 @@ def filter_magnitudes(query, auth=None, **magnitudes_and_tables):
     Stamag = magnitudes_and_tables.pop("stamag", None) or Stamag
 
     # assumes no extraneous tables/keywords were provided, and all relevent ones are popped off
-    ORIGINMAGS = {'mb', 'ml', 'ms'}
-    magnitudes = magnitudes_and_tables
+    magnitudes = magnitudes_and_tables  # for readability/intent
     magtypes = {mag.lower() for mag in magnitudes}
-    origin_magtypes = magtypes - ORIGINMAGS
-    nonorigin_magtypes = magtypes - origin_magtypes
+    nonorigin_magtypes = magtypes - {"mb", "ml", "ms"}
 
     # avoid nonsense inputs
-    if origin_magtypes and not Origin:
-        msg = "Origin table required for requested magnitudes."
+    if net and not Netmag:
+        msg = "Netmag table required for 'net' parameter."
         raise ValueError(msg)
 
     if nonorigin_magtypes and not any([Netmag, Stamag]):
         msg = "Netmag or Stamag table required for requested magnitude(s)."
         raise ValueError(msg)
 
-    constraints = []
-    # filter the Origin magnitudes, if any
-    for magname in origin_magtypes:
-        magrange = magnitudes[magname]
-        constraints.append((getattr(Origin, magname), magrange))
+    if not any([Origin, Netmag, Stamag]):
+        msg = "Query must include Origin, Netmag, or Stamag"
+        raise ValueError(msg)
+
+    # do natural joins
+    if Stamag and Netmag:
+        query = query.filter(Stamag.magid == Netmag.magid)
+
+    if Netmag and Origin:
+        query = query.filter(Netmag.orid == Origin.orid)
+
+    if Stamag and Origin:
+        query = query.filter(Stamag.orid == Origin.orid)
+
+    # apply mag/auth filters to the highest-granularity table
+    # TODO: I don't like how complex this ended up being
+    magfilters = []
+    if Stamag:
+        Magtable = Stamag
+        for magtype, (magmin, magmax) in magnitudes.items():
+            magtype = make_wildcard_list(magtype)[0]
+            type_filt = Stamag.magtype.like(magtype)
+            range_filt = range_filters((Stamag.magnitude, magmin, magmax))[0]
+            magfilters.append(and_(type_filt, range_filt))
+
+    elif Netmag:
+        Magtable = Netmag
+        if net:
+            nets = make_wildcard_list(net)
+            query = query.filter(or_(*[Netmag.net.like(net) for net in nets]))
+        for magtype, (magmin, magmax) in magnitudes.items():
+            magtype = make_wildcard_list(magtype)[0]
+            type_filt = Netmag.magtype.like(magtype)
+            range_filt = range_filters((Netmag.magnitude, magmin, magmax))[0]
+            magfilters.append(and_(type_filt, range_filt))
+
+    elif Origin:
+        Magtable = Origin
+        restr = []
+        for magtype, (magmin, magmax) in magnitudes.items():
+            restr.append((getattr(Origin, magtype), magmin, magmax))
+        magfilters = range_filters(*restr)
+
+    query = query.filter(or_(*magfilters))
+
+    # apply auth to the highest granularity table
+    if auth:
+        auths = make_wildcard_list(auth)
+        query = query.filter(or_(*[Magtable.auth.like(auth) for auth in auths]))
+
+    return query
+
 
 def filter_arrivals(query, phases=None, **tables):
     pass
