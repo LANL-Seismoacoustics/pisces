@@ -29,6 +29,7 @@ def eventdata(session):
     data.update({
         'netmag1': Netmag(net='IM', orid=1, evid=1, magtype='mb', magnitude=4, magid=1, auth='ISC'),
         'netmag2': Netmag(net='IN', orid=2, evid=1, magtype='ml', magnitude=6, magid=2, auth='ISD'),
+        'netmag3': Netmag(net='IO', orid=1, evid=1, magtype='mw', magnitude=4, magid=3, auth='ISC'),
         'stamag1': Stamag(sta='sta1', arid=1, magtype='ml', magnitude=4.1, magid=2, orid=1, auth='ISD'),
         'stamag2': Stamag(sta='sta2', arid=2, magtype='ml', magnitude=3.9, magid=2, orid=2, auth='ISD'),
         'stamag3': Stamag(sta='sta1', arid=3, magtype='mb', magnitude=3.9, magid=1, orid=1, auth='ISE'),
@@ -45,7 +46,7 @@ def eventdata(session):
     session.commit()
 
 
-def test_events_origin(session, eventdata):
+def test_filter_events_origin(session, eventdata):
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Origin)
@@ -104,7 +105,7 @@ def test_events_origin(session, eventdata):
     )
 
 
-def test_events_event(session, eventdata):
+def test_filter_events_event(session, eventdata):
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Event)
@@ -124,7 +125,7 @@ def test_events_event(session, eventdata):
     )
 
 
-def test_events_origin_event(session, eventdata):
+def test_filter_events_origin_event(session, eventdata):
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Event, Origin)
@@ -147,7 +148,7 @@ def test_events_origin_event(session, eventdata):
     )
 
 
-def test_events_exceptions(session):
+def test_filter_events_exceptions(session):
     """ Test expected exceptions. """
 
     # Origin input with no Origin table
@@ -161,7 +162,7 @@ def test_events_exceptions(session):
         r = events.filter_events(q, evid=[1])
 
 
-def test_magnitudes_origin(session, eventdata):
+def test_filter_magnitudes_origin(session, eventdata):
     d, *_ = eventdata
 
     q = session.query(Origin)
@@ -184,7 +185,7 @@ def test_magnitudes_origin(session, eventdata):
         r[1] == d['origin3']
     )
 
-def test_magnitude_origin_netmag(session, eventdata):
+def test_filter_magnitudes_origin_netmag(session, eventdata):
     d, *_ = eventdata
 
     q = session.query(Origin, Netmag)
@@ -219,7 +220,7 @@ def test_magnitude_origin_netmag(session, eventdata):
     )
 
 
-def test_magnitude_origin_netmag_stamag(session, eventdata):
+def test_filter_magnitudes_origin_netmag_stamag(session, eventdata):
     d, *_ = eventdata
 
     q = session.query(Origin, Netmag, Stamag)
@@ -263,4 +264,46 @@ def test_magnitude_origin_netmag_stamag(session, eventdata):
     assert (
         len(r) == 1 and
         r[0] == d['origin1']
+    )
+
+
+def test_filter_magnitudes_exceptions(session, eventdata):
+    """ Check for expected exceptions. """
+    d, *_ = eventdata
+
+    # None of the involved tables provided
+    q = session.query(Site)
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, mb=(4, 5))
+
+    # Netmag not provided for Netmag parameters
+    q = session.query(Origin)
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, net='IM')
+
+    # Stamag/Netmag not provided for non-Origin magnitude
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, mw=(3, 5))
+
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, sta='sta1')
+
+
+def test_filter_arrivals(session, eventdata):
+    pass
+
+
+# TODO: Add more "integration" tests eventually
+def test_filter_events_magnitudes(session, eventdata):
+    """ Test passing the results of filter_events to filter_magnitudes. """
+    d, lat, lon, depth, time_ = eventdata
+
+    # Get preferred origins and mw magnitudes for events in a region
+    q = session.query(Origin, Netmag)
+    q = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2), prefor=True, event=Event)
+    # points to origin1, netmag3
+    r = events.filter_magnitudes(q, mw=(None, None)).all()
+    assert (
+        len(r) == 1 and
+        r[0] == (d['origin1'], d['netmag3'])
     )
