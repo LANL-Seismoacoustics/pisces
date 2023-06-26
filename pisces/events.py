@@ -257,8 +257,8 @@ def filter_events(
     range_restr = []
     if time_:
         t1, t2 = time_
-        t1 = t1 if t1 else None
-        t2 = t2 if t2 else None
+        t1 = UTCDateTime(t1).timestamp if t1 else None
+        t2 = UTCDateTime(t2).timestamp if t2 else None
         time_ = (t1, t2)
         range_restr.append((Origin.time, *time_))
 
