@@ -11,6 +11,8 @@ from obspy import UTCDateTime
 from pisces.tables.kbcore import *
 from pisces import events
 
+# for scope='module' these database rows are added to a temp database once for this whole file,
+# then removed at the end. Not sure that's necessary.
 @pytest.fixture(scope='module')
 def eventdata(session):
     lat = 40
