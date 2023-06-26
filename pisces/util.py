@@ -4,15 +4,13 @@ Common Pisces utility functions.
 
 """
 import logging
-from datetime import datetime
+import math
+from getpass import getpass
+import warnings
 import functools
 import inspect
 import traceback
-from getpass import getpass
 from importlib import import_module
-import inspect
-import math
-import warnings
 
 import numpy as np
 import sqlalchemy as sa
@@ -22,7 +20,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
-from obspy import UTCDateTime
 import obspy.geodetics as geod
 from obspy.core import AttribDict
 from obspy.taup import TauPyModel
