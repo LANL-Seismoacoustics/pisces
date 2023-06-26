@@ -78,7 +78,7 @@ def test_load_config_dict():
     assert tables == {}
 
 def test_range_filters():
-    # empty values
+    # empty values produces no filters, just an empty list
     assert events.range_filters((Site.lat, None, None)) == []
 
     # min value
