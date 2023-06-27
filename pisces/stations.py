@@ -8,7 +8,7 @@ from pisces.util import make_wildcard_list, _get_entities
 
 import warnings
 
-def query_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, endtime=None, **tables):
+def filter_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, endtime=None, **tables):
     """
     Parameters
     ----------
@@ -66,31 +66,31 @@ def query_network(query, net=None, netname=None, nettype=None, auth=None, sta=No
 
     if net:
         net = make_wildcard_list(net)
-        q = q.filter(or_(*[network.net.like(nets) for nets in net]))
+        query = query.filter(or_(*[network.net.like(nets) for nets in net]))
     
     if netname:
         netname = make_wildcard_list(netname)
-        q = q.filter(or_(*[network.netname.like(netnames) for netnames in netname]))
+        query = query.filter(or_(*[network.netname.like(netnames) for netnames in netname]))
     
     if nettype:
         nettype = make_wildcard_list(nettype)
-        q = q.filter(or_(*[network.nettype.like(nettypes) for nettypes in nettype]))
+        query = query.filter(or_(*[network.nettype.like(nettypes) for nettypes in nettype]))
     
     if auth:
         auth = make_wildcard_list(auth)
-        q = q.filter(or_(*[network.net.like(auths) for auths in auth]))
+        query = query.filter(or_(*[network.net.like(auths) for auths in auth]))
 
     if sta:
         sta = make_wildcard_list(sta)
-        q = q.filter(or_(*[affiliation.sta.like(stas) for stas in sta]))
+        query = query.filter(or_(*[affiliation.sta.like(stas) for stas in sta]))
 
     if time_:
-        q = q.filter(time_.timestamp < affiliation.endtime)
+        query = query.filter(time_.timestamp < affiliation.endtime)
 
     if endtime:
-        q = q.filter(endtime.timestamp > affiliation.time)
+        query = query.filter(endtime.timestamp > affiliation.time)
 
-    return q
+    return query
 
 
 def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, with_query = None):
