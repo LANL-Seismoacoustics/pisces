@@ -8,8 +8,8 @@ from pisces.util import make_wildcard_list, _get_entities
 
 import warnings
 
-def filter_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, endtime=None, **tables):
-    """
+def filter_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, **tables):
+    """ipython
     Parameters
     ----------
     session : sqlalchemy.orm.session instance, bound
@@ -53,42 +53,41 @@ def filter_network(query, net=None, netname=None, nettype=None, auth=None, sta=N
         msg = "Network table required."
         raise ValueError(msg)
 
-    if any([sta, time_, endtime]) and not Affilation:
+    if any([sta, time_, endtime]) and not Affiliation:
         # Origin keywords supplied, but no Origin table present
         # TODO: replace with pisces.exc.MissingTableError
         msg = "Affiliation table required."
         raise ValueError(msg)
     
-     if Network and Affiliation:
-        query = query.filter(Event.evid == Origin.evid)
-        if prefor:
-            query = query.filter(Event.prefor == Origin.orid)
+    if Network and Affiliation:
+        query = query.filter(Network.net == Affiliation.net)
 
     if net:
         net = make_wildcard_list(net)
-        query = query.filter(or_(*[network.net.like(nets) for nets in net]))
+        query = query.filter(or_(*[Network.net.like(nets) for nets in net]))
     
     if netname:
         netname = make_wildcard_list(netname)
-        query = query.filter(or_(*[network.netname.like(netnames) for netnames in netname]))
+        query = query.filter(or_(*[Network.netname.like(netnames) for netnames in netname]))
     
     if nettype:
         nettype = make_wildcard_list(nettype)
-        query = query.filter(or_(*[network.nettype.like(nettypes) for nettypes in nettype]))
+        query = query.filter(or_(*[Network.nettype.like(nettypes) for nettypes in nettype]))
     
     if auth:
         auth = make_wildcard_list(auth)
-        query = query.filter(or_(*[network.net.like(auths) for auths in auth]))
+        query = query.filter(or_(*[Network.net.like(auths) for auths in auth]))
 
     if sta:
         sta = make_wildcard_list(sta)
-        query = query.filter(or_(*[affiliation.sta.like(stas) for stas in sta]))
+        query = query.filter(or_(*[Affiliation.sta.like(stas) for stas in sta]))
 
     if time_:
-        query = query.filter(time_.timestamp < affiliation.endtime)
+        
+        query = query.filter(time_.timestamp < Affiliation.endtime)
 
     if endtime:
-        query = query.filter(endtime.timestamp > affiliation.time)
+        query = query.filter(endtime.timestamp > Affiliation.time)
 
     return query
 
@@ -188,7 +187,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
 
     return q
 
-def query_responses(session, sensor, instrument = None, stas = None, chans = None, time_ = None, endtime = None, with_query = None):
+def filter_responses(query, sta = None, chan = None, time_ = None):
     """
     Parameters
     ----------
