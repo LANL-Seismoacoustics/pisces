@@ -8,8 +8,8 @@ from pisces.util import make_wildcard_list, _get_entities
 
 import warnings
 
-def query_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, endtime=None, **tables):
-    """
+def filter_network(query, net=None, netname=None, nettype=None, auth=None, sta=None,  time_=None, **tables):
+    """ipython
     Parameters
     ----------
     session : sqlalchemy.orm.session instance, bound
@@ -36,11 +36,14 @@ def query_network(query, net=None, netname=None, nettype=None, auth=None, sta=No
     """
 
     # get desired tables from the query
-    Network, Affiliation = _get_entities(query, "Network", "Affiliation")
+    Network, Affiliation, Site, Sitechan, Sensor = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor")
     # override if provided
     # XXX: add a flag for the 'filter but don't include'
     Network = tables.get("network", None) or Network
     Affiliation = tables.get("affiliation", None) or Affiliation
+    Site = tables.get("site", None) or Site
+    Sitechan = tables.get("sitechan", None) or Sitechan
+    Sensor = tables.get("sensor", None) or Sensor
 
     # avoid nonsense inputs
     if not any([Network, Affiliation]):
@@ -53,44 +56,52 @@ def query_network(query, net=None, netname=None, nettype=None, auth=None, sta=No
         msg = "Network table required."
         raise ValueError(msg)
 
-    if any([sta, time_, endtime]) and not Affilation:
+    if any([sta, time_]) and not Affiliation:
         # Origin keywords supplied, but no Origin table present
         # TODO: replace with pisces.exc.MissingTableError
         msg = "Affiliation table required."
         raise ValueError(msg)
     
-     if Network and Affiliation:
-        query = query.filter(Event.evid == Origin.evid)
-        if prefor:
-            query = query.filter(Event.prefor == Origin.orid)
+    if Network and Affiliation:
+        query = query.filter(Network.net == Affiliation.net)
+
+    if Affiliation and Site:
+        query = query.filter(Site.sta == Affiliation.sta)
+    elif Affiliation and Sitechan:
+        query = query.filter(Sitechan.sta == Affiliation.sta)
+    elif Affiliation and Sensor:
+        query = query.filter(Sensor.sta == Affiliation.sta)
 
     if net:
         net = make_wildcard_list(net)
-        q = q.filter(or_(*[network.net.like(nets) for nets in net]))
+        query = query.filter(or_(*[Network.net.like(nets) for nets in net]))
     
     if netname:
         netname = make_wildcard_list(netname)
-        q = q.filter(or_(*[network.netname.like(netnames) for netnames in netname]))
+        query = query.filter(or_(*[Network.netname.like(netnames) for netnames in netname]))
     
     if nettype:
         nettype = make_wildcard_list(nettype)
-        q = q.filter(or_(*[network.nettype.like(nettypes) for nettypes in nettype]))
+        query = query.filter(or_(*[Network.nettype.like(nettypes) for nettypes in nettype]))
     
     if auth:
         auth = make_wildcard_list(auth)
-        q = q.filter(or_(*[network.net.like(auths) for auths in auth]))
+        query = query.filter(or_(*[Network.net.like(auths) for auths in auth]))
 
     if sta:
         sta = make_wildcard_list(sta)
-        q = q.filter(or_(*[affiliation.sta.like(stas) for stas in sta]))
+        query = query.filter(or_(*[Affiliation.sta.like(stas) for stas in sta]))
 
     if time_:
-        q = q.filter(time_.timestamp < affiliation.endtime)
+        t1, t2 = time_
+        t1 = UTCDateTime(t1).timestamp if t1 else None
+        t2 = UTCDateTime(t2).timestamp if t2 else None
+        if t1:
+            query = query.filter(t1 < Affiliation.endtime)
+        if t2:
+            query = query.filter(t2 > Affiliation.time)
 
-    if endtime:
-        q = q.filter(endtime.timestamp > affiliation.time)
-
-    return q
+    return query
 
 
 def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, with_query = None):
@@ -188,7 +199,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
 
     return q
 
-def query_responses(session, sensor, instrument = None, stas = None, chans = None, time_ = None, endtime = None, with_query = None):
+def filter_responses(query, sta = None, chan = None, time_ = None):
     """
     Parameters
     ----------
@@ -210,55 +221,38 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
     ------
     
     """
+    # get desired tables from the query
+    Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query,"Affiliation","Site","Sitechan","Sensor", "Instrument")
+    # override if provided
+    # XXX: add a flag for the 'filter but don't include'
+    Affiliation = tables.get("affiliation", None) or Affiliation
+    Site = tables.get("site", None) or Site
+    Sitechan = tables.get("sitechan", None) or Sitechan
+    Sensor = tables.get("sensor", None) or Sensor
+    Instrument = tables.get("instrument", None) or Instrument
 
-    if with_query:
-        q = with_query
+    # avoid nonsense inputs
+    if not Sensor and Instrument:
+        msg = "Sensor and Instrument table required."
+        raise ValueError(msg)
 
-        sitechan = None
-        site = None
-        affiliation = None
+    query = query.filter(Sensor.inid == Instrument.inid)
 
-        for i in q.column_descriptions:
-            checkEntity = i['entity']
-            if checkEntity._tabletype == 'Sitechan':
-                sitechan = checkEntity
-            if checkEntity._tabletype == 'Site':
-                site = checkEntity
-            if checkEntity._tabletype == 'Affiliation':
-                affiliation = checkEntity
-        
-        if sitechan:
-            q = q.add_entity(sensor)
-            q = q.join(sensor, sitechan.chanid == sensor.chanid)
+    if Sitechan:
+        query = query.filter(Sitechan.chanid == Sensor.chanid)
+    elif Site:
+        query = query.filter(Sensor.sta == Site.sta)
+    elif Affiliation:
+        query = query.filter(Sensor.sta == Affiliation.sta)
 
-        elif site:
-            q = q.add_entity(sensor)
-            q = q.join(sensor, sensor.sta == site.sta)
-            warnings.warn("No sitechan specified, joining sensor to site on column sta")
-        
-        elif affiliation:
-            q = q.add_entity(sensor)
-            q = q.join(sensor, sensor.sta == affiliation.sta)
-            warnings.warn("No site or sitechan specified, joining sensor to affiliation on column sta")
-        
-        else:
-            raise NameError("No table in provided query on which to join the sensor table ")
+    if sta:
+        sta = make_wildcard_list(sta)
+        q = q.filter(or_(*[sensor.sta.like(stas) for stas in sta]))
 
-    else:
-        q = session.query(sensor)
-    
-    if instrument:
-        q = q.add_entity(instrument)
-        q = q.join(instrument, sensor.inid == instrument.inid)
-
-    if stas:
-        stas = make_wildcard_list(stas)
-        q = q.filter(or_(*[sensor.sta.like(sta) for sta in stas]))
-
-    if chans:
-        chans = make_wildcard_list(chans)
-        q = q.filter(or_(*[sensor.chan.like(chan) for chan in chans]))
-
+    if chan:
+        chan = make_wildcard_list(chan)
+        q = q.filter(or_(*[sensor.chan.like(chans) for chans in chan]))
+# copy filter network logic here
     if time_:
         q = q.filter(time_.timestamp < sensor.endtime)
 
