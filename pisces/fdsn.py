@@ -5,6 +5,7 @@ Pisces Client mirrors the ObsPy FDSN Client interface.
 """
 import logging
 import os
+import warnings
 
 import sqlalchemy as sa
 from sqlalchemy import create_engine
@@ -12,26 +13,52 @@ from sqlalchemy.orm import Session
 from obspy import Stream, UTCDateTime
 
 import pisces as ps
-import pisces.request as req
-from pisces.io.trace import wfdisc2trace
+from pisces import events
 from pisces import util
 
 log = logging.getLogger(__name__)
 
 # client = DBClient(session_or_config_or_URI, **tables)
-# get network-level info for stations containing BH? in a region. 
+# get network-level info for stations containing BH? in a region.
 # returns joined sitechan, site, affil, and network
 # q = client.stations(region=[W, E, S, N], channels='BH?').networks(pref_nets=('II','IU','ISC'))
 # get responses for all BH? stations in II
 # q = client.networks(networks=['II']).stations(channels='BH?').responses()
+# q = client.events(region=[W, E, S, N], prefor=True).magnitudes(mb=(3, 4)).arrivals(phase='P,S', auth='LANL*')
+# res = q.all()
 
+# Convert KB Core etypes to FDSN event types, best good-faith mapping
+# These are also used for a backwards mapping below, so where there multiple backwards mappings,
+# the final one is preferred/used. Relies on order-preserving dictionaries in Python 3.7+.
+FDSN_EVENT_TYPE = {
+    "ec": 'chemical explosion', #chemical explosion",
+    "ep": 'explosion', #probable explosion",
+    "ex": 'explosion', #generic explosion",
+    "en": 'nuclear explosion', #nuclear explosion",
+    "mc": 'collapse', #collapse",
+    "me": 'mining explosion', #coal bump/mining event",
+    "mp": 'mining explosion', #probable mining event",
+    "mb": 'rock burst', #rock burst",
+    "qd": 'earthquake', #damaging earthquake",
+    "qp": 'earthquake', #unknown-probable earthquake",
+    "qf": 'earthquake', #felt earthquake",
+    "qt": 'earthquake', #generic earthquake/tectonic",
+    "ge": 'other event', #geyser",
+    "xm": 'meteorite', #meteroritic origin",
+    "xl": 'other event', #ligts",
+    "xo": 'other event', #odors",
+    '-': 'not reported',
+    None: 'not reported',
+}
+# Convert FDSN event types to KB Core etypes, best good-faith mapping
+KBCORE_EVENT_TYPE = {v: k for k, v in FDSN_EVENT_TYPE.items()}
 
-def _None_if_none(iterable):
-    return None if all([val is None for val in iterable]) else iterable
+def _None_if_none(*values):
+    return None if all([val is None for val in values]) else values
 
 
 def origins_to_fdsntext(origins, header=False):
-    """ Convert a SQLAlchemy Origin instances to FDSN event text.
+    """Convert a SQLAlchemy Origin instances to FDSN event text.
 
     #EventID | Time | Latitude | Longitude | Depth/km | Author | Catalog | Contributor | ContributorID | MagType | Magnitude | MagAuthor | EventLocationName
     #origin.orid|origin.time|origin.lat|origin.lon|origin.depth|netmag.auth|netmag.auth|netmag.auth|netmag.magtype|netmag.magnitude|sregion.srname or event.evname
@@ -41,10 +68,25 @@ def origins_to_fdsntext(origins, header=False):
     """
     header_string = "EventID | Time | Latitude | Longitude | Depth/km | Author | Catalog | Contributor | ContributorID | MagType | Magnitude | MagAuthor | EventLocationName"
     # this needs to get MagType in there
-    origin_columns = ('orid', 'time', 'lat', 'lon', 'depth', 'auth', 'auth',
-                      'auth', 'orid', 'mb', 'mb', 'auth', 'grn')
-    rows = ['|'.join(str(getattr(origin, column, '-')) for column in origin_columns)
-            for origin in origins]
+    origin_columns = (
+        "orid",
+        "time",
+        "lat",
+        "lon",
+        "depth",
+        "auth",
+        "auth",
+        "auth",
+        "orid",
+        "mb",
+        "mb",
+        "auth",
+        "grn",
+    )
+    rows = [
+        "|".join(str(getattr(origin, column, "-")) for column in origin_columns)
+        for origin in origins
+    ]
 
     if header:
         out = [header_string] + rows
@@ -59,6 +101,7 @@ class Client(object):
     Basic database request client.
 
     """
+
     def __init__(self, dburl_or_session, **tables):
         """
         FDSN-style client interface to a SQL database using a CSS3.0-style schema.
@@ -86,33 +129,54 @@ class Client(object):
         >>> client = Client(session, **tables)
 
         """
-        if type(dburl_or_session) is str:
+        if isinstance(dburl_or_session, str):
             engine = sa.create_engine(dburl_or_session)
             session = Session(engine)
         else:
             session = dburl_or_session
 
         # this is just a test, will fail early if the connection is misconfigured
-        # session.bind.connect()
+        # session.bind.connect();
 
         self.session = session
         self.tables = tables
-
 
     def __repr__(self):
         repr_str = "<Client({!r})>"
 
         return repr_str.format(self.session.bind.url)
 
-
-
-    def get_events(self, starttime=None, endtime=None, minlatitude=None, maxlatitude=None,
-                   minlongitude=None, maxlongitude=None, latitude=None, longitude=None, 
-                   minradius=None, maxradius=None, mindepth=None, maxdepth=None, 
-                   minmagnitude=None, maxmagnitude=None, magnitudetype=None, eventtype=None, 
-                   includeallorigins=None, includeallmagnitudes=None, includearrivals=None, 
-                   eventid=None, limit=None, offset=None, orderby=None, catalog=None, 
-                   contributor=None, updatedafter=None, filename=None, **kwargs):
+    def get_events(
+        self,
+        starttime: UTCDateTime = None,
+        endtime: UTCDateTime = None,
+        minlatitude: float = None,
+        maxlatitude: float = None,
+        minlongitude: float = None,
+        maxlongitude: float = None,
+        latitude: float = None,
+        longitude: float = None,
+        minradius: float = None,
+        maxradius: float = None,
+        mindepth: float = None,
+        maxdepth: float = None,
+        minmagnitude: float = None,
+        maxmagnitude: float = None,
+        magnitudetype: str = None,
+        eventtype: str = None,
+        includeallorigins: bool = None,
+        includeallmagnitudes: bool = None,
+        includearrivals: bool = None,
+        eventid: str = None,
+        limit: int = None,
+        offset: int = None,
+        orderby: bool = None,
+        catalog: str = None,
+        contributor: str = None,
+        updatedafter: UTCDateTime = None,
+        filename: str = None,
+        **kwargs
+    ):
         """
         Query event data.
 
@@ -124,94 +188,103 @@ class Client(object):
         >>> t1 = UTCDateTime("2001-01-07T00:00:00")
         >>> t2 = UTCDateTime("2001-01-07T03:00:00")
         >>> cat = client.get_events(starttime=t1, endtime=t2, minmagnitude=4,
-        ...                         catalog="ISC")
+        ...                         contributor="ISC")
         >>> print(cat)
         3 Event(s) in Catalog:
         2001-01-07T02:55:59.290000Z |  +9.801,  +76.548 | 4.9 mb
         2001-01-07T02:35:35.170000Z | -21.291,  -68.308 | 4.4 mb
         2001-01-07T00:09:25.630000Z | +22.946, -107.011 | 4.0 mb
 
-        starttime : obspy.core.utcdatetime.UTCDateTime, optional
+        starttime : obspy.UTCDateTime, optional [Origin]
             Limit to events on or after the specified start time.
-        endtime : obspy.core.utcdatetime.UTCDateTime optional
+        endtime : obspy.UTCDateTime optional [Origin]
             Limit to events on or before the specified end time.
-        minlatitude : float, optional
+        minlatitude : float, optional [Origin]
             Limit to events with a latitude larger than the specified minimum.
-        maxlatitude : float, optional
+        maxlatitude : float, optional [Origin]
             Limit to events with a latitude smaller than the specified
             maximum.
-        minlongitude : float, optional
+        minlongitude : float, optional [Origin]
             Limit to events with a longitude larger than the specified
             minimum.
-        maxlongitude : float, optional
+        maxlongitude : float, optional [Origin]
             Limit to events with a longitude smaller than the specified
             maximum.
-        latitude : float, optional
+        latitude : float, optional [Origin]
             Specify the latitude to be used for a radius search.
-        longitude : float, optional
+        longitude : float, optional [Origin]
             Specify the longitude to the used for a radius search.
-        minradius : float, optional
+        minradius : float, optional [Origin]
             Limit to events within the specified minimum number of degrees
             from the geographic point defined by the latitude and longitude
             parameters.
-        maxradius : float, optional
+        maxradius : float, optional [Origin]
             Limit to events within the specified maximum number of degrees
             from the geographic point defined by the latitude and longitude
             parameters.
-        mindepth : float, optional
+        mindepth : float, optional [Origin]
             Limit to events with depth, in kilometers, larger than the
             specified minimum.
-        maxdepth : float, optional
+        maxdepth : float, optional [Origin]
             Limit to events with depth, in kilometers, smaller than the
             specified maximum.
-        minmagnitude : float, optional
-            Limit to events with a magnitude larger than the specified
-            minimum.
-        maxmagnitude : float, optional
-            Limit to events with a magnitude smaller than the specified
-            maximum.
-        magnitudetype : str, optional
+        minmagnitude : float, optional [Origin | Netmag]
+            Limit to events with a magnitude larger than the specified minimum.
+        maxmagnitude : float, optional [Origin | Netmag]
+            Limit to events with a magnitude smaller than the specified maximum.
+        magnitudetype : str, optional [Origin | Netmag]
             Specify a magnitude type to use for testing the minimum and
-            maximum limits.
-        includeallorigins : bool, optional
-            Specify if all origins for the event should be included. Default
-            returns the preferred origin only.
-            Requires Event table.
-        includeallmagnitudes : bool, optional
-            Specify if all magnitudes for the event should be included,
-            default is data center dependent but is suggested to be the
-            preferred magnitude only.
-            Requires Netmag table.
-        includearrivals : bool, optional
+            maximum limits.  If not provided, any magnitude range constraints
+            are applied to all magnitude types.
+            Netmag table is required for magnitudes other than 'ml', 'mb', or 'ms'.
+        eventtype: str, optional [Origin]
+            Limit to events with a specified event type.
+            Multiple types are comma-separated (e.g., `"earthquake,quarry blast"`).
+            Allowed values are from QuakeML. See `obspy.core.event.header.EventType` for a list of
+            allowed event types.
+        includeallorigins : bool, optional (Origin [, Event])
+            Specify if all origins for the event should be included. Default is False,
+            which returns the preferred origin only and requires the Origin and Event table.
+        includeallmagnitudes : bool, optional [Origin, Netmag]
+            Specify if all magnitudes for the event should be included, default is False.
+            KB Core has no concept of a preferred magnitude, so this parameter is only
+            meaningful if True and magnitude type is 'mb', 'ml', or 'ms'.  In this case,
+            the Origin and Netmag tables are joined, and one or more of the requested magtype
+            is returned, subject to range constraints.
+        includearrivals : bool, optional [Assoc, Arrival]
             Specify if phase arrivals should be included.
-            Requires Assoc and Arrival tables.
-        eventid : str or int, optional
+        eventid : str or int, optional [Event | Origin]
             Select a specific event by ID (evid), or comma-separated list of IDs.
             e.g. 1234 or '1234,5678'
+            Incompatible with geographic parameters.
         limit : int, optional
             Limit the results to the specified number of events.
         offset : int, optional
-            Return results starting at the event count specified, starting
-            at 1.
-        orderby : str, optional
-            Order the result by time or magnitude with the following
-            possibilities:
+            Return results starting at the event count specified, starting at 1.
+        orderby : str, optional [Origin [, Netmag]]
+            Order the result by time or magnitude with the following possibilities:
 
             * time: order by origin descending time
             * time-asc: order by origin ascending time
             * magnitude: order by descending magnitude
             * magnitude-asc: order by ascending magnitude
 
-        catalog : str, optional
-            Limit to events from a specified catalog
-            Looks for catalog inside of origin.auth.
-        contributor : str, optional
+            Ignored for includeallmagnitudes=False and magtype in ('mb', 'ms', 'ml').
+
+        catalog : str, optional [ignored]
+            KB Core tables have no concept of a catalog. See 'contributor' below.
+        contributor : str, optional [Event | Origin | Netmag]
             Limit to events contributed by a specified contributor.
-            Looks for contributer inside of origin.auth.
-        updatedafter : obspy.core.utcdatetime.UTCDateTime, optional
+            Matches strings inside the 'auth' field in the Event, Origin, or Netmag tables.
+            Commonly, Catalog sources are embedded in this field, so add them here with wildcards,
+            like '*ISC*'.
+        updatedafter : obspy.UTCDateTime, optional [Origin]
             Limit to events updated after the specified time.
+            KB Core doesn't keep track of updates, so this parameter filters Origin.lddate,
+            the date the origin was added to the database.
         format : str ["xml" (StationXML) | "text" (FDSN station text format) | query (raw SQLAlchey query)]
-            The format in which to request station information. 
+            The format in which to request station information.
+            "text" format requires specifying "magnitudetype" that isn't "all".
         asquery : bool
             Return results as a raw SQLAlchemy query instead of the results proper.
 
@@ -221,158 +294,164 @@ class Client(object):
         non-default parameters that the webservice does not support will raise
         an error.
 
+        Raises
+        ------
+        ValueError
+            Missing or improper inputs.
+
         """
-        Origin = self.tables['origin'] #required
-        Event = self.tables.get('event')
-        Netmag = self.tables.get('netmag')
-        Stamag = self.tables.get('stamag')
-        Arrival = self.tables.get('arrival')
-        Assoc = self.tables.get('assoc')
+        try:
+            Origin = self.tables["origin"]  # required
+        except KeyError:
+            msg = "Origin table required"
+            raise ValueError(msg)
 
-        # Origin filters
-        time_span = _None_if_none((starttime, endtime))
-        region = _None_if_none((minlongitude, maxlongitude, minlatitude, maxlatitude))
-        radius = _None_if_none((latitude, longitude, minradius, maxradius))
-        depth = _None_if_none((mindepth, maxdepth))
+        Event = self.tables.get("event", None)
+        Netmag = self.tables.get("netmag", None)
+        Stamag = self.tables.get("stamag", None)
+        Arrival = self.tables.get("arrival", None)
+        Assoc = self.tables.get("assoc", None)
 
-        if region and radius:
+        # characterize which inputs were provided
+        ORIGINMAGS = ('mb', 'ml', 'ms')
+        timeparams = any([starttime, endtime])
+        boxparams = any([minlongitude, maxlongitude, minlatitude, maxlatitude])
+        radialparams = any([latitude, longitude, minradius, maxradius])
+        magparams = any([minmagnitude, maxmagnitude, magnitudetype])
+
+        # check which optional tables we need
+        useEvent = not includeallorigins
+        useNetmag = includeallmagnitudes or (magnitudetype and magnitudetype not in ORIGINMAGS)
+        useArrival = includearrivals
+
+        # check for nonsense inputs
+        if eventid and (magparams or boxparams or radialparams or timeparams):
+            msg = "If eventid is specified, only the 'includeallmagnitudes' parameter is used."
+            warnings.warn(msg)
+
+        if boxparams and radialparams:
             msg = "Incompatible inputs: using both lat/lon and radius ranges not allowed"
             raise ValueError(msg)
 
-        # Event filters
-        if includeallorigins in (None, False):
-            prefor = True
-        else:
-            prefor = False
-
-        # turn string event IDs into integer evid list
-        if eventid:
-            evids = [int(evid) for evid in eventid.split(',')]
-        else:
-            evids = None
-
-        # Netmag filters
-        mag = _None_if_none((minmagnitude, maxmagnitude))
-        # if magnitudetype isn't in Origin, we'll need Netmag
-        # TODO: we need remove case-sensitivity here.
-        if magnitudetype:
-            useNetmag = True if magnitudetype not in Origin.__tables__.columns else False
-        else:
-            useNetmag = False
-
-        # we may need _all_ of Netmag
-        useAllNetMag = includeallmagnitudes
-        magtype = magnitudetype
-
-
-        q = req.get_events(self.session, Origin, event=Event, region=region, depth=depth, 
-                           etime=time_span, evids=evids, prefor=prefor, asquery=True)
-
-        # q = req.get_magnitudes(Origin, Netmag, query=None, **magnitudes)
-
-        # magnitude
-        if any([magnitudetype, minmagnitude, maxmagnitude]):
-            mag = {magnitudetype: (minmagnitude, maxmagnitude)}
-        else:
-            mag = None
-
-        if includeallmagnitudes:
-            try:
-                q = q.add_entity(Netmag)
-            except sa.exc.NoInspectionAvailable:
-                msg = "Netmag table is required for 'includeallmagnitudes`."
-                raise ps.exc.RequiredTableError(msg)
-            q = q.filter(Origin.orid == Netmag.orid)
-
-        q = q.filter(Origin.auth.contains(catalog)) if catalog else q
-        q = q.filter(Origin.auth.contains(contributor)) if contributor else q
-
-        if updatedafter:
-            q = q.filter(Origin.lddate > updatedafter.timestamp)
-
-        if includeallmagnitudes:
-            try:
-                q = q.add_entity(Netmag)
-            except sa.exc.NoInspectionAvailable:
-                msg = "Netmag table is required for 'includeallmagnitudes`."
-                raise ps.exc.RequiredTableError(msg)
-            q = q.filter(Origin.orid == Netmag.orid)
-
-        q = q.filter(Origin.auth.contains(catalog)) if catalog else q
-        q = q.filter(Origin.auth.contains(contributor)) if contributor else q
-
-        if updatedafter:
-            q = q.filter(Origin.lddate > updatedafter.timestamp)
-
-        if orderby in ('time', 'time-asc', 'magnitude', 'magnitude-asc', None):
-            if orderby == 'time':
-                q = q.order_by(Origin.time.desc())
-            elif orderby == 'time-asc':
-                q = q.order_by(Origin.time.asc())
-            elif orderby == 'magnitude':
-                # TODO: DRY
-                try:
-                    q = q.order_by(Netmag.mag.desc())
-                except AttributeError:
-                    msg = "Netmag table is required for orderby : {}".format(orderby)
-                    raise ps.exc.RequiredTableError(msg)
-            elif orderby == 'magnitude-asc':
-                try:
-                    q = q.order_by(Netmag.mag.asc())
-                except AttributeError:
-                    msg = "Netmag table is required for orderby : {}".format(orderby)
-                    raise ps.exc.RequiredTableError(msg)
-        else:
-            msg = "Unrecognized orderby : {}".format(orderby)
+        if useNetmag and not Netmag:
+            msg = "Netmag table required for includeallmagnitudes or magtype not in ('mb', 'ml', 'ms')."
             raise ValueError(msg)
 
-        if includearrivals:
-            # output is now (origins, arrivals) or (origins, netmags, arrivals)
-            try:
-                q.add_entity(Arrival)
-                q.filter(Origin.orid == Assoc.orid, Assoc.arid == Arrival.arid)
-            except (sa.exc.NoInspectionAvailable, AttributeError):
-                msg = "Assoc and Arrival table required for 'includeallarrivals`."
-                raise ps.exc.RequiredTableError(msg)
+        if useEvent and not Event:
+            msg = "Event table required for includeallorigins is False or None."
+            raise ValueError(msg)
+
+        if useArrival and (not Arrival or not Assoc):
+            msg = "Arrival and Assoc tables required for includeallarrivals."
+            raise ValueError(msg)
+
+        if orderby not in ("time", "time-asc", "magnitude", "magnitude-asc", None):
+            msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
+            raise ValueError(msg)
+
+        if orderby and 'magnitude' in orderby and not useNetmag:
+            # we're not going to orderby magnitude value in the Origin table.
+            msg = "Netmag table not used, so magnitude sorting is ignored."
+            warnings.warn(msg)
+
+        if eventtype and eventtype.lower() not in KBCORE_EVENT_TYPE:
+            msg = f"eventtype '{eventtype}' not recognized.  choose from {list(KBCORE_EVENT_TYPE.keys())}"
+            raise ValueError(msg)
+
+        # normalize inputs for event query functions
+        time_ = _None_if_none(starttime, endtime)
+        region = _None_if_none(minlongitude, maxlongitude, minlatitude, maxlatitude)
+        radius = _None_if_none(latitude, longitude, minradius, maxradius)
+        depth = _None_if_none(mindepth, maxdepth)
+        prefor = not includeallorigins
+        etype = ','.join({KBCORE_EVENT_TYPE[e.lower()] for e in eventtype.split(',')}) if eventtype else None
+        magnitudetype = 'all' if magparams and not magnitudetype else magnitudetype
+        magnitudes = {magnitudetype: (minmagnitude, maxmagnitude)} if magparams else {}
+        originauth = contributor if not useNetmag else None
+        netmagauth = contributor if useNetmag else None
+
+        # turn string event IDs into integer evid list
+        evid = [int(e) for e in eventid.split(",")] if eventid else None
+
+        # build the query (finally)
+
+        # geographic / categorical stuff
+        q = self.session.query(Origin)
+        q = q.add_entity(Event) if useEvent else q
+        q = events.filter_events(q,
+                                 region=region,
+                                 time_=time_,
+                                 depth=depth,
+                                 evid=evid,
+                                 prefor=prefor,
+                                 auth=originauth,
+                                 etype=etype,
+        )
+
+        # magnitude stuff
+        if useNetmag:
+            q = q.add_entity(Netmag)
+        q = events.filter_magnitudes(q, auth=netmagauth, **magnitudes)
+
+        # arrival stuff
+        if useArrival:
+            q = q.add_entity(Assoc)
+            q = q.add_entity(Arrival)
+            q = events.filter_arrivals(q)
+
+        if updatedafter:
+            q = q.filter(Origin.lddate > updatedafter)
+
+        if orderby == "time":
+            q = q.order_by(Origin.time.desc())
+        elif orderby == "time-asc":
+            q = q.order_by(Origin.time.asc())
+        elif orderby == "magnitude" and useNetmag:
+            q = q.order_by(Netmag.magnitude.desc())
+        elif orderby == "magnitude-asc" and useNetmag:
+            q = q.order_by(Netmag.mag.asc())
+
 
         q = q.limit(limit) if limit else q
         q = q.offset(offset) if offset else q
 
-        if kwargs.get('asquery'):
+        if kwargs.get("asquery"):
             result = q
         else:
-            result = q.all()
+            # XXX: build requested format here.  For now, just return the query no matter what.
+            result = q
 
         return result
 
-
-    def get_stations(self,
-                     starttime: UTCDateTime = None, 
-                     endtime: UTCDateTime = None,
-                     startbefore: UTCDateTime = None,
-                     startafter: UTCDateTime = None,
-                     endbefore: UTCDateTime = None,
-                     endafter: UTCDateTime = None,
-                     network: str = None,
-                     station: str = None,
-                     location: str = None,
-                     channel: str = None,
-                     minlatitude: float = None,
-                     maxlatitude: float = None,
-                     minlongitude: float = None,
-                     maxlongitude: float = None,
-                     latitude: float = None,
-                     longitude: float = None,
-                     minradius: float = None,
-                     maxradius: float = None,
-                     level: str = None,
-                     includerestricted: bool = None,
-                     includeavailability: bool = None,
-                     updatedafter: UTCDateTime = None,
-                     matchtimeseries: bool = None,
-                     filename: str = None,
-                     format: str = "xml",
-                     **kwargs):
+    def get_stations(
+        self,
+        starttime: UTCDateTime = None,
+        endtime: UTCDateTime = None,
+        startbefore: UTCDateTime = None,
+        startafter: UTCDateTime = None,
+        endbefore: UTCDateTime = None,
+        endafter: UTCDateTime = None,
+        network: str = None,
+        station: str = None,
+        location: str = None,
+        channel: str = None,
+        minlatitude: float = None,
+        maxlatitude: float = None,
+        minlongitude: float = None,
+        maxlongitude: float = None,
+        latitude: float = None,
+        longitude: float = None,
+        minradius: float = None,
+        maxradius: float = None,
+        level: str = None,
+        includerestricted: bool = None,
+        includeavailability: bool = None,
+        updatedafter: UTCDateTime = None,
+        matchtimeseries: bool = None,
+        filename: str = None,
+        format: str = "xml",
+        **kwargs
+    ):
         """
         Query station station data.
 
@@ -505,18 +584,28 @@ class Client(object):
         webservice does not support it, a warning will be issued. Passing any
         non-default parameters that the webservice does not support will raise
         an error.
-        
+
         """
         pass
 
-
-    def get_waveforms(self, network, station, location, channel, starttime,
-                      endtime, quality=None, minimumlength=None,
-                      longestonly=None, attach_response=False, asquery=False,
-                      **kwargs):
+    def get_waveforms(
+        self,
+        network,
+        station,
+        location,
+        channel,
+        starttime,
+        endtime,
+        quality=None,
+        minimumlength=None,
+        longestonly=None,
+        attach_response=False,
+        asquery=False,
+        **kwargs
+    ):
         """
         Get waveforms from the database.
-        
+
         Requires the data and response directories in 'dir' and 'dfile' columns
         to be available/mounted on the client machine.
 
@@ -589,12 +678,12 @@ class Client(object):
         # longestonly : bool, optional
         #     Limit results to the longest continuous segment per channel.
 
-        Wfdisc = self.tables['wfdisc'] # required
-        Affil = self.tables.get('affiliation')
+        Wfdisc = self.tables["wfdisc"]  # required
+        Affil = self.tables.get("affiliation")
 
         # Manage wildcarding and location codes before query.filter-ing.
 
-        location = '' if location == '--' else location
+        location = "" if location == "--" else location
 
         # Replace '*' and '?' with '%' and '_'
         wildcardables = (network, station, location, channel)
@@ -603,7 +692,7 @@ class Client(object):
 
         # turn any "comma lists" into Python lists
         listables = (network, station, location, channel)
-        listables = [listable.split(',') for listable in listables]
+        listables = [listable.split(",") for listable in listables]
         networks, stations, locations, channels = listables
         # even single strings are now a single element list
 
@@ -616,7 +705,9 @@ class Client(object):
         t1, t2 = starttime.timestamp, endtime.timestamp
 
         # Build the query
-        q = req.get_wfdisc_rows(self.session, Wfdisc, sta=stations, chan=channel, t1=t1, t2=t2, asquery=True)
+        q = req.get_wfdisc_rows(
+            self.session, Wfdisc, sta=stations, chan=channel, t1=t1, t2=t2, asquery=True
+        )
 
         # q = self.session.query(Wfdisc)
 
@@ -641,7 +732,7 @@ class Client(object):
                 raise ValueError(msg)
 
         if minimumlength:
-            q = q.filter((Wfdisc.endtime - Wfdisc.time ) > minimumlength)
+            q = q.filter((Wfdisc.endtime - Wfdisc.time) > minimumlength)
 
         if asquery:
             out = q
