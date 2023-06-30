@@ -256,11 +256,8 @@ def filter_events(
     # collect range restrictions on columns
     range_restr = []
     if time_:
-        t1, t2 = time_
-        t1 = UTCDateTime(t1).timestamp if t1 else None
-        t2 = UTCDateTime(t2).timestamp if t2 else None
-        time_ = (t1, t2)
-        range_restr.append((Origin.time, *time_))
+        t1, t2 = [UTCDateTime(t).timestamp if t is not None else None for t in time_]
+        range_restr.append((Origin.time, t1, t2))
 
     if region:
         W, E, S, N = region
@@ -302,20 +299,21 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
         Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
     **magnitudes_and_tables : [Stamag > Netmag > Origin]
         Magnitudes
-        Specify the magtype=(min, max) values for the filter as keyword, 2-tuple pairs,
-        e.g. mb=(3.5, 5.5) . If omitted, all found magnitudes will be returned.
-        If no range values are provided (e.g. mw=(None, None)), all rows with that magtype
-        are returned.
-        Magnitude filters are applied to tables in the following priority: Origin, Netmag, Stamag
-        Wildcards are accepted, but they must be provided as an expanded dict, like:
+        Specify the `magtype=(min|None, max|None)` values for the filter as keyword, 2-tuple pairs,
+        e.g. `mb=(3.5, 5.5)`. One special magtype is recognized: `all=(min|None, max|None)` will
+        constrain and return all magnitudes. If no range values are provided (e.g. mw=(None, None)),
+        all rows with that magtype are returned. Using `all=(None, None)` is the same as providing
+        no filter at all. [not yet implemented] Magnitude filters are applied to tables in the
+        following priority: Stamag, Netmag, Origin Wildcards are accepted, but they must be provided
+        as an expanded dict, like:
         >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
 
         Tables
         If a required ORM table isn't in the SELECT of your query, you can provide it here as a
         keyword argument (e.g. netmag=Netmag). If provided in this way, it won't be returned in the
         result set but is instead just used to filter the result set for the incoming query.
-        If you wish a table included in the result set, use the `sqlalchemy.orm.Query.add_entity`
-        method prior to calling this function.
+        If you wish a table to be included in the result set, use the
+        `sqlalchemy.orm.Query.add_entity` method prior to calling this function.
         e.g. `q = q.add_entity(Stamag)`
 
     Joins
@@ -497,9 +495,7 @@ def filter_arrivals(query, sta=None, auth=None, time_=None, orid=None, phase=Non
         query = query.filter(Assoc.orid.in_(orid))
 
     if time_:
-        t1, t2 = time_
-        t1 = UTCDateTime(t1).timestamp if t1 else None
-        t2 = UTCDateTime(t2).timestamp if t2 else None
+        t1, t2 = [UTCDateTime(t).timestamp if t is not None else None for t in time_]
         time_filter = range_filters((Arrival.time, t1, t2))[0]
         query = query.filter(time_filter)
 
