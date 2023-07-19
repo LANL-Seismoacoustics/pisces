@@ -433,6 +433,8 @@ class ETree:
                 amplitude = self.amplitude(arrival)
                 amplitude.waveform_id = pick.waveform_id
 
+        return cat
+
 
 
 def catalog(*event_queries,
