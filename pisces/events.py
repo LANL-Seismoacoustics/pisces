@@ -8,46 +8,47 @@ the result set, but won't be added to the query SELECT statement.
 
 ```bash
 pisces/
+    __init__.py : filter_*, inventory, catalog, stream
     util.py
     crud.py
     request.py @deprecated
-    events.py : filter_events, filter_magnitudes, filter_arrivals, catalog
-    stations.py : filter_networks, filter_stations, filter_responses, inventory
-    waveforms.py : import filter_waveforms, stream
-    fdsn.py : Client
+    events.py : filter_events, filter_magnitudes, filter_arrivals
+    stations.py : filter_networks, filter_stations, filter_responses
+    waveforms.py : filter_waveforms
+    stream.py : stream
+    inventory.py : inventory
+    catalog.py : catalog, enum values
+    client.py : Client
+    fdsnws.py : Client
     commands/
+        ...
     schema/
+        ...
     tables/
+        ...
     io/
         # register various read_* waveform or response functions with their dtype or rsptype string,
         # so that read_waveform/read_response can route to it, each using a standard calling signature
         # and return values.
-        __init__.py  # imports api functions
+        __init__.py  # read_waveform, read_response
         sac.py : read_sac, write_sac # + various header conversion functions
         mseed.py : read_mseed, write_mseed
         numpy.py : read_f4, etc...
         waveform.py : read_waveform # registers reader functions
-        pazfir.py
-        pazfap.py
-        paziir.py
-        fap.py
-        fir.py
+        pazfir.py : read_pazfir
+        pazfap.py : read_pazfap
+        paziir.py : read_pazfir
+        fap.py : read_fap
+        fir.py : read_fir
         response.py : read_response # registers reader functions
 
 ```
 
 ```python
 
-from pisces.io.sac import read_sac
-from pisces.io.mseed import read_mseed
-from pisces.io.response import read_pazfir, read_fap, read_fir, read_paziir, read_pazfap # decide on a common function signature, and use a registry
-from pisces.io import read_waveform, read_response
-from pisces.events import filter_events, filter_magnitudes, filter_arrivals, catalog
-from pisces.stations import filter_networks, filter_stations, filter_responses, inventory
-from pisces.waveforms import filter_waveforms, stream
-from pisces.request import get_stations, get_events, get_waveforms, ...
 from pisces.fdsn import Client
-from pisces.client import Client
+from pisces import inventory, catalog
+from pisces.io import read_waveform, read_response
 
 # get broadband waves and responses for stations [20, 80] degrees from events
 q = session.query(Site, Sitechan)
@@ -86,6 +87,45 @@ cat = catalog(q, resource_id, description=None, comments=None, creation_info=Non
 
 ...or a request class?
 ```python
+from contextlib import contextmanager
+class RequestClient:
+    def __init__(self, session, **tables):
+        # add them to self
+        self._event_query = None
+        self._station_query = None
+        self._waveform_query = None #?
+
+    @contextmanager
+    def query(self):
+        self._event_query = None
+        self._station_query = None
+        self._waveform_query = None #?
+        try:
+            yield self
+        finally:
+            self._event_query = None
+            self._station_query = None
+            self._waveform_query = None #?
+
+    def events(self, *stuff, **morestuff):
+        if not self._event_query:
+            self._event_query = self.session.query(self.tables['event'], self.tables['origin'])
+        self._event_query = events.filter_events(self._event_query, *stuff, **morestuff)
+
+        return self
+
+    def stations(self, *stuff, **morestuff):
+        if not self._station_query:
+            self._station_query = self.session.query(self.tables['network', 'affiliation', 'site'])
+
+        self._station_query = events.filter_stations(self._station_query, *stuff, **morestuff)
+
+        return self
+
+    def distance(self, *stuff, **morestuff):
+        # needs to be called last
+        return util.distance(self._event_query, self._station_query, *stuff, **morestuff)
+
 tables = make_tables('origin', 'event', 'arrival', 'assoc', schema='kbcore', owner='global')
 rclient = RequestClient(session, **tables)
 
@@ -93,13 +133,14 @@ rclient = RequestClient(session, **tables)
 with rclient.query() as q:
     q = q.events(
             region=(-10, 5, 40, 47),
-            time_=('2009-01-01', '2010-01-01'),
+            time_=('2009-01-01', '2010-01-01'), #anything UTCDateTime can consume
             depth=(50, 100),
-            mb=(3.5, 4.5)
         ).stations(
-            channels='BH?',
+            channels='BH?,HH?',
         ).distance(
             degrees=(20, 80),
+            #or
+            kilometers=(50, 300)
         )
     st = q.waveforms(
             filelength=84600,
@@ -155,7 +196,8 @@ def filter_events(
     """Filter an event query using Event, Origin tables.
 
     These filters are primarily geographic and catagorical.  For magnitude filtering,
-    use the `filter_magnitudes` function.
+    Use the `filter_magnitudes` function for magnitude filtering, and filter_arrivals
+    for arrivals and amplitudes.
 
     Parameters
     ----------
@@ -278,7 +320,7 @@ def filter_events(
     return query
 
 
-def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tables):
+def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tables):
     """
     Filter an event query by magnitude range using Origin, Netmag, and/or Stamag tables.
 
@@ -291,10 +333,10 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
     ----------
     query : SQLAlchemy query object
         Includes Origin, Netmag, and/or Stamag tables.
-    sta : str or list of str [Stamag]
-        Station code, wildcards allowed.  Requies Stamag.
     net : str or list of str [Netmag]
         Network code, wildcards allowed. Requires Netmag.
+    sta : str or list of str [Stamag]
+        Station code, wildcards allowed.  Requies Stamag.
     auth : str or list of str [Stamag > Netmag > Origin]
         Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
     **magnitudes_and_tables : [Stamag > Netmag > Origin]
@@ -306,7 +348,7 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
         no filter at all. [not yet implemented] Magnitude filters are applied to tables in the
         following priority: Stamag, Netmag, Origin Wildcards are accepted, but they must be provided
         as an expanded dict, like:
-        >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
+        >>> query = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
 
         Tables
         If a required ORM table isn't in the SELECT of your query, you can provide it here as a
