@@ -3,6 +3,7 @@
 Pisces Client mirrors the ObsPy FDSN Client interface.
 
 """
+from functools import cached_property
 import logging
 import os
 import warnings
@@ -11,10 +12,12 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from obspy import Stream, UTCDateTime
+from obspy.core.event.header import EventType
 
-import pisces as ps
 from pisces import events
+import pisces.request as req
 from pisces import util
+from .catalog import KBCORE_EVENT_TYPE
 
 log = logging.getLogger(__name__)
 
@@ -27,31 +30,6 @@ log = logging.getLogger(__name__)
 # q = client.events(region=[W, E, S, N], prefor=True).magnitudes(mb=(3, 4)).arrivals(phase='P,S', auth='LANL*')
 # res = q.all()
 
-# Convert KB Core etypes to FDSN event types, best good-faith mapping
-# These are also used for a backwards mapping below, so where there multiple backwards mappings,
-# the final one is preferred/used. Relies on order-preserving dictionaries in Python 3.7+.
-FDSN_EVENT_TYPE = {
-    "ec": 'chemical explosion', #chemical explosion",
-    "ep": 'explosion', #probable explosion",
-    "ex": 'explosion', #generic explosion",
-    "en": 'nuclear explosion', #nuclear explosion",
-    "mc": 'collapse', #collapse",
-    "me": 'mining explosion', #coal bump/mining event",
-    "mp": 'mining explosion', #probable mining event",
-    "mb": 'rock burst', #rock burst",
-    "qd": 'earthquake', #damaging earthquake",
-    "qp": 'earthquake', #unknown-probable earthquake",
-    "qf": 'earthquake', #felt earthquake",
-    "qt": 'earthquake', #generic earthquake/tectonic",
-    "ge": 'other event', #geyser",
-    "xm": 'meteorite', #meteroritic origin",
-    "xl": 'other event', #ligts",
-    "xo": 'other event', #odors",
-    '-': 'not reported',
-    None: 'not reported',
-}
-# Convert FDSN event types to KB Core etypes, best good-faith mapping
-KBCORE_EVENT_TYPE = {v: k for k, v in FDSN_EVENT_TYPE.items()}
 
 def _None_if_none(*values):
     return None if all([val is None for val in values]) else values
@@ -146,6 +124,18 @@ class Client(object):
 
         return repr_str.format(self.session.bind.url)
 
+    @cached_property # >= py3.8
+    def contributors(self):
+        """ Sorted list of distinct origin authors (Origin.auth) """
+        Origin = self.tables['origin']
+        return self.session.query(Origin.auth).distinct().order_by(Origin.auth).all()
+
+    @cached_property # >= py3.8
+    def magnitude_types(self):
+        """ Sorted list of distinct Netmag.magtype """
+        Netmag = self.tables['netmag']
+        return self.session.query(Netmag.magtype).distinct().order_by(Netmag.magtype).all()
+
     def get_events(
         self,
         starttime: UTCDateTime = None,
@@ -174,8 +164,8 @@ class Client(object):
         catalog: str = None,
         contributor: str = None,
         updatedafter: UTCDateTime = None,
-        filename: str = None,
-        **kwargs
+        asquery: bool = False,
+        **kwargs,
     ):
         """
         Query event data.
@@ -212,87 +202,82 @@ class Client(object):
             maximum.
         latitude : float, optional [Origin]
             Specify the latitude to be used for a radius search.
+            Not currently implemented.
         longitude : float, optional [Origin]
             Specify the longitude to the used for a radius search.
+            Not currently implemented.
         minradius : float, optional [Origin]
             Limit to events within the specified minimum number of degrees
             from the geographic point defined by the latitude and longitude
             parameters.
+            Not currently implemented.
         maxradius : float, optional [Origin]
             Limit to events within the specified maximum number of degrees
             from the geographic point defined by the latitude and longitude
             parameters.
+            Not currently implemented.
         mindepth : float, optional [Origin]
             Limit to events with depth, in kilometers, larger than the
             specified minimum.
         maxdepth : float, optional [Origin]
             Limit to events with depth, in kilometers, smaller than the
             specified maximum.
-        minmagnitude : float, optional [Origin | Netmag]
+        minmagnitude : float, optional [Origin, Netmag]
             Limit to events with a magnitude larger than the specified minimum.
-        maxmagnitude : float, optional [Origin | Netmag]
+        maxmagnitude : float, optional [Origin, Netmag]
             Limit to events with a magnitude smaller than the specified maximum.
-        magnitudetype : str, optional [Origin | Netmag]
-            Specify a magnitude type to use for testing the minimum and
-            maximum limits.  If not provided, any magnitude range constraints
-            are applied to all magnitude types.
-            Netmag table is required for magnitudes other than 'ml', 'mb', or 'ms'.
+        magnitudetype : str, optional [Origin, Netmag]
+            Specify a magnitude type to use for testing the minimum and maximum limits.  If not
+            provided, any magnitude range constraints are applied to all magnitude types. Netmag
+            table is required for magnitudes other than 'ml', 'mb', or 'ms'.
+            Wildcards are accepted.
         eventtype: str, optional [Origin]
-            Limit to events with a specified event type.
-            Multiple types are comma-separated (e.g., `"earthquake,quarry blast"`).
-            Allowed values are from QuakeML. See `obspy.core.event.header.EventType` for a list of
-            allowed event types.
+            Limit to events with a specified event type. Multiple types are comma-separated
+            e.g., `"earthquake,quarry blast"`. Allowed values are from QuakeML.
+            See `obspy.core.event.header.EventType` for a list of allowed event types.
         includeallorigins : bool, optional (Origin [, Event])
             Specify if all origins for the event should be included. Default is False,
             which returns the preferred origin only and requires the Origin and Event table.
-        includeallmagnitudes : bool, optional [Origin, Netmag]
-            Specify if all magnitudes for the event should be included, default is False.
-            KB Core has no concept of a preferred magnitude, so this parameter is only
-            meaningful if True and magnitude type is 'mb', 'ml', or 'ms'.  In this case,
-            the Origin and Netmag tables are joined, and one or more of the requested magtype
-            is returned, subject to range constraints.
+        includeallmagnitudes : bool, optional [ignored]
+            KB Core has no concept of a preferred magnitude, so all magnitudes are always returned
+            (i.e. always True). If more refined magnitudes are desired, users are
+            recommended to also specify a magnitudetype and/or contributor.
         includearrivals : bool, optional [Assoc, Arrival]
             Specify if phase arrivals should be included.
         eventid : str or int, optional [Event | Origin]
             Select a specific event by ID (evid), or comma-separated list of IDs.
-            e.g. 1234 or '1234,5678'
-            Incompatible with geographic parameters.
-        limit : int, optional
+            e.g. 1234 or '1234,5678'.  If provided, all other parameters are ignored.
+        limit : int, optional [not yet implemented]k
             Limit the results to the specified number of events.
-        offset : int, optional
+        offset : int, optional [not yet implemented]
             Return results starting at the event count specified, starting at 1.
-        orderby : str, optional [Origin [, Netmag]]
+        orderby : str, optional [Origin]
             Order the result by time or magnitude with the following possibilities:
 
-            * time: order by origin descending time
-            * time-asc: order by origin ascending time
-            * magnitude: order by descending magnitude
-            * magnitude-asc: order by ascending magnitude
-
-            Ignored for includeallmagnitudes=False and magtype in ('mb', 'ms', 'ml').
+            * time: order by origin descending time [not yet implemented]
+            * time-asc: order by origin ascending time [not yet implemented]
+            * magnitude: order by descending magnitude [ignored]
+                KB Core events doen't have a preferred magnitude, so sorting is ignored.
+            * magnitude-asc: order by ascending magnitude [ignored]
+                See above.
 
         catalog : str, optional [ignored]
-            KB Core tables have no concept of a catalog. See 'contributor' below.
-        contributor : str, optional [Event | Origin | Netmag]
+            KB Core tables have no concept of a catalog. This parameter is ignored.
+            See 'contributor' below.
+        contributor : str, optional [Origin]
             Limit to events contributed by a specified contributor.
-            Matches strings inside the 'auth' field in the Event, Origin, or Netmag tables.
-            Commonly, Catalog sources are embedded in this field, so add them here with wildcards,
-            like '*ISC*'.
+            Matches strings inside the 'auth' field in the Origin table.  Catalog sources
+            are embedded within this field, so add them here with wildcards, like '*ISC*'.
         updatedafter : obspy.UTCDateTime, optional [Origin]
             Limit to events updated after the specified time.
             KB Core doesn't keep track of updates, so this parameter filters Origin.lddate,
             the date the origin was added to the database.
-        format : str ["xml" (StationXML) | "text" (FDSN station text format) | query (raw SQLAlchey query)]
-            The format in which to request station information.
-            "text" format requires specifying "magnitudetype" that isn't "all".
         asquery : bool
-            Return results as a raw SQLAlchemy query instead of the results proper.
+            Return the raw SQLAlchemy query instead of direct results.
 
-        Any additional keyword arguments will be passed to the webservice as
-        additional arguments. If you pass one of the default parameters and the
-        webservice does not support it, a warning will be issued. Passing any
-        non-default parameters that the webservice does not support will raise
-        an error.
+        Returns
+        -------
+        result : obspy.Catalog or sqlalchemy.orm.Query instance
 
         Raises
         ------
@@ -301,44 +286,33 @@ class Client(object):
 
         """
         try:
-            Origin = self.tables["origin"]  # required
+            Origin = self.tables["origin"]
+            Netmag = self.tables["netmag"]
+            Event = self.tables["event"]
         except KeyError:
-            msg = "Origin table required"
+            msg = "Event, Origin, and Netmag tables required."
             raise ValueError(msg)
 
-        Event = self.tables.get("event", None)
-        Netmag = self.tables.get("netmag", None)
-        Stamag = self.tables.get("stamag", None)
+        # Stamag = self.tables.get("stamag", None)
         Arrival = self.tables.get("arrival", None)
         Assoc = self.tables.get("assoc", None)
 
         # characterize which inputs were provided
-        ORIGINMAGS = ('mb', 'ml', 'ms')
         timeparams = any([starttime, endtime])
         boxparams = any([minlongitude, maxlongitude, minlatitude, maxlatitude])
         radialparams = any([latitude, longitude, minradius, maxradius])
         magparams = any([minmagnitude, maxmagnitude, magnitudetype])
 
         # check which optional tables we need
-        useEvent = not includeallorigins
-        useNetmag = includeallmagnitudes or (magnitudetype and magnitudetype not in ORIGINMAGS)
         useArrival = includearrivals
 
         # check for nonsense inputs
         if eventid and (magparams or boxparams or radialparams or timeparams):
-            msg = "If eventid is specified, only the 'includeallmagnitudes' parameter is used."
+            msg = "If eventid is specified, no other parameters are used."
             warnings.warn(msg)
 
         if boxparams and radialparams:
             msg = "Incompatible inputs: using both lat/lon and radius ranges not allowed"
-            raise ValueError(msg)
-
-        if useNetmag and not Netmag:
-            msg = "Netmag table required for includeallmagnitudes or magtype not in ('mb', 'ml', 'ms')."
-            raise ValueError(msg)
-
-        if useEvent and not Event:
-            msg = "Event table required for includeallorigins is False or None."
             raise ValueError(msg)
 
         if useArrival and (not Arrival or not Assoc):
@@ -349,12 +323,7 @@ class Client(object):
             msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
             raise ValueError(msg)
 
-        if orderby and 'magnitude' in orderby and not useNetmag:
-            # we're not going to orderby magnitude value in the Origin table.
-            msg = "Netmag table not used, so magnitude sorting is ignored."
-            warnings.warn(msg)
-
-        if eventtype and eventtype.lower() not in KBCORE_EVENT_TYPE:
+        if eventtype and eventtype.lower() not in EventType:
             msg = f"eventtype '{eventtype}' not recognized.  choose from {list(KBCORE_EVENT_TYPE.keys())}"
             raise ValueError(msg)
 
@@ -364,11 +333,18 @@ class Client(object):
         radius = _None_if_none(latitude, longitude, minradius, maxradius)
         depth = _None_if_none(mindepth, maxdepth)
         prefor = not includeallorigins
-        etype = ','.join({KBCORE_EVENT_TYPE[e.lower()] for e in eventtype.split(',')}) if eventtype else None
         magnitudetype = 'all' if magparams and not magnitudetype else magnitudetype
         magnitudes = {magnitudetype: (minmagnitude, maxmagnitude)} if magparams else {}
-        originauth = contributor if not useNetmag else None
-        netmagauth = contributor if useNetmag else None
+        auth = contributor
+        if eventtype:
+            # may be multiple eventtypes, which may correspond to multiple KB Core etypes
+            etype_set = {}
+            for e in eventtype.split(','):
+                ietypes = KBCORE_EVENT_TYPE.get(e, e).split(',')
+                etype_set.update({*ietypes})
+            etype = ','.join(etype_set) # rejoin the unique set with commas
+        else:
+            etype = None
 
         # turn string event IDs into integer evid list
         evid = [int(e) for e in eventid.split(",")] if eventid else None
@@ -376,52 +352,56 @@ class Client(object):
         # build the query (finally)
 
         # geographic / categorical stuff
-        q = self.session.query(Origin)
-        q = q.add_entity(Event) if useEvent else q
+        q = self.session.query(Event, Origin, Netmag)
         q = events.filter_events(q,
                                  region=region,
                                  time_=time_,
                                  depth=depth,
                                  evid=evid,
                                  prefor=prefor,
-                                 auth=originauth,
+                                 auth=auth,
                                  etype=etype,
         )
+        # [(event, origin, netmag)]
 
         # magnitude stuff
-        if useNetmag:
-            q = q.add_entity(Netmag)
-        q = events.filter_magnitudes(q, auth=netmagauth, **magnitudes)
+        q = events.filter_magnitudes(q, **magnitudes)
 
         # arrival stuff
         if useArrival:
+            # unfortunately, produces a cartesian join with netmags, resulting in repeated
+            # events, origins, netmags for each arrival/origin
             q = q.add_entity(Assoc)
             q = q.add_entity(Arrival)
             q = events.filter_arrivals(q)
+        # [(event, origin, netmag, assoc, arrival)]
 
         if updatedafter:
             q = q.filter(Origin.lddate > updatedafter)
 
-        if orderby == "time":
-            q = q.order_by(Origin.time.desc())
-        elif orderby == "time-asc":
-            q = q.order_by(Origin.time.asc())
-        elif orderby == "magnitude" and useNetmag:
-            q = q.order_by(Netmag.magnitude.desc())
-        elif orderby == "magnitude-asc" and useNetmag:
-            q = q.order_by(Netmag.mag.asc())
+        # XXX: implement proper preferred origin sorting, limit, offset
+        # if orderby == "time":
+            # q = q.order_by(Origin.time.desc())
+        # elif orderby == "time-asc":
+            # q = q.order_by(Origin.time.asc())
+        # elif orderby == "magnitude":
+            # q = q.order_by(Netmag.magnitude.desc())
+        # elif orderby == "magnitude-asc":
+            # q = q.order_by(Netmag.magnitude.asc())
 
+        # TODO: how to offset/limit just the Event.evids?  use itertools sorted, groupby, islice?
+        # .limit/offset on an ordered subquery?
+        # q = q.limit(limit) if limit else q
+        # q = q.offset(offset) if offset else q
 
-        q = q.limit(limit) if limit else q
-        q = q.offset(offset) if offset else q
-
-        if kwargs.get("asquery"):
+        if asquery:
             result = q
         else:
-            # XXX: build requested format here.  For now, just return the query no matter what.
+            # result = events.catalog(q)
             result = q
 
         return result
+
 
     def get_stations(
         self,
