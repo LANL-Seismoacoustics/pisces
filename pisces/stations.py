@@ -1,14 +1,13 @@
 from sqlalchemy import func, or_
-from pisces.util import make_wildcard_list, _get_entities
+from pisces.util import make_wildcard_list, _get_entities, range_filters
 from obspy.core import UTCDateTime
 
-import warnings
 
-def filter_network(query, net=None, netname=None, auth=None, sta=None,  time_=None, **tables):
+def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=None, **tables):
     """Filter a network query using Network, Affiliation tables.
 
     These filters are primarily catagorical. For additional station filtering, queries can be
-    passed to and from filter_site() and filter_response() to and from filter_network().
+    passed to and from filter_sites() and filter_responses() to and from filter_networks().
 
     Parameters
     ----------
@@ -46,7 +45,7 @@ def filter_network(query, net=None, netname=None, auth=None, sta=None,  time_=No
     If Network and Affiliation:
         Network.net == Affiliation.net
 
-    If Site, Sitechan, or Sensor are provided, filter_network() will attempt to join to one of those,
+    If Site, Sitechan, or Sensor are provided, filter_networks() will attempt to join to one of those,
     in that order, on Affilation.sta.
 
     if Affiliation and Site:
@@ -68,31 +67,31 @@ def filter_network(query, net=None, netname=None, auth=None, sta=None,  time_=No
     Forgot to include a required table when building query:
     >>> q = session.query(Network)
     >>> try:
-    ... q = filter_network(q, sta = 'ANMO')
+    ... q = filter_networks(q, sta = 'ANMO')
     ... except ValueError:
     ...     # fails b/c Affiliation isn't in the query
-    ...     q = filter_network(q, sta = 'ANMO', affiliation=Affiliation)
+    ...     q = filter_networks(q, sta = 'ANMO', affiliation=Affiliation)
     >>> networks = q.all() # list of all networks affiliated with station ANMO
 
     Get a cartesian join of both networks and stations
     >>> q = session.query(Network, Affiliation)
     >>> q = session.query(Network).add_entity(Affiliation) # equivalent to above
-    >>> nets_and_stas = filter_network(q, sta = 'ANMO').all()
+    >>> nets_and_stas = filter_networks(q, sta = 'ANMO').all()
 
     Get a cartesian join of networks to sites
     >>> q = session.query(Network, Affiliation, Site)
     >>> q = session.query(Network, Affiliation).add_entity(Site) # equivalent to above
-    >>> nets_and_sites = filter_network(q, sta = 'ANMO').all()
+    >>> nets_and_sites = filter_networks(q, sta = 'ANMO').all()
 
     String handling.  The following queries will produce equivalent results
     >>> q = session.query(Network)
-    >>> q = filter_network(q, net = 'SR,IU')
-    >>> q = filter_network(q, net = ('SR','IU'))
-    >>> q = filter_network(q, net = ['SR',IU'])
+    >>> q = filter_networks(q, net = 'SR,IU')
+    >>> q = filter_networks(q, net = ('SR','IU'))
+    >>> q = filter_networks(q, net = ['SR',IU'])
 
     String handling.  Wildcards * and ? are accepted as well as SQL wildcards % and _ .
     >>> q = session.query(Network, Affiliation)
-    >>> q = filter_network(q, net = 'SR', sta = ['*'])
+    >>> q = filter_networks(q, net = 'SR', sta = ['*'])
 
     """
 
@@ -163,11 +162,11 @@ def filter_network(query, net=None, netname=None, auth=None, sta=None,  time_=No
     return query
 
 
-def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta = None, **tables):
+def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = None, refsta = None, **tables):
     """Filter a site query using Site, Sitechan tables.
 
     These filters are primarily geograpchical and catagorical. For additional station filtering, queries can be
-    passed to and from filter_network() and filter_response() to and from filter_site().
+    passed to and from filter_networks() and filter_responses() to and from filter_sites().
 
     Parameters
     ----------
@@ -188,6 +187,8 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
         and endtime columns.  If starttime or endtime are None, that column is not filtered. If both 
         Site and Sitechan are provided, Site will be further filtered by 
         Sitechan.ondate.between(Site.ondate, Site.offdate)
+    region : tuple [Origin]
+        (W, E, S, N) inclusive lat/lon box containing int/float/None(unbounded) degrees
     staname: str [Site]
         Filter Site table on staname column.  Wildcards accepted. Multiple stanames can be 
         included as a list, tuple, or comma separated string (no spaces).
@@ -210,7 +211,7 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
     If time_ and Sitechan:
         Sitechan.ondate.between(Site.ondate, Site.offdate)
 
-    If Affiliation or Sensor are provided, filter_site() will attempt to join to each of those in the 
+    If Affiliation or Sensor are provided, filter_sites() will attempt to join to each of those in the 
     following order:
         if Sitechan and Sensor
             Sitechan.chanid == Sensor.chanid
@@ -230,7 +231,12 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
     
     Examples:
     ---------
-    See filter_network() docstring for usage examples.
+    Region filtering on Site table
+    >>> q = session.query(Site)
+    >>> stations = filter_sites(q, region=(W, E, S, N)).all()
+    >>> stations = filter_sites(q, region=(-107, -106, 34, 35)).all()
+    
+    See filter_networks() docstring for additional usage examples.
 
     """
    
@@ -246,7 +252,7 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
         msg = "Site or Sitechan table required."
         raise ValueError(msg)
 
-    if any([staname, refsta]) and not Site:
+    if any([region, staname, refsta]) and not Site:
         # Site keywords supplied, but no Site table present
         # TODO: replace with pisces.exc.MissingTableError
         msg = "Site table required."
@@ -258,7 +264,7 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
         msg = "Sitechan table required."
         raise ValueError(msg)
     
-    # Join Ste and Sitechan if both present
+    # Join Site and Sitechan if both present
     if Site and Sitechan:
         query = query.filter(Site.sta == Sitechan.sta)
     
@@ -312,6 +318,18 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
             if t2: 
                 query = query.filter(t1 >= Site.ondate)
     
+    # collect range restrictions on columns
+    range_restr = []
+    if region:
+        W, E, S, N = region
+        range_restr.append((Site.lon, W, E))
+        range_restr.append((Site.lat, S, N))
+    
+    # apply all the range restrictions
+    # works even if restrictions is an empty list
+    filters = range_filters(*range_restr)
+    query = query.filter(*filters)
+
     if staname:
         staname = make_wildcard_list(staname)
         query = query.filter(or_(*[Site.staname.like(stanames) for stanames in staname]))
@@ -322,13 +340,13 @@ def filter_site(query, sta=None, chan=None, time_=None, staname = None, refsta =
 
     return query
 
-def filter_response(query, sta = None, chan = None, time_ = None, **tables):
+def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
     """Filter query for instrument response information using the Sensor and Instrument tables.
 
     These filters are primarily catagorical. For additional station filtering, queries can be
-    passed to and from filter_network() and filter_site() to and from filter_response().
+    passed to and from filter_networks() and filter_sites() to and from filter_responses().
 
-    filter_response() only provides the response information in database tables.  Actual 
+    filter_responses() only provides the response information in database tables.  Actual 
     response files will need to be read in separately from the dir and dfile columns returned
     in the Instrument table.
 
@@ -360,7 +378,7 @@ def filter_response(query, sta = None, chan = None, time_ = None, **tables):
     -----
     Sensor.inid == Instrument.inid
 
-    If Sitechan, Site, or Affiliation are provided, filter_response() will attempt to join to each of those in the 
+    If Sitechan, Site, or Affiliation are provided, filter_responses() will attempt to join to each of those in the 
     following order:
         if Sitechan
             Sitechan.chanid == Sensor.chanid
@@ -377,7 +395,7 @@ def filter_response(query, sta = None, chan = None, time_ = None, **tables):
     
     Examples:
     ---------
-    See filter_network() docstring for usage examples.
+    See filter_networks() docstring for usage examples.
 
     """
     # get desired tables from the query
