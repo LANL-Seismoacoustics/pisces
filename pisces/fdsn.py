@@ -328,7 +328,7 @@ class Client(object):
             raise ValueError(msg)
 
         # normalize inputs for event query functions
-        time_ = _None_if_none(starttime, endtime)
+        times = _None_if_none(starttime, endtime)
         region = _None_if_none(minlongitude, maxlongitude, minlatitude, maxlatitude)
         radius = _None_if_none(latitude, longitude, minradius, maxradius)
         depth = _None_if_none(mindepth, maxdepth)
@@ -355,7 +355,7 @@ class Client(object):
         q = self.session.query(Event, Origin, Netmag)
         q = events.filter_events(q,
                                  region=region,
-                                 time_=time_,
+                                 times=times,
                                  depth=depth,
                                  evid=evid,
                                  prefor=prefor,
