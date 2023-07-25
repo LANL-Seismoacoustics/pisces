@@ -92,7 +92,7 @@ def test_filter_events_origin(session, eventdata):
     )
 
     # time
-    r = events.filter_events(q, time_=(time_-2, time_+2)).order_by(Origin.orid).all()
+    r = events.filter_events(q, times=(time_-2, time_+2)).order_by(Origin.orid).all()
     assert (
         len(r) == 2 and
         r[0] == d['origin1'] and
