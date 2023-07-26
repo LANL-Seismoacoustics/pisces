@@ -117,8 +117,8 @@ class ETree:
     """
     Event tree
 
-    Turn redundant tabular data from a database into nonredudant hierarchical data.
-    Can be traversed to produce a QuakeML/obspy.Catalog (see `ETree.catalog`).
+    Turn redundant tabular data from a database into nonredudant hierarchical data
+    that can be easily traversed to produce a QuakeML/obspy.Catalog (see `ETree.catalog`).
 
     Parameters
     ----------
