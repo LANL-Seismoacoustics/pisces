@@ -6,6 +6,7 @@ tree.update(query3)
 tree.catalog()
 
 """
+from itertools import zip_longest
 import os
 
 from obspy import UTCDateTime
@@ -86,12 +87,38 @@ FDSN_POLARITY = {
 }
 
 
+def pretty(d, out=None, indent=0):
+    """ Pretty-print a dict tree.
+
+    Use os.linesep.join(out)
+
+    """
+    out = out or []
+    for key, value in d.items():
+        if isinstance(key, tuple):
+            if 'instance' in value:
+                out.append('  ' * indent + repr(value['instance']))
+            else:
+                out.append('  ' * indent + repr(value))
+        elif key == 'instance':
+            pass
+        else:
+            out.append('  ' * indent + str(key))
+
+        if isinstance(value, dict):
+           out = pretty(value, out, indent+1)
+        else:
+            pass
+
+    return out
+
+
 class ETree:
     """
     Event tree
 
-    Turn redundant tabular data from a database into nonredudant hierarchical data
-    roughly mirroring the structure of QuakeML/obspy.Catalog.
+    Turn redundant tabular data from a database into nonredudant hierarchical data.
+    Can be traversed to produce a QuakeML/obspy.Catalog (see `ETree.catalog`).
 
     Parameters
     ----------
@@ -112,11 +139,18 @@ class ETree:
         event2, origin3, netmag6
         ...
         or
-        event1, origin1, netmag1, Stamag1
-        event1, origin1, netmag1, Stamag2
-        event1, origin1, netmag1, Stamag3
-        event1, origin1, netmag2, Stamag4
-        event1, origin1, netmag2, Stamag5
+        event1, origin1, netmag1, stamag1
+        event1, origin1, netmag1, stamag2
+        event1, origin1, netmag1, stamag3
+        event1, origin1, netmag2, stamag4
+        event1, origin1, netmag2, stamag5
+        ...
+        or
+        event1, origin1, assoc1/arrival1
+        event1, origin1, assoc2/arrival2
+        event1, origin2, assoc3/arrival3
+        event1, origin2, assoc4/arrival4
+        event2, origin3, assoc5/arrival5
         ...
         or
         event1, origin1, assoc1, arrival1
@@ -133,81 +167,60 @@ class ETree:
     -----
     The tree has the following structure:
     {
-        eventkey1:
-        'instance': event1,
-        'picks': {
-            arrivalkey1: arrival1,
-            arrivalkey2, arrival2,
-            ...
-        }
-        'origins': {
-            originkey1: {
-                'instance': origin1,
-                'magnitudes': {
-                    netmagkey1: netmag1,
-                    netmagkey2: netmag2,
-                    ...
-                },
-                'station_magnitudes': {
-                    stamagkey1: stamag1,
-                    stamagkey2: stamag2,
-                    ...
-                },
-            'arrivals': {
-                assockey1: assoc1,
-                assockey2, assoc2,
-                ...
-                },
+        eventkey1: {
+            'instance': event1,         # quakeml Event
+            'origins': {
+                originkey1: {
+                    'instance': origin1,    # quakeml Origin
+                    'assocs': {
+                        assockey1: assoc1,  # quakeml Arrival
+                        assockey2: assoc2,
+                        ...
+                    },
+                    'arrivals': {
+                        arrivalkey1: arrival1,  # quakeml Pick
+                        arrivalkey2: arrival2,
+                        ...
+                    },
+                    'netmags': {
+                        netmagkey1: {
+                            'instance': netmag1, # quakeml Magnitude
+                            'stamags': {
+                                stamagkey1: stamag1,    # quakeml StationMagnitude
+                                stamagkey2: stamag2,
+                                ...
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     Keys are the (hashable) output of `sqlalchemy.inspect(instance).identity_key`.
 
+    Access parts of the tree like:
+
+    tree[eventkey]['origins'][originkey]['netmags'][netmagkey] = netmag
+    tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
+    tree[eventkey]['origins'][originkey]['instance'] = origin
+    tree[eventkey]['arrivals'][arrivalkey] = arrival
+    tree[eventkey]['amplitudes'][arrivalkey] = arrival
+    tree[eventkey]['instance'] = event
+
     """
     def __init__(self, *event_queries, resource_prefix='smi:local'):
         self.resource_prefix = resource_prefix
         self._tree = dtree()
 
-    def __getitem__(self, key):
-        return self._tree[key]
-
-    def __setitem__(self, key, value):
-        self._tree[key] = value
-
-    def __delitem__(self, key):
-        del self._rtree[key]
+        for query in event_queries:
+            self.update(query)
 
     def __str__(self):
         """ Pretty-print the structure of the event tree. """
-        indent = 2
-        L0 = ''
-        L1 = indent * ' '
-        L2 = 2 * L1
-        L3 = 3 * L1
-        L4 = 4 * L1
+        out = pretty(self._tree)
 
-        tree = self._tree
-        out = ''
-        for eventkey in tree:
-            out += repr(tree[eventkey]['instance']) + os.linesep
-            out += L1 + '[picks],[amplitudes]' + os.linesep
-            for arrivalkey in tree[eventkey]['picks']:
-                out += L2 + repr(tree[eventkey]['picks'][arrivalkey]) + os.linesep
-            out += L1 + '[origins]' + os.linesep
-            for originkey in tree[eventkey]['origins']:
-                out += L2 + repr(tree[eventkey]['origins'][originkey]['instance']) + os.linesep
-                out += L3 + '[magnitudes]' + os.linesep
-                for netmagkey in tree[eventkey]['origins'][originkey]['magnitudes']:
-                    out += L4 + repr(tree[eventkey]['origins'][originkey]['magnitudes'][netmagkey]) + os.linesep
-                out += L3 + '[station_magnitudes]' + os.linesep
-                for stamagkey in tree[eventkey]['origins'][originkey]['station_magnitudes']:
-                    out += L4 + repr(tree[eventkey]['origins'][originkey]['magnitudes'][stamagkey]) + os.linesep
-                out += L3 + '[arrivals]' + os.linesep
-                for assockey in tree[eventkey]['origins'][originkey]['arrivals']:
-                    out += L4 + repr(tree[eventkey]['origins'][originkey]['arrivals'][assockey]) + os.linesep
-
-        return out
+        return os.linesep.join(out)
 
     def update(self, query):
         """ Append to or update an event tree using event query results.
@@ -233,12 +246,6 @@ class ETree:
         # Leaf nodes (e.g. magnitudes under the 'magnitudes' list/node) simply use their key to
         # store their instance, like:
         #
-        #   tree[eventkey]['origins'][originkey]['magnitudes'][netmagkey] = netmag
-        #   tree[eventkey]['origins'][originkey]['arrivals'][assockey] = assoc
-        #   tree[eventkey]['origins'][originkey]['instance'] = origin
-        #   tree[eventkey]['picks'][arrivalkey] = arrival
-        #   tree[eventkey]['amplitudes'][arrivalkey] = arrival
-        #   tree[eventkey]['instance'] = event
 
         # If needed, we can use those keys to retrieve the actual instances, like:
         # instance = session.identity_map[key]
@@ -271,59 +278,77 @@ class ETree:
             originkey = inspect(origin).identity_key
             self._tree[eventkey]['origins'][originkey]['instance'] = origin
 
+            # "picks" in quakeml are like Arrival rows, and they're at the Event level
+            # "amplitudes" in quakeml are also stored in Arrival rows, and at the Event level,
+            # so we'll ultimately just reuse arrivals for them.
             if Arrival:
-                # "picks" in quakeml are like Arrival rows, and they're at the Event level
                 arrival = getattr(row, Arrival.__name__)
                 arrivalkey = inspect(arrival).identity_key
-                self._tree[eventkey]['picks'][arrivalkey] = arrival
-
-                # "amplitudes" info in quakeml are stored in arrival rows, also at the Event level,
-                # so we'll also store arrivals in an 'amplitudes' branch
-                self._tree[eventkey]['amplitudes'][arrivalkey] = arrival
-
-            if Netmag:
-                netmag = getattr(row, Netmag.__name__)
-                netmagkey = inspect(netmag).identity_key
-                self._tree[eventkey]['origins'][originkey]['magnitudes'][netmagkey] = netmag
-
-            if Stamag:
-                stamag = getattr(row, Stamag.__name__)
-                stamagkey = inspect(stamag).identity_key
-                self._tree[eventkey]['origins'][originkey]['station_magnitudes'][stamagkey] = stamag
+                self._tree[eventkey]['origins'][originkey]['arrivals'][arrivalkey] = arrival
 
             if Assoc:
                 # "arrivals" in quakeml are like Assoc rows
                 assoc = getattr(row, Assoc.__name__)
                 assockey = inspect(assoc).identity_key
-                self._tree[eventkey]['origins'][originkey]['arrivals'][assockey] = assoc
+                self._tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
+
+            # "magnitudes" in quakeml are Netmag rows and are kept at the Event level,
+            # but Netmag rows are generally tied to origins. we keep them at Origin level for easier
+            # processing later (they're children of their Origin instead of disconnected from them).
+            if Netmag:
+                netmag = getattr(row, Netmag.__name__)
+                netmagkey = inspect(netmag).identity_key
+                self._tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['instance'] = netmag
+
+            # "station_magnitudes" in quakeml are Stamag rows, and are kept at the Event level,
+            # but Stamag rows are generally also tied to origins.  We'll keep them at Origin level
+            # for easier processing later.
+            if Stamag:
+                stamag = getattr(row, Stamag.__name__)
+                stamagkey = inspect(stamag).identity_key
+                self._tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['stamags'][stamagkey] = stamag
+
+        return self
+
 
     def event(self, event):
-        """ Initiate an obspy.core.event.Event from a database Event row. """
-        resource_prefix = self.resource_prefix
+        """ Return an obspy.core.event.Event from a database Event row. """
+        prefix = self.resource_prefix
+        eventkey = inspect(event).identity_key
+        tree = self._tree
+
         qevent = qml.Event(
-            resource_id=qml.ResourceIdentifier(id=f'{resource_prefix}/event/event.evid={event.evid}'),
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/event/event.evid={event.evid}'),
             creation_info=qml.CreationInfo(author=event.auth),
             description=qml.EventDescription(text=event.evname, type="earthquake name"),
         )
+
         return qevent
 
+
     def origin(self, origin):
-        """ Initiate an obspy.core.event.Origin from a database Origin row. """
-        resource_prefix = self.resource_prefix
+        """ Return an obspy.core.event.Origin from a database Origin row. """
+        prefix = self.resource_prefix
+        tree = self._tree
         qorigin = qml.Origin(
-            resource_id=qml.ResourceIdentifier(id=f'{resource_prefix}/origin/origin.orid={origin.orid}')
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/origin/origin.orid={origin.orid}'),
+            time=UTCDateTime(origin.time),
+            longitude=origin.lon,
+            latitude=origin.lat,
+            depth=origin.depth,
         )
         return qorigin
 
+
     def pick(self, arrival):
         """ Initialize an obspy.core.event.Pick from a database Arrival row. """
-        resource_prefix = self.resource_prefix
+        prefix = self.resource_prefix
         pick = qml.Pick(
-            resource_id=qml.ResourceIdentifier(id=f'{resource_prefix}/pick/arrival.arid={arrival.arid}'),
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/pick/arrival.arid={arrival.arid}'),
             waveform_id=qml.WaveformStreamID(station_code=arrival.sta, channel_code=arrival.chan),
             time=UTCDateTime(arrival.time),
             time_errors=qml.QuantityError(uncertainty=arrival.deltim),
-            horizontal_slowness=arrival.slo,
+            horizontal_slowness=arrival.slow,
             horizontal_slowness_errors=qml.QuantityError(uncertainty=arrival.delslo),
             backazimuth=baz if (baz := arrival.azimuth - 180) >= 0 else arrival.azimuth + 180,
             backazimuth_errors=qml.QuantityError(uncertainty=arrival.delaz),
@@ -333,18 +358,28 @@ class ETree:
         )
         return pick
 
-    def amplitude(self, arrival, resource_prefix, pick_id=None, waveform_id=None):
-        """ Initialize an obspy.core.event.Amplitude from a database Arrival row.
+    def arrival(self, assoc, pick_id=None):
+        """ Initialize an obspy.core.event.Arrival from a database Assoc row. """
+        prefix = self.resource_prefix
+        qarrival = qml.Arrival(
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/arrival/assoc.arid={assoc.arid}'),
+            pick_id=pick_id,
+            phase=assoc.phase,
+            distance=assoc.delta,
+            time_residual=assoc.timeres,
+            horizontal_slowness_residual=assoc.slores,
+            backazimuth_residual=assoc.azres,
+        )
+        return qarrival
 
-        Unfilled:
-        - pick_id
-        - waveform_id
 
-        """
-        resource_prefix = self.resource_prefix
+    def amplitude(self, arrival, pick_id=None):
+        """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
+        prefix = self.resource_prefix
         amp = qml.Amplitude(
-            resource_id=qml.ResourceIdentifier(id=f'{resource_prefix}/amplitude/arrival.arid={arrival.arid}'),
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/amplitude/arrival.arid={arrival.arid}'),
             waveform_id=qml.WaveformStreamID(station_code=arrival.sta, channel_code=arrival.chan),
+            pick_id=pick_id,
             generic_amplitude=arrival.amp*1e9, #nanometers to meters
             unit='m',
             type='A',
@@ -355,19 +390,21 @@ class ETree:
         )
         return amp
 
+
     def magnitude(self, netmag, origin_id=None):
         """ Initialize an obspy.core.event.Magnitude from a database Netmag row. """
-        resource_prefix = self.resource_prefix
+        prefix = self.resource_prefix
         magnitude = qml.Magnitude(
-            resource_id=qml.ResourceIdentifier(id=f'{resource_prefix}/magnitude/netmag.magid={netmag.magid}'),
+            resource_id=qml.ResourceIdentifier(id=f'{prefix}/magnitude/netmag.magid={netmag.magid}'),
             mag=netmag.magnitude,
-            type=netmag.magtype,
+            magnitude_type=netmag.magtype,
             station_count=netmag.nsta,
             origin_id=origin_id,
         )
         return magnitude
 
-    def catalog(self, description, comments, preferred_magauth, preferred_magtype):
+
+    def catalog(self, description=None, preferred_magauth=None, preferred_magtype=None):
         """ Convert an database event tree to an obspy Catalog.
 
         Parameters
@@ -396,42 +433,58 @@ class ETree:
         resource_prefix = self.resource_prefix
         cat = qml.Catalog(
             creation_info=qml.CreationInfo(author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
-            resource_id=qml.ResourceIdentifier(prefix=f'{resource_prefix}/catalog') # uses a uuid after prefix
+            resource_id=qml.ResourceIdentifier(prefix=f'{resource_prefix}/catalog'), # uses a uuid after prefix
+            description=description,
         )
 
         tree = self._tree
         for eventkey in tree:
+            # b/c event nodes aren't leaf nodes (we use its key to get child nodes),
+            # we need to use 'instance' get the actual instance
             event = tree[eventkey]['instance']
+            # build an obspy Event from a database Event row
             qevent = self.event(event)
 
             origins = tree[eventkey]['origins']
             for originkey in origins:
-                #b/c origin nodes aren't leaf nodes, we need to use 'instance' get the instance
                 origin = origins[originkey]['instance']
                 qorigin = self.origin(origin)
-                qevent.events.append(qorigin)
+                qevent.origins.append(qorigin)
 
                 if origin.orid == event.prefor:
                     # this as the preferred origin
                     qevent.preferred_origin_id = qorigin.resource_id
-                    qevent.event_type = FDSN_EVENT_TYPE.get(event.etype, "not reported")
+                    qevent.event_type = FDSN_EVENT_TYPE.get(origin.etype, "not reported")
 
-                netmags = tree['eventkey']['origins'][originkey]['magnitudes']
+                # process parallel lists of Assoc and Arrival rows
+                assocs = tree[eventkey]['origins'][originkey]['assocs']
+                arrivals = tree[eventkey]['origins'][originkey]['arrivals']
+                for assockey, arrivalkey in zip_longest(assocs, arrivals):
+                    # if the lists aren't parallel (one list is empty), the key is None
+                    # and the database row is an empty defaultdict, which is Falsy
+                    if arrival := arrivals[arrivalkey]:
+                        qpick = self.pick(arrival)
+                        # stored at the Event level.
+                        qevent.picks.append(qpick)
+
+                        amplitude = self.amplitude(arrival, pick_id=qpick.resource_id)
+                        amplitude.waveform_id = qpick.waveform_id
+
+                    if assoc := assocs[assockey]:
+                        qarrival = self.arrival(assoc, pick_id=qpick.resource_id)
+                        # stored at the Origin level.
+                        qorigin.arrivals.append(qarrival)
+
+                netmags = tree[eventkey]['origins'][originkey]['netmags']
                 for netmagkey in netmags:
-                    netmag = netmags[netmagkey]
+                    netmag = netmags[netmagkey]['instance']
                     magnitude = self.magnitude(netmag, origin_id=qorigin.resource_id)
+                    # stored at the Event level.
                     qevent.magnitudes.append(magnitude)
 
-            # both QML 'picks' and 'amplitudes' information are in Arrival table rows
-            arrivals = tree[eventkey]['picks']
-            for arrivalkey in arrivals:
-                #b/c arrival nodes are leaf nodes, we can just use the key to get the instance
-                arrival = arrivals[arrivalkey]
-                pick = self.pick(arrival)
-                qevent.picks.append(pick)
+                # TODO: station_magnitudes/stamags
 
-                amplitude = self.amplitude(arrival)
-                amplitude.waveform_id = pick.waveform_id
+            cat.events.append(qevent)
 
         return cat
 
@@ -477,9 +530,7 @@ def catalog(*event_queries,
 
     Returns
     -------
-    obspy.Catalog
-
-
+    obspy.core.events.Catalog
 
     """
     # to get instances back from their identity key:
@@ -488,10 +539,7 @@ def catalog(*event_queries,
     # or:
     # query.session.get(originkey[0], originkey[1])
 
+    ETREE = dtree(*event_queries, resource_prefix=resource_prefix)
 
-    ETREE = dtree()
-    for query in event_queries:
-        ETREE = fill_etree(query, tree=ETREE)
-
-    cat = etree_to_catalog(ETREE, resource_prefix, description, comments, preferred_magauth, preferred_magtype)
+    cat = ETREE.catalog(description, comments, preferred_magauth, preferred_magtype)
     # TODO: perform origin time / magnitude sorting here?
