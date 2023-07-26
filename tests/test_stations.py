@@ -35,7 +35,7 @@ def test_query_network_nets(session, get_stations_data):
     #     (Network(net='IU'), Affiliation(net='IU', sta='ANMO', time=620352000.0)),
     #     (Network(net='IU'), Affiliation(net='IU', sta='ANMO', time=972000000.0)),
     # ]
-    query = query.add_entity('Affiliation')
+    query = query.add_entity(Affiliation)
     q = stations.filter_networks(query, net=['IU'])
     out = q.order_by(Affiliation.time).all()
     assert (
@@ -115,7 +115,7 @@ def test_query_network_time(session, get_stations_data):
         out[1] == (d['IM'], d['IM_NV32']) and
         out[2] == (d['IM'], d['IM_NV33'])
     )
-    with pytest.raises(NameError):
+    with pytest.raises(ValueError):
         # without Affiliation provided, time queries should fail
         query = session.query(Network)
         out = stations.filter_networks(query, times=times).all()
@@ -138,6 +138,6 @@ def test_query_network_time(session, get_stations_data):
     )
 
     # without Affiliation provided, time queries should fail
-    with pytest.raises(NameError):
+    with pytest.raises(ValueError):
         query = session.query(Network)
-        out = req.query_network(query, times=times).all()
+        out = stations.filter_networks(query, times=times).all()
