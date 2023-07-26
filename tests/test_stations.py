@@ -27,7 +27,7 @@ def test_query_network_nets(session, get_stations_data):
     # expected = [
     #     Network(net='IU')
     # ]
-    out = stations.filter_networks(q, net=['IU']).all()
+    out = stations.filter_networks(query, net=['IU']).all()
     assert out == [d['IU']]
 
     # Affiliation information is present if provided
@@ -118,7 +118,7 @@ def test_query_network_time(session, get_stations_data):
     with pytest.raises(NameError):
         # without Affiliation provided, time queries should fail
         query = session.query(Network)
-        out = stations.filter_networks(session, Network, times=times).all()
+        out = stations.filter_networks(query, times=times).all()
         
     # get results where network affiliation.time < endtime
     # expected = [
