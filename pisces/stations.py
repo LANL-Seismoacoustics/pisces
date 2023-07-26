@@ -3,11 +3,11 @@ from pisces.util import make_wildcard_list, _get_entities, range_filters
 from obspy.core import UTCDateTime
 
 
-def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=None, **tables):
+def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=None, **tables):
     """Filter a network query using Network, Affiliation tables.
 
     These filters are primarily catagorical. For additional station filtering, queries can be
-    passed to and from filter_sites() and filter_responses() to and from filter_networks().
+    passed to and from filter_stations() and filter_responses() to and from filter_networks().
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
     sta : str [Affiliation]
         Filter Affiliation table on sta column.  Wildcards accepted. Multiple stations can be 
         included as a list, tuple, or comma separated string (no spaces).
-    time_ : tuple [Affiliation]
+    times : tuple [Affiliation]
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps. Filters
         Affiliation table on the time and endtime columns.  If starttime or endtime are None, 
         that column is not filtered.
@@ -45,16 +45,11 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
     If Network and Affiliation:
         Network.net == Affiliation.net
 
-    If Site, Sitechan, or Sensor are provided, filter_networks() will attempt to join to one of those,
-    in that order, on Affilation.sta.
+    If Site:
+        Affiliation.sta == Site.sta
 
-    if Affiliation and Site:
-        Site.sta == Affiliation.sta
-    elif Affiliation and Sitechan:
-        Sitechan.sta == Affiliation.sta
-    elif Affiliation and Sensor:
-        Sensor.sta == Affiliation.sta
-    
+    If tables other than Network, Affiliation, or Site are present in the query, they will not 
+    be properly joined, resulting in improperly filtered output.
     
     Returns
     -------
@@ -96,13 +91,11 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
     """
 
     # get desired tables from the query
-    Network, Affiliation, Site, Sitechan, Sensor = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor")
+    Network, Affiliation, Site = _get_entities(query, "Network", "Affiliation","Site")
     # override if provided
     Network = tables.get("network", None) or Network
     Affiliation = tables.get("affiliation", None) or Affiliation
     Site = tables.get("site", None) or Site
-    Sitechan = tables.get("sitechan", None) or Sitechan
-    Sensor = tables.get("sensor", None) or Sensor
 
     # avoid nonsense inputs
     if not any([Network, Affiliation]):
@@ -115,7 +108,7 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
         msg = "Network table required."
         raise ValueError(msg)
 
-    if any([sta, time_]) and not Affiliation:
+    if any([sta, times]) and not Affiliation:
         # Affiliation keywords supplied, but no Affiliation table present
         # TODO: replace with pisces.exc.MissingTableError
         msg = "Affiliation table required."
@@ -125,14 +118,9 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
     if Network and Affiliation:
         query = query.filter(Network.net == Affiliation.net)
 
-    # if query contains Site, Sitechan, or Sensor, append to Affiliation 
-    # in order of Site, else Sitechan, else Sensor
+    # if query contains Site, join on Site.sta
     if Affiliation and Site:
         query = query.filter(Site.sta == Affiliation.sta)
-    elif Affiliation and Sitechan:
-        query = query.filter(Sitechan.sta == Affiliation.sta)
-    elif Affiliation and Sensor:
-        query = query.filter(Sensor.sta == Affiliation.sta)
 
     if net:
         net = make_wildcard_list(net)
@@ -150,8 +138,8 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
         sta = make_wildcard_list(sta)
         query = query.filter(or_(*[Affiliation.sta.like(stas) for stas in sta]))
 
-    if time_:
-        t1, t2 = time_
+    if times:
+        t1, t2 = times
         t1 = UTCDateTime(t1).timestamp if t1 else None
         t2 = UTCDateTime(t2).timestamp if t2 else None
         if t1:
@@ -162,11 +150,11 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  time_=N
     return query
 
 
-def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = None, refsta = None, **tables):
+def filter_stations(query, sta=None, chan=None, times=None, region=None, staname = None, refsta = None, **tables):
     """Filter a site query using Site, Sitechan tables.
 
     These filters are primarily geograpchical and catagorical. For additional station filtering, queries can be
-    passed to and from filter_networks() and filter_responses() to and from filter_sites().
+    passed to and from filter_networks() and filter_responses() to and from filter_stations().
 
     Parameters
     ----------
@@ -181,7 +169,7 @@ def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = 
     chan : str [Sitechan]
         Filter Sitechan table on chan column.  Wildcards accepted. Multiple chans can be 
         included as a list, tuple, or comma separated string (no spaces). 
-    time_ : tuple [Site, Sitechan]
+    times : tuple [Site, Sitechan]
         (starttime, endtime) inclusive range containing int following the format YYYYDDD for the 
         4 character year and the 3 character julian day. Filters Site or Sitechan table on the time 
         and endtime columns.  If starttime or endtime are None, that column is not filtered. If both 
@@ -208,20 +196,21 @@ def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = 
     If Site and Sitechan:
         Site.sta == Sitechan.sta
 
-    If time_ and Sitechan:
+    If times and Sitechan:
         Sitechan.ondate.between(Site.ondate, Site.offdate)
 
-    If Affiliation or Sensor are provided, filter_sites() will attempt to join to each of those in the 
-    following order:
-        if Sitechan and Sensor
+    If Affiliation or Sensor are provided, filter_stations will attempt to join to site and
+    sitechan as follows:
+        If Sitechan and Sensor:
             Sitechan.chanid == Sensor.chanid
-        else if  Site and Sensor
-            Site.sta == Sensor.sta    
-               
-        if Site and Affiliation
+        If Site and Affiliation:
             Site.sta == Affiliation.sta
-        else if Sitechan and Affiliation
-            Sitechan.sta == Affiliation.sta
+    
+    If Affiliation is provided and not Site or if Sensor is provided and not Sitechan, the tables 
+    will not be properly joined resulting in an improperly filtered output.  If any tables other 
+    than Affiliation, Site, Sitechan, or Sensor are provided they will not be joined at all 
+    resulting in an improperly filtered output.
+
         
     Returns
     -------
@@ -269,20 +258,12 @@ def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = 
         query = query.filter(Site.sta == Sitechan.sta)
     
     # If Sensor is present join first on Sitechan.chanid if Sitechan present
-    # Else join on Site.sta
-    if Sensor:
-        if Sitechan:
-            query = query.filter(Sitechan.chanid == Sensor.chanid)
-        else:
-            query = query.filter(Sensor.sta == Site.sta)
+    if Sensor and Sitechan:
+        query = query.filter(Sitechan.chanid == Sensor.chanid)
 
     # If Affiliation is present join first on Site.sta if Site present
-    # Else join on Sitechan.sta 
-    if Affiliation:
-        if Site:
-            query = query.filter(Site.sta == Affiliation.sta)
-        else:
-            query =query.filter(Sitechan.sta == Affiliation.sta)
+    if Affiliation and Site:
+        query = query.filter(Site.sta == Affiliation.sta)
 
     if sta:
         sta = make_wildcard_list(sta)
@@ -297,8 +278,8 @@ def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = 
 
 
     # Filter by ondate and offdate which are year and julian day represented as integers
-    if time_:
-        t1, t2 = time_
+    if times:
+        t1, t2 = times
         t1 = int(UTCDateTime(t1).strftime('%Y%j')) if t1 else None
         t2 = int(UTCDateTime(t2).strftime('%Y%j')) if t2 else None
         
@@ -340,11 +321,11 @@ def filter_sites(query, sta=None, chan=None, time_=None, region=None, staname = 
 
     return query
 
-def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
+def filter_responses(query, sta = None, chan = None, times = None, **tables):
     """Filter query for instrument response information using the Sensor and Instrument tables.
 
     These filters are primarily catagorical. For additional station filtering, queries can be
-    passed to and from filter_networks() and filter_sites() to and from filter_responses().
+    passed to and from filter_networks() and filter_stations to and from filter_responses().
 
     filter_responses() only provides the response information in database tables.  Actual 
     response files will need to be read in separately from the dir and dfile columns returned
@@ -362,7 +343,7 @@ def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
     chan : str [Sensor]
         Filter Sensor table on chan column.  Wildcards accepted. Multiple chans can be 
         included as a list, tuple, or comma separated string (no spaces). 
-    time_ : tuple [Sensor]
+    times : tuple [Sensor]
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps. Filters
         Sensor table on the time and endtime columns.  If starttime or endtime are None, 
         that column is not filtered.
@@ -378,14 +359,11 @@ def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
     -----
     Sensor.inid == Instrument.inid
 
-    If Sitechan, Site, or Affiliation are provided, filter_responses() will attempt to join to each of those in the 
-    following order:
-        if Sitechan
-            Sitechan.chanid == Sensor.chanid
-        else if  Site
-            Site.sta == Sensor.sta
-        else if Affiliation
-            Affiliation.sta == Sensor.sta
+    If Sitechan:
+        Sitechan.chanid == Sensor.chanid
+
+    If tables other than Sensor, Instrument, or Sitechan are present in the query, they will not 
+    be properly joined, resulting in improperly filtered output.
         
     Returns
     -------
@@ -399,10 +377,9 @@ def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
 
     """
     # get desired tables from the query
-    Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query,"Affiliation","Site","Sitechan","Sensor", "Instrument")
+    Sitechan, Sensor, Instrument = _get_entities(query,"Sitechan","Sensor", "Instrument")
     # override if provided
-    Affiliation = tables.get("affiliation", None) or Affiliation
-    Site = tables.get("site", None) or Site
+
     Sitechan = tables.get("sitechan", None) or Sitechan
     Sensor = tables.get("sensor", None) or Sensor
     Instrument = tables.get("instrument", None) or Instrument
@@ -415,14 +392,9 @@ def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
     # Join Sensor and Instrument since both are always required for responses 
     query = query.filter(Sensor.inid == Instrument.inid)
 
-    # If Sitechan, Site, or Affiliation are present join first on Sitechan.chanid
-    # Then try to join on Site.sta, then try to join on Affiliation.sta
+    # If Sitechan is present join on Sitechan.chanid
     if Sitechan:
         query = query.filter(Sitechan.chanid == Sensor.chanid)
-    elif Site:
-        query = query.filter(Sensor.sta == Site.sta)
-    elif Affiliation:
-        query = query.filter(Sensor.sta == Affiliation.sta)
 
     if sta:
         sta = make_wildcard_list(sta)
@@ -432,8 +404,8 @@ def filter_responses(query, sta = None, chan = None, time_ = None, **tables):
         chan = make_wildcard_list(chan)
         query = query.filter(or_(*[Sensor.chan.like(chans) for chans in chan]))
 
-    if time_:
-        t1, t2 = time_
+    if times:
+        t1, t2 = times
         t1 = UTCDateTime(t1).timestamp if t1 else None
         t2 = UTCDateTime(t2).timestamp if t2 else None
         if t1:
