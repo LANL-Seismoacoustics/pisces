@@ -539,7 +539,9 @@ def catalog(*event_queries,
     # or:
     # query.session.get(originkey[0], originkey[1])
 
-    ETREE = dtree(*event_queries, resource_prefix=resource_prefix)
+    event_tree = ETree(*event_queries, resource_prefix=resource_prefix)
 
-    cat = ETREE.catalog(description, comments, preferred_magauth, preferred_magtype)
+    cat = event_tree.catalog(description, comments, preferred_magauth, preferred_magtype)
     # TODO: perform origin time / magnitude sorting here?
+
+    return cat
