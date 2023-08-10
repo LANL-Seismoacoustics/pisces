@@ -17,7 +17,7 @@ from obspy.core.event.header import EventType
 from pisces import events
 import pisces.request as req
 from pisces import util
-from .catalog import KBCORE_EVENT_TYPE
+from .catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 
@@ -155,13 +155,11 @@ class Client(object):
         magnitudetype: str = None,
         eventtype: str = None,
         includeallorigins: bool = None,
-        includeallmagnitudes: bool = None,
         includearrivals: bool = None,
         eventid: str = None,
         limit: int = None,
         offset: int = None,
         orderby: bool = None,
-        catalog: str = None,
         contributor: str = None,
         updatedafter: UTCDateTime = None,
         asquery: bool = False,
@@ -352,8 +350,8 @@ class Client(object):
         # build the query (finally)
 
         # geographic / categorical stuff
-        q = self.session.query(Event, Origin, Netmag)
-        q = events.filter_events(q,
+        q = self.session.query(Event, Origin)
+        qe = events.filter_events(q,
                                  region=region,
                                  times=times,
                                  depth=depth,
@@ -364,20 +362,26 @@ class Client(object):
         )
         # [(event, origin, netmag)]
 
+        if updatedafter:
+            qe = qe.filter(Origin.lddate > updatedafter)
+
         # magnitude stuff
-        q = events.filter_magnitudes(q, **magnitudes)
+        # return all magnitudes...
+        qm = qe.add_entity(Netmag)
+        if magnitudes:
+            # ...unless certain ones were specified
+            qm = events.filter_magnitudes(qm, **magnitudes)
 
         # arrival stuff
         if useArrival:
             # unfortunately, produces a cartesian join with netmags, resulting in repeated
             # events, origins, netmags for each arrival/origin
-            q = q.add_entity(Assoc)
-            q = q.add_entity(Arrival)
-            q = events.filter_arrivals(q)
+            qa = qe.add_entity(Assoc).add_entity(Arrival)
+            qa = events.filter_arrivals(qa)
+        else:
+            qa = None
         # [(event, origin, netmag, assoc, arrival)]
 
-        if updatedafter:
-            q = q.filter(Origin.lddate > updatedafter)
 
         # XXX: implement proper preferred origin sorting, limit, offset
         # if orderby == "time":
@@ -395,10 +399,10 @@ class Client(object):
         # q = q.offset(offset) if offset else q
 
         if asquery:
-            result = q
+            result = qm, qa
         else:
-            # result = events.catalog(q)
-            result = q
+            queries = [q for q in [qm, qa] if q]
+            result = catalog(*queries)
 
         return result
 
