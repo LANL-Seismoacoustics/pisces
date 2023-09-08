@@ -241,7 +241,7 @@ class Client(object):
             (i.e. always True). If more refined magnitudes are desired, users are
             recommended to also specify a magnitudetype and/or contributor.
         includearrivals : bool, optional [Assoc, Arrival]
-            Specify if phase arrivals should be included.
+            Specify if phase arrivals should be included. Default is False.
         eventid : str or int, optional [Event | Origin]
             Select a specific event by ID (evid), or comma-separated list of IDs.
             e.g. 1234 or '1234,5678'.  If provided, all other parameters are ignored.
@@ -321,7 +321,7 @@ class Client(object):
             msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
             raise ValueError(msg)
 
-        if eventtype and eventtype.lower() not in EventType:
+        if eventtype and (eventtype.lower() not in EventType):
             msg = f"eventtype '{eventtype}' not recognized.  choose from {list(KBCORE_EVENT_TYPE.keys())}"
             raise ValueError(msg)
 
