@@ -1,5 +1,5 @@
 """
-A series of query-building functions with a uniform API
+A series of query-building functions
 
 These functions simply add WHERE clauses to an _existing_ query using more convenient syntax.
 The incoming query should contain the tables your using in your WHERE clause, or the required
@@ -174,7 +174,7 @@ dbclient.station_query
 
 """
 from obspy import UTCDateTime
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, false
 
 from .util import _get_entities, range_filters, make_wildcard_list
 
@@ -462,7 +462,8 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
             restr.append((getattr(Origin, magtype), magmin, magmax))
         magfilters = range_filters(*restr)
 
-    query = query.filter(or_(*magfilters))
+    if magfilters:
+        query = query.filter(or_(*magfilters))
 
     # apply auth to the highest granularity table
     if auth:

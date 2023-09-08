@@ -90,7 +90,7 @@ FDSN_POLARITY = {
 def pretty(d, out=None, indent=0):
     """ Pretty-print a dict tree.
 
-    Use os.linesep.join(out)
+    Use with os.linesep.join(out)
 
     """
     out = out or []
@@ -541,7 +541,7 @@ def catalog(*event_queries,
 
     event_tree = ETree(*event_queries, resource_prefix=resource_prefix)
 
-    cat = event_tree.catalog(description, comments, preferred_magauth, preferred_magtype)
+    cat = event_tree.catalog(description, preferred_magauth, preferred_magtype)
     # TODO: perform origin time / magnitude sorting here?
 
     return cat
