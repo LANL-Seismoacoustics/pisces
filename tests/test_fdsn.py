@@ -5,6 +5,7 @@ Fixtures use from this gist:
 https://gist.github.com/kissgyorgy/e2365f25a213de44b9a2
 
 """
+import os
 import os.path
 import tempfile
 
@@ -112,21 +113,26 @@ def test_get_waveforms_defaults(dbsession):
     N = 100
     fs = 20
     a = np.arange(N, dtype='<i4')
+    # Windows needs the file to not be deleted yet
+    with tempfile.NamedTemporaryFile(delete=False) as fp:
+        a.tofile(fp)
+
     t1 = UTCDateTime('2015001')
     t2 = t1 + N/fs
     client = Client(dbsession, wfdisc=kb.Wfdisc, affiliation=kb.Affiliation)
-    with tempfile.NamedTemporaryFile() as fp:
-        a.tofile(fp)
-        affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-N,
-                            endtime=t2.timestamp+N)
-        wf = kb.Wfdisc(sta='ANMO', chan='BHZ', time=t1.timestamp, endtime=t2.timestamp,
-                    samprate=fs, wfid=1, chanid=2, nsamp=N, foff=0, datatype='i4',
-                    dir=os.path.dirname(fp.name), dfile=os.path.basename(fp.name))
-        tr = wf.to_trace()
-        dbsession.add_all([wf, affil])
-        dbsession.commit()
+    affil = kb.Affiliation(net='IU', sta='ANMO', time=t1.timestamp-N,
+                        endtime=t2.timestamp+N)
+    wf = kb.Wfdisc(sta='ANMO', chan='BHZ', time=t1.timestamp, endtime=t2.timestamp,
+                samprate=fs, wfid=1, chanid=2, nsamp=N, foff=0, datatype='i4',
+                dir=os.path.dirname(fp.name), dfile=os.path.basename(fp.name))
+    dbsession.add_all([wf, affil])
+    dbsession.commit()
 
-        st = client.get_waveforms('IU', 'ANMO', '', 'BHZ', t1, t2)
+    tr = wf.to_trace()
+    st = client.get_waveforms('IU', 'ANMO', '', 'BHZ', t1, t2)
+
+    # finally delete the file
+    os.remove(fp.name)
 
     assert len(st) == 1
     assert (
