@@ -49,6 +49,7 @@ def eventdata(session):
 
 
 def test_filter_events_origin(session, eventdata):
+    """ Tests only on the Origin table. """
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Origin)
@@ -108,6 +109,7 @@ def test_filter_events_origin(session, eventdata):
 
 
 def test_filter_events_event(session, eventdata):
+    """ Tests only on the Event table. """
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Event)
@@ -128,6 +130,7 @@ def test_filter_events_event(session, eventdata):
 
 
 def test_filter_events_origin_event(session, eventdata):
+    """ Tests using the Event and Origin tables. """
     d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Event, Origin)
@@ -165,6 +168,7 @@ def test_filter_events_exceptions(session):
 
 
 def test_filter_magnitudes_origin(session, eventdata):
+    """ Magnitude tests using the Origin table. """
     d, *_ = eventdata
 
     q = session.query(Origin)
@@ -188,6 +192,7 @@ def test_filter_magnitudes_origin(session, eventdata):
     )
 
 def test_filter_magnitudes_origin_netmag(session, eventdata):
+    """ Magnitude tests using the Origin and Netmag tables. """
     d, *_ = eventdata
 
     q = session.query(Origin, Netmag)
@@ -223,6 +228,7 @@ def test_filter_magnitudes_origin_netmag(session, eventdata):
 
 
 def test_filter_magnitudes_origin_netmag_stamag(session, eventdata):
+    """ Magnitude tests using the Origin, Netmag, and Stamag tables. """
     d, *_ = eventdata
 
     q = session.query(Origin, Netmag, Stamag)
