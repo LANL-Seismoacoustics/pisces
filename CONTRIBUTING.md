@@ -41,7 +41,7 @@ Please see the project Wiki for a description of the git branching model.
     ```
     * using `conda`
     ```
-    $ conda create -n pisces -c obspy obspy lxml Click
+    $ conda create -n pisces -c conda-forge obspy lxml Click
     $ cd pisces/
     $ pip install -e .
     ```
