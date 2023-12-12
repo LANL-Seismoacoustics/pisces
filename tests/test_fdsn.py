@@ -103,7 +103,6 @@ def test_get_events_defaults(dbsession):
     assert cat == expected
 
     cat = client.get_events(eventid='2')
-
     assert cat == expected
 
 
