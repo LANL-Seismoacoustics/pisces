@@ -1,13 +1,6 @@
 import numpy as np
-import pisces.schema.kbcore as kb
-from obspy.core.utcdatetime import UTCDateTime
 from obspy.core.inventory import response
-from obspy.core.inventory import Inventory, Network, Station, Channel, Site
-from obspy.core.stream import Stream
-from sqlalchemy import or_
-from obspy.clients.fdsn import Client
 import warnings
-from obspy.core.util import AttribDict 
 
 def get_pazfir_lines(path):
     """
@@ -39,10 +32,10 @@ def get_pazfir_lines(path):
     linesActual = []
     
     # Remove commented lines
-    for i in range(len(linesAll)):
-        lineData = linesAll[i].split()
+    for i, line in enumerate(linesAll):
+        lineData = line.split()
         if len(lineData) > 0 and lineData[0][0] != '#' :
-            linesActual.append(linesAll[i])
+            linesActual.append(line)
     
     return linesActual
 
@@ -108,19 +101,20 @@ def get_pazfir_metadata(fileLines):
     stageType = []
 
     # iterate through and find the exact lines marking a new stage in the file
-    for i in range(len(fileLines)):
-        lineData = fileLines[i].split()
-        if lineData[0][0].isalpha():
-            t_v_m.append(lineData[0])
-            stageNums.append(int(lineData[1]))
-            sourceType.append(lineData[2])
-            stageType.append(lineData[3])
+    for i, fline in enumerate(fileLines):
+        checkAlpha, *vars = fline.split() # need to check first character that isn't a space w/o stripping spaces
+        if checkAlpha[0].isalpha():
+            i_t_v_m, stageNum, i_sourceType, i_stageType, *vars = fline.split() # now unpack the rest
+            t_v_m.append(i_t_v_m)
+            stageNums.append(int(stageNum))
+            sourceType.append(i_sourceType)
+            stageType.append(i_stageType)
             stageStart.append(i)
     
     return stageStart, stageNums, stageType, sourceType, t_v_m
 
 
-def get_pazfir_data(fileLines, stageStart, stageNums, stageType):    #  Talk to Jonathan about what kwargs with stageStart, stageNums, and stageType would look like here
+def get_pazfir_data(fileLines, stageStart, stageType):
     """
     get_pazfir_data takes the metadata lists determeined from get_pazfir_metadata
     and returns lists containing the poles/numerators, zeros/denominators, and 
@@ -143,9 +137,6 @@ def get_pazfir_data(fileLines, stageStart, stageNums, stageType):    #  Talk to 
     stageStart: list of integers, output from get_pazfir_metadata()
         Index values for lines in fileLines that initiate a new response stage in
         the order they are found in the file.
-    stageNums:  list of integers, output from get_pazfir_metadata()
-        Stage numbers extracted from response stage initiation lines in fileLines
-        found at the index values in the variable stageStart
     stageType: list of strings, output from get_pazfir_metadata() 
         Stage types as described above extracted from response stage initiation lines 
         in fileLines found at the index values in the variable stageStart
@@ -167,14 +158,14 @@ def get_pazfir_data(fileLines, stageStart, stageNums, stageType):    #  Talk to 
     
     Examples:
     ---------
-    poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageNums, stageType)
+    poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageType)
     """
 
     poles_nums = []
     zeros_denoms = []
     sens_decim = []
     
-    for i in range(len(stageNums)):
+    for i, startVal  in enumerate(stageStart):
         
         if stageType[i] == 'paz' or stageType[i] == 'fir' or stageType[i] == 'iir':
         
@@ -182,7 +173,7 @@ def get_pazfir_data(fileLines, stageStart, stageNums, stageType):    #  Talk to 
             bottoms = []
        
         # get total norm value for paz and decimation sample rate for fir/iir
-            startLine = stageStart[i]
+            startLine = startVal
             stage_constant = float(fileLines[startLine+1])
             sens_decim.append(stage_constant)
            
@@ -322,7 +313,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
     stageStart, stageNums, stageType, sourceType, t_v_m = get_pazfir_metadata(linesAll)
     
     # get all numerators, denominators, sensitivities and decimation values
-    poles_nums, zeros_denoms, sens_decim = get_pazfir_data(linesAll, stageStart, stageNums, stageType)
+    poles_nums, zeros_denoms, sens_decim = get_pazfir_data(linesAll, stageStart, stageType)
     
     # check consecutive stages and add dummy stages where necessary
     # check if starting stage is 0
@@ -509,7 +500,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
     
     ###################    PAZ STAGE   ###########################################
     
-    for i in range(len(stageNums)):
+    for i, stageVal in enumerate(stageNums):
         if stageType[i] == 'paz':
             
             poles = poles_nums[i]
@@ -526,7 +517,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
                 a0 = a0_from_pz(poles, zeros, a0f)
                 scale = scale/a0
                 
-            if stageNums[i] == 1:
+            if stageVal == 1:
                 if input_units == 'M':
                     scale *= 10**9  
                 gain = scale
@@ -582,7 +573,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             else:
                 scale = 1.0
                 
-            if stageNums[i] == 1:
+            if stageVal == 1:
                 gain = scale
             else:
                 gain = 1.0
@@ -643,7 +634,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
                 gain_freq = 1.0
                 gain = 1.0
                 
-            if stageNums[i] == 1:
+            if stageVal == 1:
                 if input_units == 'M':
                     gain *= 10**9
             else:
@@ -654,12 +645,12 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             startLine = stageStart[i]
             
             #total number of frequency, amplitude, phase pairs
-            num_fap = int(lines[startLine+1])
+            num_fap = int(linesAll[startLine+1])
             
             faps = []
             
             for j in range(startLine + 2, startLine + 2 + num_fap):
-                fapdat = lines[j].split()
+                fapdat = linesAll[j].split()
                 
                 frequency = float(fapdat[0])
                 amplitude = float(fapdat[1])
