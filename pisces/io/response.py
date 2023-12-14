@@ -102,14 +102,17 @@ def get_pazfir_metadata(fileLines):
 
     # iterate through and find the exact lines marking a new stage in the file
     for i, fline in enumerate(fileLines):
-        checkAlpha, *vars = fline.split() # need to check first character that isn't a space w/o stripping spaces
-        if checkAlpha[0].isalpha():
-            i_t_v_m, stageNum, i_sourceType, i_stageType, *vars = fline.split() # now unpack the rest
-            t_v_m.append(i_t_v_m)
-            stageNums.append(int(stageNum))
-            sourceType.append(i_sourceType)
-            stageType.append(i_stageType)
-            stageStart.append(i)
+        try:
+            i_t_v_m, stageNum, i_sourceType, i_stageType, *vars = fline.split()
+            if i_t_v_m[0].isalpha():
+                t_v_m.append(i_t_v_m)
+                stageNums.append(int(stageNum))
+                sourceType.append(i_sourceType)
+                stageType.append(i_stageType)
+                stageStart.append(i)
+        except ValueError:
+            # data line doesn't contain 4 variables
+            pass
     
     return stageStart, stageNums, stageType, sourceType, t_v_m
 
