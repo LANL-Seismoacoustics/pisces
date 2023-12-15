@@ -25,18 +25,18 @@ def get_pazfir_lines(path):
     fileLines = get_pazfir_lines('response_file.pazfir')
     """
     
-    f = open(path, "r")
-    linesAll = f.readlines()
-    f.close()
-    
-    linesActual = []
-    
-    # Remove commented lines
-    for i, line in enumerate(linesAll):
-        lineData = line.split()
-        if len(lineData) > 0 and lineData[0][0] != '#' :
-            linesActual.append(line)
-    
+    with open(path, 'r') as f:
+        linesAll = f.readlines()
+
+        
+        linesActual = []
+        
+        # Remove commented lines
+        for i, line in enumerate(linesAll):
+            lineData = line.split()
+            if len(lineData) > 0 and lineData[0][0] != '#' :
+                linesActual.append(line)
+        
     return linesActual
 
 
