@@ -1,6 +1,11 @@
 # Changelog
 
-## master/main
+## 0.4.3
+
+* Add initial response reader module.
+* Add `request.py` to top `pisces` namespace explicitly.
+
+## 0.4.2
 
 * Replace deprecated `._copy()` method on SQLAlchemy columns with `deepcopy`
 * New contributor Brady Spears!
