@@ -111,7 +111,7 @@ def db_connect(*args, **kwargs):
         port = kwargs.get('port', '')
         instance = kwargs.get('instance', '')
 
-        if backend is 'sqlite':
+        if backend == 'sqlite':
             userpsswd = ''
         else:
             if user and not psswd:
