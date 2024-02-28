@@ -3,6 +3,7 @@
 Common Pisces utility functions.
 
 """
+from collections import defaultdict
 import logging
 import math
 from getpass import getpass
@@ -864,7 +865,7 @@ def _get_entities(query, *requested_classes):
     Parameters
     ----------
     query : SQLAlchemy query object
-    requested_classes : strings
+    requested_classes : strings, optional
         Canonical table class names, e.g. 'Site', 'Sitechan', 'Sensor'
 
     Returns
@@ -881,7 +882,8 @@ def _get_entities(query, *requested_classes):
     observed_entities = {
         d["entity"]._tabletype: d["entity"] for d in query.column_descriptions
     }
-    return [observed_entities.get(c.capitalize(), None) for c in requested_classes]
+    out = [observed_entities.get(c.capitalize(), None) for c in requested_classes] if requested_classes else observed_entities.values()
+    return out
 
 
 def range_filters(*restrictions):
@@ -980,3 +982,13 @@ def distance_filter(
     """
     pass
 
+
+def dtree():
+    """
+    A dictionary tree that doesn't require you to explicitly create subdictionaries
+    before assigning to them ("autovivication").
+
+    source: https://gist.github.com/hrldcpr/2012250
+
+    """
+    return defaultdict(dtree)

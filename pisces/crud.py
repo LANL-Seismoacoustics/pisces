@@ -99,42 +99,40 @@ def make_table_names(*tables, **kwargs):
     return tablenames
 
 
-def split_table_names(*tablenames, **kwargs):
+def split_table_names(*tablenames, schema=None):
     """
     Splits full table names into a (owner, prefix, tablename) 3-tuples.
 
     Parameters
     ----------
     tablenames : str
-    schema : str {'css3', 'kbcore'} Default 'css3'.
-    split_prefix : bool, default True
-        If True, return (owner, prefix, tablename) tuples,
-        otherwise return (owner, tablename) tuples.
+    schema : str {'css3', 'kbcore'}, optional
+        If provided, the prefix is the part before a known canonical table name,
+        otherwise the prefix is ''.
 
     Returns
     -------
     list
-        Corresponding list of (owner, tablename) or (owner, prefix, tablename)
-        tuples strings. Empty owner or prefix are ''.
+        Corresponding list of (owner, prefix, tablename) tuples strings. Empty
+        owner or prefix are ''.
 
     Examples
     --------
-    >>> tablenames = ['global.site', 'global.sitechan', 'TA_site',
-    ...               'different_acct.my_origin', 'myfriend.discrim_last']
+    >>> tablenames = ['global.site', 'different_acct.my_origin', 'TA_site')
+    >>> split_table_names(*tablenames, schema='css3')
+    [('global', '', 'site'), ('different_acct', 'my_', 'origin'), ('', 'TA_', 'site')
     >>> split_table_names(*tablenames)
-    [('global', '', 'site'), ('global', '', 'sitechan'), ('', 'TA_', 'site'),
-    ('different_acct', 'my_', 'origin'), ('myfriend', '', 'discrim_last')]
+    [('global', '', 'site'), ('different_acct', '', 'my_origin'), ('', '', 'TA_site')
 
     """
-    split_prefix = kwargs.pop('split_prefix', True)
-    schema = kwargs.get('schema', 'css3')
-    if schema == 'css3':
-        schematables = css3.CORETABLES.keys()
-    elif schema == 'kbcore':
-        schematables = kb.CORETABLES.keys()
-    else:
-        msg = "Unknown schema: {}".format(schema)
-        raise ValueError(msg)
+    if schema:
+        if schema == 'css3':
+            schematables = css3.CORETABLES.keys()
+        elif schema == 'kbcore':
+            schematables = kb.CORETABLES.keys()
+        else:
+            msg = "Unknown schema: {}".format(schema)
+            raise ValueError(msg)
 
     out = []
     for fulltablename in tablenames:
@@ -144,9 +142,7 @@ def split_table_names(*tablenames, **kwargs):
             owner = ''
             prefixed_tablename = fulltablename
 
-        if split_prefix:
-            # if a table 'endswith' a table in the schema, the part before is the
-            # table prefix
+        if schema:
             for schematable in schematables:
                 head, sep, tail = prefixed_tablename.rpartition(schematable)
                 if sep and not tail:
@@ -160,13 +156,15 @@ def split_table_names(*tablenames, **kwargs):
         else:
             out.append((owner, prefixed_tablename))
 
-
     return out
 
 
-def make_tables(*tables, **kwargs):
+def make_tables(*tables, prefix='', owner=None, schema='css3'):
     """
-    Create mapped SQLAlchemy ORM table classes.
+    Create mapped SQLAlchemy ORM table classes of known schema.
+
+    This functions produces classes that inherit from PiscesMeta, which provides
+    a number of useful behaviours, like Wfdisc.to_trace and formatted strings.
 
     If no owner or prefix is indicated, the returned tables are the same as
     those in pisces.tables.<schema> .  The user is encouraged to import these
@@ -176,7 +174,7 @@ def make_tables(*tables, **kwargs):
     Parameters
     ----------
     tables : str
-        Desired table names.  Table name must be known to the schema. 
+        Desired table names.  Table name must be known to the schema.
         If omitted, a schema must be specified, and all core tables for the
         schema are returned.
     schema : str  ("css3" or "kbcore")
@@ -205,13 +203,10 @@ def make_tables(*tables, **kwargs):
     >>> tables = make_tables('origin', 'event', schema='kbcore', owner='myowner')
 
     """
+    # TODO: accept inputs like: site='global.site', wfdisc='global.wfdisc_raw'
+    #       Keep track of all the unique owners, so that 
     # if there is an owner or a prefix, the tables need to be created
     # otherwise, just return the existing ones.
-
-    # TODO: find a way to not repeat arguments with all these functions
-    prefix = kwargs.get('prefix', '')
-    owner = kwargs.get('owner', None)
-    schema = kwargs.get('schema', 'css3')
 
     if schema == 'css3':
         CORETABLES = css3.CORETABLES
@@ -311,6 +306,7 @@ def load_tables(session, *tables, **kwargs):
     schema = kwargs.get('schema', 'css3')
     prefix = kwargs.get('prefix', '')
     owner = kwargs.get('owner', None)
+    primary_keys = kwargs.get('primary_keys')
 
     # I don't use 'owner' here, b/c it will be enforced by the MetaData. Here,
     # we nust need table names.
@@ -320,6 +316,7 @@ def load_tables(session, *tables, **kwargs):
         parents = (declarative_base(metadata=sa.MetaData(schema=owner),
                                     constructor=None, metaclass=PiscesMeta),)
     else:
+        # XXX: still use PiscesMeta here somehow
         parents = ()
 
     colinfo = getattr(parents, '_column_info_registry', {})
