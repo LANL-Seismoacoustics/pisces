@@ -117,7 +117,7 @@ def distaz_query(records, deg=None, km=None, swath=None):
 
     if km:
         #???: this may be backwards
-        mgen = (geod.gps2DistAzimuth(irec.lat, irec.lon, km[0], km[1])[0] \
+        mgen = (geod.gps2dist_azimuth(irec.lat, irec.lon, km[0], km[1])[0] \
                   for irec in records)
         kilometers = np.fromiter(mgen, dtype=float)/1e3
         #meters, azs, bazs = zip(*valgen)
@@ -133,7 +133,7 @@ def distaz_query(records, deg=None, km=None, swath=None):
         minaz = swath[2] - swath[3]
         maxaz = swath[2] + swath[3]
         #???: this may be backwards
-        azgen = (geod.gps2DistAzimuth(irec.lat, irec.lon, km[0], km[1])[1] \
+        azgen = (geod.gps2dist_azimuth(irec.lat, irec.lon, km[0], km[1])[1] \
                  for irec in records)
         azimuths = np.fromiter(azgen, dtype=float)
         mask0 = np.logical_and(mask0, azimuths >= minaz)
