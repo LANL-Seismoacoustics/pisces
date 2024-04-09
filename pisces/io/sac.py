@@ -638,7 +638,7 @@ def sachdr2assoc(header, pickmap=None):
         try:
             delta = geod.locations2degrees(header['stla'], header['stlo'],
                                            header['evla'], header['evlo'])
-            m, seaz, esaz = geod.gps2DistAzimuth(header['stla'], header['stlo'],
+            m, seaz, esaz = geod.gps2dist_azimuth(header['stla'], header['stlo'],
                                                  header['evla'], header['evlo'])
             assocdict['esaz'] = esaz
             assocdict['seaz'] = seaz
