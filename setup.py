@@ -16,7 +16,7 @@ with open('README.md') as readme:
 doclines = __doc__.split("\n")
 
 setup(name='pisces',
-      version='0.4.3',
+      version='0.4.4',
       description='A Practical Seismological Database Library in Python.',
       long_description=long_description,
       long_description_content_type="text/markdown", # setuptools >= 38.6.0
