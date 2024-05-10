@@ -1,3 +1,4 @@
+from pisces import stations
 from obspy.core import inventory
 
 def build_inventory(session, stas, nets, chans, times, level)
