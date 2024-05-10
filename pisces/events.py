@@ -1,5 +1,5 @@
 """
-A series of query-building functions with a uniform API
+A series of query-building functions
 
 These functions simply add WHERE clauses to an _existing_ query using more convenient syntax.
 The incoming query should contain the tables your using in your WHERE clause, or the required
@@ -8,52 +8,53 @@ the result set, but won't be added to the query SELECT statement.
 
 ```bash
 pisces/
+    __init__.py : filter_*, inventory, catalog, stream
     util.py
     crud.py
     request.py @deprecated
-    events.py : filter_events, filter_magnitudes, filter_arrivals, catalog
-    stations.py : filter_networks, filter_stations, filter_responses, inventory
-    waveforms.py : import filter_waveforms, stream
-    fdsn.py : Client
+    events.py : filter_events, filter_magnitudes, filter_arrivals
+    stations.py : filter_networks, filter_stations, filter_responses
+    waveforms.py : filter_waveforms
+    stream.py : stream
+    inventory.py : inventory
+    catalog.py : catalog, enum values
+    client.py : Client
+    fdsnws.py : Client
     commands/
+        ...
     schema/
+        ...
     tables/
+        ...
     io/
         # register various read_* waveform or response functions with their dtype or rsptype string,
         # so that read_waveform/read_response can route to it, each using a standard calling signature
         # and return values.
-        __init__.py  # imports api functions
+        __init__.py  # read_waveform, read_response
         sac.py : read_sac, write_sac # + various header conversion functions
         mseed.py : read_mseed, write_mseed
         numpy.py : read_f4, etc...
         waveform.py : read_waveform # registers reader functions
-        pazfir.py
-        pazfap.py
-        paziir.py
-        fap.py
-        fir.py
+        pazfir.py : read_pazfir
+        pazfap.py : read_pazfap
+        paziir.py : read_pazfir
+        fap.py : read_fap
+        fir.py : read_fir
         response.py : read_response # registers reader functions
 
 ```
 
 ```python
 
-from pisces.io.sac import read_sac
-from pisces.io.mseed import read_mseed
-from pisces.io.response import read_pazfir, read_fap, read_fir, read_paziir, read_pazfap # decide on a common function signature, and use a registry
-from pisces.io import read_waveform, read_response
-from pisces.events import filter_events, filter_magnitudes, filter_arrivals, catalog
-from pisces.stations import filter_networks, filter_stations, filter_responses, inventory
-from pisces.waveforms import filter_waveforms, stream
-from pisces.request import get_stations, get_events, get_waveforms, ...
 from pisces.fdsn import Client
-from pisces.client import Client
+from pisces import inventory, catalog
+from pisces.io import read_waveform, read_response
 
 # get broadband waves and responses for stations [20, 80] degrees from events
 q = session.query(Site, Sitechan)
 try:
     # time gets applied to the lowest-granularity table used in the query, Sitechan here b/c chan keyword was supplied.
-    q = filter_stations(q, net='IU', chan='BH_', time_=(t1, t2))
+    q = filter_stations(q, net='IU', chan='BH_', times=(t1, t2))
 except ValueError:
     # failed b/c Affiliation isn't in the query
     q = filter_stations(q, net='IU', chan='BH_' affiliation=Affiliation)
@@ -76,7 +77,7 @@ inv = inventory(q, default_network='__', network_priority=('II', 'IU', 'TA'))
 
 
 q = session.query(Origin)
-q = localize(q, region=(W, E, S, N), depth=(dmin, dmax), time_=(starttime, endtime))
+q = localize(q, region=(W, E, S, N), depth=(dmin, dmax), times=(starttime, endtime))
 q = filter_magnitudes(q, magtype='mw', magnitude=(3, 5), netmag=Netmag)
 
 
@@ -86,6 +87,45 @@ cat = catalog(q, resource_id, description=None, comments=None, creation_info=Non
 
 ...or a request class?
 ```python
+from contextlib import contextmanager
+class RequestClient:
+    def __init__(self, session, **tables):
+        # add them to self
+        self._event_query = None
+        self._station_query = None
+        self._waveform_query = None #?
+
+    @contextmanager
+    def query(self):
+        self._event_query = None
+        self._station_query = None
+        self._waveform_query = None #?
+        try:
+            yield self
+        finally:
+            self._event_query = None
+            self._station_query = None
+            self._waveform_query = None #?
+
+    def events(self, *stuff, **morestuff):
+        if not self._event_query:
+            self._event_query = self.session.query(self.tables['event'], self.tables['origin'])
+        self._event_query = events.filter_events(self._event_query, *stuff, **morestuff)
+
+        return self
+
+    def stations(self, *stuff, **morestuff):
+        if not self._station_query:
+            self._station_query = self.session.query(self.tables['network', 'affiliation', 'site'])
+
+        self._station_query = events.filter_stations(self._station_query, *stuff, **morestuff)
+
+        return self
+
+    def distance(self, *stuff, **morestuff):
+        # needs to be called last
+        return util.distance(self._event_query, self._station_query, *stuff, **morestuff)
+
 tables = make_tables('origin', 'event', 'arrival', 'assoc', schema='kbcore', owner='global')
 rclient = RequestClient(session, **tables)
 
@@ -93,13 +133,14 @@ rclient = RequestClient(session, **tables)
 with rclient.query() as q:
     q = q.events(
             region=(-10, 5, 40, 47),
-            time_=('2009-01-01', '2010-01-01'),
+            times=('2009-01-01', '2010-01-01'), #anything UTCDateTime can consume
             depth=(50, 100),
-            mb=(3.5, 4.5)
         ).stations(
-            channels='BH?',
+            channels='BH?,HH?',
         ).distance(
             degrees=(20, 80),
+            #or
+            kilometers=(50, 300)
         )
     st = q.waveforms(
             filelength=84600,
@@ -133,7 +174,7 @@ dbclient.station_query
 
 """
 from obspy import UTCDateTime
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, false
 
 from .util import _get_entities, range_filters, make_wildcard_list
 
@@ -142,7 +183,7 @@ from .util import _get_entities, range_filters, make_wildcard_list
 def filter_events(
     query,
     region=None,
-    time_=None,
+    times=None,
     depth=None,
     evid=None,
     orid=None,
@@ -155,7 +196,8 @@ def filter_events(
     """Filter an event query using Event, Origin tables.
 
     These filters are primarily geographic and catagorical.  For magnitude filtering,
-    use the `filter_magnitudes` function.
+    Use the `filter_magnitudes` function for magnitude filtering, and filter_arrivals
+    for arrivals and amplitudes.
 
     Parameters
     ----------
@@ -164,7 +206,7 @@ def filter_events(
         otherwise they must be provided as keywords (see below).
     region : tuple [Origin]
         (W, E, S, N) inclusive lat/lon box containing int/float/None(unbounded) degrees
-    time_ : tuple [Origin]
+    times : tuple [Origin]
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps
     depth : tuple [Origin]
         (mindepth, maxdepth) inclusive range, in float/int kilometers
@@ -223,7 +265,7 @@ def filter_events(
         msg = "Event or Origin table required."
         raise ValueError(msg)
 
-    if any([time_, orid, region, depth]) and not Origin:
+    if any([times, orid, region, depth]) and not Origin:
         msg = "Origin table required."
         raise ValueError(msg)
 
@@ -255,12 +297,9 @@ def filter_events(
 
     # collect range restrictions on columns
     range_restr = []
-    if time_:
-        t1, t2 = time_
-        t1 = UTCDateTime(t1).timestamp if t1 else None
-        t2 = UTCDateTime(t2).timestamp if t2 else None
-        time_ = (t1, t2)
-        range_restr.append((Origin.time, *time_))
+    if times:
+        t1, t2 = [UTCDateTime(t).timestamp if t is not None else None for t in times]
+        range_restr.append((Origin.time, t1, t2))
 
     if region:
         W, E, S, N = region
@@ -281,7 +320,7 @@ def filter_events(
     return query
 
 
-def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tables):
+def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tables):
     """
     Filter an event query by magnitude range using Origin, Netmag, and/or Stamag tables.
 
@@ -294,33 +333,35 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
     ----------
     query : SQLAlchemy query object
         Includes Origin, Netmag, and/or Stamag tables.
-    sta : str or list of str [Stamag]
-        Station code, wildcards allowed.  Requies Stamag.
     net : str or list of str [Netmag]
         Network code, wildcards allowed. Requires Netmag.
+    sta : str or list of str [Stamag]
+        Station code, wildcards allowed.  Requies Stamag.
     auth : str or list of str [Stamag > Netmag > Origin]
         Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
     **magnitudes_and_tables : [Stamag > Netmag > Origin]
         Magnitudes
-        Specify the magtype=(min, max) values for the filter as keyword, 2-tuple pairs,
-        e.g. mb=(3.5, 5.5) . If omitted, all found magnitudes will be returned.
-        If no range values are provided (e.g. mw=(None, None)), all rows with that magtype
-        are returned.
-        Magnitude filters are applied to tables in the following priority: Origin, Netmag, Stamag
-        Wildcards are accepted, but they must be provided as an expanded dict, like:
-        >>> out = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
+        Specify the `magtype=(min|None, max|None)` values for the filter as keyword, 2-tuple pairs,
+        e.g. `mb=(3.5, 5.5)`. One special magtype is recognized: `all=(min|None, max|None)` will
+        constrain and return all magnitudes. If no range values are provided (e.g. mw=(None, None)),
+        all rows with that magtype are returned. Using `all=(None, None)` is the same as providing
+        no filter at all. [not yet implemented] Magnitude filters are applied to tables in the
+        following priority: Stamag, Netmag, Origin Wildcards are accepted, but they must be provided
+        as an expanded dict, like:
+        >>> query = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
 
         Tables
         If a required ORM table isn't in the SELECT of your query, you can provide it here as a
         keyword argument (e.g. netmag=Netmag). If provided in this way, it won't be returned in the
         result set but is instead just used to filter the result set for the incoming query.
-        If you wish a table included in the result set, use the `sqlalchemy.orm.Query.add_entity`
-        method prior to calling this function.
+        If you wish a table to be included in the result set, use the
+        `sqlalchemy.orm.Query.add_entity` method prior to calling this function.
         e.g. `q = q.add_entity(Stamag)`
 
     Joins
     -----
     Origin.orid == Netmag.orid
+    Netmag.evid == Event.evid
     Netmag.magid == Stamag.magid
     Origin.orid == Stamag.orid
 
@@ -340,9 +381,10 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
 
     """
     # XXX: if wildcards and only Origin is present, it should/will fail b/c it'll interpret 'm?', for example, as a non-Origin magtype and want to apply the filter to a different table.
-    Origin, Netmag, Stamag = _get_entities(query, "Origin", "Netmag", "Stamag")
+    Event, Origin, Netmag, Stamag = _get_entities(query, "Event", "Origin", "Netmag", "Stamag")
 
     # override if provided
+    Event = magnitudes_and_tables.pop("event", None) or Event
     Origin = magnitudes_and_tables.pop("origin", None) or Origin
     Netmag = magnitudes_and_tables.pop("netmag", None) or Netmag
     Stamag = magnitudes_and_tables.pop("stamag", None) or Stamag
@@ -372,6 +414,9 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
     # do natural joins
     if Stamag and Netmag:
         query = query.filter(Stamag.magid == Netmag.magid)
+
+    if Netmag and Event:
+        query = query.filter(Netmag.evid == Event.evid)
 
     if Netmag and Origin:
         query = query.filter(Netmag.orid == Origin.orid)
@@ -417,7 +462,8 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
             restr.append((getattr(Origin, magtype), magmin, magmax))
         magfilters = range_filters(*restr)
 
-    query = query.filter(or_(*magfilters))
+    if magfilters:
+        query = query.filter(or_(*magfilters))
 
     # apply auth to the highest granularity table
     if auth:
@@ -427,7 +473,7 @@ def filter_magnitudes(query, sta=None, net=None, auth=None, **magnitudes_and_tab
     return query
 
 
-def filter_arrivals(query, sta=None, auth=None, time_=None, orid=None, phase=None, **tables):
+def filter_arrivals(query, sta=None, auth=None, times=None, orid=None, phase=None, **tables):
     """
     Filter a query for phase arrival information using Arrival, Assoc
 
@@ -437,7 +483,7 @@ def filter_arrivals(query, sta=None, auth=None, time_=None, orid=None, phase=Non
         Includes any of Arrival, Assoc tables
     sta : str or list [Assoc > Arrival]
     auth : str or list or str [Arrival]
-    time_ : tuple of (starttime, endtime) [Arrival]
+    times : tuple of (starttime, endtime) [Arrival]
         Anything that obspy.UTCDateTime can consume is accepted.
     orid : int or list of int [Assoc]
     phase : str or list of str [Assoc.phase > Arrival.iphase]
@@ -459,8 +505,8 @@ def filter_arrivals(query, sta=None, auth=None, time_=None, orid=None, phase=Non
         msg = "Arrival or Assoc table required."
         raise ValueError(msg)
 
-    if any([time_, auth]) and not Arrival:
-        msg = "Arrival table required for 'time_' and 'auth' parameters."
+    if any([times, auth]) and not Arrival:
+        msg = "Arrival table required for 'times' and 'auth' parameters."
         raise ValueError(msg)
 
     if orid and not Assoc:
@@ -496,10 +542,8 @@ def filter_arrivals(query, sta=None, auth=None, time_=None, orid=None, phase=Non
     if orid:
         query = query.filter(Assoc.orid.in_(orid))
 
-    if time_:
-        t1, t2 = time_
-        t1 = UTCDateTime(t1).timestamp if t1 else None
-        t2 = UTCDateTime(t2).timestamp if t2 else None
+    if times:
+        t1, t2 = [UTCDateTime(t).timestamp if t is not None else None for t in times]
         time_filter = range_filters((Arrival.time, t1, t2))[0]
         query = query.filter(time_filter)
 
