@@ -1,9 +1,10 @@
 from pisces import stations
 from obspy.core import inventory
 
-def build_inventory(session, stas, nets, chans, times, level)
-    
-    # how closely do we want to keep with obspy fdsn client get_stations 
-    # no location, handle networks differently
-    # reduce variablaes with ranges?
-    # what is level default?  parse through obspy documentation for their default?
+def make_inventory(query, level='station', filename = None, format=None):
+
+    # take query output from filtering functions and turn into an inventory object
+
+    # check level and see if net is available
+
+    Network, Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor","Instrument")
