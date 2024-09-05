@@ -7,6 +7,9 @@ from obspy.core.inventory.response import ComplexWithUncertainties
 from math import pi
 from obspy.core import UTCDateTime
 import os
+from obspy.core.inventory.response import ComplexWithUncertainties, PolesZerosResponseStage, \
+    CoefficientsTypeResponseStage,PolynomialResponseStage,ResponseListResponseStage, \
+    ResponseStage, FIRResponseStage
 
 def get_pazfir_lines(path):
     """
@@ -1079,7 +1082,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
 
     # get frequency from first stage if out_freq is None type 
     if out_freq is None:
-        if response.response_stages[0].__class__.__name__ == 'PolesZerosResponseStage':
+        if isinstance(response.response_stages[0],PolesZerosResponseStage):
             out_freq = response.response_stages[0].normalization_frequency
         else:
             out_freq = response.response_stages[0].stage_gain_frequency
@@ -1187,7 +1190,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     for respStage in response.response_stages:
         stageLines = ''
 
-        if respStage.__class__.__name__ == 'PolesZerosResponseStage':
+        if isinstance(respStage,PolesZerosResponseStage):
             if respStage.pz_transfer_function_type == 'DIGITAL (Z-TRANSFORM)':
                     raise NotImplementedError('Conversion of PolesZerosResponseStage transfer function of type "DIGITAL (Z-TRANSFORM)" to type "LAPLACE (RADIANS/SECOND)" not implemented')
 
@@ -1265,7 +1268,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             headerLines = headerLines + respStageLines
 
 
-        elif respStage.__class__.__name__ == 'CoefficientsTypeResponseStage':
+        elif isinstance(respStage,CoefficientsTypeResponseStage):
 
             if respStage.cf_transfer_function_type in ['ANALOG (RADIANS/SECOND)','ANALOG (HERTZ)']:
                 raise NotImplementedError('Conversion of CoefficientsTypeResponseStage transfer function of type "{}" to type "DIGITAL" not implemented'.format(respStage.cf_transfer_function_type))
@@ -1321,12 +1324,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             respStageLines = get_stationxml_lines(respStage)
             headerLines = headerLines + respStageLines
 
-        elif respStage.__class__.__name__ == 'FIRResponseStage':
-
-            # if firTrigger == False:
-            #     headerLines = headerLines + '# Setting all fir stage source descriptions to anti-alias.\n'
-            #     firTrigger = True
-            
+        elif isinstance(respStage,FIRResponseStage):
 
             numNum = len(respStage.coefficients)
             
@@ -1371,7 +1369,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
                 headerLines = headerLines + respStageLines
                 continue
 
-        elif respStage.__class__.__name__ == 'ResponseListResponseStage':
+        elif isinstance(respStage,ResponseListResponseStage):
             
             stageInUnitType = unitMap[respStage.input_units.upper()]
             stageOutUnitType = unitMap[respStage.output_units.upper()]
@@ -1410,10 +1408,10 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             respStageLines = get_stationxml_lines(respStage)
             headerLines = headerLines + respStageLines
 
-        elif respStage.__class__.__name__ == 'PolynomialResponseStage':
+        elif isinstance(respStage, PolynomialResponseStage):
             raise TypeError('Pazfir file spec does not support Polynomial Responses')
 
-        elif respStage.__class__.__name__ == 'ResponseStage':
+        elif isinstance(respStage, ResponseStage):
             headerLines = headerLines + 'Generic Obspy ResponseStage object in StationXML File. \n# Does not contribute to pazfir type response. \n'
             respStageLines = get_stationxml_lines(respStage)
             headerLines = headerLines + respStageLines
@@ -1429,7 +1427,15 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     timeStr = starttime.strftime('%Y%j')
     extSet = set(extensions)
     uniqueExt = list(extSet)
-    fileExt = ''.join(uniqueExt)
+    fileExt = ''
+    if 'paz' in uniqueExt:
+        fileExt = fileExt + 'paz'
+    if 'fir' in uniqueExt:
+        fileExt = fileExt + 'fir'
+    if 'iir' in uniqueExt:
+        fileExt = fileExt + 'iir'
+    if 'fap' in uniqueExt:
+        fileExt = fileExt + 'fap'
 
     fileName = '{}.{}.{}.{}.{}.{}'.format(network, station, channel, location, timeStr, fileExt)
 
