@@ -21,6 +21,8 @@ __version__ = "0.4.3"
 
 import logging
 
+import logging
+
 from pisces.util import db_connect, get_tables, travel_times, make_table
 from pisces.schema.util import string_formatter
 from pisces.io.trace import wfdisc2trace

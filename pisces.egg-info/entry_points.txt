@@ -1,0 +1,2 @@
+[console_scripts]
+pisces = pisces.commands.main:cli

@@ -1,0 +1,7 @@
+numpy
+obspy>=1.0
+sqlalchemy>=1.4
+Click
+
+[e1]
+e1
