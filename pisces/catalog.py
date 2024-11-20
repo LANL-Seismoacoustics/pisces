@@ -1,9 +1,14 @@
 """
-from pisces.catalog import ETree
 
-tree = ETree(query1, query2, resource_prefix='smi:lanl.gov')
-tree.update(query3)
-tree.catalog()
+
+Examples
+--------
+
+>>> from pisces.catalog import ETree
+
+>>> tree = ETree(query1, query2, resource_prefix='smi:lanl.gov')
+>>> tree.update(query3)
+>>> tree.catalog()
 
 """
 from itertools import zip_longest
@@ -314,8 +319,6 @@ class ETree:
     def event(self, event):
         """ Return an obspy.core.event.Event from a database Event row. """
         prefix = self.resource_prefix
-        eventkey = inspect(event).identity_key
-        tree = self._tree
 
         qevent = qml.Event(
             resource_id=qml.ResourceIdentifier(id=f'{prefix}/event/event.evid={event.evid}'),
@@ -329,7 +332,6 @@ class ETree:
     def origin(self, origin):
         """ Return an obspy.core.event.Origin from a database Origin row. """
         prefix = self.resource_prefix
-        tree = self._tree
         qorigin = qml.Origin(
             resource_id=qml.ResourceIdentifier(id=f'{prefix}/origin/origin.orid={origin.orid}'),
             time=UTCDateTime(origin.time),
@@ -532,12 +534,19 @@ def catalog(*event_queries,
     -------
     obspy.core.events.Catalog
 
+
+    Notes
+    -----
+    To get instances back from their identity key:
+
+    >>> entity, pk, _ = originkey
+    >>> query.session.get(entity, pk):
+
+    or
+
+    >>> query.session.get(originkey[0], originkey[1])
+
     """
-    # to get instances back from their identity key:
-    # entity, pk, _ = originkey
-    # query.session.get(entity, pk)
-    # or:
-    # query.session.get(originkey[0], originkey[1])
 
     event_tree = ETree(*event_queries, resource_prefix=resource_prefix)
 
