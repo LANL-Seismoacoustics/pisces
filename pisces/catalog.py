@@ -172,34 +172,34 @@ class ETree:
     -----
     The tree has the following structure:
     {
-        eventkey1: {
-            'instance': event1,         # quakeml Event
-            'origins': {
-                originkey1: {
-                    'instance': origin1,    # quakeml Origin
-                    'assocs': {
-                        assockey1: assoc1,  # quakeml Arrival
-                        assockey2: assoc2,
-                        ...
-                    },
-                    'arrivals': {
-                        arrivalkey1: arrival1,  # quakeml Pick
-                        arrivalkey2: arrival2,
-                        ...
-                    },
-                    'netmags': {
-                        netmagkey1: {
-                            'instance': netmag1, # quakeml Magnitude
-                            'stamags': {
-                                stamagkey1: stamag1,    # quakeml StationMagnitude
-                                stamagkey2: stamag2,
-                                ...
-                            }
-                        }
-                    }
-                }
-            }
+      eventkey1: {
+        'instance': event1,         # quakeml Event
+        'origins': {
+           originkey1: {
+             'instance': origin1,    # quakeml Origin
+             'assocs': {
+               assockey1: assoc1,  # quakeml Arrival
+               assockey2: assoc2,
+               ...
+             },
+             'arrivals': {
+               arrivalkey1: arrival1,  # quakeml Pick
+               arrivalkey2: arrival2,
+               ...
+             },
+             'netmags': {
+               netmagkey1: {
+                 'instance': netmag1, # quakeml Magnitude
+                 'stamags': {
+                   stamagkey1: stamag1,    # quakeml StationMagnitude
+                   stamagkey2: stamag2,
+                   ...
+                 }
+               }
+             }
+           }
         }
+      }
     }
 
     Keys are the (hashable) output of `sqlalchemy.inspect(instance).identity_key`.
@@ -259,7 +259,7 @@ class ETree:
         # This works only for instances retrieved from a database, or merged into the session with:
         # `session.merge(instance)`
 
-        tree = self._tree
+        # tree = self._tree
 
         table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival')
         Event, Origin, Netmag, Stamag, Assoc, Arrival = _get_entities(query, *table_types)
