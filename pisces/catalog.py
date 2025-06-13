@@ -21,6 +21,7 @@ from sqlalchemy import inspect
 import pisces as ps
 from pisces.util import _get_entities, dtree
 
+
 # Convert KB Core etypes to FDSN event types, best good-faith mapping
 # These are also used for a backwards mapping below, so where there multiple backwards mappings,
 # the final one is preferred/used. Relies on order-preserving dictionaries in Python 3.7+.
@@ -91,6 +92,10 @@ FDSN_POLARITY = {
     '-': 'undecidable',
 }
 
+
+def _get_key(row):
+    """ Generalize how to get a row's hashable identity, so it can be easily changed. """
+    return inspect(row).identity_key
 
 def pretty(d, out=None, indent=0):
     """ Pretty-print a dict tree.
@@ -283,7 +288,7 @@ class ETree:
             originkey = inspect(origin).identity_key
             self._tree[eventkey]['origins'][originkey]['instance'] = origin
 
-            # "picks" in quakeml are like Arrival rows, and they're at the Event level
+            # "picks" in quakeml are like CSS Arrival rows, and they're at the Event level
             # "amplitudes" in quakeml are also stored in Arrival rows, and at the Event level,
             # so we'll ultimately just reuse arrivals for them.
             if Arrival:
@@ -292,7 +297,7 @@ class ETree:
                 self._tree[eventkey]['origins'][originkey]['arrivals'][arrivalkey] = arrival
 
             if Assoc:
-                # "arrivals" in quakeml are like Assoc rows
+                # "arrivals" in quakeml are like CSS Assoc rows
                 assoc = getattr(row, Assoc.__name__)
                 assockey = inspect(assoc).identity_key
                 self._tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
@@ -406,7 +411,7 @@ class ETree:
         return magnitude
 
 
-    def catalog(self, description=None, preferred_magauth=None, preferred_magtype=None):
+    def catalog(self, description=None, comments=None, preferred_magauth=None, preferred_magtype=None):
         """ Convert an database event tree to an obspy Catalog.
 
         Parameters
@@ -437,6 +442,7 @@ class ETree:
             creation_info=qml.CreationInfo(author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
             resource_id=qml.ResourceIdentifier(prefix=f'{resource_prefix}/catalog'), # uses a uuid after prefix
             description=description,
+            comments=comments,
         )
 
         tree = self._tree
@@ -550,7 +556,7 @@ def catalog(*event_queries,
 
     event_tree = ETree(*event_queries, resource_prefix=resource_prefix)
 
-    cat = event_tree.catalog(description, preferred_magauth, preferred_magtype)
+    cat = event_tree.catalog(description, comments, preferred_magauth, preferred_magtype)
     # TODO: perform origin time / magnitude sorting here?
 
     return cat
