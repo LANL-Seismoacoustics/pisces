@@ -411,7 +411,7 @@ class ETree:
         return magnitude
 
 
-    def catalog(self, description=None, comments=None, preferred_magauth=None, preferred_magtype=None):
+    def catalog(self, description=None, preferred_magauth=None, preferred_magtype=None):
         """ Convert an database event tree to an obspy Catalog.
 
         Parameters
@@ -438,11 +438,11 @@ class ETree:
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
         resource_prefix = self.resource_prefix
+        # comments = comments if comments else []
         cat = qml.Catalog(
             creation_info=qml.CreationInfo(author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
             resource_id=qml.ResourceIdentifier(prefix=f'{resource_prefix}/catalog'), # uses a uuid after prefix
             description=description,
-            comments=comments,
         )
 
         tree = self._tree
@@ -472,7 +472,7 @@ class ETree:
                     # and the database row is an empty defaultdict, which is Falsy
                     if arrival := arrivals[arrivalkey]:
                         qpick = self.pick(arrival)
-                        # stored at the Event level.
+                        # Picks are stored at the Event level.
                         qevent.picks.append(qpick)
 
                         amplitude = self.amplitude(arrival, pick_id=qpick.resource_id)
