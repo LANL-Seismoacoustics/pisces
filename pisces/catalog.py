@@ -438,7 +438,6 @@ class ETree:
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
         resource_prefix = self.resource_prefix
-        # comments = comments if comments else []
         cat = qml.Catalog(
             creation_info=qml.CreationInfo(author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
             resource_id=qml.ResourceIdentifier(prefix=f'{resource_prefix}/catalog'), # uses a uuid after prefix
@@ -556,7 +555,7 @@ def catalog(*event_queries,
 
     event_tree = ETree(*event_queries, resource_prefix=resource_prefix)
 
-    cat = event_tree.catalog(description, comments, preferred_magauth, preferred_magtype)
+    cat = event_tree.catalog(description, preferred_magauth, preferred_magtype)
     # TODO: perform origin time / magnitude sorting here?
 
     return cat

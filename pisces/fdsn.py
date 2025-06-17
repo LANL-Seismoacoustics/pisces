@@ -352,13 +352,13 @@ class Client(object):
         # geographic / categorical stuff
         q = self.session.query(Event, Origin)
         qe = events.filter_events(q,
-                                 region=region,
-                                 times=times,
-                                 depth=depth,
-                                 evid=evid,
-                                 prefor=prefor,
-                                 auth=auth,
-                                 etype=etype,
+                                  region=region,
+                                  times=times,
+                                  depth=depth,
+                                  evid=evid,
+                                  prefor=prefor,
+                                  auth=auth,
+                                  etype=etype,
         )
         # [(event, origin, netmag)]
 
