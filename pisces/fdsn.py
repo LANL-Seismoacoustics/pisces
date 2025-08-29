@@ -288,6 +288,7 @@ class Client(object):
             Netmag = self.tables["netmag"]
             Event = self.tables["event"]
         except KeyError:
+            # XXX: why is Netmag required?
             msg = "Event, Origin, and Netmag tables required."
             raise ValueError(msg)
 

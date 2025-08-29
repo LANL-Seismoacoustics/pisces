@@ -71,8 +71,8 @@ def test_get_events_defaults(dbsession):
     cat = client.get_events(minlatitude=39, maxlatitude=41, includeallorigins=False)
 
     expected = qml.Catalog(
-        resource_id=cat.resource_id, # a random hash I can't predict
-        creation_info=cat.creation_info, # a specific time I can't predict
+        resource_id=cat.resource_id, # a random hash I can't predict, so I just make them match
+        creation_info=cat.creation_info, # a specific time I can't predict, so I just make them match
         events=[
             qml.Event(
                 resource_id=qml.ResourceIdentifier('smi:local/event/event.evid=2'),
