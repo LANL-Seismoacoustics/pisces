@@ -81,25 +81,31 @@ def test_filter_events_origin(session):
     assert observed.statement.compare(expected.statement)
 
 
-def test_filter_events_event(session, eventdata):
+def test_filter_events_event(session):
     """ Tests only on the Event table. """
-    d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Event)
 
     # evname, with two different kinds of wildcard
-    r = events.filter_events(q, evname='*important%').order_by(Event.evid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['event1']
+    observed = events.filter_events(q, evname='*important%', asquery=True)
+    expected = (
+        session.query(Event)
+               .filter(Event.evname.like('%important%'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # evids
-    r = events.filter_events(q, evid=[2]).order_by(Event.evid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['event2']
+    # r = events.filter_events(q, evid=[2]).order_by(Event.evid).all()
+    # assert (
+    #     len(r) == 1 and
+    #     r[0] == d['event2']
+    # )
+    observed = events.filter_events(q, evid=[2], asquery=True)
+    expected = (
+        session.query(Event)
+               .filter(Event.evid.in_([2]))
     )
+    assert observed.statement.compare(expected.statement)
 
 
 def test_filter_events_origin_event(session, eventdata):
