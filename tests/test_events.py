@@ -20,7 +20,6 @@ time_ = UTCDateTime('2000-01-01').timestamp
 
 def test_filter_events_origin(session):
     """ Tests only on the Origin table. """
-    d, lat, lon, depth, time_ = eventdata
 
     q = session.query(Origin)
 
@@ -31,51 +30,55 @@ def test_filter_events_origin(session):
     # assert str(expected) == str(observed)
 
     # full region
-    r = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2), asquery=True)
+    expected = (
+        session.query(Origin)
+               .filter(Origin.lon.between(lon-2, lon+2))
+               .filter(Origin.lat.between(lat-2, lat+2))
     )
+    assert observed.statement.compare(expected.statement)
 
     # partial region
-    r = events.filter_events(q, region=(None, lon, None, lat)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin3']
+    observed = events.filter_events(q, region=(None, lon, None, lat), asquery=True)
+    expected = (
+        session.query(Origin)
+               .filter(Origin.lon <= lon)
+               .filter(Origin.lat <= lat)
     )
+    assert observed.statement.compare(expected.statement)
     # TODO: a region that spans the meridian
 
     # depth
-    r = events.filter_events(q, depth=(depth-6, depth-4)).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin3']
+    observed = events.filter_events(q, depth=(depth-6, depth-4), asquery=True)
+    expected = (
+            session.query(Origin)
+                   .filter(Origin.depth.between(depth-6, depth-4))
     )
+    assert observed.statement.compare(expected.statement)
 
     # orid list
-    r = events.filter_events(q, orid=[1, 2]).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, orid=[1, 2], asquery=True)
+    expected = (
+        session.query(Origin)
+               .filter(Origin.orid.in_([1, 2]))
     )
+    assert observed.statement.compare(expected.statement)
 
     # time
-    r = events.filter_events(q, times=(time_-2, time_+2)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, times=(time_-2, time_+2), asquery=True)
+    expected = (
+        session.query(Origin)
+               .filter(Origin.time.between(time_-2, time_+2))
     )
+    assert observed.statement.compare(expected.statement)
 
     # auth
-    r = events.filter_events(q, auth='auth2').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin3']
+    observed = events.filter_events(q, auth='auth2', asquery=True)
+    expected = (
+        session.query(Origin)
+               .filter(Origin.auth.like('auth2'))
     )
+    assert observed.statement.compare(expected.statement)
 
 
 def test_filter_events_event(session, eventdata):
@@ -271,7 +274,7 @@ def test_filter_arrivals(session, eventdata):
     pass
 
 
-# TODO: Add more "integration" tests eventually
+# TODO: Add more "integration" tests
 def test_filter_events_magnitudes(session, eventdata):
     """ Test passing the results of filter_events to filter_magnitudes. """
     d, lat, lon, depth, time_ = eventdata
