@@ -21,14 +21,6 @@ from .catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 
-# client = DBClient(session_or_config_or_URI, **tables)
-# get network-level info for stations containing BH? in a region.
-# returns joined sitechan, site, affil, and network
-# q = client.stations(region=[W, E, S, N], channels='BH?').networks(pref_nets=('II','IU','ISC'))
-# get responses for all BH? stations in II
-# q = client.networks(networks=['II']).stations(channels='BH?').responses()
-# q = client.events(region=[W, E, S, N], prefor=True).magnitudes(mb=(3, 4)).arrivals(phase='P,S', auth='LANL*')
-# res = q.all()
 
 
 def _None_if_none(*values):
