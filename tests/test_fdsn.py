@@ -22,42 +22,7 @@ from pisces.fdsn import Client
 import pytest
 
 
-
-
-@pytest.fixture(scope='session')
-def engine():
-    return create_engine('sqlite://')
-
-
-@pytest.fixture(scope='session')
-def tables(engine):
-    kb.Site.metadata.create_all(engine) # use the MetaData from any table
-    yield
-    kb.Site.metadata.drop_all(engine)
-
-
-@pytest.fixture
-def dbsession(engine, tables):
-    """Returns an sqlalchemy session, and after the test tears down everything properly."""
-    connection = engine.connect()
-    # begin the nested transaction
-    transaction = connection.begin()
-    # use the connection with the already started transaction
-    session = Session(bind=connection)
-
-    yield session
-
-    session.close()
-    # roll back the broader transaction
-    transaction.rollback()
-    # put back the connection to the connection pool
-    connection.close()
-
-
-# the "dbsession" test fixture allows your test function to get a clean session
-# to an in-memory sqlite database.  You can add test data to it inside your test
-# function, and the database will be clean for other tests when the test exits.
-
+# TODO: use eventdata fixture instead of creating it here?
 def test_get_events_defaults(dbsession):
     origin = kb.Origin(orid=1, evid=2, lat=40, lon=123, time=0, depth=5)
     origin2 = kb.Origin(orid=2, evid=1, lat=42, lon=123)
@@ -68,8 +33,8 @@ def test_get_events_defaults(dbsession):
     dbsession.commit()
 
     client = Client(dbsession, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
-    cat = client.get_events(minlatitude=39, maxlatitude=41, includeallorigins=False)
 
+    cat = client.get_events(minlatitude=39, maxlatitude=41, includeallorigins=False)
     expected = qml.Catalog(
         resource_id=cat.resource_id, # a random hash I can't predict, so I just make them match
         creation_info=cat.creation_info, # a specific time I can't predict, so I just make them match
@@ -103,7 +68,6 @@ def test_get_events_defaults(dbsession):
     assert cat == expected
 
     cat = client.get_events(eventid='2')
-
     assert cat == expected
 
 
