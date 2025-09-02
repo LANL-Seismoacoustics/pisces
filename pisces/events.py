@@ -215,7 +215,9 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
     ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5), netmag=Netmag)
 
     """
-    # XXX: if wildcards and only Origin is present, it should/will fail b/c it'll interpret 'm?', for example, as a non-Origin magtype and want to apply the filter to a different table.
+    # XXX: if wildcards and only Origin is present, it should/will fail b/c
+    # it'll interpret 'm?', for example, as a non-Origin magtype and want to
+    # apply the filter to a different table.
     Event, Origin, Netmag, Stamag = _get_entities(query, "Event", "Origin", "Netmag", "Stamag")
 
     # override if provided
@@ -224,10 +226,10 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
     Netmag = magnitudes_and_tables.pop("netmag", None) or Netmag
     Stamag = magnitudes_and_tables.pop("stamag", None) or Stamag
 
-    # assumes no extraneous tables/keywords were provided, and all relevent ones are popped off
+    # XXX: assumes no keywords were provided, and all relevent ones are popped off
     magnitudes = magnitudes_and_tables  # for readability/intent
     magtypes = {mag.lower() for mag in magnitudes}
-    nonorigin_magtypes = magtypes - {"mb", "ml", "ms"}
+    nonorigin_magtypes = magtypes - {"mb", "ml", "ms"} # magtypes not in Origin table
 
     # avoid nonsense inputs
     if sta and not Stamag:
@@ -336,14 +338,17 @@ def filter_arrivals(query, sta=None, auth=None, times=None, orid=None, phase=Non
     Assoc = tables.get("assoc", None) or Assoc
 
     # avoid nonsense inputs
-    if not any([Arrival, Assoc]):
+    # if not any([Arrival, Assoc]):
+    if not (Arrival or Assoc):
         msg = "Arrival or Assoc table required."
         raise ValueError(msg)
 
-    if any([times, auth]) and not Arrival:
+    # if any([times, auth]) and not Arrival:
+    if (times or auth) and not Arrival:
         msg = "Arrival table required for 'times' and 'auth' parameters."
         raise ValueError(msg)
 
+    # why did I subset orid in Assoc if Origin is required?  did I join it?
     if orid and not Assoc:
         msg = "Assoc table required for 'orid' parameter."
         raise ValueError(msg)
