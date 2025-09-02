@@ -229,7 +229,7 @@ class Client(object):
             Specify if all origins for the event should be included. Default is False,
             which returns the preferred origin only and requires the Origin and Event table.
         includeallmagnitudes : bool, optional [ignored]
-            KB Core has no concept of a preferred magnitude, so all magnitudes are always returned
+            KB Core has no concept of a preferred magnitude, so all network magnitudes are returned
             (i.e. always True). If more refined magnitudes are desired, users are
             recommended to also specify a magnitudetype and/or contributor.
         includearrivals : bool, optional [Assoc, Arrival]
@@ -277,25 +277,21 @@ class Client(object):
         """
         try:
             Origin = self.tables["origin"]
-            Netmag = self.tables["netmag"]
-            Event = self.tables["event"]
+            Event = self.tables["event"] # needed for QuakeML output
+            Netmag = self.tables["netmag"] # needed b/c includeallmagnitudes is always true
         except KeyError:
-            # XXX: why is Netmag required?
             msg = "Event, Origin, and Netmag tables required."
             raise ValueError(msg)
 
-        # Stamag = self.tables.get("stamag", None)
         Arrival = self.tables.get("arrival", None)
         Assoc = self.tables.get("assoc", None)
+        # Stamag = self.tables.get("stamag", None)
 
         # characterize which inputs were provided
         timeparams = any([starttime, endtime])
         boxparams = any([minlongitude, maxlongitude, minlatitude, maxlatitude])
         radialparams = any([latitude, longitude, minradius, maxradius])
         magparams = any([minmagnitude, maxmagnitude, magnitudetype])
-
-        # check which optional tables we need
-        useArrival = includearrivals
 
         # check for nonsense inputs
         if eventid and (magparams or boxparams or radialparams or timeparams):
@@ -306,7 +302,9 @@ class Client(object):
             msg = "Incompatible inputs: using both lat/lon and radius ranges not allowed"
             raise ValueError(msg)
 
-        if useArrival and (not Arrival or not Assoc):
+        # TODO: Are some of these checks already in the respective 
+        #   filter_[events, arrivals, magnitudes] functions?
+        if includearrivals and (not Arrival or not Assoc):
             msg = "Arrival and Assoc tables required for includeallarrivals."
             raise ValueError(msg)
 
@@ -353,20 +351,19 @@ class Client(object):
                                   auth=auth,
                                   etype=etype,
         )
-        # [(event, origin, netmag)]
+        # [(event, origin)] expected structure
 
         if updatedafter:
             qe = qe.filter(Origin.lddate > updatedafter)
 
-        # magnitude stuff
-        # return all magnitudes...
+        # includeallmagnitudes is always true, so return all magnitudes
+        # joins with Netmag even if magnitudes is empty, so no "if" clause
         qm = qe.add_entity(Netmag)
-        if magnitudes:
-            # ...unless certain ones were specified
-            qm = events.filter_magnitudes(qm, **magnitudes)
+        qm = events.filter_magnitudes(qm, **magnitudes) 
+        # [(event, origin, netmag)] expected structure
 
         # arrival stuff
-        if useArrival:
+        if includearrivals:
             # unfortunately, produces a cartesian join with netmags, resulting in repeated
             # events, origins, netmags for each arrival/origin
             qa = qe.add_entity(Assoc).add_entity(Arrival)
