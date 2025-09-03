@@ -7,3 +7,4 @@ __pycache__
 apidocs
 .session.vim
 pyrightconfig.json
+pisces.egg-info
