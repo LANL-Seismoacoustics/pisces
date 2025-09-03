@@ -92,41 +92,6 @@ def get_stations_data(session):
 
     session.commit()
 
-# for scope='module' these database rows are added to a temp database once for this whole file,
-# then removed at the end. Not sure that's necessary.
-@pytest.fixture(scope='module')
-def eventdata(session):
-    lat = 40
-    lon = 25
-    depth = 15
-    time_ = UTCDateTime('2000-01-01').timestamp
-    # event stuff
-    data = {
-        'event1': Event(evid=1, prefor=1, evname='an important description'),
-        'origin1': Origin(orid=1, evid=1, lat=lat, lon=lon, depth=depth, time=time_, auth='auth1', mb=4.1, mbid=1, ms=5, ml=6, mlid=2),
-        'origin2': Origin(orid=2, evid=1, lat=lat+1, lon=lon+1, depth=depth+1, time=time_+1, ml=5),
-        'event2': Event(evid=2, prefor=3, evname='another description'),
-        'origin3': Origin(orid=3, evid=2, lat=lat-5, lon=lon-5, depth=depth-5, time=time_-5, etype='ex', auth='auth2', mb=2, ms=3, ml=4),
-    }
-    # magnitude stuff
-    data.update({
-        'netmag1': Netmag(net='IM', orid=1, evid=1, magtype='mb', magnitude=4, magid=1, auth='ISC'),
-        'netmag2': Netmag(net='IN', orid=2, evid=1, magtype='ml', magnitude=6, magid=2, auth='ISD'),
-        'netmag3': Netmag(net='IO', orid=1, evid=1, magtype='mw', magnitude=4, magid=3, auth='ISC'),
-        'stamag1': Stamag(sta='sta1', arid=1, magtype='ml', magnitude=4.1, magid=2, orid=1, auth='ISD'),
-        'stamag2': Stamag(sta='sta2', arid=2, magtype='ml', magnitude=3.9, magid=2, orid=2, auth='ISD'),
-        'stamag3': Stamag(sta='sta1', arid=3, magtype='mb', magnitude=3.9, magid=1, orid=1, auth='ISE'),
-    })
-
-    session.add_all(list(data.values()))
-    session.commit()
-
-    yield data, lat, lon, depth, time_
-
-    for item in data.values():
-        session.delete(item)
-
-    session.commit()
 
 # TODO: these are fixtures from test_fdsn that should be refactored here to avoid redundancy
 @pytest.fixture(scope='session')
