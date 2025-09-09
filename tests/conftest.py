@@ -109,6 +109,7 @@ def tables(engine):
 # the "dbsession" test fixture allows your test function to get a clean session
 # to an in-memory sqlite database.  You can add test data to it inside your test
 # function, and the database will be clean for other tests when the test exits.
+# TODO: use the "session" fixture instead
 @pytest.fixture
 def dbsession(engine, tables):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
@@ -132,7 +133,7 @@ def dbsession(engine, tables):
 # - a station with multiple site entries in one network (IU ANMO)
 # - a station with multiple network affiliations (IU|SR ANMO)
 pytest.fixture(scope='module')
-def testdata(session):
+def stationdata(session):
     data = {}
     ## 1. site Table
     data['site'] = dict(
@@ -183,6 +184,21 @@ def testdata(session):
         ISM_KDAK=Affiliation(net='IMS', sta='KDAK', time=1262304000.00000, endtime=1893456000.00000),
         AFTAC_COLA=Affiliation(net='AFTAC', sta='COLA', time=1262304000.00000, endtime=1893456000.00000),
     )
+    for table in data:
+        session.add_all(data[table].values())
+        session.commit()
+
+    yield session, data
+
+    for table in data:
+        for row in data[table].values():
+            session.delete(row)
+        session.commit()
+
+
+@pytest.fixture(scope='module')
+def eventdata(session):
+    data = {}
     ## 7. event Table
     data['event'] = dict(
         evid1001=Event(evid=1001, evname='NEVADA TEST 1', prefor=1, auth='USGS', commid=5),
@@ -194,11 +210,11 @@ def testdata(session):
     ## 8. origin Table
     # INSERT INTO origin (lat, lon, depth, time, orid, evid, jdate, nass, ndef, ndp, grn, srn, etype, depdp, dtype, mb, mbid, ms, msid, ml, mlid, algorithm, auth, commid, lddate) VALUES
     data['origin'] = dict(
-        orid1=Origin(lat=37.1166, lon=-116.0463, depth=0.5, time=1609459200.00000, orid=1, evid=1001, jdate=2021001, nass=8, ndef=15, ndp=5, grn=123, srn=45, etype='ex', depdp=0.5, dtype='F', mb=5.2, mbid=1, ms=5.5, msid=2, ml=5.3, mlid=3, algorightm='locsat', auth='USGS', commid=10),
-        orid2=Origin(lat=34.9459, lon=-106.4572, depth=10.2, time=1609545600.00000, orid=2, evid=1002, jdate=2021002, nass=6, ndef=12, ndp=4, grn=124, srn=46, etype='qt', depdp=10.2, dtype='F', mb=4.8, mbid=4, ms=5.0, msid=5, ml=4.9, mlid=6, algorightm='locsat', auth='USGS', commid=11),
-        orid3=Origin(lat=61.4478, lon=-149.7328, depth=15.3, time=1609632000.00000, orid=3, evid=1003, jdate=2021003, nass=7, ndef=14, ndp=6, grn=125, srn=47, etype='qt', depdp=15.3, dtype='F', mb=6.1, mbid=7, ms=6.3, msid=8, ml=6.2, mlid=9, algorightm='locsat', auth='AEC', commid=12),
-        orid4=Origin(lat=19.4075, lon=-155.2833, depth=3.1, time=1609718400.00000, orid=4, evid=1004, jdate=2021004, nass=5, ndef=10, ndp=3, grn=126, srn=48, etype='qp', depdp=3.1, dtype='F', mb=4.2, mbid=10, ms=4.5, msid=11, ml=4.3, mlid=12, algorightm='locsat', auth='HVO', commid=13),
-        orid5=Origin(lat=37.7749, lon=-122.4194, depth=8.7, time=1609804800.00000, orid=5, evid=1005, jdate=2021005, nass=9, ndef=18, ndp=7, grn=127, srn=49, etype='qt', depdp=8.7, dtype='F', mb=5.8, mbid=13, ms=6.0, msid=14, ml=5.9, mlid=15, algorightm='locsat', auth='USGS', commid=14),
+        orid1=Origin(lat=37.1166, lon=-116.0463, depth=0.5, time=1609459200.00000, orid=1, evid=1001, jdate=2021001, nass=8, ndef=15, ndp=5, grn=123, srn=45, etype='ex', depdp=0.5, dtype='F', mb=5.2, mbid=1, ms=5.5, msid=2, ml=5.3, mlid=3, algorithm='locsat', auth='USGS', commid=10),
+        orid2=Origin(lat=34.9459, lon=-106.4572, depth=10.2, time=1609545600.00000, orid=2, evid=1002, jdate=2021002, nass=6, ndef=12, ndp=4, grn=124, srn=46, etype='qt', depdp=10.2, dtype='F', mb=4.8, mbid=4, ms=5.0, msid=5, ml=4.9, mlid=6, algorithm='locsat', auth='USGS', commid=11),
+        orid3=Origin(lat=61.4478, lon=-149.7328, depth=15.3, time=1609632000.00000, orid=3, evid=1003, jdate=2021003, nass=7, ndef=14, ndp=6, grn=125, srn=47, etype='qt', depdp=15.3, dtype='F', mb=6.1, mbid=7, ms=6.3, msid=8, ml=6.2, mlid=9, algorithm='locsat', auth='AEC', commid=12),
+        orid4=Origin(lat=19.4075, lon=-155.2833, depth=3.1, time=1609718400.00000, orid=4, evid=1004, jdate=2021004, nass=5, ndef=10, ndp=3, grn=126, srn=48, etype='qp', depdp=3.1, dtype='F', mb=4.2, mbid=10, ms=4.5, msid=11, ml=4.3, mlid=12, algorithm='locsat', auth='HVO', commid=13),
+        orid5=Origin(lat=37.7749, lon=-122.4194, depth=8.7, time=1609804800.00000, orid=5, evid=1005, jdate=2021005, nass=9, ndef=18, ndp=7, grn=127, srn=49, etype='qt', depdp=8.7, dtype='F', mb=5.8, mbid=13, ms=6.0, msid=14, ml=5.9, mlid=15, algorithm='locsat', auth='USGS', commid=14),
     )
     ## 9. origerr Table
     data['origerr'] = dict(
@@ -247,6 +263,21 @@ def testdata(session):
         ampid5=Stamag(magid=7, ampid=5, sta='KDAK', arid=5, orid=3, evid=1003, phase='P', delta=1.20, magtype='mb', magnitude=6.20, uncertainty=0.14, magres=0.10, magdef='d', mmodel='veith', auth='AEC', commid=45),
         ampid6=Stamag(magid=7, ampid=6, sta='COLA', arid=6, orid=3, evid=1003, phase='P', delta=0.80, magtype='mb', magnitude=6.00, uncertainty=0.11, magres=-0.10, magdef='d', mmodel='veith', auth='AEC', commid=46),
     )
+    for table in data:
+        session.add_all(data[table].values())
+        session.commit()
+
+    yield session, data
+
+    for table in data:
+        for row in data[table].values():
+            session.delete(row)
+        session.commit()
+
+
+@pytest.fixture(scope='module')
+def wavedata(session):
+    data = {}
     ## 14. wfdisc Table
     data['wfdisc'] = dict(
         wfid1=Wfdisc(sta='ANMO', chan='BHZ', time=1609459200.00000, wfid=1, chanid=1, jdate=2021001, endtime=1609459500.00000, nsamp=12000, samprate=40.0000000, calib=1.000000, calper=1.000000, instype='STS-2', segtype='o', datatype='s4', clip='n', dir='/data/ANMO/2021/', dfile='ANMO_BHZ_20210101.w', foff=0, commid=47),
