@@ -982,13 +982,3 @@ def distance_filter(
     """
     pass
 
-
-def dtree():
-    """
-    A dictionary tree that doesn't require you to explicitly create subdictionaries
-    before assigning to them ("autovivication").
-
-    source: https://gist.github.com/hrldcpr/2012250
-
-    """
-    return defaultdict(dtree)
