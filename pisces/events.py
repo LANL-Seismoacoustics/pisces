@@ -171,27 +171,25 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
     net : str or list of str [Netmag]
         Network code, wildcards allowed. Requires Netmag.
     sta : str or list of str [Stamag]
-        Station code, wildcards allowed.  Requies Stamag.
+        Station code, wildcards allowed.  Requires Stamag.
     auth : str or list of str [Stamag > Netmag > Origin]
-        Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided.
+        Magnitude author, wildcards allowed.  Applied to lowest-granularity table provided
+        (i.e. Stamag has highest priority).
     **magnitudes_and_tables : [Stamag > Netmag > Origin]
-        Magnitudes
-        Specify the `magtype=(min|None, max|None)` values for the filter as keyword, 2-tuple pairs,
-        e.g. `mb=(3.5, 5.5)`. One special magtype is recognized: `all=(min|None, max|None)` will
-        constrain and return all magnitudes. If no range values are provided (e.g. mw=(None, None)),
-        all rows with that magtype are returned. Using `all=(None, None)` is the same as providing
-        no filter at all. [not yet implemented] Magnitude filters are applied to tables in the
-        following priority: Stamag, Netmag, Origin Wildcards are accepted, but they must be provided
-        as an expanded dict, like:
+        Magnitudes: Specify the `magtype=(min|None, max|None)` values for the filter as keyword,
+        2-tuple pairs, e.g. `mb=(3.5, 5.5)`. One special magtype is recognized: `all=(min|None,
+        max|None)` will constrain and return all magnitudes. If no range values are provided (e.g.
+        mw=(None, None)), all rows with that magtype are returned. Using `all=(None, None)` is the
+        same as providing no filter at all. [not yet implemented] Magnitude filters are applied to
+        tables in the following priority: Stamag, Netmag, Origin Wildcards are accepted, but they
+        must be provided as an expanded dict, like:
         >>> query = query_magnitudes(query, **{'mb': (3, 4), 'mw*': (4, 5.5), 'stamag': Stamag})
 
-        Tables
-        If a required ORM table isn't in the SELECT of your query, you can provide it here as a
-        keyword argument (e.g. netmag=Netmag). If provided in this way, it won't be returned in the
-        result set but is instead just used to filter the result set for the incoming query.
-        If you wish a table to be included in the result set, use the
-        `sqlalchemy.orm.Query.add_entity` method prior to calling this function.
-        e.g. `q = q.add_entity(Stamag)`
+        Tables: If a required ORM table isn't in the SELECT of your query, you can provide it here
+        as a keyword argument (e.g. netmag=Netmag). If provided in this way, it won't be returned in
+        the result set but is instead just used to filter the result set for the incoming query. If
+        you wish a table to be included in the result set, use the `sqlalchemy.orm.Query.add_entity`
+        method prior to calling this function. e.g. `q = q.add_entity(Stamag)`
 
     Joins
     -----
@@ -211,8 +209,15 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
     >>> try:
     ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5))
     ... except ValueError:
-    ...     # Netmag table should've been included, so provide it now.
+    ...     # needed Netmag table, so provide it now.
     ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5), netmag=Netmag)
+    ...     # or
+    ...     q.add_entity(Netmag)
+    ...     q = events.filter_magnitudes(q, mLg=(2.5, 3.5), mw=(4.0, 6.5))
+
+    Get any magnitude between 3 and 5
+    >>> q = session.query(Origin, Netmag)
+    >>> q = events.filter_magnitudes(q, 'all'=(3, 5))
 
     """
     # XXX: if wildcards and only Origin is present, it should/will fail b/c
@@ -229,7 +234,9 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
     # XXX: assumes no keywords were provided, and all relevent ones are popped off
     magnitudes = magnitudes_and_tables  # for readability/intent
     magtypes = {mag.lower() for mag in magnitudes}
-    nonorigin_magtypes = magtypes - {"mb", "ml", "ms"} # magtypes not in Origin table
+    # magtypes in Origin table
+    origin_magtypes = {"mb", "ml", "ms"}
+    nonorigin_magtypes = magtypes - origin_magtypes
 
     # avoid nonsense inputs
     if sta and not Stamag:
@@ -271,7 +278,7 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
             query = query.filter(or_(*[Stamag.sta.like(sta) for sta in stas]))
         for magtype, (magmin, magmax) in magnitudes.items():
             magtype = make_wildcard_list(magtype)[0]
-            type_filt = Stamag.magtype.like(magtype)
+            type_filt = Stamag.magtype.like(magtype) if magtype != 'all' else True # hope True is a filter that always passes
             range_filts = range_filters((Stamag.magnitude, magmin, magmax))
             if range_filts:
                 magfilters.append(and_(type_filt, range_filts[0]))
@@ -285,7 +292,7 @@ def filter_magnitudes(query, net=None, sta=None, auth=None, **magnitudes_and_tab
             query = query.filter(or_(*[Netmag.net.like(net) for net in nets]))
         for magtype, (magmin, magmax) in magnitudes.items():
             magtype = make_wildcard_list(magtype)[0]
-            type_filt = Netmag.magtype.like(magtype)
+            type_filt = Netmag.magtype.like(magtype) if magtype != 'all' else True
             range_filts = range_filters((Netmag.magnitude, magmin, magmax))
             if range_filts:
                 magfilters.append(and_(type_filt, range_filts[0]))
@@ -334,6 +341,7 @@ def filter_arrivals(query, sta=None, auth=None, times=None, orid=None, phase=Non
     Origin, Arrival, Assoc = _get_entities(query, 'Origin', 'Arrival', 'Assoc')
 
     # override if provided
+    # TODO: These should be required tables, right?
     Arrival = tables.get("arrival", None) or Arrival
     Assoc = tables.get("assoc", None) or Assoc
 
