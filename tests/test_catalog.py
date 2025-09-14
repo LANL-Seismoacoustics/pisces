@@ -4,8 +4,6 @@ from obspy import UTCDateTime
 import pisces as ps
 import pisces.tables.kbcore as kb
 import pisces.catalog as cat
-import resource
-from pkg_resources import resource_isdir
 
 resource_prefix='smi:local'
 qgen = cat.QMLGenerator(resource_prefix=resource_prefix)
@@ -79,74 +77,11 @@ def test_qmltree(eventdata):
     assert observed == expected
 
 
-def test_catalog(eventdata):
+def test_catalog(eventdata, eventqml):
     session, data = eventdata
+    expected = eventqml
 
     event1001 = data['event']['evid1001']
-    origin1 = data['origin']['orid1']
-    netmag1 = data['netmag']['magid1']
-    netmag2 = data['netmag']['magid2']
-    netmag3 = data['netmag']['magid3']
-
-    qorigin1 = qml.Origin(
-        resource_id=qml.ResourceIdentifier(
-            id=f'{resource_prefix}/origin/origin.orid={origin1.orid}'),
-        time=UTCDateTime(origin1.time),
-        longitude=origin1.lon,
-        latitude=origin1.lat,
-        depth=origin1.depth,
-    )
-    qmag1 = qml.Magnitude(
-        resource_id=qml.ResourceIdentifier(
-                id=f'{resource_prefix}/magnitude/netmag.magid={netmag1.magid}'
-            ),
-        mag=netmag1.magnitude,
-        magnitude_type=netmag1.magtype,
-        station_count=netmag1.nsta,
-        origin_id=qorigin1.resource_id,
-    )
-    qmag2 = qml.Magnitude(
-        resource_id=qml.ResourceIdentifier(
-                id=f'{resource_prefix}/magnitude/netmag.magid={netmag2.magid}'
-            ),
-        mag=netmag2.magnitude,
-        magnitude_type=netmag2.magtype,
-        station_count=netmag2.nsta,
-        origin_id=qorigin1.resource_id,
-    )
-    qmag3 = qml.Magnitude(
-        resource_id=qml.ResourceIdentifier(
-                id=f'{resource_prefix}/magnitude/netmag.magid={netmag3.magid}'
-            ),
-        mag=netmag3.magnitude,
-        magnitude_type=netmag3.magtype,
-        station_count=netmag3.nsta,
-        origin_id=qorigin1.resource_id,
-    )
-    qevent = qml.Event(
-        resource_id=qml.ResourceIdentifier(
-            id=f'{resource_prefix}/event/event.evid={event1001.evid}'
-        ),
-        creation_info=qml.CreationInfo(author=event1001.auth),
-        description=qml.EventDescription(
-            text=event1001.evname, type="earthquake name"),
-        origins=[qorigin1],
-        magnitudes=[qmag1, qmag2, qmag3],
-        # amplitudes=None,
-        preferred_origin_id=qorigin1.resource_id,
-        event_type="explosion",
-    )
-    expected = qml.Catalog(
-        creation_info=qml.CreationInfo(
-            author=f'Pisces v{ps.__version__}',
-            creation_time=UTCDateTime()
-        ),
-        resource_id=qml.ResourceIdentifier(
-            prefix=f'{resource_prefix}/catalog'
-        ),  # uses a uuid after prefix
-        description='A test catalog',
-        events = [qevent],
-    )
 
     query = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
