@@ -416,8 +416,7 @@ class Client(object):
         if asquery:
             result = q
         else:
-            queries = [q for q in [qm, qa] if q]
-            result = catalog(*queries)
+            result = catalog(q)
 
         return result
 
