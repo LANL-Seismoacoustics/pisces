@@ -16,7 +16,7 @@ with open('README.md') as readme:
 doclines = __doc__.split("\n")
 
 setup(name='pisces',
-      version='0.4.3',
+      version='0.4.5',
       description='A Practical Seismological Database Library in Python.',
       long_description=long_description,
       long_description_content_type="text/markdown", # setuptools >= 38.6.0
@@ -27,7 +27,7 @@ setup(name='pisces',
       url='https://github.com/LANL-Seismoacoustics/pisces',
       download_url='https://github.com/LANL-Seismoacoustics/pisces/tarball/0.4.2',
       keywords = ['seismology', 'geophysics', 'database'],
-      install_requires=['numpy','obspy>=1.0','sqlalchemy>=1.4','Click'],
+      install_requires=['numpy','obspy>=1.4.1','sqlalchemy>=1.4','Click'],
       extras_require={
          'e1': ["e1"],
       },
