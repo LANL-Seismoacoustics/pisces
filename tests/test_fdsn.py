@@ -66,8 +66,7 @@ def test_get_events_misc(session):
                .filter(kb.Netmag.evid == kb.Event.evid)
                .filter(kb.Netmag.orid == kb.Origin.orid)
     )
-    assert literal_sql(observed) == literal_sql(expected)
-    # assert observed.statement.compare(expected.statement)
+    assert observed.statement.compare(expected.statement)
 
 
 def test_get_events_magnitudes(session):

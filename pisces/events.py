@@ -55,8 +55,9 @@ def filter_events(
         Produces an equality clause.
     evname : str [Event]
         Produces a CONTAINS clause (looks for input as a substring).
-    etype : str [Origin]
-        Two-character event type.  Produces an equality clause.
+    etype : str or iterable of str [Origin]
+        Two-character KBCore event type(s).  Produces an == clause if it's a string, an "IN" clause
+        if it's a list or tuple.
     **tables :
         If a required table isn't in the SELECT of your query, you can provide it
         here as a keyword argument (e.g. event=Event).  It gets used in the filter,
@@ -149,7 +150,9 @@ def filter_events(
     filters = range_filters(*range_restr)
     query = query.filter(*filters)
 
-    if etype:
+    if isinstance(etype, (list, tuple)):
+        query = query.filter(Origin.etype.in_(etype))
+    elif isinstance(etype, str):
         query = query.filter(Origin.etype == etype)
 
     return query

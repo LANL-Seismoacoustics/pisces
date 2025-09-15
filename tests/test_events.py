@@ -82,6 +82,21 @@ def test_filter_events_origin(session):
     )
     assert observed.statement.compare(expected.statement)
 
+    # etype
+    observed = events.filter_events(q, etype='ex')
+    expected = (
+        session.query(Origin)
+               .filter(Origin.etype == 'ex')
+    )
+    assert observed.statement.compare(expected.statement)
+
+    observed = events.filter_events(q, etype=['ex', 'eq'])
+    expected = (
+        session.query(Origin)
+               .filter(Origin.etype.in_(['ex', 'eq']))
+    )
+    assert observed.statement.compare(expected.statement)
+
 
 def test_filter_events_event(session):
     """ Tests only on the Event table. """

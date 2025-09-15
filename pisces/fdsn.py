@@ -77,7 +77,10 @@ def _etype(eventtype):
     for e in eventtype.split(','):
         ietypes = KBCORE_EVENT_TYPE.get(e, e).split(',')
         etype_set.update({*ietypes})
-    etype = ','.join(etype_set)  # rejoin the unique set with commas
+    # etype = ','.join(etype_set)  # rejoin the unique set with commas
+    etype = sorted(etype_set)  # rejoin the unique set with commas, predictable order for tests
+
+    return etype[0] if len(etype) == 1 else etype
 
 
 def _evid_list(eventid):
