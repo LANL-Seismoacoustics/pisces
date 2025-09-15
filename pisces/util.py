@@ -844,19 +844,13 @@ def string_expression(selectable, string_filters):
     return expression
 
 
-def literal_sql(engine, statement_or_query):
+def literal_sql(query):
     # https://stackoverflow.com/questions/5631078/sqlalchemy-print-the-actual-query
-    try:
-        # it's a query
-        statement = statement_or_query.statement
-    except AttributeError:
-        # it was already a statement
-        statement = statement_or_query
 
-    sql = str(statement.compile(engine,
-              compile_kwargs={'literal_binds': True}))
+    sql = query.statement.compile(compile_kwargs={'literal_binds': True})
 
-    return sql
+    return str(sql)
+
 
 def _get_entities(query, *requested_classes):
     """
@@ -981,4 +975,3 @@ def distance_filter(
 
     """
     pass
-
