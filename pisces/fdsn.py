@@ -23,7 +23,6 @@ from pisces.catalog import KBCORE_EVENT_TYPE, catalog
 log = logging.getLogger(__name__)
 
 
-
 def _None_if_none(*values):
     return None if all([val is None for val in values]) else values
 
@@ -182,8 +181,8 @@ class Client(object):
         maxmagnitude: float = None,
         magnitudetype: str = None,
         eventtype: str = None,
-        includeallorigins: bool = None,
-        includearrivals: bool = None,
+        includeallorigins: bool = True,
+        includearrivals: bool = False,
         eventid: str = None,
         limit: int = None,
         offset: int = None,
@@ -349,7 +348,7 @@ class Client(object):
             msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
             raise ValueError(msg)
 
-        if eventtype and (eventtype.lower() not in EventType):
+        if eventtype and any([e.lower() not in EventType for e in eventtype.split(',')]):
             msg = f"eventtype '{eventtype}' not recognized.  choose from {list(KBCORE_EVENT_TYPE.keys())}"
             raise ValueError(msg)
 
