@@ -1,4 +1,3 @@
-from pisces.schema.css3 import magtype
 """
 Tests for fdsn module
 
@@ -12,9 +11,7 @@ import tempfile
 
 import numpy as np
 from obspy import UTCDateTime
-import obspy.core.event as qml
 
-import pisces as ps
 import pisces.tables.kbcore as kb
 from pisces.fdsn import Client
 from pisces.util import literal_sql
