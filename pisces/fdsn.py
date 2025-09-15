@@ -65,6 +65,41 @@ def origins_to_fdsntext(origins, header=False):
 
     return os.linesep.join(out)
 
+def _etype(eventtype):
+    """ Convert QML eventtype string to KBCore etype string.
+
+    Both input and output may be comma-separated.
+    Input may contain duplicate eventtypes, but output contains no duplicate etypes.
+
+    """
+    # may be multiple eventtypes, which may correspond to multiple KB Core etypes
+    etype_set = set()
+    for e in eventtype.split(','):
+        ietypes = KBCORE_EVENT_TYPE.get(e, e).split(',')
+        etype_set.update({*ietypes})
+    etype = ','.join(etype_set)  # rejoin the unique set with commas
+
+
+def _evid_list(eventid):
+    """ Turn (possibly comma-separated) string event IDs into integer evid list.
+
+    Raises
+    ------
+    TypeError : input must be {int, str, list, tuple}
+
+    """
+    # py3.10+
+    match type(eventid):
+        case builtins.int:
+            evids = [eventid]
+        case builtins.str:
+            evids = [int(e) for e in eventid.split(",")]
+        case _:
+            msg = f"eventid must be an int, str, list, or tuple. received: {type(eventid)}."
+            raise TypeError(msg)
+
+    return evids
+
 
 class Client(object):
     """
@@ -325,18 +360,8 @@ class Client(object):
         magnitudetype = 'all' if magparams and not magnitudetype else magnitudetype
         magnitudes = {magnitudetype: (minmagnitude, maxmagnitude)} if magparams else {}
         auth = contributor
-        if eventtype:
-            # may be multiple eventtypes, which may correspond to multiple KB Core etypes
-            etype_set = {}
-            for e in eventtype.split(','):
-                ietypes = KBCORE_EVENT_TYPE.get(e, e).split(',')
-                etype_set.update({*ietypes})
-            etype = ','.join(etype_set) # rejoin the unique set with commas
-        else:
-            etype = None
-
-        # turn string event IDs into integer evid list
-        evid = [int(e) for e in eventid.split(",")] if eventid else None
+        etype = _etype(eventtype) if eventtype else None
+        evid = _evid_list(eventid) if eventid else None
 
         # build the query (finally)
 
