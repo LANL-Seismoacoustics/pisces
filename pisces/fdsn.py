@@ -3,21 +3,22 @@
 Pisces Client mirrors the ObsPy FDSN Client interface.
 
 """
+import builtins
 from functools import cached_property
 import logging
+import types
 import os
 import warnings
 
 import sqlalchemy as sa
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from obspy import Stream, UTCDateTime
+from obspy import UTCDateTime
 from obspy.core.event.header import EventType
 
 from pisces import events
 import pisces.request as req
 from pisces import util
-from .catalog import KBCORE_EVENT_TYPE, catalog
+from pisces.catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 
@@ -379,24 +380,23 @@ class Client(object):
         # [(event, origin)] expected structure
 
         if updatedafter:
-            qe = qe.filter(Origin.lddate > updatedafter)
+            q = q.filter(Origin.lddate > updatedafter)
 
         # includeallmagnitudes is always true, so return all magnitudes
         # joins with Netmag even if magnitudes is empty, so no "if" clause
-        qm = qe.add_entity(Netmag)
-        qm = events.filter_magnitudes(qm, **magnitudes) 
+        # TODO: add Stamag
+        # TODO: implement includeallmagnitudes=False and preferred_magnitudes kwarg
+        # TODO: implement 'all' magnitudetype
+        q = q.add_entity(Netmag)
+        q = events.filter_magnitudes(q, **magnitudes)
         # [(event, origin, netmag)] expected structure
 
         # arrival stuff
         if includearrivals:
-            # unfortunately, produces a cartesian join with netmags, resulting in repeated
-            # events, origins, netmags for each arrival/origin
-            qa = qe.add_entity(Assoc).add_entity(Arrival)
-            qa = events.filter_arrivals(qa)
-        else:
-            qa = None
-        # [(event, origin, netmag, assoc, arrival)]
-
+            # XXX: potential cartesian join with Netmag stuff
+            q = q.add_entity(Assoc).add_entity(Arrival)
+            q = events.filter_arrivals(q)
+            # [(event, origin, netmag, assoc, arrival)]
 
         # XXX: implement proper preferred origin sorting, limit, offset
         # if orderby == "time":
@@ -414,7 +414,7 @@ class Client(object):
         # q = q.offset(offset) if offset else q
 
         if asquery:
-            result = qm, qa
+            result = q
         else:
             queries = [q for q in [qm, qa] if q]
             result = catalog(*queries)
