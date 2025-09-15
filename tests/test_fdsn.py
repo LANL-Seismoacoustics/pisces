@@ -1,3 +1,4 @@
+from pisces.schema.css3 import magtype
 """
 Tests for fdsn module
 
@@ -12,63 +13,101 @@ import tempfile
 import numpy as np
 from obspy import UTCDateTime
 import obspy.core.event as qml
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
 
-import pisces.tables.css3 as css3
+import pisces as ps
 import pisces.tables.kbcore as kb
 from pisces.fdsn import Client
+from pisces.util import literal_sql
 
 import pytest
 
+def test_get_events_geographic(session):
+    """ Geographic tests """
+    client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
 
-# TODO: use eventdata fixture instead of creating it here?
-def test_get_events_defaults(dbsession):
-    origin = kb.Origin(orid=1, evid=2, lat=40, lon=123, time=0, depth=5)
-    origin2 = kb.Origin(orid=2, evid=1, lat=42, lon=123)
-    origin3 = kb.Origin(orid=3, evid=2, lat=40.5, lon=123)
-    event = kb.Event(evid=2, prefor=1)
-    netmag = kb.Netmag(evid=2, orid=1, magnitude=4, magtype='mb', magid=1)
-    dbsession.add_all([origin, origin2, event, netmag])
-    dbsession.commit()
-
-    client = Client(dbsession, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
-
-    cat = client.get_events(minlatitude=39, maxlatitude=41, includeallorigins=False)
-    expected = qml.Catalog(
-        resource_id=cat.resource_id, # a random hash I can't predict, so I just make them match
-        creation_info=cat.creation_info, # a specific time I can't predict, so I just make them match
-        events=[
-            qml.Event(
-                resource_id=qml.ResourceIdentifier('smi:local/event/event.evid=2'),
-                creation_info=qml.CreationInfo(author='-'),
-                event_type='not reported',
-                origins=[
-                    qml.Origin(
-                        resource_id=qml.ResourceIdentifier('smi:local/origin/origin.orid=1'),
-                        time=UTCDateTime(0),
-                        latitude=40.0,
-                        longitude=123,
-                        depth=5,
-                    ),
-                ],
-                magnitudes=[
-                    qml.Magnitude(
-                        resource_id=qml.ResourceIdentifier('smi:local/magnitude/netmag.magid=1'),
-                        mag=4.0,
-                        magnitude_type='mb',
-                        station_count=-1,
-                        origin_id=qml.ResourceIdentifier('smi:local/origin/origin.orid=1'),
-                    ),
-                ],
-                preferred_origin_id=qml.ResourceIdentifier('smi:local/origin/origin.orid=1'),
-            ),
-        ],
+    observed = client.get_events(
+        minlatitude=10, maxlatitude=11,
+        minlongitude=13, maxlongitude=14,
+        mindepth=15,
+        asquery=True
     )
-    assert cat == expected
+    expected = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Origin.lon.between(13, 14))
+               .filter(kb.Origin.lat.between(10, 11))
+               .filter(kb.Origin.depth >= 15)
+               .filter(kb.Netmag.evid == kb.Event.evid)
+               .filter(kb.Netmag.orid == kb.Origin.orid)
+    )
+    assert literal_sql(observed) == literal_sql(expected)
 
-    cat = client.get_events(eventid='2')
-    assert cat == expected
+def test_get_events_eventid(session):
+    """ Specify an event and its preferred origin. """
+    client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
+    observed = client.get_events(eventid=1, includeallorigins=False, asquery=True)
+    expected = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Event.prefor == kb.Origin.orid)
+               .filter(kb.Origin.evid.in_([1]))
+               .filter(kb.Netmag.evid == kb.Event.evid)
+               .filter(kb.Netmag.orid == kb.Origin.orid)
+    )
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_events_misc(session):
+    """ Specify events by contributor and event type. """
+    client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
+    observed = client.get_events(contributor='USGS', eventtype='explosion', asquery=True)
+    expected = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Origin.auth.like('USGS'))
+               .filter(kb.Origin.etype.in_(['ec', 'ep', 'ex']))
+               .filter(kb.Netmag.evid == kb.Event.evid)
+               .filter(kb.Netmag.orid == kb.Origin.orid)
+    )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement)
+
+
+def test_get_events_magnitudes(session):
+    """ Magnitude parameters. """
+    client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
+
+    # target a magnitude and range
+    observed = client.get_events(minmagnitude=3, maxmagnitude=4, magnitudetype='mb', asquery=True)
+    expected = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Netmag.evid == kb.Event.evid)
+               .filter(kb.Netmag.orid == kb.Origin.orid)
+               .filter(kb.Netmag.magtype.like('mb'))
+               .filter(kb.Netmag.magnitude.between(3, 4))
+    )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement)
+
+    # any magnitude, half-range
+    observed = client.get_events(minmagnitude=3, asquery=True)
+    expected = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Netmag.evid == kb.Event.evid)
+               .filter(kb.Netmag.orid == kb.Origin.orid)
+               .filter(kb.Netmag.magnitude >= 3)
+    )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement)
+
+    # error b/c there's no Netmag
+    client = Client(session, origin=kb.Origin, event=kb.Event)
+    with pytest.raises(ValueError):
+        observed = client.get_events(minmagnitude=3, asquery=True)
+
+
 
 
 def test_get_waveforms_defaults(dbsession):
@@ -104,6 +143,3 @@ def test_get_waveforms_defaults(dbsession):
         st[0].stats.starttime == tr.stats.starttime and
         st[0].stats.endtime == tr.stats.endtime
     )
-
-
-
