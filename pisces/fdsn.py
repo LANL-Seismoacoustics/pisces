@@ -152,13 +152,13 @@ class Client(object):
 
         return repr_str.format(self.session.bind.url)
 
-    @cached_property # >= py3.8
+    @cached_property  # >= py3.8
     def contributors(self):
         """ Sorted list of distinct origin authors (Origin.auth) """
         Origin = self.tables['origin']
         return self.session.query(Origin.auth).distinct().order_by(Origin.auth).all()
 
-    @cached_property # >= py3.8
+    @cached_property  # >= py3.8
     def magnitude_types(self):
         """ Sorted list of distinct Netmag.magtype """
         Netmag = self.tables['netmag']
@@ -313,8 +313,9 @@ class Client(object):
         """
         try:
             Origin = self.tables["origin"]
-            Event = self.tables["event"] # needed for QuakeML output
-            Netmag = self.tables["netmag"] # needed b/c includeallmagnitudes is always true
+            Event = self.tables["event"]  # needed for QuakeML output
+            # needed b/c includeallmagnitudes is always true
+            Netmag = self.tables["netmag"]
         except KeyError:
             msg = "Event, Origin, and Netmag tables required."
             raise ValueError(msg)
@@ -338,7 +339,7 @@ class Client(object):
             msg = "Incompatible inputs: using both lat/lon and radius ranges not allowed"
             raise ValueError(msg)
 
-        # TODO: Are some of these checks already in the respective 
+        # TODO: Are some of these checks already in the respective
         #   filter_[events, arrivals, magnitudes] functions?
         if includearrivals and (not Arrival or not Assoc):
             msg = "Arrival and Assoc tables required for includeallarrivals."
@@ -368,21 +369,21 @@ class Client(object):
 
         # geographic / categorical stuff
         q = self.session.query(Event, Origin)
-        qe = events.filter_events(q,
-                                  region=region,
-                                  times=times,
-                                  depth=depth,
-                                  evid=evid,
-                                  prefor=prefor,
-                                  auth=auth,
-                                  etype=etype,
-        )
+        q = events.filter_events(q,
+                                 region=region,
+                                 times=times,
+                                 depth=depth,
+                                 evid=evid,
+                                 prefor=prefor,
+                                 auth=auth,
+                                 etype=etype,
+                                 )
         # [(event, origin)] expected structure
 
         if updatedafter:
             q = q.filter(Origin.lddate > updatedafter)
 
-        # includeallmagnitudes is always true, so return all magnitudes
+        # includeallmagnitudes is always True, so return all magnitudes
         # joins with Netmag even if magnitudes is empty, so no "if" clause
         # TODO: add Stamag
         # TODO: implement includeallmagnitudes=False and preferred_magnitudes kwarg
