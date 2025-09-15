@@ -11,6 +11,7 @@ from sqlalchemy import or_
 
 from pisces.tables.kbcore import Event, Origin, Netmag, Stamag, Site
 from pisces import events
+from pisces.util import literal_sql
 
 # print(observed.statement.compile(compile_kwargs={"literal_binds": True}))
 
@@ -28,7 +29,7 @@ def test_filter_events_origin(session):
     expected = q
     observed = events.filter_events(q)
     assert observed.statement.compare(expected.statement)
-    # assert str(expected) == str(observed)
+    # literal_sql strliteral_sql) == str(observed)
 
     # full region
     observed = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2))
@@ -153,7 +154,7 @@ def test_filter_magnitudes_origin(session):
     expected = (
         session.query(Origin)
                .filter(or_(
-                        Origin.ml.between(4.5, 5.5), 
+                        Origin.ml.between(4.5, 5.5),
                         Origin.mb >= 3
                     )
         )
@@ -184,7 +185,7 @@ def test_filter_magnitudes_origin_netmag(session):
                .filter(Netmag.magtype.like('m_'))
                .filter(Netmag.magnitude >= 5)
     )
-    assert str(observed) == str(expected)
+    assert literal_sql(observed) == literal_sql(expected)
     # assert observed.statement.compare(expected.statement) # not sure why this isn't working
 
     # net
@@ -214,7 +215,7 @@ def test_filter_magnitudes_origin_netmag(session):
                .filter(Netmag.magtype.like('ml'))
                .filter(Netmag.magnitude >= 5)
     )
-    assert str(observed) == str(expected) 
+    assert literal_sql(observed) == literal_sql(expected)
     # assert observed.statement.compare(expected.statement) # not sure why this isn't working
 
 
@@ -233,7 +234,7 @@ def test_filter_magnitudes_origin_netmag_stamag(session):
                .filter(Stamag.magtype.like('mb'))
                .filter(Stamag.magnitude <= 4)
     )
-    assert str(observed) == str(expected)
+    assert literal_sql(observed) == literal_sql(expected)
     # assert observed.statement.compare(expected.statement)
 
     # auth from Stamag
@@ -272,7 +273,7 @@ def test_filter_magnitudes_origin_netmag_stamag(session):
                .filter(Stamag.magtype.like('mb'))
                .filter(Stamag.magnitude <= 4)
     )
-    assert str(observed) == str(expected)
+    assert literal_sql(observed) == literal_sql(expected)
     # assert observed.statement.compare(expected.statement) #XXX not sure why this doesn't work
 
     # pop in Stamag
@@ -287,7 +288,9 @@ def test_filter_magnitudes_origin_netmag_stamag(session):
                .filter(Stamag.magnitude <= 4)
     )
     # assert observed.statement.compare(expected.statement) #XXX not sure why this doesn't work
-    assert str(observed) == str(expected)
+    # print(literal_sql(observed))
+    # print(literal_sql(expected))
+    assert literal_sql(observed) == literal_sql(expected)
 
 
 def test_filter_magnitudes_exceptions(session):
@@ -340,4 +343,4 @@ def test_filter_events_magnitudes(session):
                .filter(Netmag.magtype.like('mw'))
     )
     assert observed.statement.compare(expected.statement)
-    # assert str(observed) == str(expected)
+    # assert literal_sql(observed) == literal_sql(expected)
