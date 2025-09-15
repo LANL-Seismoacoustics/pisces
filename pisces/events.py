@@ -9,7 +9,7 @@ the result set, but won't be added to the query SELECT statement.
 
 """
 from obspy import UTCDateTime
-from sqlalchemy import or_, and_, false
+from sqlalchemy import or_, and_
 
 from .util import _get_entities, range_filters, make_wildcard_list
 

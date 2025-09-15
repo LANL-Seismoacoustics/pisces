@@ -136,12 +136,12 @@ def test_filter_events_exceptions(session):
     # Origin input with no Origin table
     q = session.query(Event)
     with pytest.raises(ValueError):
-        r = events.filter_events(q, orid=[1])
+        _ = events.filter_events(q, orid=[1])
 
     # Event input with no Origin or Event table
     q = session.query(Site)
     with pytest.raises(ValueError):
-        r = events.filter_events(q, evid=[1])
+        _ = events.filter_events(q, evid=[1])
 
 
 def test_filter_magnitudes_origin(session):

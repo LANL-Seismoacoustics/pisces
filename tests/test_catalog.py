@@ -1,7 +1,6 @@
 import obspy.core.event as qml
 from obspy import UTCDateTime
 
-import pisces as ps
 import pisces.tables.kbcore as kb
 import pisces.catalog as cat
 
