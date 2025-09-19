@@ -112,6 +112,18 @@ def _dtree():
     """
     return defaultdict(_dtree)
 
+def _denull(result):
+    """
+    Replace CSS/KBCore null values in a table row with None.
+    Useful to avoid unnecessarily verbose QuakeML or JSON serializations.
+
+    """
+    for c in result.__table__.columns:
+        if getattr(result, c.name) == c.info['default']:
+            setattr(result, c.name, None)
+
+    return result
+
 
 def pretty(d, out=None, indent=0, raw=False):
     """ Pretty-print a qmltree tree to see its structure
@@ -256,6 +268,21 @@ def qmltree(query, update_from=None):
 
 
 class QMLGenerator:
+    """ Convert CSS/KBCore database results to QuakeML/Obspy event objects.
+
+    Examples
+    --------
+
+    >>> q = QMLGenerator(resource_prefix='smi:lanl.gov')
+    >>> e = q.event(my_database_event_row)
+    >>> e
+    Event:	2012-04-04T14:21:42.300000Z | +41.818,  +79.689 | 4.4  mb | manual
+           resource_id: ResourceIdentifier(id="smi:lanl.gov/event/evid=1")
+	        event_type: 'not reported'
+	     creation_info: CreationInfo(agency_uri=...)
+	referred_origin_id: ResourceIdentifier(id=...)
+
+    """
     def __init__(self, resource_prefix='smi:local'):
         self.resource_prefix = resource_prefix
 
@@ -263,19 +290,24 @@ class QMLGenerator:
     def event(self, event):
         """ Return an obspy.core.event.Event from a database Event row. """
 
+        event = _denull(event)
+
         qevent = qml.Event(
             resource_id=qml.ResourceIdentifier(
                 id=f'{self.resource_prefix}/event/event.evid={event.evid}'
             ),
             creation_info=qml.CreationInfo(author=event.auth),
             description=qml.EventDescription(
-                text=event.evname, type="earthquake name"),
+                text=event.evname,
+                # type="earthquake name",
+            ),
         )
 
         return qevent
 
     def origin(self, origin):
         """ Return an obspy.core.event.Origin from a database Origin row. """
+        origin = _denull(origin)
         prefix = self.resource_prefix
         qorigin = qml.Origin(
             resource_id=qml.ResourceIdentifier(
@@ -289,6 +321,7 @@ class QMLGenerator:
 
     def pick(self, arrival):
         """ Initialize an obspy.core.event.Pick from a database Arrival row. """
+        arrival = _denull(arrival)
         prefix = self.resource_prefix
         pick = qml.Pick(
             resource_id=qml.ResourceIdentifier(
@@ -311,6 +344,7 @@ class QMLGenerator:
 
     def arrival(self, assoc, pick_id=None):
         """ Initialize an obspy.core.event.Arrival from a database Assoc row. """
+        assoc = _denull(assoc)
         prefix = self.resource_prefix
         qarrival = qml.Arrival(
             resource_id=qml.ResourceIdentifier(
@@ -326,6 +360,7 @@ class QMLGenerator:
 
     def amplitude(self, arrival, pick_id=None):
         """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
+        arrival = _denull(arrival)
         prefix = self.resource_prefix
         amp = qml.Amplitude(
             resource_id=qml.ResourceIdentifier(
@@ -345,6 +380,7 @@ class QMLGenerator:
 
     def magnitude(self, netmag, origin_id=None):
         """ Initialize an obspy.core.event.Magnitude from a database Netmag row. """
+        netmag = _denull(netmag)
         prefix = self.resource_prefix
         magnitude = qml.Magnitude(
             resource_id=qml.ResourceIdentifier(

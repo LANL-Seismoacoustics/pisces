@@ -266,10 +266,6 @@ class Client(object):
         includeallorigins : bool, optional (Origin [, Event])
             Specify if all origins for the event should be included. Default is False,
             which returns the preferred origin only and requires the Origin and Event table.
-        includeallmagnitudes : bool, optional [ignored]
-            KB Core has no concept of a preferred magnitude, so all network magnitudes are returned
-            (i.e. always True). If more refined magnitudes are desired, users are
-            recommended to also specify a magnitudetype and/or contributor.
         includearrivals : bool, optional [Assoc, Arrival]
             Specify if phase arrivals should be included. Default is False.
         eventid : str or int, optional [Event | Origin]
@@ -313,6 +309,10 @@ class Client(object):
             Missing or improper inputs.
 
         """
+        # includeallmagnitudes : bool, optional [ignored]
+        #     KB Core has no concept of a preferred magnitude, so all network magnitudes are returned
+        #     (i.e. always True). If more refined magnitudes are desired, users are
+        #     recommended to also specify a magnitudetype and/or contributor.
         try:
             Origin = self.tables["origin"]
             Event = self.tables["event"]  # needed for QuakeML output
@@ -679,7 +679,12 @@ class Client(object):
         # longestonly : bool, optional
         #     Limit results to the longest continuous segment per channel.
 
-        Wfdisc = self.tables["wfdisc"]  # required
+        try:
+            Wfdisc = self.tables["wfdisc"]  # required
+        except KeyError:
+            msg = "Wfdisc table required."
+            raise ValueError(msg)
+
         Affil = self.tables.get("affiliation")
 
         # Manage wildcarding and location codes before query.filter-ing.
