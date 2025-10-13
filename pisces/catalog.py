@@ -444,12 +444,17 @@ class QMLGenerator:
         return cat
 
 
-def catalog(*queries, resource_prefix='smi:local', description=None, comments=None,
-            preferred_magauth=None, preferred_magtype=('mw', 'mb', 'ms')):
+def catalog(*queries,
+    resource_prefix='smi:local',
+    description=None,
+    comments=None,
+    preferred_magauth=None,
+    preferred_magtype=('mw', 'mb', 'ms')
+):
     """
     Parameters
     ----------
-    queries : sqlalchemy.orm.Query instance
+    queries : sqlalchemy.orm.Query instances
         One or more queries, output from filter_events, filter_arrivals, or filter_magnitudes,
         with any of the following structures (tables in any order):
         query = session.query(Event, Origin) # from filter_events
