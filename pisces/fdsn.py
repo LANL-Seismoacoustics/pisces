@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Pisces Client mirrors the ObsPy FDSN Client interface.
 
@@ -54,7 +53,8 @@ def origins_to_fdsntext(origins, header=False):
         "grn",
     )
     rows = [
-        "|".join(str(getattr(origin, column, "-")) for column in origin_columns)
+        "|".join(str(getattr(origin, column, "-"))
+                 for column in origin_columns)
         for origin in origins
     ]
 
@@ -64,6 +64,7 @@ def origins_to_fdsntext(origins, header=False):
         out = rows
 
     return os.linesep.join(out)
+
 
 def _etype(eventtype):
     """ Convert QML eventtype string to KBCore etype string.
@@ -78,7 +79,8 @@ def _etype(eventtype):
         ietypes = KBCORE_EVENT_TYPE.get(e, e).split(',')
         etype_set.update({*ietypes})
     # etype = ','.join(etype_set)  # rejoin the unique set with commas
-    etype = sorted(etype_set)  # rejoin the unique set with commas, predictable order for tests
+    # rejoin the unique set with commas, predictable order for tests
+    etype = sorted(etype_set)
 
     return etype[0] if len(etype) == 1 else etype
 
@@ -357,12 +359,14 @@ class Client(object):
 
         # normalize inputs for event query functions
         times = _None_if_none(starttime, endtime)
-        region = _None_if_none(minlongitude, maxlongitude, minlatitude, maxlatitude)
+        region = _None_if_none(minlongitude, maxlongitude,
+                               minlatitude, maxlatitude)
         radius = _None_if_none(latitude, longitude, minradius, maxradius)
         depth = _None_if_none(mindepth, maxdepth)
         prefor = not includeallorigins
         magnitudetype = 'all' if magparams and not magnitudetype else magnitudetype
-        magnitudes = {magnitudetype: (minmagnitude, maxmagnitude)} if magparams else {}
+        magnitudes = {magnitudetype: (
+            minmagnitude, maxmagnitude)} if magparams else {}
         auth = contributor
         etype = _etype(eventtype) if eventtype else None
         evid = _evid_list(eventid) if eventid else None
@@ -423,171 +427,170 @@ class Client(object):
 
         return result
 
+    # def get_stations(
+    #     self,
+    #     starttime: UTCDateTime = None,
+    #     endtime: UTCDateTime = None,
+    #     startbefore: UTCDateTime = None,
+    #     startafter: UTCDateTime = None,
+    #     endbefore: UTCDateTime = None,
+    #     endafter: UTCDateTime = None,
+    #     network: str = None,
+    #     station: str = None,
+    #     location: str = None,
+    #     channel: str = None,
+    #     minlatitude: float = None,
+    #     maxlatitude: float = None,
+    #     minlongitude: float = None,
+    #     maxlongitude: float = None,
+    #     latitude: float = None,
+    #     longitude: float = None,
+    #     minradius: float = None,
+    #     maxradius: float = None,
+    #     level: str = None,
+    #     includerestricted: bool = None,
+    #     includeavailability: bool = None,
+    #     updatedafter: UTCDateTime = None,
+    #     matchtimeseries: bool = None,
+    #     filename: str = None,
+    #     format: str = "xml",
+    #     **kwargs
+    # ):
+    #     """
+    #     Query station station data.
 
-    def get_stations(
-        self,
-        starttime: UTCDateTime = None,
-        endtime: UTCDateTime = None,
-        startbefore: UTCDateTime = None,
-        startafter: UTCDateTime = None,
-        endbefore: UTCDateTime = None,
-        endafter: UTCDateTime = None,
-        network: str = None,
-        station: str = None,
-        location: str = None,
-        channel: str = None,
-        minlatitude: float = None,
-        maxlatitude: float = None,
-        minlongitude: float = None,
-        maxlongitude: float = None,
-        latitude: float = None,
-        longitude: float = None,
-        minradius: float = None,
-        maxradius: float = None,
-        level: str = None,
-        includerestricted: bool = None,
-        includeavailability: bool = None,
-        updatedafter: UTCDateTime = None,
-        matchtimeseries: bool = None,
-        filename: str = None,
-        format: str = "xml",
-        **kwargs
-    ):
-        """
-        Query station station data.
+    #     Examples
+    #     --------
 
-        Examples
-        --------
+    #     >>> starttime = UTCDateTime("2001-01-01")
+    #     >>> endtime = UTCDateTime("2001-01-02")
+    #     >>> inventory = client.get_stations(network="IU", station="A*",
+    #     ...                                 starttime=starttime,
+    #     ...                                 endtime=endtime)
+    #     >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    #     Inventory created at ...
+    #         Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
+    #                     ...
+    #         Sending institution: IRIS-DMC (IRIS-DMC)
+    #         Contains:
+    #                 Networks (1):
+    #                         IU
+    #                 Stations (3):
+    #                         IU.ADK (Adak, Aleutian Islands, Alaska)
+    #                         IU.AFI (Afiamalu, Samoa)
+    #                         IU.ANMO (Albuquerque, New Mexico, USA)
+    #                 Channels (0):
 
-        >>> starttime = UTCDateTime("2001-01-01")
-        >>> endtime = UTCDateTime("2001-01-02")
-        >>> inventory = client.get_stations(network="IU", station="A*",
-        ...                                 starttime=starttime,
-        ...                                 endtime=endtime)
-        >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Inventory created at ...
-            Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
-                        ...
-            Sending institution: IRIS-DMC (IRIS-DMC)
-            Contains:
-                    Networks (1):
-                            IU
-                    Stations (3):
-                            IU.ADK (Adak, Aleutian Islands, Alaska)
-                            IU.AFI (Afiamalu, Samoa)
-                            IU.ANMO (Albuquerque, New Mexico, USA)
-                    Channels (0):
+    #     The result is an `obspy.core.inventory.inventory.Inventory`
+    #     object which models a StationXML file.
 
-        The result is an `obspy.core.inventory.inventory.Inventory`
-        object which models a StationXML file.
+    #     The `level` argument determines the amount of returned information.
+    #     `level="station"` is useful for availability queries whereas
+    #     `level="response"` returns the full response information for the
+    #     requested channels. `level` can furthermore be set to `"network"`
+    #     and `"channel"`.
 
-        The `level` argument determines the amount of returned information.
-        `level="station"` is useful for availability queries whereas
-        `level="response"` returns the full response information for the
-        requested channels. `level` can furthermore be set to `"network"`
-        and `"channel"`.
+    #     >>> inventory = client.get_stations(
+    #     ...     starttime=starttime, endtime=endtime,
+    #     ...     network="IU", sta="ANMO", loc="00", channel="*Z",
+    #     ...     level="response")
+    #     >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    #     Inventory created at ...
+    #         Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
+    #                     ...
+    #         Sending institution: IRIS-DMC (IRIS-DMC)
+    #         Contains:
+    #             Networks (1):
+    #                 IU
+    #             Stations (1):
+    #                 IU.ANMO (Albuquerque, New Mexico, USA)
+    #             Channels (4):
+    #                 IU.ANMO.00.BHZ, IU.ANMO.00.LHZ, IU.ANMO.00.UHZ,
+    #                 IU.ANMO.00.VHZ
 
-        >>> inventory = client.get_stations(
-        ...     starttime=starttime, endtime=endtime,
-        ...     network="IU", sta="ANMO", loc="00", channel="*Z",
-        ...     level="response")
-        >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Inventory created at ...
-            Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
-                        ...
-            Sending institution: IRIS-DMC (IRIS-DMC)
-            Contains:
-                Networks (1):
-                    IU
-                Stations (1):
-                    IU.ANMO (Albuquerque, New Mexico, USA)
-                Channels (4):
-                    IU.ANMO.00.BHZ, IU.ANMO.00.LHZ, IU.ANMO.00.UHZ,
-                    IU.ANMO.00.VHZ
+    #     Parameters
+    #     ----------
+    #     starttime : UTCDateTime
+    #         Limit to metadata epochs starting on or after the specified start time.
+    #     endtime : UTCDateTime
+    #         Limit to metadata epochs ending on or before the specified end time.
+    #     startbefore : .UTCDateTime
+    #         Limit to metadata epochs starting before specified time.
+    #     startafter : UTCDateTime
+    #         Limit to metadata epochs starting after specified time.
+    #     endbefore : UTCDateTime
+    #         Limit to metadata epochs ending before specified time.
+    #     endafter : UTCDateTime
+    #         Limit to metadata epochs ending after specified time.
+    #     network : str
+    #         Select one or more network codes. Can be SEED network codes or data
+    #         center defined codes. Multiple codes are comma-separated (e.g.
+    #         "IU,TA").
+    #     station : str
+    #         Select one or more SEED station codes. Multiple codes are comma-separated
+    #         (e.g. "ANMO,PFO").
+    #     location : str
+    #         Select one or more SEED location identifiers. Multiple identifiers
+    #         are comma-separated (e.g. "00,01").  As a special case "--"
+    #         (two dashes) will be translated to a string of two space characters
+    #         to match blank location IDs.
+    #     channel : str
+    #         Select one or more SEED channel codes. Multiple codes are
+    #         comma-separated (e.g. "BHZ,HHZ").
+    #     minlatitude : float
+    #         Limit to stations with a latitude larger than the specified minimum.
+    #     maxlatitude : float
+    #         Limit to stations with a latitude smaller than the specified maximum.
+    #     minlongitude : float
+    #         Limit to stations with a longitude larger than the specified minimum.
+    #     maxlongitude : float
+    #         Limit to stations with a longitude smaller than the specified maximum.
+    #     latitude : float
+    #         Specify the latitude to be used for a radius search.
+    #     longitude : float
+    #         Specify the longitude to be used for a radius search.
+    #     minradius : float
+    #         Limit results to stations within the specified minimum number of
+    #         degrees from the geographic point defined by the latitude and
+    #         longitude parameters.
+    #     maxradius : float
+    #         Limit results to stations within the specified maximum number of
+    #         degrees from the geographic point defined by the latitude and
+    #         longitude parameters.
+    #     level : str
+    #         Specify the level of detail for the results ("network", "station",
+    #         "channel", "response"), e.g. specify "response" to get full
+    #         information including instrument response for each channel.
+    #     includerestricted : bool
+    #         Specify if results should include information for restricted stations.
+    #     includeavailability : bool
+    #         Specify if results should include information about time series data availability.
+    #     updatedafter : UTCDateTime
+    #         Limit to metadata updated after specified date; updates are data center specific.
+    #     matchtimeseries : bool
+    #         Only include data for which matching time series data is available.
+    #     filename : str or file
+    #         If given, the downloaded data will be saved there instead of being
+    #         parsed to an ObsPy object. Thus it will contain the raw data from
+    #         the webservices.
+    #     format : str
+    #         The format in which to request station information. "xml"
+    #         (StationXML) or "text" (FDSN station text format). XML has more
+    #         information but text is much faster.
 
-        Parameters
-        ----------
-        starttime : UTCDateTime
-            Limit to metadata epochs starting on or after the specified start time.
-        endtime : UTCDateTime
-            Limit to metadata epochs ending on or before the specified end time.
-        startbefore : .UTCDateTime
-            Limit to metadata epochs starting before specified time.
-        startafter : UTCDateTime
-            Limit to metadata epochs starting after specified time.
-        endbefore : UTCDateTime
-            Limit to metadata epochs ending before specified time.
-        endafter : UTCDateTime
-            Limit to metadata epochs ending after specified time.
-        network : str
-            Select one or more network codes. Can be SEED network codes or data
-            center defined codes. Multiple codes are comma-separated (e.g.
-            "IU,TA").
-        station : str
-            Select one or more SEED station codes. Multiple codes are comma-separated
-            (e.g. "ANMO,PFO").
-        location : str
-            Select one or more SEED location identifiers. Multiple identifiers
-            are comma-separated (e.g. "00,01").  As a special case "--"
-            (two dashes) will be translated to a string of two space characters
-            to match blank location IDs.
-        channel : str
-            Select one or more SEED channel codes. Multiple codes are
-            comma-separated (e.g. "BHZ,HHZ").
-        minlatitude : float
-            Limit to stations with a latitude larger than the specified minimum.
-        maxlatitude : float
-            Limit to stations with a latitude smaller than the specified maximum.
-        minlongitude : float
-            Limit to stations with a longitude larger than the specified minimum.
-        maxlongitude : float
-            Limit to stations with a longitude smaller than the specified maximum.
-        latitude : float
-            Specify the latitude to be used for a radius search.
-        longitude : float
-            Specify the longitude to be used for a radius search.
-        minradius : float
-            Limit results to stations within the specified minimum number of
-            degrees from the geographic point defined by the latitude and
-            longitude parameters.
-        maxradius : float
-            Limit results to stations within the specified maximum number of
-            degrees from the geographic point defined by the latitude and
-            longitude parameters.
-        level : str
-            Specify the level of detail for the results ("network", "station",
-            "channel", "response"), e.g. specify "response" to get full
-            information including instrument response for each channel.
-        includerestricted : bool
-            Specify if results should include information for restricted stations.
-        includeavailability : bool
-            Specify if results should include information about time series data availability.
-        updatedafter : UTCDateTime
-            Limit to metadata updated after specified date; updates are data center specific.
-        matchtimeseries : bool
-            Only include data for which matching time series data is available.
-        filename : str or file
-            If given, the downloaded data will be saved there instead of being
-            parsed to an ObsPy object. Thus it will contain the raw data from
-            the webservices.
-        format : str
-            The format in which to request station information. "xml"
-            (StationXML) or "text" (FDSN station text format). XML has more
-            information but text is much faster.
+    #     Returns
+    #     -------
+    #     Inventory
+    #         Inventory with requested station information.
 
-        Returns
-        -------
-        Inventory
-            Inventory with requested station information.
+    #     Any additional keyword arguments will be passed to the webservice as
+    #     additional arguments. If you pass one of the default parameters and the
+    #     webservice does not support it, a warning will be issued. Passing any
+    #     non-default parameters that the webservice does not support will raise
+    #     an error.
 
-        Any additional keyword arguments will be passed to the webservice as
-        additional arguments. If you pass one of the default parameters and the
-        webservice does not support it, a warning will be issued. Passing any
-        non-default parameters that the webservice does not support will raise
-        an error.
-
-        """
-        pass
+    #     """
+    #     pass
 
     def get_waveforms(
         self,
@@ -637,11 +640,6 @@ class Client(object):
             specified in seconds.
         longestonly : bool, optional
             Limit results to the longest continuous segment per channel.
-        attach_response : bool
-            Specify whether the station web service should be used to
-            automatically attach response information to each trace in the
-            result set. A warning will be shown if a response can not be found.
-            Not currently implemented.
         asquery : bool, optional
             If True, doesn't return a Stream, but instead returns the SQLAlchemy
             Query instance that was produced by the passed parameters.
@@ -665,20 +663,6 @@ class Client(object):
         IU.ANMO.10.LHZ | 2010-02-27T06:30:00.069538Z - ... | 1.0 Hz, 5 samples
 
         """
-        # Use ``attach_response=True`` to automatically add response information
-        # to each trace. This can be used to remove response using
-        # :meth:`~obspy.core.stream.Stream.remove_response`.
-
-        # >>> t = UTCDateTime("2012-12-14T10:36:01.6Z")
-        # >>> st = client.get_waveforms("TA", "E42A", "*", "BH?", t+300, t+400,
-        # ...                           attach_response=True)
-        # >>> st.remove_response(output="VEL") # doctest: +ELLIPSIS
-        # <obspy.core.stream.Stream object at ...>
-        # >>> st.plot()  # doctest: +SKIP
-
-        # longestonly : bool, optional
-        #     Limit results to the longest continuous segment per channel.
-
         try:
             Wfdisc = self.tables["wfdisc"]  # required
         except KeyError:
@@ -702,29 +686,12 @@ class Client(object):
         networks, stations, locations, channels = listables
         # even single strings are now a single element list
 
-        # XXX: we decided not to support this
-        # In CSS-like schema, location codes are often just tacked onto channel
-        # codes.  channel may now included multiple wildcards.  Do a cartesian
-        # product of location codes tacked at the end of channel codes.
-        # channels = [chan + loc for chan in channels for loc in locations]
-
         t1, t2 = starttime.timestamp, endtime.timestamp
 
         # Build the query
         q = req.get_wfdisc_rows(
             self.session, Wfdisc, sta=stations, chan=channel, t1=t1, t2=t2, asquery=True
         )
-
-        # q = self.session.query(Wfdisc)
-
-        # # apply string filters/expressions
-        # q = q.filter(util.string_expression(Wfdisc.sta, stations))
-        # q = q.filter(util.string_expression(Wfdisc.chan, channels))
-
-        # CHUNKSIZE = 24 * 60 * 60
-        # q = q.filter(Wfdisc.time.between(t1 - CHUNKSIZE, t2))
-        # q = q.filter(Wfdisc.time > t1)
-        # q = q.filter(Wfdisc.time <= t2)
 
         if networks:
             try:
@@ -744,18 +711,124 @@ class Client(object):
             out = q
         else:
             out = req.wfdisc_rows_to_stream(q, starttime, endtime)
-        # log.debug(util.literal_sql(self.session, q))
-
-        # st = Stream()
-        # for wf in q:
-        #     try:
-        #         tr = wfdisc2trace(wf)
-        #         st.append(tr)
-        #     except IOError:
-        #         msg = "Unable to read file: dir = {}, dfile = {}"
-        #         log.error(msg.format(wf.dir, wf.dfile)) # TODO: append action IOError message, too
-
-        # st.trim(starttime, endtime)
-        # # TODO: merge them?
+        # log.debug(util.literal_sql(q))
 
         return out
+
+
+    def get_waveforms_bulk(self, bulk, quality=None, minimumlength=None,
+                      longestonly=None, filename=None, **kwargs):
+        """
+        Query the dataselect service of the client. Bulk request.
+
+        Send a bulk request for waveforms to the server. `bulk` can either be
+        specified as a filename, a file-like object or a string (with
+        information formatted according to the FDSN standard) or a list of
+        lists (each specifying network, station, location, channel, starttime
+        and endtime). See examples and parameter description for more
+        details.
+
+        `bulk` can be provided in the following forms:
+
+        (1) As a list of lists. Each list item has to be list of network,
+            station, location, channel, starttime and endtime.
+
+        (2) As a valid request string/file as defined in the
+            `FDSNWS documentation <https://www.fdsn.org/webservices/>`_.
+            The request information can be provided as a..
+
+            - a string containing the request information
+            - a string with the path to a local file with the request
+            - an open file handle (or file-like object) with the request
+
+        >>> client = Client(session, origin=Origin, site=Site)
+        >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
+        >>> t2 = t1 + 1
+        >>> t3 = t1 + 3
+        >>> bulk = [("IU", "ANMO", "*", "BHZ", t1, t2),
+        ...         ("IU", "AFI", "1?", "BHE", t1, t3),
+        ...         ("GR", "GRA1", "*", "BH*", t2, t3)]
+        >>> st = client.get_waveforms_bulk(bulk)
+        >>> print(st)  # doctest: +ELLIPSIS
+        5 Trace(s) in Stream:
+        GR.GRA1..BHE   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
+        GR.GRA1..BHN   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
+        GR.GRA1..BHZ   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
+        IU.ANMO.00.BHZ | 2010-02-27T06:30:00... | 20.0 Hz, 20 samples
+        IU.ANMO.10.BHZ | 2010-02-27T06:30:00... | 40.0 Hz, 40 samples
+        >>> bulk = 'quality=B\n' + \
+        ...        'longestonly=false\n' + \
+        ...        'IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02\n' + \
+        ...        'IU AFI 1? BHE 2010-02-27 2010-02-27T00:00:04\n' + \
+        ...        'GR GRA1 * BH? 2010-02-27 2010-02-27T00:00:02\n'
+        >>> st = client.get_waveforms_bulk(bulk)
+        >>> print(st)  # doctest: +ELLIPSIS
+        5 Trace(s) in Stream:
+        GR.GRA1..BHE   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        GR.GRA1..BHN   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+        >>> st = client.get_waveforms_bulk("/tmp/request.txt") \
+        ...     # doctest: +SKIP
+        >>> print(st)  # doctest: +SKIP
+        5 Trace(s) in Stream:
+        GR.GRA1..BHE   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        GR.GRA1..BHN   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
+        IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+        >>> t = UTCDateTime("2012-12-14T10:36:01.6Z")
+        >>> t1 = t + 300
+        >>> t2 = t + 400
+        >>> bulk = [("TA", "S42A", "*", "BHZ", t1, t2),
+        ...         ("TA", "W42A", "*", "BHZ", t1, t2),
+        ...         ("TA", "Z42A", "*", "BHZ", t1, t2)]
+
+        Parameters
+        ----------
+        bulk : str, file or list[list]
+            Information about the requested data. See above for details.
+        quality : str, optional [not implemented]
+            Select a specific SEED quality indicator, handling is data center dependent.
+            Ignored when `bulk` is provided as a request string/file.
+        minimumlength : float, optional [not implemented]
+            Limit results to continuous data segments of a minimum length specified in seconds.
+            Ignored when `bulk` is provided as a request string/file.
+        longestonly : bool, optional  [not implemented]
+            Limit results to the longest continuous segment per channel.
+            Ignored when `bulk` is provided as a request string/file.
+        filename : str or file
+            If given, the downloaded data will be saved there instead of being parsed to an ObsPy object.
+            Thus it will contain the raw data from the webservices.
+
+        Any additional keyword arguments will be passed to the webservice as
+        additional arguments. If you pass one of the default parameters and the
+        webservice does not support it, a warning will be issued. Passing any
+        non-default parameters that the webservice does not support will raise
+        an error.
+
+        """
+        # TODO: implement file-like or path-like inputs
+        st = Stream()
+
+        for network, station, location, channel, starttime, endtime in bulk:
+            ist = client.get_waveforms(
+                network,
+                station,
+                location,
+                channel,
+                starttime,
+                endtime,
+                quality=quality,
+                minimumlength=minimumlength,
+                longestonly=longestonly,
+                filename=filename,
+                **kwargs
+            )
+            st.extend(ist)
+
+        if filename:
+            st.write(filename, format='MSEED')
+        else:
+            return st
