@@ -3,13 +3,12 @@ from obspy.core.inventory import response
 import warnings
 from obspy import read_inventory
 from datetime import datetime
-from obspy.core.inventory.response import ComplexWithUncertainties
 from math import pi
 from obspy.core import UTCDateTime
 import os
 from obspy.core.inventory.response import ComplexWithUncertainties, PolesZerosResponseStage, \
     CoefficientsTypeResponseStage,PolynomialResponseStage,ResponseListResponseStage, \
-    ResponseStage, FIRResponseStage
+    ResponseStage, FIRResponseStage, FloatWithUncertainties
 
 def get_pazfir_lines(path):
     """
@@ -186,37 +185,67 @@ def get_pazfir_data(fileLines, stageStart, stageType):
        
         # get total norm value for paz and decimation sample rate for fir/iir
             startLine = startVal
-            stage_constant = float(fileLines[startLine+1])
+            con_line = fileLines[startLine+1].split()
+            stage_constant = float(con_line[0])
             sens_decim.append(stage_constant)
            
             # get poles
-            num_tops =  int(fileLines[startLine+2])
+            top_line = fileLines[startLine+2].split()
+            num_tops =  int(top_line[0])
             lineRange = range(startLine+3, startLine + 3 + num_tops)
                    
             for j in lineRange:
-              topData = fileLines[j].split()
-              
-              if stageType[i] == 'paz':
-                  tops.append(complex(float(topData[0]),float(topData[1])))
-                  
-              elif stageType[i] == 'fir' or stageType[i] == 'iir':
-                  tops.append(float(topData[0]))
-                  
-              else:
-                  tops.append(None)
-           
+                topData = fileLines[j].split()
+
+                if stageType[i] == 'paz':
+                    if len(topData) == 4:
+                        if complex(float(topData[2]),float(topData[3])) != 0:
+                            topComplex = ComplexWithUncertainties(complex(float(topData[0]),float(topData[1])), upper_uncertainty = complex(float(topData[2]),float(topData[3])), lower_uncertainty = complex(float(topData[2]),float(topData[3])))
+                        else:
+                            topComplex = ComplexWithUncertainties(complex(float(topData[0]),float(topData[1])))
+                    else:
+                        topComplex = ComplexWithUncertainties(complex(float(topData[0]),float(topData[1])))
+                    tops.append(topComplex)
+                    
+                elif stageType[i] == 'fir' or stageType[i] == 'iir':
+                    if len(topData) == 2:
+                        if topData[1] != 0:
+                            topVal = FloatWithUncertainties(topData[0], lower_uncertainty = topData[1], upper_uncertainty = topData[1])
+                        else:
+                            topVal = FloatWithUncertainties(topData[0])
+                    else:
+                        topVal = FloatWithUncertainties(topData[0])
+                    tops.append(topVal)
+
+                else:
+                    tops.append(None)
+            
             #get zeros
-            num_bottoms = int(fileLines[startLine + 3 + num_tops])
+            bot_line = fileLines[startLine + 3 + num_tops].split()
+            num_bottoms = int(bot_line[0])
             lineRange = range(startLine + 3 + num_tops + 1, startLine + 3 + num_tops + 1 + num_bottoms)
            
             for j in lineRange:
                 bottomData = fileLines[j].split()
                
                 if stageType[i] == 'paz':
-                    bottoms.append(complex(float(bottomData[0]),float(bottomData[1])))
+                    if len(bottomData) == 4:
+                        if complex(float(bottomData[2]),float(bottomData[3])) != 0:
+                            bottomComplex = ComplexWithUncertainties(complex(float(bottomData[0]),float(bottomData[1])), upper_uncertainty = complex(float(bottomData[2]),float(bottomData[3])), lower_uncertainty = complex(float(bottomData[2]),float(bottomData[3])))
+                        else:
+                            bottomComplex = ComplexWithUncertainties(complex(float(bottomData[0]),float(bottomData[1])))
+                    else:
+                        bottomComplex = ComplexWithUncertainties(complex(float(bottomData[0]),float(bottomData[1])))
+                    bottoms.append(bottomComplex)
                    
                 elif stageType[i] == 'fir' or stageType[i] == 'iir':
-                    bottoms.append(float(bottomData[0]))
+                    if len(bottomData) == 2:
+                        if bottomData[1] != 0:
+                            bottomVal = FloatWithUncertainties(bottomData[0], lower_uncertainty = bottomData[1], upper_uncertainty = bottomData[1])
+                        else:
+                            bottomVal = FloatWithUncertainties(bottomData[0])
+                    else:
+                        bottomVal = ComplexWithUncertainties(bottomData[0])
                    
                 else:
                     bottoms.append(None)
@@ -277,7 +306,7 @@ def a0_from_pz(poles, zeros, a0f):
     return a0
 
 
-def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM', a0f=1.0, calratio=None):
+def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = True, calratio=None):
     """
     Read in a pazfir file and output the instrument response in the form of an obspy 
     response object.
@@ -294,9 +323,15 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         The period at which calib was calculated contained in an instrument 
         or wfdisc table
     input_units: string
-        The units of ground motion or pressure being  measured by a 
-        seismic or infrasound sensor.  Currently supports displacement in 'M' or 
-        'NM' and pressure in pascals, 'PA'.
+        Specify whether the input file units are in Displacement ('DISP'),
+        Velocity ('VEL'), Acceleration ('ACC'), or Pressure ('PRESSURE').  Units of
+        displacement, velocity, or acceleration are assumed to be in nanometers
+        following the KBCore, CSS3.0, and Antelope specifications.  Units of pressure
+        are assumed to be in Pascals.
+    nm_to_m: boolean
+        Specify whether the output response object is in units displacement, velocity
+        or acceleration will be in meters or nanometers.  Default is in meters and
+        set to true.
     a0f: float
         The frequency at which to calculate a0.  If calper is provided, that value
         is converted to frequency and used
@@ -345,8 +380,9 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
     
     # check if stages are consecutive
     stageCheck = 1
+    lenStage = len(stageNums)
     
-    if len(stageNums) > 1:
+    if lenStage > 1:
         startNum = 1 
         for i in range(len(stageNums)):
             if stageNums[i] == stageCheck:
@@ -368,7 +404,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
                 stageCheck += 1
                 flag +=1
             else:
-                warnings.warn('Unusual issues with numbering found, consider evaulating file')
+                warnings.warn('Unusual issues with numbering found, consider evaulating file.')
                 
     # raise warnings if weird stage numbers
     if flag > 0:
@@ -380,7 +416,9 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         if stageNums[i] == stageCheck2:
             stageCheck2 += 1
         else:
-            raise ValueError('Stage numbers not consecutive despite attempts to correct')
+            stageNums = list(range(1,(lenStage+1)))
+            # raise ValueError('Stage numbers not consecutive despite attempts to correct')
+            warnings.warn('Could not resolve stage numbering.  Numbering consecutively to proceed.')
         
     # Check for no paz and no fap
     pazCount = stageType.count('paz')
@@ -391,13 +429,21 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         
     
     # set units lists and variables
-    if input_units == 'M':
-        in_desc = 'Displacement in Meters'
-    elif input_units == 'PA':
-        in_desc = 'Atmospheric Pressure in Pascals'
-    else:
-        inUput_nits = 'NM'
+    if input_units == 'DISP':
+        units_in = 'NM'
         in_desc = 'Displacement in Nanometers'
+    elif input_units == 'PRESSURE':
+        units_in = 'PA'
+        in_desc = 'Atmospheric Pressure in Pascals'
+    elif input_units == 'VEL':
+        units_in = 'NM/S'
+        in_desc = 'Velocity in in Nanometers/Second'
+    elif input_units == 'ACC':
+        units_in = 'NM/S**2'
+        in_desc = 'Acceleration in Nanometers/Second**2'      
+    else:
+        raise TypeError('Input unit type not supported.  Accepts DISP, VEL, ACC, or PRESSURE')
+        
     elec = 'V'
     elec_desc = 'Volts of unknown order of magnitude'
     final = 'COUNTS'
@@ -419,7 +465,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
     
     # set units based on number of paz stages
     if stageType[0] == 'fap':
-        in_units.append(input_units)
+        in_units.append(units_in)
         out_units.append(final)
         in_units_desc.append(in_desc)
         out_units_desc.append(final_desc)
@@ -429,7 +475,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         subtractNum = startingPAZ
     
     elif startingPAZ == 1:
-        in_units.append(input_units)
+        in_units.append(units_in)
         in_units_desc.append(in_desc)
         out_units.append(final)
         out_units_desc.append(final_desc)
@@ -437,7 +483,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             
     elif startingPAZ == 2:
         # first paz stage
-        in_units.append(input_units)
+        in_units.append(units_in)
         in_units_desc.append(in_desc)
         out_units.append(elec)
         out_units_desc.append(elec_desc)
@@ -450,7 +496,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         
     elif startingPAZ > 2:
         # first paz stage
-        in_units.append(input_units)
+        in_units.append(units_in)
         in_units_desc.append(in_desc)
         out_units.append(elec)
         out_units_desc.append(elec_desc)
@@ -480,37 +526,13 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         out_units_desc.append(final_desc)
         in_units_desc.append(final_desc)
             
-    # calib and calper checks
-    calperNull = '-'
-    if calper == calperNull or calper is None:
-        if calib is None:
-            warnings.warn('No calib/calper pair provided. Assumng total scaling is provided in the file.')
-            useCals = False
-        else:
-            warnings.warn('No calper provided with calib. Assumng total scaling is provided in the file.')
-            useCals = False
-    elif calib is None:
-        warnings.warn('No calib provided with calper.  Assumng total scaling is provided in the file.')
-        useCals = False
-    else:
-        useCals = True
-        pass
-    
-    # check FIR stage order and decimation numbers
-    
-    # print(in_units)
-    # print(out_units)
-    # print(stageNums)
-    # print(stageType)
-    # print(stageStart)
-    ####     CREATE RESPONSE STAGES
+    # CREATE RESPONSE STAGES
     
     stageList = []
     total_scaling = 1.0
-    if useCals == True:
-        a0f = 1/calper
+    a0f = 1/calper
     
-    ###################    PAZ STAGE   ###########################################
+    # PAZ STAGE
     
     for i, stageVal in enumerate(stageNums):
         if stageType[i] == 'paz':
@@ -518,20 +540,31 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             poles = poles_nums[i]
             zeros = zeros_denoms[i]
             scale = sens_decim[i]
-            
-            if useCals == True:
-                a0 = a0_from_pz(poles, zeros, a0f)
-                if calratio is not None:
-                    scale = 1/(calib*calratio)
-                else:
-                    scale = 1/(calib)
+
+            # Calculate a0 in case a0 in file is incorrect        
+            a0 = a0_from_pz(poles, zeros, a0f)
+            if calratio is not None:
+                scale = 1/(calib*calratio)
             else:
-                a0 = a0_from_pz(poles, zeros, a0f)
-                scale = scale/a0
-                
+                scale = 1/(calib)
+
+            # adjust scaling and units if converting from nm to m    
             if stageVal == 1:
-                if input_units == 'M':
-                    scale *= 10**9  
+                if nm_to_m == True:
+                    if  input_units == 'DISP':
+                        in_units[i] = 'M'
+                        in_units_desc[i] = 'Displacement in Meters'
+                        scale *= 10**9
+                    elif  input_units == 'VEL':
+                        in_units[i] = 'M/S'
+                        in_units_desc[i] = 'Velocity in Meters/Second'
+                        scale *= 10**9
+                    elif  input_units == 'ACC':
+                        in_units[i] = 'M/S**2'
+                        in_units_desc[i] = 'Acceleration in Meters/Second**2'
+                        scale *= 10**9
+                    else:
+                        warnings.warn('Input_unit type cannot be converted from nanometers to meters in any of displacement, velocity, or acceleration')
                 gain = scale
             else:
                 gain = 1.0
@@ -552,7 +585,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             stageList.append(pazStage)
     
                          
-    ########################   FIR /  IIR STAGE  #################################  
+    # FIR /  IIR STAGE
           
         elif stageType[i] == 'fir' or stageType[i] == 'iir':
             
@@ -577,13 +610,11 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             else:
                 warnings.warn('Unexpected issue with FIR stage decimation. Considering evaluating file.')
             
-            if useCals == True:
-                if calratio is not None:
-                    scale = 1/(calib*calratio)
-                else:
-                    scale = 1/(calib)
+            
+            if calratio is not None:
+                scale = 1/(calib*calratio)
             else:
-                scale = 1.0
+                scale = 1/(calib)
                 
             if stageVal == 1:
                 gain = scale
@@ -609,7 +640,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             stageList.append(firStage)
      
     
-    #########################    DUMMY STAGE     #################################
+    # DUMMY STAGE if necessary
                
         elif stageType[i] == 'dummy':
             
@@ -631,24 +662,32 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
         
     
     
-    #########################    FAP STAGE    ####################################
+    # FAP STAGE 
     
         elif stageType[i] == 'fap':
-            
-            if useCals == True:
-                gain_freq = 1/calper
-                if calratio is not None:
-                    gain = 1/(calib*calratio)
-                else:
-                    gain_freq = a0f
-                    gain = 1/calib
+
+            if calratio is not None:
+                gain = 1/(calib*calratio)
             else:
-                gain_freq = 1.0
-                gain = 1.0
+                gain = 1/calib
                 
             if stageVal == 1:
-                if input_units == 'M':
-                    gain *= 10**9
+                if nm_to_m == True:
+                    if  input_units == 'DISP':
+                        in_units[i] = 'M'
+                        in_units_desc[i] = 'Displacement in Meters'
+                        scale *= 10**9
+                    elif  input_units == 'VEL':
+                        in_units[i] = 'M/S'
+                        in_units_desc[i] = 'Velocity in Meters/Second'
+                        scale *= 10**9
+                    elif  input_units == 'ACC':
+                        in_units[i] = 'M/S**2'
+                        in_units_desc[i] = 'Acceleration in Meters/Second**2'
+                        scale *= 10**9
+                    else:
+                        warnings.warn('Input_unit type cannot be converted from nanometers to meters in any of displacement, velocity, or acceleration')
+                gain = scale
             else:
                 gain = 1.0
             
@@ -660,13 +699,18 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             num_fap = int(linesAll[startLine+1])
             
             faps = []
-            
+
             for j in range(startLine + 2, startLine + 2 + num_fap):
+                
                 fapdat = linesAll[j].split()
                 
                 frequency = float(fapdat[0])
                 amplitude = float(fapdat[1])
                 phase = float(fapdat[2])
+                if phase > 360 or phase < -360:
+                    warnings.warn('Phase in fap stage not between -360 and 360.  Wrapping phase to comply with Obspy Angle class limitations which may result in interpolation issues.')
+
+                phase = ((phase+360)%(720)-360) # wrap -360 to 360 to satisfy obspy Angle class limitations
                 
                 fapElement = response.ResponseListElement(frequency, amplitude, phase)
                 
@@ -679,9 +723,11 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
             
             stageList.append(fapStage)
     
-    ################## GROUP DELAY STAGE
+    # GROUP DELAY STAGE
+
+    ### TO DO
     
-    ########################  IS THERE WEIRD SHIT?   #############################
+    # Is there weird shit?
                 
         else:
             warnings.warn('Ignoring unexpected stage type {}.  Pazfir files evaulation recommended.'.format(stageType[i]))
@@ -697,7 +743,7 @@ def read_pazfir(path, input_samp_rate, calib=None, calper=None, input_units='NM'
                             input_units_description = stage0_in_units_desc,
                             output_units_description = stage0_out_units_desc)
         
-    #### CREATE FINAL RESPONSE OBJECT
+    # CREATE FINAL RESPONSE OBJECT
     
     if "stage0" in locals():
         total_resp = response.Response(response_stages = stageList, instrument_sensitivity = stage0)
