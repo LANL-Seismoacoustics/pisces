@@ -24,7 +24,7 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     wfdisc: SQLAlchemy mapped wfdisc table
     sta, chan, : str, optional
         station, channel strings,
-    t1, t2 : int, optional
+    t1, t2 : float, optional
         Epoch time window of interest (seconds)
         Actually searches for wfdisc.time between t1-86400 and t2 and
         wfdisc.endtime > t1
@@ -183,15 +183,15 @@ def geographic_query(q, table, region=None, depth=None, asquery=False):
 
     return res
 
-def netstachan_query(q, stations=None, channels=None, networks=None, 
+def netstachan_query(q, stations=None, channels=None, networks=None,
         asquery=False):
     pass
 
 def time_query(q, time=None, daylong=False, asquery=False):
     pass
 
-def get_events(session, origin, event=None, region=None, deg=None, km=None, 
-        swath=None, mag=None, depth=None, etime=None, orids=None, evids=None, 
+def get_events(session, origin, event=None, region=None, deg=None, km=None,
+        swath=None, mag=None, depth=None, etime=None, orids=None, evids=None,
         prefor=False, asquery=False):
     """
     Build common queries for events.
@@ -232,7 +232,7 @@ def get_events(session, origin, event=None, region=None, deg=None, km=None,
     asquery : bool, optional
         Return the query object instead of the results.  Default, False.
         Useful if additional you desire additional sorting of filtering, or
-        if you have your own in-database geographic query function(s).  If 
+        if you have your own in-database geographic query function(s).  If
         supplied, deg, km, and/or swath are ignored in the returned query.
 
     Returns
@@ -291,10 +291,10 @@ def get_events(session, origin, event=None, region=None, deg=None, km=None,
         res = distaz_query(q.all(), deg=deg, km=km, swath=swath)
 
     return res
- 
 
-def get_stations(session, site, sitechan=None, affiliation=None, stations=None, 
-        channels=None, nets=None, loc=None, region=None, deg=None, km=None, 
+
+def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
+        channels=None, nets=None, loc=None, region=None, deg=None, km=None,
         swath=None, time_span=None, asquery=False):
     """
     Build common queries for stations.
@@ -328,25 +328,25 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     asquery : bool, optional
         Return the query object instead of the results.  Default, False.
         Useful if additional you desire additional sorting of filtering, or
-        if you have your own in-database geographic query function(s).  If 
+        if you have your own in-database geographic query function(s).  If
         supplied, deg, km, and/or swath are ignored in the returned query.
     time_span : tuple or list
         (startdate, enddate) or [startdate, enddate]
-        startdate and enddate are integer julian days of when you want stations (YYYYddd).  
-        If stations were moved one or more times in the time_span, you will 
-        get multiple copies of the station with updated gps values. If you want to be 
-        guaranteed a specific station at a specific time, startdate and enddate must 
+        startdate and enddate are integer julian days of when you want stations (YYYYddd).
+        If stations were moved one or more times in the time_span, you will
+        get multiple copies of the station with updated gps values. If you want to be
+        guaranteed a specific station at a specific time, startdate and enddate must
         both be included, even if they are the same.
 
     Notes
     -----
-    Each parameter produces an AND clause, list parameters produce IN 
+    Each parameter produces an AND clause, list parameters produce IN
     clauses, a regex produces a REGEXP_LIKE clause (Oracle-specific?).
 
-    deg, km, and swath are evaluated out-of-database by evaluating all other 
+    deg, km, and swath are evaluated out-of-database by evaluating all other
     flags first, then masking.  This can be memory-intensive.  See "Examples"
     for how to perform in-database distance filters.
-    
+
     To include channels or networks with your results use asquery=True, and
 
     >>> q = q.add_columns(Sitechan.chan)
@@ -369,13 +369,13 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     Affiliation = affiliation
 
     d = deg
-    
+
     q = session.query(Site)
-    
+
     if stations:
         stations = make_wildcard_list(stations)
         q = q.filter(or_(*[Site.sta.like(stas) for stas in stations]))
-        
+
     if nets:
         nets = make_wildcard_list(nets)
         q = q.join(Affiliation, Affiliation.sta==Site.sta)
@@ -403,12 +403,12 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     return res
 
 
-def get_arrivals(session, arrival, assoc=None, stations=None, channels=None, 
-        atime=None, phases=None, arids=None, orids=None, auth=None, 
+def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
+        atime=None, phases=None, arids=None, orids=None, auth=None,
         asquery=False):
     """
     Build common queries for arrivals.
-    
+
     Parameters
     ----------
     stations, channels : list or tuple of strings
@@ -540,23 +540,23 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
         res = wfdisc_rows_to_stream(wfs, t1_utc, t2_utc, tol=tol)
 
     return res
-    
+
 
 def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     """
-    Convert wfdisc rows to obspy stream, trim the data to starttime and endtime 
+    Convert wfdisc rows to obspy stream, trim the data to starttime and endtime
     in the process
 
     Parameters
     ----------
-    wf_rows : 
+    wf_rows :
         Wfdisc rows as generated by get_wfdisc_rows or similar
     start_t: UTCDateTime
         Requested start time of the returned traces
     end_t: UTCDateTime
         Requested end time of the returned traces
     tol: float
-        If provided, a warning is fired if any Trace is not within tol seconds 
+        If provided, a warning is fired if any Trace is not within tol seconds
         of starttime and endtime
 
     Returns
@@ -568,16 +568,21 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     ------
     ValueError:
         Returned Stream contains trace start/end times outside of the tolerance.
+    IOError:
+        System can't find dir/dfile?
+
     """
     st = Stream()
-    
+
     for wf in wf_rows:
         try:
             tr = wfdisc2trace(wf)
         except IOError:
             # can't read file
-            # XXX: wow, why the hell would I let unreadable traces slip past
-            tr = None
+            # XXX: wow, why let unreadable traces slip past instead of raising an error?
+            msg = f"Can't read {wf.dir}/{wf.dfile}."
+            raise IOError(msg)
+            # tr = None
 
         if tr:
             # None utc times will pass through
@@ -640,20 +645,20 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
     Parameters
     ----------
     session : sqlalchemy.orm.session instance, bound
-    network : 
-    nets : 
-    affiliation : 
+    network :
+    nets :
+    affiliation :
     stas :
     time_ :
-    endtime : 
-    pref_nets : 
+    endtime :
+    pref_nets :
     with_query :
-    site_name :  
+    site_name :
     Returns
     -------
     query
         sdfs
-    
+
     Notes:
     ------
     If input into get_networks is a query, an affiliation table must be provided and the query must contain a site table to be
@@ -663,7 +668,7 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
     """
     if with_query:
         if not affiliation:
-            raise NameError('Affiliation table must be provided when get_networks is given a query as input')   
+            raise NameError('Affiliation table must be provided when get_networks is given a query as input')
 
         q = with_query
 
@@ -679,7 +684,7 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
                 sitechan = checkEntity
             if checkEntity._tabletype == 'Sensor':
                 sensor = checkEntity
-        
+
         if site:
             q = q.add_entity(affiliation)
             q = q.join(affiliation, affiliation.sta == site.sta)
@@ -692,7 +697,7 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
             q = q.add_entity(network)
             q = q.join(network, network.net == affiliation.net)
             warnings.warn("No site table is given in provided query.  Joining Affiliation on Sitechan")
-        
+
         elif sensor:
             q = q.add_entity(affiliation)
             q = q.join(affiliation, affiliation.sta == sensor.sta)
@@ -737,12 +742,12 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
     Parameters
     ----------
     session : sqlalchemy.orm.session instance, bound
-    site : 
-    sitechan : 
-    stas : 
+    site :
+    sitechan :
+    stas :
     chans :
     time_ :
-    endtime :  
+    endtime :
     with_query :
     affiliation_name :
     sensor_name:
@@ -751,15 +756,15 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
     -------
     query
         sdfs
-    
+
     Notes:
     ------
-    
+
     """
     if with_query:
 
         q = with_query
-        
+
         affiliation = None
         sensor = None
 
@@ -769,7 +774,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
                 affiliation = checkEntity
             if checkEntity._tabletype == 'Sensor':
                 sensor = checkEntity
-        
+
         if affiliation and sensor:
             q = q.add_entity(site)
             q = q.join(site, affiliation.sta == site.sta)
@@ -798,9 +803,9 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
                 q = q.add_entity(site)
                 q =q.join(site, site.sta == sensor.sta)
                 warnings.warn("No sitechan specified, joining site to sensor on column sta")
-        else: 
+        else:
             raise NameError("No affiliation or sensor table in provided in input query for join to site")
-         
+
     else:
         q = session.query(site)
         if sitechan:
@@ -832,22 +837,22 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
     Parameters
     ----------
     session : sqlalchemy.orm.session instance, bound
-    sensor : 
-    instrument : 
-    stas : 
+    sensor :
+    instrument :
+    stas :
     chans :
     time_ :
-    endtime :  
+    endtime :
     with_query :
 
     Returns
     -------
     query
         sdfs
-    
+
     Notes:
     ------
-    
+
     """
 
     if with_query:
@@ -865,7 +870,7 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
                 site = checkEntity
             if checkEntity._tabletype == 'Affiliation':
                 affiliation = checkEntity
-        
+
         if sitechan:
             q = q.add_entity(sensor)
             q = q.join(sensor, sitechan.chanid == sensor.chanid)
@@ -874,18 +879,18 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
             q = q.add_entity(sensor)
             q = q.join(sensor, sensor.sta == site.sta)
             warnings.warn("No sitechan specified, joining sensor to site on column sta")
-        
+
         elif affiliation:
             q = q.add_entity(sensor)
             q = q.join(sensor, sensor.sta == affiliation.sta)
             warnings.warn("No site or sitechan specified, joining sensor to affiliation on column sta")
-        
+
         else:
             raise NameError("No table in provided query on which to join the sensor table ")
 
     else:
         q = session.query(sensor)
-    
+
     if instrument:
         q = q.add_entity(instrument)
         q = q.join(instrument, sensor.inid == instrument.inid)
@@ -908,7 +913,7 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
     return q
 
 def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__'):
-    return 
+    return
 
 def check_orphan_stas():
     return

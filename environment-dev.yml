@@ -7,8 +7,7 @@ dependencies:
 - obspy>=1.4.1
 - sqlalchemy>1.4
 - click
-- oracle-instant-client
-- cx_oracle
+- oracledb
 - ipython
 - black
 - make
