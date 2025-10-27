@@ -1,0 +1,15 @@
+name: pisces-docs
+channels:
+- conda-forge
+- defaults
+dependencies:
+- python=3
+- make
+- markdown-it-py
+- myst-parser
+- pydata-sphinx-theme
+- sphinx >= 5.0
+- sphinx-book-theme
+- pip
+- pip:
+  - sphinx-autodoc2

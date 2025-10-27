@@ -252,9 +252,9 @@ def from_string(cls, line, default_on_error=None):
     Notes
     -----
     default_on_error is useful for malformed fields, but it will also mask
-    other problems with line parsing. It's better to pre-process tables 
-    to match the table specifications or catch exceptions and isolate 
-    these lines.  
+    other problems with line parsing. It's better to pre-process tables
+    to match the table specifications or catch exceptions and isolate
+    these lines.
 
     Examples
     --------

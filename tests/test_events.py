@@ -7,49 +7,21 @@ query statements, which compares two such objects for equivalence.
 """
 import pytest
 from obspy import UTCDateTime
+from sqlalchemy import or_
 
-from pisces.tables.kbcore import *
+from pisces.tables.kbcore import Event, Origin, Netmag, Stamag, Site
 from pisces import events
+from pisces.util import literal_sql
 
-# for scope='module' these database rows are added to a temp database once for this whole file,
-# then removed at the end. Not sure that's necessary.
-@pytest.fixture(scope='module')
-def eventdata(session):
-    lat = 40
-    lon = 25
-    depth = 15
-    time_ = UTCDateTime('2000-01-01').timestamp
-    # event stuff
-    data = {
-        'event1': Event(evid=1, prefor=1, evname='an important description'),
-        'origin1': Origin(orid=1, evid=1, lat=lat, lon=lon, depth=depth, time=time_, auth='auth1', mb=4.1, mbid=1, ms=5, ml=6, mlid=2),
-        'origin2': Origin(orid=2, evid=1, lat=lat+1, lon=lon+1, depth=depth+1, time=time_+1, ml=5),
-        'event2': Event(evid=2, prefor=3, evname='another description'),
-        'origin3': Origin(orid=3, evid=2, lat=lat-5, lon=lon-5, depth=depth-5, time=time_-5, etype='ex', auth='auth2', mb=2, ms=3, ml=4),
-    }
-    # magnitude stuff
-    data.update({
-        'netmag1': Netmag(net='IM', orid=1, evid=1, magtype='mb', magnitude=4, magid=1, auth='ISC'),
-        'netmag2': Netmag(net='IN', orid=2, evid=1, magtype='ml', magnitude=6, magid=2, auth='ISD'),
-        'netmag3': Netmag(net='IO', orid=1, evid=1, magtype='mw', magnitude=4, magid=3, auth='ISC'),
-        'stamag1': Stamag(sta='sta1', arid=1, magtype='ml', magnitude=4.1, magid=2, orid=1, auth='ISD'),
-        'stamag2': Stamag(sta='sta2', arid=2, magtype='ml', magnitude=3.9, magid=2, orid=2, auth='ISD'),
-        'stamag3': Stamag(sta='sta1', arid=3, magtype='mb', magnitude=3.9, magid=1, orid=1, auth='ISE'),
-    })
+# print(observed.statement.compile(compile_kwargs={"literal_binds": True}))
 
-    session.add_all(list(data.values()))
-    session.commit()
+lat = 40
+lon = 25
+depth = 15
+time_ = UTCDateTime('2000-01-01').timestamp
 
-    yield data, lat, lon, depth, time_
-
-    for item in data.values():
-        session.delete(item)
-
-    session.commit()
-
-
-def test_filter_events_origin(session, eventdata):
-    d, lat, lon, depth, time_ = eventdata
+def test_filter_events_origin(session):
+    """ Tests only on the Origin table. """
 
     q = session.query(Origin)
 
@@ -57,97 +29,120 @@ def test_filter_events_origin(session, eventdata):
     expected = q
     observed = events.filter_events(q)
     assert observed.statement.compare(expected.statement)
-    # assert str(expected) == str(observed)
+    # literal_sql strliteral_sql) == str(observed)
 
     # full region
-    r = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2))
+    expected = (
+        session.query(Origin)
+               .filter(Origin.lon.between(lon-2, lon+2))
+               .filter(Origin.lat.between(lat-2, lat+2))
     )
+    assert observed.statement.compare(expected.statement)
 
     # partial region
-    r = events.filter_events(q, region=(None, lon, None, lat)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin3']
+    observed = events.filter_events(q, region=(None, lon, None, lat))
+    expected = (
+        session.query(Origin)
+               .filter(Origin.lon <= lon)
+               .filter(Origin.lat <= lat)
     )
+    assert observed.statement.compare(expected.statement)
     # TODO: a region that spans the meridian
 
     # depth
-    r = events.filter_events(q, depth=(depth-6, depth-4)).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin3']
+    observed = events.filter_events(q, depth=(depth-6, depth-4))
+    expected = (
+            session.query(Origin)
+                   .filter(Origin.depth.between(depth-6, depth-4))
     )
+    assert observed.statement.compare(expected.statement)
 
     # orid list
-    r = events.filter_events(q, orid=[1, 2]).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, orid=[1, 2])
+    expected = (
+        session.query(Origin)
+               .filter(Origin.orid.in_([1, 2]))
     )
+    assert observed.statement.compare(expected.statement)
 
     # time
-    r = events.filter_events(q, time_=(time_-2, time_+2)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    observed = events.filter_events(q, times=(time_-2, time_+2))
+    expected = (
+        session.query(Origin)
+               .filter(Origin.time.between(time_-2, time_+2))
     )
+    assert observed.statement.compare(expected.statement)
 
     # auth
-    r = events.filter_events(q, auth='auth2').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin3']
+    observed = events.filter_events(q, auth='auth2')
+    expected = (
+        session.query(Origin)
+               .filter(Origin.auth.like('auth2'))
     )
+    assert observed.statement.compare(expected.statement)
+
+    # etype
+    observed = events.filter_events(q, etype='ex')
+    expected = (
+        session.query(Origin)
+               .filter(Origin.etype == 'ex')
+    )
+    assert observed.statement.compare(expected.statement)
+
+    observed = events.filter_events(q, etype=['ex', 'eq'])
+    expected = (
+        session.query(Origin)
+               .filter(Origin.etype.in_(['ex', 'eq']))
+    )
+    assert observed.statement.compare(expected.statement)
 
 
-def test_filter_events_event(session, eventdata):
-    d, lat, lon, depth, time_ = eventdata
+def test_filter_events_event(session):
+    """ Tests only on the Event table. """
 
     q = session.query(Event)
 
     # evname, with two different kinds of wildcard
-    r = events.filter_events(q, evname='*important%').order_by(Event.evid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['event1']
+    observed = events.filter_events(q, evname='*important%')
+    expected = (
+        session.query(Event)
+               .filter(Event.evname.like('%important%'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # evids
-    r = events.filter_events(q, evid=[2]).order_by(Event.evid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['event2']
+    observed = events.filter_events(q, evid=[2])
+    expected = (
+        session.query(Event)
+               .filter(Event.evid.in_([2]))
     )
+    assert observed.statement.compare(expected.statement)
 
 
-def test_filter_events_origin_event(session, eventdata):
-    d, lat, lon, depth, time_ = eventdata
+def test_filter_events_origin_event(session):
+    """ Tests using the Event and Origin tables. """
 
     q = session.query(Event, Origin)
 
     # prefor
-    r = events.filter_events(q, prefor=True).order_by(Event.evid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == (d['event1'], d['origin1']) and
-        r[1] == (d['event2'], d['origin3'])
+    observed = events.filter_events(q, prefor=True)
+    expected = (
+        session.query(Event, Origin)
+               .filter(Event.evid == Origin.evid)
+               .filter(Origin.orid == Event.prefor)
     )
-    # prefor, but add Event during at calling.
-    # it isn't added to the result set
+    assert observed.statement.compare(expected.statement)
+
+    # prefor, but add Event during at calling. it isn't added to the result set
     q = session.query(Origin)
-    r = events.filter_events(q, prefor=True, event=Event).order_by(Event.evid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin3']
+    observed = events.filter_events(q, prefor=True, event=Event)
+    expected = (
+        session.query(Origin)
+               .filter(Event.evid == Origin.evid)
+               .filter(Event.prefor == Origin.orid)
     )
+    assert observed.statement.compare(expected.statement)
 
 
 def test_filter_events_exceptions(session):
@@ -156,124 +151,167 @@ def test_filter_events_exceptions(session):
     # Origin input with no Origin table
     q = session.query(Event)
     with pytest.raises(ValueError):
-        r = events.filter_events(q, orid=[1])
+        _ = events.filter_events(q, orid=[1])
 
     # Event input with no Origin or Event table
     q = session.query(Site)
     with pytest.raises(ValueError):
-        r = events.filter_events(q, evid=[1])
+        _ = events.filter_events(q, evid=[1])
 
 
-def test_filter_magnitudes_origin(session, eventdata):
-    d, *_ = eventdata
+def test_filter_magnitudes_origin(session):
+    """ Magnitude tests using the Origin table. """
 
     q = session.query(Origin)
 
-    # origin magnitudes
-    r = events.filter_magnitudes(q, ml=(4.5, 5.5), mb=(3, None)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin2']
+    # magnitudes in origin table
+    observed = events.filter_magnitudes(q, ml=(4.5, 5.5), mb=(3, None))
+    expected = (
+        session.query(Origin)
+               .filter(or_(
+                        Origin.ml.between(4.5, 5.5),
+                        Origin.mb >= 3
+                    )
+        )
     )
+    assert observed.statement.compare(expected.statement)
 
     # TODO: filter_magnitudes(q, **{'m?': (1, 2)}) should fail with only Origin
 
-    # auth
-    r = events.filter_magnitudes(q, auth='auth?').order_by(Origin.orid).all()
-    assert (
-        len(r) == 2 and
-        r[0] == d['origin1'] and
-        r[1] == d['origin3']
+    # auth with wildcard
+    observed = events.filter_magnitudes(q, auth='auth?')
+    expected = (
+        session.query(Origin)
+               .filter(Origin.auth.like('auth_'))
     )
+    assert observed.statement.compare(expected.statement)
 
-def test_filter_magnitudes_origin_netmag(session, eventdata):
-    d, *_ = eventdata
+
+def test_filter_magnitudes_origin_netmag(session):
+    """ Magnitude tests using the Origin and Netmag tables. """
 
     q = session.query(Origin, Netmag)
 
     # non-origin magnitudes, joined results
-    r = events.filter_magnitudes(q, **{'m?': (5, None)}).order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin2'], d['netmag2'])
+    observed = events.filter_magnitudes(q, **{'m?': (5, None)})
+    expected = (
+        session.query(Origin, Netmag)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Netmag.magtype.like('m_'))
+               .filter(Netmag.magnitude >= 5)
     )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement) # not sure why this isn't working
 
     # net
-    r = events.filter_magnitudes(q, net='?M').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin1'], d['netmag1'])
+    observed = events.filter_magnitudes(q, net='?M')
+    expected = (
+        session.query(Origin, Netmag)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Netmag.net.like('_M'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # auth
-    r = events.filter_magnitudes(q, auth='*D').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin2'], d['netmag2'])
+    observed = events.filter_magnitudes(q, auth='*D')
+    expected = (
+        session.query(Origin, Netmag)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Netmag.auth.like('%D'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # pop in Netmag to get only Origin results filtered on Netmag
     q = session.query(Origin)
-    r = events.filter_magnitudes(q, ml=(5, None), netmag=Netmag).order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin2']
+    observed = events.filter_magnitudes(q, ml=(5, None), netmag=Netmag)
+    expected = (
+        session.query(Origin)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Netmag.magtype.like('ml'))
+               .filter(Netmag.magnitude >= 5)
     )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement) # not sure why this isn't working
 
 
-def test_filter_magnitudes_origin_netmag_stamag(session, eventdata):
-    d, *_ = eventdata
+def test_filter_magnitudes_origin_netmag_stamag(session):
+    """ Magnitude tests using the Origin, Netmag, and Stamag tables. """
 
     q = session.query(Origin, Netmag, Stamag)
 
     # mb from Stamag, joined with the correct Origin, Netmag rows
-    r = events.filter_magnitudes(q, mb=(None, 4)).order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin1'], d['netmag1'], d['stamag3'])
+    observed = events.filter_magnitudes(q, mb=(None, 4))
+    expected = (
+        session.query(Origin, Netmag, Stamag)
+               .filter(Stamag.magid == Netmag.magid)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Stamag.orid == Origin.orid)
+               .filter(Stamag.magtype.like('mb'))
+               .filter(Stamag.magnitude <= 4)
     )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement)
 
     # auth from Stamag
-    r = events.filter_magnitudes(q, auth='*E').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin1'], d['netmag1'], d['stamag3'])
+    observed = events.filter_magnitudes(q, auth='*E')
+    expected = (
+        session.query(Origin, Netmag, Stamag)
+               .filter(Stamag.magid == Netmag.magid)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Stamag.orid == Origin.orid)
+               .filter(Stamag.auth.like('%E'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # sta
-    r = events.filter_magnitudes(q, sta='*2').order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin2'], d['netmag2'], d['stamag2'])
+    observed = events.filter_magnitudes(q, sta='*2')
+    expected = (
+        session.query(Origin, Netmag, Stamag)
+               .filter(Stamag.magid == Netmag.magid)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Stamag.orid == Origin.orid)
+               .filter(Stamag.sta.like('%2'))
     )
+    assert observed.statement.compare(expected.statement)
 
     # pop in Netmag
     q = session.query(Origin, Stamag)
 
     # mb from Stamag, joined with the correct Origin rows
-    r = events.filter_magnitudes(q, mb=(None, 4), netmag=Netmag).order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin1'], d['stamag3'])
+    # we should filter on the Netmag table if it's suppled as a keyword?
+    observed = events.filter_magnitudes(q, mb=(None, 4), netmag=Netmag)
+    expected = (
+        session.query(Origin, Stamag)
+               .filter(Stamag.magid == Netmag.magid)
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Stamag.orid == Origin.orid)
+               .filter(Stamag.magtype.like('mb'))
+               .filter(Stamag.magnitude <= 4)
     )
+    assert literal_sql(observed) == literal_sql(expected)
+    # assert observed.statement.compare(expected.statement) #XXX not sure why this doesn't work
 
     # pop in Stamag
     # get Origin rows filtered on Stamag magnitudes
     q = session.query(Origin)
 
-    r = events.filter_magnitudes(q, mb=(None, 4), stamag=Stamag).order_by(Origin.orid).all()
-    assert (
-        len(r) == 1 and
-        r[0] == d['origin1']
+    observed = events.filter_magnitudes(q, mb=(None, 4), stamag=Stamag)
+    expected = (
+        session.query(Origin)
+               .filter(Stamag.orid == Origin.orid)
+               .filter(Stamag.magtype.like('mb'))
+               .filter(Stamag.magnitude <= 4)
     )
+    # assert observed.statement.compare(expected.statement) #XXX not sure why this doesn't work
+    # print(literal_sql(observed))
+    # print(literal_sql(expected))
+    assert literal_sql(observed) == literal_sql(expected)
 
 
-def test_filter_magnitudes_exceptions(session, eventdata):
+def test_filter_magnitudes_exceptions(session):
     """ Check for expected exceptions. """
-    d, *_ = eventdata
 
-    # None of the involved tables provided
+    # None of the involved tables are provided
     q = session.query(Site)
     with pytest.raises(ValueError):
         q = events.filter_magnitudes(q, mb=(4, 5))
@@ -291,21 +329,33 @@ def test_filter_magnitudes_exceptions(session, eventdata):
         q = events.filter_magnitudes(q, sta='sta1')
 
 
-def test_filter_arrivals(session, eventdata):
-    pass
+# def test_filter_arrivals(session, eventdata):
+#     pass
 
 
-# TODO: Add more "integration" tests eventually
-def test_filter_events_magnitudes(session, eventdata):
+# TODO: Add more "integration" tests
+def test_filter_events_magnitudes(session):
     """ Test passing the results of filter_events to filter_magnitudes. """
-    d, lat, lon, depth, time_ = eventdata
 
     # Get preferred origins and mw magnitudes for events in a region
-    q = session.query(Origin, Netmag)
+    q = session.query(Origin)
     q = events.filter_events(q, region=(lon-2, lon+2, lat-2, lat+2), prefor=True, event=Event)
+    q = q.add_entity(Netmag)
     # points to origin1, netmag3
-    r = events.filter_magnitudes(q, mw=(None, None)).all()
-    assert (
-        len(r) == 1 and
-        r[0] == (d['origin1'], d['netmag3'])
+    # r = events.filter_magnitudes(q, mw=(None, None)).all()
+    # assert (
+    #     len(r) == 1 and
+    #     r[0] == (d['origin1'], d['netmag3'])
+    # )
+    observed = events.filter_magnitudes(q, mw=(None, None))
+    expected = (
+        session.query(Origin, Netmag)
+               .filter(Event.evid == Origin.evid)
+               .filter(Event.prefor == Origin.orid)
+               .filter(Origin.lon.between(lon-2, lon+2))
+               .filter(Origin.lat.between(lat-2, lat+2))
+               .filter(Netmag.orid == Origin.orid)
+               .filter(Netmag.magtype.like('mw'))
     )
+    assert observed.statement.compare(expected.statement)
+    # assert literal_sql(observed) == literal_sql(expected)
