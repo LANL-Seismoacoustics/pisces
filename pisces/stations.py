@@ -91,7 +91,7 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
     """
 
     # get desired tables from the query
-    Network, Affiliation, Site = _get_entities(query, "Network", "Affiliation","Site")
+    Network, Affiliation, Site = _get_entities(query, "Network", "Affiliation", "Site")
     # override if provided
     Network = tables.get("network", None) or Network
     Affiliation = tables.get("affiliation", None) or Affiliation
@@ -239,6 +239,10 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
 
     if not any([Site, Sitechan]):
         msg = "Site or Sitechan table required."
+        raise ValueError(msg)
+    
+    if Site and Sensor and not Sitechan:
+        msg = "Sitechan table required to join Site and Sensor."
         raise ValueError(msg)
 
     if any([region, staname, refsta]) and not Site:
