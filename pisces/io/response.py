@@ -667,9 +667,9 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
         elif stageType[i] == 'fap':
 
             if calratio is not None:
-                gain = 1/(calib*calratio)
+                scale = 1/(calib*calratio)
             else:
-                gain = 1/calib
+                scale = 1/calib
                 
             if stageVal == 1:
                 if nm_to_m == True:
