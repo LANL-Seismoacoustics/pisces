@@ -4,6 +4,7 @@ import warnings
 from obspy import read_inventory
 from datetime import datetime
 from math import pi
+from scipy.signal import group_delay
 from obspy.core import UTCDateTime
 import os
 from obspy.core.inventory.response import ComplexWithUncertainties, PolesZerosResponseStage, \
@@ -246,13 +247,26 @@ def get_pazfir_data(fileLines, stageStart, stageType):
                             bottomVal = FloatWithUncertainties(bottomData[0])
                     else:
                         bottomVal = ComplexWithUncertainties(bottomData[0])
+                    bottoms.append(bottomVal)
                    
                 else:
                     bottoms.append(None)
             
             poles_nums.append(tops)
             zeros_denoms.append(bottoms)
-            
+        
+        elif stageType[i] == 'delay':
+            startLine = startVal
+            con_line = fileLines[startLine+1].split()
+
+            tops = None
+            bottoms = None
+            stage_constant = float(con_line[0])
+
+            poles_nums.append(tops)
+            zeros_denoms.append(bottoms)
+            sens_decim.append(stage_constant)
+        
         else:
             tops = None
             bottoms = None
@@ -306,7 +320,7 @@ def a0_from_pz(poles, zeros, a0f):
     return a0
 
 
-def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = True, calratio=None):
+def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = True, calratio=None, calculate_delays = True):
     """
     Read in a pazfir file and output the instrument response in the form of an obspy 
     response object.
@@ -337,6 +351,12 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
         is converted to frequency and used
     calratio: float
         Calibration conversion ratio found in a KBCore/CSSS3.0 sensor table
+    calculate_delays: boolean
+        Calculate group delays of FIR and IIR stages using scipy's group_delay function.
+        Default is True and group delays are calculated and included in the response 
+        object.  It is assumed that the data is corrected for the delay by the digitizer
+        so the delay is set in both the delay and correction fields.  This may not be
+        true but cannot be evaulated from pazfir files/CSS3-like databases.
 
 
     Returns
@@ -369,14 +389,14 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
     if stageNums[0] == 0:
         stageNums = [n + 1 for n in stageNums]
         flag += 1
-        warnings.warn('First stage labeled as stage 0, increasing all stage numbers by one.')
+        #warnings.warn('First stage labeled as stage 0, increasing all stage numbers by one.')
     
     # check if starting stage is greater than 1
     if stageNums[0] > 1:
         diff = stageNums[0]-1
         stageNums = [n + diff for n in stageNums]
         flag += 1
-        warnings.warn('First stage number greater than one. Shifting all stage numbers such that the first stage is stage 1.')
+        #warnings.warn('First stage number greater than one. Shifting all stage numbers such that the first stage is stage 1.')
     
     # check if stages are consecutive
     stageCheck = 1
@@ -400,11 +420,12 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
             elif stageNums[i] > stageCheck:
                 diff = stageCheck - stageNums[i]
                 stageNums[i] += diff
-                warnings.warn('Stage number lower than expected, increasing by difference between actual and expected')
+                #warnings.warn('Stage number lower than expected, increasing by difference between actual and expected')
                 stageCheck += 1
                 flag +=1
             else:
-                warnings.warn('Unusual issues with numbering found, consider evaulating file.')
+                #warnings.warn('Unusual issues with numbering found, consider evaulating file.')
+                pass
                 
     # raise warnings if weird stage numbers
     if flag > 0:
@@ -531,7 +552,8 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
     stageList = []
     total_scaling = 1.0
     a0f = 1/calper
-    
+    delaySum = 0
+
     # PAZ STAGE
     
     for i, stageVal in enumerate(stageNums):
@@ -623,8 +645,22 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
             
             total_scaling *= gain
             
-            trans_func_type = 'DIGITAL'   
+            trans_func_type = 'DIGITAL' 
+
+            if calculate_delays == True:
+                if len(denominators) == 0:
+                    gd = group_delay((numerators,[1.0]), w = a0f, fs = dec_sample_rate)[1]
+
+                else:
+                    gd = group_delay((numerators,denominators), w = a0f, fs = dec_sample_rate)[1]
+                
+                delay = gd/dec_sample_rate
+
+            else:
+                delay = 0
             
+            delaySum =+ delay
+
             # Create coefficient response stage for each fir stage
             firStage = response.CoefficientsTypeResponseStage(stageNums[i], gain, \
                                 a0f, in_units[i], out_units[i], trans_func_type,\
@@ -632,8 +668,8 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
                                 decimation_input_sample_rate = dec_sample_rate, \
                                 decimation_factor = dec_factor, \
                                 decimation_offset = 0, \
-                                decimation_delay = 0, \
-                                decimation_correction = 0, \
+                                decimation_delay = delay, \
+                                decimation_correction = delay, \
                                 input_units_description = in_units_desc[i], \
                                 output_units_description = out_units_desc[i])
                 
@@ -725,9 +761,17 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
     
     # GROUP DELAY STAGE
 
-    ### TO DO
+        elif stageType[i] == 'delay':
+            fileDelay = abs(sens_decim[i])
+            calculatedDelay = abs(delaySum)
+
+            delayDiff = abs(fileDelay-calculatedDelay)
+
+            if delayDiff > 0.001:
+                warnings.warn('Group delay reported in file ({}) differs from calculated group delay ({}) by more than 0.001 second'.format(fileDelay, calculatedDelay))
+
     
-    # Is there weird shit?
+    # are there weird stages?
                 
         else:
             warnings.warn('Ignoring unexpected stage type {}.  Pazfir files evaulation recommended.'.format(stageType[i]))
