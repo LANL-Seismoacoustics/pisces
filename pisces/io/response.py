@@ -4,6 +4,7 @@ import warnings
 from obspy import read_inventory
 from datetime import datetime
 from math import pi
+from scipy.signal import group_delay
 from obspy.core import UTCDateTime
 import os
 from obspy.core.inventory.response import ComplexWithUncertainties, PolesZerosResponseStage, \
@@ -246,6 +247,7 @@ def get_pazfir_data(fileLines, stageStart, stageType):
                             bottomVal = FloatWithUncertainties(bottomData[0])
                     else:
                         bottomVal = ComplexWithUncertainties(bottomData[0])
+                    bottoms.append(bottomVal)
                    
                 else:
                     bottoms.append(None)
@@ -306,7 +308,7 @@ def a0_from_pz(poles, zeros, a0f):
     return a0
 
 
-def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = True, calratio=None):
+def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = True, calratio=None, calculate_delays = True):
     """
     Read in a pazfir file and output the instrument response in the form of an obspy 
     response object.
@@ -337,6 +339,12 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
         is converted to frequency and used
     calratio: float
         Calibration conversion ratio found in a KBCore/CSSS3.0 sensor table
+    calculate_delays: boolean
+        Calculate group delays of FIR and IIR stages using scipy's group_delay function.
+        Default is True and group delays are calculated and included in the response 
+        object.  It is assumed that the data is corrected for the delay by the digitizer
+        so the delay is set in both the delay and correction fields.  This may not be
+        true but cannot be evaulated from pazfir files/CSS3-like databases.
 
 
     Returns
@@ -623,7 +631,19 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
             
             total_scaling *= gain
             
-            trans_func_type = 'DIGITAL'   
+            trans_func_type = 'DIGITAL' 
+
+            if calculate_delays == True:
+                if len(denominators) == 0:
+                    gd = group_delay((numerators,[1.0]), w = a0f, fs = dec_sample_rate)[1]
+
+                else:
+                    gd = group_delay((numerators,denominators), w = a0f, fs = dec_sample_rate)[1]
+                
+                delay = gd/dec_sample_rate
+
+            else:
+                delay = 0
             
             # Create coefficient response stage for each fir stage
             firStage = response.CoefficientsTypeResponseStage(stageNums[i], gain, \
@@ -632,8 +652,8 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
                                 decimation_input_sample_rate = dec_sample_rate, \
                                 decimation_factor = dec_factor, \
                                 decimation_offset = 0, \
-                                decimation_delay = 0, \
-                                decimation_correction = 0, \
+                                decimation_delay = delay, \
+                                decimation_correction = delay, \
                                 input_units_description = in_units_desc[i], \
                                 output_units_description = out_units_desc[i])
                 
