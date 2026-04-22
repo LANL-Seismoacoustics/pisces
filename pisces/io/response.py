@@ -654,10 +654,10 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
                 else:
                     gd = group_delay((numerators,denominators), w = a0f, fs = dec_sample_rate)[1]
                 
-                delay = gd/dec_sample_rate
+                delay = (np.atleast_1d(gd)[0])/dec_sample_rate
 
             else:
-                delay = 0
+                delay = 0.0
             
             delaySum =+ delay
 
