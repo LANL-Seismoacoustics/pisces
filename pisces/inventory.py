@@ -1,4 +1,3 @@
-from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
 from obspy.core.inventory import (
     Inventory, Network as ObsNetwork, Station, Channel,
     Site as ObsPySite, Equipment, Comment)
@@ -8,16 +7,32 @@ import warnings
 from collections import defaultdict
 from pisces.util import _get_entities, jdate_to_utc
 
-def make_inventory(query, use_network = True, level = 'station', filename = None, format=None):
+def make_inventory(query, use_network = True, level = 'station', schema = 'kbcore'):
 
     # add in schema option with multiple import if statements...
+    schema = schema.lower()
+    VALID_SCHEMAS = ['kbcore', 'css3', 'antelope']
+    if schema not in VALID_SCHEMAS:
+        raise ValueError(f"schema must be one of {VALID_SCHEMAS}")
+    
+    if schema == 'kbcore':
+        from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
 
+    if schema == 'css3':
+        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+    
+    if schema == 'antelope':
+        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
+    
+    level = level.lower()
     VALID_LEVELS = ['network', 'station', 'channel', 'response']
     if level not in VALID_LEVELS:
         raise ValueError(f"level must be one of {VALID_LEVELS}")
     
     # Get tables from query
     Network, Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor","Instrument")
+
 
     # Check tables are present for different level requests
     if level == 'network':
@@ -43,7 +58,7 @@ def make_inventory(query, use_network = True, level = 'station', filename = None
     # Execute query and organize results
     results = query.all()
 
-    data_structure = organize_data(results, use_network=use_network)
+    data_structure = organize_data(results, use_network=use_network,schema = schema)
 
     # Build inventory based on level
     networks = []
@@ -58,12 +73,26 @@ def make_inventory(query, use_network = True, level = 'station', filename = None
         created = UTCDateTime()
     )
 
-def organize_data(results, use_network = True):
+def organize_data(results, use_network = True, schema = 'kbcore'):
     """
     Organize query results into nested dictionary structure.
     
     Returns: {network_code: {station_code: {channel_key: [data]}}}
     """
+    schema = schema.lower()
+    VALID_SCHEMAS = ['kbcore', 'css3', 'antelope']
+    if schema not in VALID_SCHEMAS:
+        raise ValueError(f"schema must be one of {VALID_SCHEMAS}")
+    
+    if schema == 'kbcore':
+        from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
+    if schema == 'css3':
+        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+    
+    if schema == 'antelope':
+        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
     data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     
     if not results:
@@ -306,15 +335,26 @@ def build_channel(site, chan_data, include_response=False):
     channel.comments.append(Comment(value=f"Channel ID: {sitechan.chanid}"))
     
     # Build response if requested
+
+    # Add schema specific calls here since Antelope can support VEL and ACC
     if include_response and sensor and instrument:
-        if sitechan.chan[1].upper() == 'D':
-            resp_units = 'PRESSURE'
-        elif sitechan.chan[1].upper() in ['H', 'L', 'N', 'G', 'M', 'P']:
+        if instrument.rsptype == 'A':
+            resp_units = 'ACC'
+        elif instrument.rsptype == 'V':
+            resp_units = 'VEL'
+        elif instrument.rsptype == 'D':
             resp_units = 'DISP'
+        elif instrument.rsptype == 'I':
+            resp_units = 'PRESSURE'
         else:
-            VALID_CODES = ['H', 'L', 'N', 'G', 'M', 'P', 'D']
-            msg = f"Instrument response reader expecting channel codes with instrument codes in {VALID_CODES} "
-            raise ValueError(msg)
+            if sitechan.chan[1].upper() == 'D':
+                resp_units = 'PRESSURE'
+            elif sitechan.chan[1].upper() in ['H', 'L', 'N', 'G', 'M', 'P']:
+                resp_units = 'DISP'
+            else:
+                VALID_CODES = ['H', 'L', 'N', 'G', 'M', 'P', 'D']
+                msg = f"Instrument response reader expecting channel codes with instrument codes in {VALID_CODES} "
+                raise ValueError(msg)
                    
         response = build_response(sensor, instrument, sample_rate, resp_units)
         if response:
