@@ -1,5 +1,5 @@
 from sqlalchemy import func, or_
-from pisces.util import make_wildcard_list, _get_entities, range_filters
+from pisces.util import make_wildcard_list, _get_entities, range_filters, jdate_to_utc
 from obspy.core import UTCDateTime
 
 
@@ -260,6 +260,8 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
     # Join Site and Sitechan if both present
     if Site and Sitechan:
         query = query.filter(Site.sta == Sitechan.sta)
+        query = query.filter(Sitechan.ondate.between(Site.ondate, Site.offdate))
+
     
     # If Sensor is present join first on Sitechan.chanid if Sitechan present
     if Sensor and Sitechan:
@@ -295,8 +297,6 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
                 query = query.filter(t1 <= Sitechan.offdate)
             if t2: 
                 query = query.filter(t1 >= Sitechan.ondate)
-            if Sitechan and Site:
-                query =query.filter(Sitechan.ondate.between(Site.ondate, Site.offdate))
         else:
             if t1:
                 query = query.filter(t1 <= Site.offdate)
@@ -399,6 +399,8 @@ def filter_responses(query, sta = None, chan = None, times = None, **tables):
     # If Sitechan is present join on Sitechan.chanid
     if Sitechan:
         query = query.filter(Sitechan.chanid == Sensor.chanid)
+        # not sure I need this line?
+        # query = query.filter(Sensor.time.between(jdate_to_utc(Sitechan.ondate).timestamp, jdate_to_utc(Sitechan.offdate).timestamp)) 
 
     if sta:
         sta = make_wildcard_list(sta)

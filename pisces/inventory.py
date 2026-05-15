@@ -1,160 +1,331 @@
-from pisces import stations
-import obspy.core import inventory as inv
-from obspy.core import UTCDateTime
-import datetime
+from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+from obspy.core.inventory import (
+    Inventory, Network as ObsNetwork, Station, Channel,
+    Site as ObsPySite, Equipment, Comment)
+from obspy import UTCDateTime
 from pisces.io.response import read_pazfir
+import warnings
+from collections import defaultdict
+from pisces.util import _get_entities, jdate_to_utc
 
-def make_inventory(query, level='station', filename = None, format=None):
+def make_inventory(query, use_network = True, level = 'station', filename = None, format=None):
 
-    # take query output from filtering functions and turn into an inventory object
+    # add in schema option with multiple import if statements...
 
-    # check level and see if net is available
-
-    # Create mapping dictionaries where net is keywork and sta in corresponding list, do for primary keys down to response?
-
+    VALID_LEVELS = ['network', 'station', 'channel', 'response']
+    if level not in VALID_LEVELS:
+        raise ValueError(f"level must be one of {VALID_LEVELS}")
+    
     # Get tables from query
     Network, Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor","Instrument")
 
     # Check tables are present for different level requests
+    if level == 'network':
+        if not Network:
+            msg = "Network table required for station metadata"
+            raise ValueError(msg)
+
     if level == 'station':
-        if not any [Site]:
+        if not Site:
             msg = "Site table required for station metadata"
             raise ValueError(msg)
         
     if level == 'channel':
-        if not any [Site, Sitechan, Sensor, Instrument]:
-            msg = "Site, Sitechan, Sensor, and Instrument tables required for channel metadata"
+        if not any([Site, Sitechan]):
+            msg = "Site and Sitechan tables required for channel metadata"
             raise ValueError(msg)
 
     if level == 'response':
-        if not any [Site, Sitechan, Sensor, Instrument]:
-            msg = "SSite, Sitechan, Sensor, and Instrument tables required for responses"
+        if not any([Site, Sitechan, Sensor, Instrument]):
+            msg = "Site, Sitechan, Sensor, and Instrument tables required for responses"
             raise ValueError(msg)
         
-    inventory = inv.Inventory(
-            networks=[])
+    # Execute query and organize results
+    results = query.all()
+
+    data_structure = organize_data(results, use_network=use_network)
+
+    # Build inventory based on level
+    networks = []
+    for net_code, net_data in data_structure.items():
+        network = build_network(net_code, net_data, level)
+        if network is not None:
+            networks.append(network)
     
-    #if Network:
-        
+    return Inventory(
+        networks = networks,
+        source = "KB Core Database via Pisces",
+        created = UTCDateTime()
+    )
 
-    # if level == 'network':
+def organize_data(results, use_network = True):
+    """
+    Organize query results into nested dictionary structure.
+    
+    Returns: {network_code: {station_code: {channel_key: [data]}}}
+    """
+    data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    
+    if not results:
+        warnings.warn("Query returned no results")
+        return Inventory(networks=[], source="KB Core via Pisces")    
+    
+    for row in results:
+        site = extract_table(row, Site)
+        sitechan = extract_table(row, Sitechan)
+        sensor = extract_table(row, Sensor)
+        instrument = extract_table(row, Instrument)
+        affiliation = extract_table(row, Affiliation)
+        network = extract_table(row, Network)
 
-    netStaDict = {}
-    netObjDict = {}
-    staChanDict = {}
-    staObjDict = {}
-    chanRespDict = {}
-    chanObjDict = {}
-    respObjDict = {}
-
-    for row in query:
-        # start with network, get network value if exists if not exist then '__'
-        if Network:
-            netcode = row.network.net
-            netObj = inv.Network(netcode)  #TODO:  return later and count netStaDict entries and add to total number of stations, add staObj list to stations field
-            if row.network.netname != '-':
-                netObj.description = row.network.netname
-            if row.network.auth != '-':
-                netObj.source_id = row.network.auth
-        else:
-            netcode = '__'
-            netname = 'Default network when none provided in query'
-            auth = 'Pisces Default'
-            netObj = inv.Network(netcode, description = netname, source_id=auth)
-        
-        if Affiliation:
-            if not Network:
-                netcode = row.affiliation.net
-                netObj = inv.Network(netcode)
-
-            netStart = UTCDateTime(row.affiliation.time)
-            netEnd = UTCDateTime(row.affiliation.endtime)
-
-            if netStart.timestamp != -9999999999.999:
-                netObj.start_date = netStart
-            if netEnd.timestamp != 9999999999.999:
-                netObj.end_date = netEnd
-
-            if netcode in netStaDict:  # check if network in netStaDict as key, if not add as key with station in list, if so add sta
-                netStaDict[netcode].append(row.affiliation.sta)
+        if network and use_network == True:
+            net_name = network.netname
+            if net_name == '-' or net_name is None:
+                net_name = 'Netname in Network table is Null'
+            if Affiliation:
+                net_code = affiliation.net
             else:
-                netStaDict[netcode] = [row.affiliation.sta]
-
-        if netcode not in netObjDict:
-                    netObjDict[netcode] = netObj
+                net_code = network.net
+        else:
+            net_code = '__'
+            net_name = 'Pisces Default Network Code if none are provided or available'
         
-
-        # Next move to station tables
-
-        if level != 'network':
-            # Will always need site/station unless level is network
-            stacode = row.site.sta
-            staObj = inv.Station(stacode)
-            if row.site.staname != '-':
-                staObj.description = row.site.staname
-            if row.site.lat != -999:            #TODO: required for channel object, what to do?
-                staObj.latitude = row.site.lat
-            if row.site.lon != -999:
-                staObj.longitude = row.site.lon
-            if row.site.elev != '-999':
-                staObj.elevation = row.site.elev*1000
-            if row.site.ondate != -1:
-                staObj.start_date = UTCDateTime(datetime.datetime.strptime(row.site.ondate, '%Y%j').date())
-            if row.site.offdate != 2286324:
-                staObj.end_date = UTCDateTime(datetime.datetime.strptime(row.site.offdate, '%Y%j').date())
-            
-            #TODO: if stacode not in staObjDict
-            
-            if Sitechan:
-                chancode = row.sitechan.chan
-                chanid = row.sitechan.chanid
-                location_code = ''
-                chanObj = inv.Channel(chancode, location_code, row.site.lat, row.site.lon, row.site.lon, \
-                                      row.site.elev*1000, row.sitechan.edpeth)
-                if row.sitechan.hang != -1:
-                    chanObj.azimuth = row.sitechan.hang
-                if row.sitechan.vang != -1:
-                    chanObj.dip = row.sitechan.vang
-                if row.sitechan.descrip != '-':
-                    chanObj.description = row.sitechan.descrip
-                if row.sitechan.ctype != '-':
-                    chanObj.types = row.sitechan.ctype
-                if row.sitechan.ondate != -1:
-                    chanObj.start_date = UTCDateTime(datetime.datetime.strptime(row.sitechan.ondate, '%Y%j').date())
-                if row.sitechan.offdate != 2286324:
-                    chanObj.end_date = UTCDateTime(datetime.datetime.strptime(row.sitechan.offdate, '%Y%j').date())
-            
-            if Sensor:
-                if row.sensor.time != -9999999999.999:
-    
-        #### THE SAME CHANID CAN MAP TO MULTIPLE INIDS, WILL NEED TO ACCOUNT HERE AND ALSO IN STATIONS.PY
-
-        ## NOTE TO SELF:  START MAPPING LOGIC AT BOTTOM AND WORK UP 
-    
-
-            if Instrument:
-                chanObj.sample_rate = row.instrument.samprate
-
-            if level == 'response':
-                calib = row.instrument.ncalib
-                calper = row.instrument.ncalper
-                calratio = row.sensor.calratio
-
-                if row.instrment.dir != '-' and row.instrument.dfile !=  '-':
-                    filepath = '{}/{}'.format(row.instrment.dir,row.instrment.dfile)
-                    chanObj.response = read_pazfir(filepath, cailb = calib, calper = calper, input_units='M', calratio = calratio)
-                else:
-                    chanObj.response = None ### DOES THIS MAKE SENSE?
-
-
-
-
-
-        else:  
-            pass # TODO: check if pass or continue...
-
-    
-    return inventory
+        # Store network metadata
+        if 'metadata' not in data[net_code]:
+            data[net_code]['metadata'] = {
+                'network': network,
+                'description': net_name
+            }
         
-
+        # Store station metadata
+        if site:
+            sta_key = (site.sta, site.ondate)
+            if 'metadata' not in data[net_code][sta_key]:
+                data[net_code][sta_key]['metadata'] = {
+                    'site': site,
+                    'affiliation': affiliation
+            }
         
+        # Store channel data
+        if sitechan:
+            # Use (chan, ondate, offdate) as unique key for each channel epoch
+            chan_key = (sitechan.chan, sitechan.ondate, sitechan.offdate)
+            data[net_code][sta_key][chan_key].append({
+                'sitechan': sitechan,
+                'sensor': sensor,
+                'instrument': instrument
+            })
+    
+    return data
+
+
+def extract_table(row, table_class):
+    """Extract specific table object from query row."""
+    # Try multiple methods to get the table
+    # Method 1: Direct attribute access
+    if hasattr(row, table_class.__name__.lower()):
+        return getattr(row, table_class.__name__.lower())
+    
+    # Method 2: Check if row is tuple-like
+    if isinstance(row, tuple):
+        for item in row:
+            if isinstance(item, table_class):
+                return item
+    
+    # Method 3: Check if row is the table itself
+    if isinstance(row, table_class):
+        return row
+    
+    return None
+
+
+
+def build_network(net_code, net_data, level):
+    """Build ObsPy Network object."""
+    metadata = net_data.get('metadata', {})
+    network_obj = metadata.get('network')
+    
+    # For 'network' level, return basic network info only
+    if level == 'network':
+        return ObsNetwork(
+            code = net_code,
+            description = metadata.get('description', f"Network {net_code}"),
+        )
+    
+    # Build stations for other levels
+    stations = []
+    for sta_code, sta_data in net_data.items():
+        if sta_code == 'metadata':
+            continue
+        station = build_station(sta_code, sta_data, level)
+        if station is not None:
+            stations.append(station)
+
+    if not stations:
+        return None
+    
+    return ObsNetwork(
+        code = net_code,
+        description = metadata.get('description', f"Network {net_code}"),
+        stations = stations,
+    )
+
+
+def build_station(sta_key, sta_data, level):
+    """Build ObsPy Station object."""
+    metadata = sta_data.get('metadata', {})
+    site = metadata.get('site')
+    
+    if not site:
+        return None
+    
+    sta_code = sta_key[0]
+
+    if site.ondate == -1:
+        start_time = None
+    else:
+        start_time = jdate_to_utc(site.ondate)
+
+    if site.offdate == 2286324:
+        end_time = None
+    else:
+        end_time = jdate_to_utc(site.offdate)
+    
+    if site.staname == '-':
+        sta_name = 'Staname in Site table is Null'
+    else:
+        sta_name = site.staname
+
+    station = Station(
+        code = sta_code,
+        latitude = site.lat,
+        longitude = site.lon,
+        elevation = site.elev*1000,
+        site = ObsPySite(name=  sta_name or sta_code),
+        start_date = start_time,
+        end_date = end_time,
+    )
+    
+    # Add reference station if available
+    if hasattr(site, 'refsta') and site.refsta:
+        station.comments.append(Comment(value=f"Reference station: {site.refsta}"))
+    
+    # For 'station' level, return without channels
+    if level == 'station':
+        return station
+    
+    # Build channels for 'channel' and 'response' levels
+    channels = []
+    for chan_key, chan_data_list in sta_data.items():
+        if chan_key == 'metadata':
+            continue
+        for chan_data in chan_data_list:
+            try:
+                channel = build_channel(
+                    site = site,
+                    chan_data = chan_data,
+                    include_response = (level == 'response')
+                )
+                if channel is not None:
+                    channels.append(channel)
+            except Exception as e:
+                warnings.warn(f"Error building channel {chan_key[0]} for {sta_code}: {e}")
+    
+    station.channels = channels
+    return station
+
+
+def build_channel(site, chan_data, include_response=False):
+    """Build ObsPy Channel object."""
+    sitechan = chan_data['sitechan']
+    sensor = chan_data['sensor']
+    instrument = chan_data['instrument']
+
+    
+    # Location code
+    location_code = ''
+
+    if sitechan.ondate == -1:
+        start_time = None
+    else:
+        start_time = jdate_to_utc(sitechan.ondate)
+
+    if sitechan.offdate == 2286324:
+        end_time = None
+    else:
+        end_time = jdate_to_utc(sitechan.offdate)
+
+    if sitechan.descrip == '-':
+        chan_descrip = 'Descrip in Sitechan table is Null'
+    else:
+        chan_descrip = sitechan.descrip
+
+    
+    # Calculate dip from vang
+    # KB Core: vang=0 horizontal, vang=90 up, vang=-90 down
+    # SEED: dip=0 horizontal, dip=90 down, dip=-90 up
+    if sitechan.vang == -1 or sitechan.vang is None:
+        dip = None
+    else:
+        dip = 90.0 - sitechan.vang
+
+    if sitechan.hang == -1 or sitechan.hang is None:
+        azimuth = None
+    else:
+        azimuth = sitechan.hang
+    
+    # Sample rate from instrument
+    if instrument:
+        sample_rate = float(instrument.samprate)
+    else:
+        sample_rate = None
+
+    channel = Channel(
+        code = sitechan.chan,
+        location_code = location_code,
+        latitude = site.lat,
+        longitude = site.lon,
+        elevation = site.elev*1000,
+        depth = sitechan.edepth*1000,
+        azimuth = azimuth,
+        dip = dip,
+        sample_rate = sample_rate,
+        start_date = start_time,
+        end_date = end_time,
+        description = chan_descrip
+    )
+
+    # Add sensor equipment
+    if instrument:
+        channel.sensor = Equipment(
+            type = instrument.insname,
+            description = getattr(instrument, 'instype', instrument.insname) if instrument else instrument.insname
+        )
+    
+    # Add chanid comment
+    channel.comments.append(Comment(value=f"Channel ID: {sitechan.chanid}"))
+    
+    # Build response if requested
+    if include_response and sensor and instrument:
+        if sitechan.chan[1].upper() == 'D':
+            resp_units = 'PRESSURE'
+        elif sitechan.chan[1].upper() in ['H', 'L', 'N', 'G', 'M', 'P']:
+            resp_units = 'DISP'
+        else:
+            VALID_CODES = ['H', 'L', 'N', 'G', 'M', 'P', 'D']
+            msg = f"Instrument response reader expecting channel codes with instrument codes in {VALID_CODES} "
+            raise ValueError(msg)
+                   
+        response = build_response(sensor, instrument, sample_rate, resp_units)
+        if response:
+            channel.response = response
+    
+    return channel
+
+def build_response(sensor, instrument, sample_rate, input_units):
+    """Build ObsPy Response object from sensor calibration data."""
+    response_path = f"{instrument.dir}/{instrument.dfile}"
+
+    response= read_pazfir(response_path, sample_rate, instrument.ncalib, instrument.ncalper, input_units, calratio = sensor.calratio)
+
+    return response

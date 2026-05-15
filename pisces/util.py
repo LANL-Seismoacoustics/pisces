@@ -22,7 +22,7 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import obspy.geodetics as geod
-from obspy.core import AttribDict
+from obspy.core import AttribDict, UTCDateTime
 from obspy.taup import TauPyModel
 
 from pisces.schema.util import PiscesMeta
@@ -975,3 +975,17 @@ def distance_filter(
 
     """
     pass
+
+def jdate_to_utc(jdate):
+    """Convert KB Core Julian date (YYYYDDD) to UTCDateTime."""
+    if jdate is None or jdate in (-1, -999, -9999999):
+        return None
+    
+    try:
+        year = int(jdate / 1000)
+        day = int(jdate % 1000)
+        if year < 1900 or year > 2100 or day < 1 or day > 366:
+            return None
+        return UTCDateTime(year=year, julday=day)
+    except Exception:
+        return None
