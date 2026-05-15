@@ -7,9 +7,7 @@ import warnings
 from collections import defaultdict
 from pisces.util import _get_entities, jdate_to_utc
 
-def make_inventory(query, use_network = True, level = 'station', schema = 'kbcore'):
-
-    # add in schema option with multiple import if statements...
+def schema_import(schema):
     schema = schema.lower()
     VALID_SCHEMAS = ['kbcore', 'css3', 'antelope']
     if schema not in VALID_SCHEMAS:
@@ -23,8 +21,28 @@ def make_inventory(query, use_network = True, level = 'station', schema = 'kbcor
     
     if schema == 'antelope':
         from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
-
     
+    return Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
+def build_inventory(query, use_network = True, level = 'station', schema = 'kbcore'):
+
+    # add in schema option with multiple import if statements...
+    # schema = schema.lower()
+    # VALID_SCHEMAS = ['kbcore', 'css3', 'antelope']
+    # if schema not in VALID_SCHEMAS:
+    #     raise ValueError(f"schema must be one of {VALID_SCHEMAS}")
+    
+    # if schema == 'kbcore':
+    #     from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
+    # if schema == 'css3':
+    #     from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+    
+    # if schema == 'antelope':
+    #     from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+
+    Network, Affiliation, Site, Sitechan, Sensor, Instrument = schema_import(schema)
+
     level = level.lower()
     VALID_LEVELS = ['network', 'station', 'channel', 'response']
     if level not in VALID_LEVELS:
@@ -79,19 +97,7 @@ def organize_data(results, use_network = True, schema = 'kbcore'):
     
     Returns: {network_code: {station_code: {channel_key: [data]}}}
     """
-    schema = schema.lower()
-    VALID_SCHEMAS = ['kbcore', 'css3', 'antelope']
-    if schema not in VALID_SCHEMAS:
-        raise ValueError(f"schema must be one of {VALID_SCHEMAS}")
-    
-    if schema == 'kbcore':
-        from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
-
-    if schema == 'css3':
-        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
-    
-    if schema == 'antelope':
-        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+    Network, Affiliation, Site, Sitechan, Sensor, Instrument = schema_import(schema)
 
     data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     
@@ -369,3 +375,4 @@ def build_response(sensor, instrument, sample_rate, input_units):
     response= read_pazfir(response_path, sample_rate, instrument.ncalib, instrument.ncalper, input_units, calratio = sensor.calratio)
 
     return response
+
