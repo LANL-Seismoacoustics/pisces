@@ -296,12 +296,12 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
             if t1:
                 query = query.filter(t1 <= Sitechan.offdate)
             if t2: 
-                query = query.filter(t1 >= Sitechan.ondate)
+                query = query.filter(t2 >= Sitechan.ondate)
         else:
             if t1:
                 query = query.filter(t1 <= Site.offdate)
             if t2: 
-                query = query.filter(t1 >= Site.ondate)
+                query = query.filter(t2 >= Site.ondate)
     
     # collect range restrictions on columns
     range_restr = []

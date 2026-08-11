@@ -51,7 +51,6 @@ def build_inventory(query, use_network = True, level = 'station', schema = 'kbco
     # Get tables from query
     Network, Affiliation, Site, Sitechan, Sensor, Instrument = _get_entities(query, "Network", "Affiliation","Site","Sitechan","Sensor","Instrument")
 
-
     # Check tables are present for different level requests
     if level == 'network':
         if not Network:

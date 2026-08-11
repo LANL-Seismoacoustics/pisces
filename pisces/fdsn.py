@@ -427,35 +427,34 @@ class Client(object):
 
         return result
 
-    # def get_stations(
-    #     self,
-    #     starttime: UTCDateTime = None,
-    #     endtime: UTCDateTime = None,
-    #     startbefore: UTCDateTime = None,
-    #     startafter: UTCDateTime = None,
-    #     endbefore: UTCDateTime = None,
-    #     endafter: UTCDateTime = None,
-    #     network: str = None,
-    #     station: str = None,
-    #     location: str = None,
-    #     channel: str = None,
-    #     minlatitude: float = None,
-    #     maxlatitude: float = None,
-    #     minlongitude: float = None,
-    #     maxlongitude: float = None,
-    #     latitude: float = None,
-    #     longitude: float = None,
-    #     minradius: float = None,
-    #     maxradius: float = None,
-    #     level: str = None,
-    #     includerestricted: bool = None,
-    #     includeavailability: bool = None,
-    #     updatedafter: UTCDateTime = None,
-    #     matchtimeseries: bool = None,
-    #     filename: str = None,
-    #     format: str = "xml",
-    #     **kwargs
-    # ):
+    def get_stations(
+        self,
+        starttime: UTCDateTime = None,
+        endtime: UTCDateTime = None,
+        startbefore: UTCDateTime = None,
+        startafter: UTCDateTime = None,
+        endbefore: UTCDateTime = None,
+        endafter: UTCDateTime = None,
+        network: str = None,
+        station: str = None,
+        channel: str = None,
+        minlatitude: float = None,
+        maxlatitude: float = None,
+        minlongitude: float = None,
+        maxlongitude: float = None,
+        latitude: float = None,
+        longitude: float = None,
+        minradius: float = None,
+        maxradius: float = None,
+        level: str = None,
+        # includerestricted: bool = None,
+        # includeavailability: bool = None,
+        updatedafter: UTCDateTime = None,
+        matchtimeseries: bool = None,
+        filename: str = None,
+        format: str = "xml",
+        **kwargs
+    ):
     #     """
     #     Query station station data.
 
@@ -529,11 +528,6 @@ class Client(object):
     #     station : str
     #         Select one or more SEED station codes. Multiple codes are comma-separated
     #         (e.g. "ANMO,PFO").
-    #     location : str
-    #         Select one or more SEED location identifiers. Multiple identifiers
-    #         are comma-separated (e.g. "00,01").  As a special case "--"
-    #         (two dashes) will be translated to a string of two space characters
-    #         to match blank location IDs.
     #     channel : str
     #         Select one or more SEED channel codes. Multiple codes are
     #         comma-separated (e.g. "BHZ,HHZ").
@@ -590,6 +584,47 @@ class Client(object):
     #     an error.
 
     #     """
+
+        level = level.lower()
+        VALID_LEVELS = ['network', 'station', 'channel', 'response']
+        if level not in VALID_LEVELS:
+            raise ValueError(f"level must be one of {VALID_LEVELS}")
+
+        if level == 'network':
+            try:
+                Network = self.tables["network"]
+            except KeyError:
+                msg = "Network table required for network level metadata."
+                raise ValueError(msg)
+
+        elif level == 'station':
+            try:
+                Site = self.tables["site"]
+            except KeyError:
+                msg = "Site table required for station level metadata."
+                raise ValueError(msg)
+        elif level == 'channel':
+            try:
+                Site = self.tables["site"]
+                Sitechan = self.tables["sitechan"]
+            except KeyError:
+                msg = "Site and sitechan tables required for channel level metadata."
+                raise ValueError(msg)
+        elif level == 'response':
+            try:
+                Site = self.tables["site"]
+                Sitechan = self.tables["sitechan"]
+                Sensor = self.tables["sensor"]
+                Instrument = self.tables["instrument"]
+            except KeyError:
+                msg = "Site, sitechan, sensor, and instrument tables required for response level metadata."
+                raise ValueError(msg)
+
+    #
+
+    # determine time filters
+
+
     #     pass
 
     def get_waveforms(
