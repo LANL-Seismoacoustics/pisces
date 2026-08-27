@@ -210,11 +210,11 @@ def get_pazfir_data(fileLines, stageStart, stageType):
                 elif stageType[i] == 'fir' or stageType[i] == 'iir':
                     if len(topData) == 2:
                         if topData[1] != 0:
-                            topVal = FloatWithUncertainties(topData[0], lower_uncertainty = topData[1], upper_uncertainty = topData[1])
+                            topVal = FloatWithUncertainties(float(topData[0]), lower_uncertainty = float(topData[1]), upper_uncertainty = float(topData[1]))
                         else:
-                            topVal = FloatWithUncertainties(topData[0])
+                            topVal = FloatWithUncertainties(float(topData[0]))
                     else:
-                        topVal = FloatWithUncertainties(topData[0])
+                        topVal = FloatWithUncertainties(float(topData[0]))
                     tops.append(topVal)
 
                 else:
@@ -241,11 +241,11 @@ def get_pazfir_data(fileLines, stageStart, stageType):
                 elif stageType[i] == 'fir' or stageType[i] == 'iir':
                     if len(bottomData) == 2:
                         if bottomData[1] != 0:
-                            bottomVal = FloatWithUncertainties(bottomData[0], lower_uncertainty = bottomData[1], upper_uncertainty = bottomData[1])
+                            bottomVal = FloatWithUncertainties(float(bottomData[0]), lower_uncertainty = float(bottomData[1]), upper_uncertainty = float(bottomData[1]))
                         else:
-                            bottomVal = FloatWithUncertainties(bottomData[0])
+                            bottomVal = FloatWithUncertainties(float(bottomData[0]))
                     else:
-                        bottomVal = ComplexWithUncertainties(bottomData[0])
+                        bottomVal = ComplexWithUncertainties(float(bottomData[0]))
                    
                 else:
                     bottoms.append(None)
@@ -888,81 +888,334 @@ def get_stationxml_lines(respStage):
 
     return respStageLines
 
-def write_dict_to_flatfile(tableDict, dirPath = None):
+def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema = 'kbcore'):
 
     """
-    Take a dictionary with all of the sensor or instrument table colunns as keys with
-    lists of values corresponding to each channel or response object in an inventory
-    object and output a fixed-width formatted flatfile corresponding to that table.  
-    Currently, this function is hard code for only sensor and instrument tables though 
-    may be expanded to include more tables in the future.
+    Takes a dictionary of any of network, affiliation, site, sitechan, sensor, or instrument 
+    with all of the output table colunns as keys withlists of values corresponding to the appropriate 
+    values from in an inventory object and output a fixed-width formatted or tab delimited flatfile 
+    corresponding to that table. 
 
     Parameters
     ----------
     tableDict: dict
-        Sensor or instrument dictionary to be written as a flat file
+        Network, affiliation, site, sitechan, sensor, or instrument dictionary to be written as a 
+        flat file.  Must have a "tablename" key indicating which table type and the other keys must
+        correspond to the columns of that table.
     dirPath: string
         Directory in which to write the files. If none is provided, the current working
         directory will be used.
+    tab_delim: True or False
+        False will output a fixed-width formatted file and True will output a tab delimited file
+    schema: string
+        Dictates the schema to which a file is written.  The options are "KBCORE", "CSS3.0",
+        and "ANTELOPE" and capilization is unimportant.
     
     Returns
     -------
-    Writes file to directory labeled either instrument.txt or sensor.txt
+    Writes file to directory of any of network_table.txt, affiliation_table.txt, site_table.txt,
+    sitechan_table.txt, sensor_table.txt, and instrument_table.txt
     """
-
+    schema = schema.lower()
     tableLines = ''
+    if tableDict['tablename'] == 'network':
+        for dex in range(len(tableDict['net'])):
+            net = '{:<.8s}'.format(tableDict['net'][dex])
+            netname = '{:<.80s}'.format(tableDict['netname'][dex])
+            nettype = '{:<.4s}'.format(tableDict['nettype'][dex])
+
+            if len(net) > 8:
+                warnings.warn('Net field provided in network dictionary for index {} \
+                                exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+            if len(netname) > 80:
+                warnings.warn('Netname field provided in network dictionary for index {} \
+                                exceeds 80 characters and will be truncated to fit the 80 character limit'.format(dex))
+            if len(nettype) > 4:
+                            warnings.warn('Nettype field provided in network dictionary for index {} \
+                                            exceeds 4 characters and will be truncated to fit the 4 character limit'.format(dex))
+
+            if schema in ['css3.0','css3','css']:
+                auth = '{:<.15s}'.format(tableDict['auth'][dex])
+                commid = '{:>8d}'.format(tableDict['commid'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+                if len(auth) > 15:
+                    warnings.warn('Auth field provided in network dictionary for index {} \
+                                    exceeds 15 characters and will be truncated to fit the 15 character limit'.format(dex))
+
+            if schema in ['antelope', 'ant']:
+                auth = '{:<.15s}'.format(tableDict['auth'][dex])
+                commid = '{:>8d}'.format(tableDict['commid'][dex])
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+
+                if len(auth) > 15:
+                    warnings.warn('Auth field provided in network dictionary for index {} \
+                                    exceeds 15 characters and will be truncated to fit the 15 character limit'.format(dex))
+
+            if schema in ['kbcore','kb','kbc']:
+                auth = '{:<.20s}'.format(tableDict['auth'][dex])
+                commid = '{:>9d}'.format(tableDict['commid'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+                if len(auth) > 20:
+                    warnings.warn('Auth field provided in network dictionary for index {} \
+                                    exceeds 20 characters and will be truncated to fit the 20 character limit'.format(dex))
+
+            if tab_delim == False:
+                rowLine = '{} {} {} {} {} {}\n'.format(net, netname, nettype, auth, commid, lddate)
+                
+            else:
+                rowLine = '{}\t{}\t{}\t{}\t{}\t{}\n'.format(net.strip(' '), netname.strip(' '), nettype.strip(' '), auth.strip(' '), \
+                                                             commid.strip(' '), lddate)
+                
+            tableLines = tableLines + rowLine
+
+        fileName = 'network_table.txt'
+            
+
+    if tableDict['tablename'] == 'affiliation':
+        for dex in range(len(tableDict['sta'])):
+            net = '{:<.8s}'.format(tableDict['net'][dex])
+            sta = '{:<.6s}'.format(tableDict['sta'][dex])
+            time = '{:>17.5f}'.format(tableDict['time'][dex])
+            endtime = '{:>17.5f}'.format(tableDict['endtime'][dex])
+
+            if len(net) > 8:
+                warnings.warn('Net field provided in affiliation dictionary for index {} \
+                                exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+            if len(sta) > 6:
+                warnings.warn('Sta field provided in affiliation dictionary for index {} \
+                              exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+
+            if schema in ['css3.0','css3','css']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if schema in ['antelope', 'ant']:
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+
+            if schema in ['kbcore','kb','kbc']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if schema in ['css3.0','css3','css','antelope', 'ant']:
+                if tab_delim == False:
+                    rowLine = '{} {} {}\n'.format(net, sta, lddate)     
+                else:
+                    rowLine = '{}\t{}\t{}\n'.format(net.strip(' '), sta.strip(' '), lddate)
+
+            if schema in ['kbcore','kb','kbc']:
+                if tab_delim == False:
+                    rowLine = '{} {} {} {} {}\n'.format(net, sta, time, endtime, lddate)     
+                else:
+                    rowLine = '{}\t{}\t{}\t{}\t{}\n'.format(net.strip(' '), sta.strip(' '), time.strip(' '), endtime.strip(' '), lddate)
+
+            tableLines = tableLines + rowLine
+            
+        fileName = 'affiliation_table.txt'
+
+
+    if tableDict['tablename'] == 'site':
+        for dex in range(len(tableDict['sta'])):
+
+            if schema in ['kbcore','kb','kbc']:
+                if tableDict['offdate'][dex] == -1:
+                    offDate = 2286324
+            else:
+                offDate = tableDict['offdate'][dex]
+
+            sta = '{:<.6s}'.format(tableDict['sta'][dex])
+            ondate = '{:>8d}'.format(tableDict['ondate'][dex])
+            offdate = '{:>8d}'.format(offDate)
+            elev = '{:>9.4f}'.format(tableDict['elev'][dex])
+            staname = '{:<.50s}'.format(tableDict['staname'][dex])
+            statype = '{:<.4s}'.format(tableDict['statype'][dex])    
+            refsta = '{:<.6s}'.format(tableDict['refsta'][dex])
+            dnorth = '{:>9.4f}'.format(tableDict['dnorth'][dex])
+            deast = '{:>9.4f}'.format(tableDict['deast'][dex])
+
+            if schema in ['css3.0','css3','css']:
+                lat = '{:>9.4f}'.format(tableDict['lat'][dex])
+                lon = '{:>9.4f}'.format(tableDict['lon'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if schema in ['antelope', 'ant']:
+                lat = '{:>9.4f}'.format(tableDict['lat'][dex])
+                lon = '{:>9.4f}'.format(tableDict['lon'][dex])
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+
+            if schema in ['kbcore','kb','kbc']:
+                lat = '{:>11.6f}'.format(tableDict['lat'][dex])
+                lon = '{:>11.6f}'.format(tableDict['lon'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if len(sta) > 6:
+                warnings.warn('Sta field provided in site dictionary for index {} \
+                              exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+
+            if len(staname) > 50:
+                warnings.warn('Staname field provided in sute dictionary for index {} \
+                              exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+
+            if tab_delim == False:
+                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, ondate, offdate, lat, lon, \
+                        elev, staname, statype, refsta, dnorth, deast, lddate)
+            else:
+                rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), ondate.strip(' '), \
+                        offdate.strip(' '), lat.strip(' '), lon.strip(' '), elev.strip(' '), staname.strip(' '), \
+                        statype.strip(' '), refsta.strip(' '), dnorth.strip(' '), deast.strip(' '), lddate)
+                
+            tableLines = tableLines + rowLine
+
+        fileName = 'site_table.txt'
+                    
+    if tableDict['tablename'] == 'sitechan':
+        for dex in range(len(tableDict['chanid'])):
+
+            if schema in ['kbcore','kb','kbc']:
+                if tableDict['offdate'][dex] == -1:
+                    offDate = 2286324
+            else:
+                offDate = tableDict['offdate'][dex]
+
+            sta = '{:<.6s}'.format(tableDict['sta'][dex])
+            chan = '{:>.8s}'.format(tableDict['chan'][dex])
+            ondate = '{:>8d}'.format(tableDict['ondate'][dex])
+            chanid = '{:>8d}'.format(tableDict['chanid'][dex])
+            offdate = '{:>8d}'.format(offDate)
+            ctype = '{:>.4s}'.format(tableDict['ctype'][dex])
+            edepth = '{:>9.4f}'.format(tableDict['edepth'][dex])
+            hang = '{:>6.1f}'.format(tableDict['hang'][dex])
+            vang = '{:>6.1f}'.format(tableDict['vang'][dex])
+            descrip = '{:<.50s}'.format(tableDict['descrip'][dex])
+
+            if schema in ['css3.0','css3','css']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if schema in ['antelope', 'ant']:
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+
+            if schema in ['kbcore','kb','kbc']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if len(sta) > 6:
+                warnings.warn('Sta field provided in sitechan dictionary for index {} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))    
+
+            if len(chan) > 8:
+                warnings.warn('Chan field provided in sitechan dictionary for index {} \
+                              exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+
+            if len(descrip) > 50:
+                warnings.warn('Descrip field provided in sitechan dictionary for index {} \
+                              exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+
+
+            if tab_delim == False:
+                rowLine = '{} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, chan, ondate, chanid, offdate, ctype, edepth, hang, vang, \
+                        descrip, lddate)
+            else:
+                 rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), chan.strip(' '), ondate.strip(' '), \
+                        chanid.strip(' '), offdate.strip(' '), ctype.strip(' '), edepth.strip(' '), hang.strip(' '), vang.strip(' '), \
+                        descrip.strip(' '), lddate)
+                 
+            tableLines = tableLines + rowLine
+        fileName = 'sitechan_table.txt'
+    
     if tableDict['tablename'] == 'sensor':
         for dex in range(len(tableDict['chanid'])):
-            if tableDict['inid'][dex] == -1:
-                inidStr = '{:>8s}'.format(str(tableDict['inid'][dex]))
-            else:
-                inidStr = '{:>8d}'.format(tableDict['inid'][dex])
 
-            if tableDict['chanid'][dex] == -1:
-                chanidStr = '{:>8s}'.format(str(tableDict['chanid'][dex]))
-            else:
-                chanidStr = '{:>8d}'.format(tableDict['chanid'][dex])
+            sta = '{:<.6s}'.format(tableDict['sta'][dex])
+            chan = '{:<.8s}'.format(tableDict['chan'][dex])
+            time = '{:>17.5f}'.format(tableDict['time'][dex])
+            endtime = '{:>17.5f}'.format(tableDict['endtime'][dex])
+            inid = '{:>8d}'.format(tableDict['inid'][dex])
+            chanid = '{:>8d}'.format(tableDict['chanid'][dex])
+            jdate = '{:>8d}'.format(tableDict['jdate'][dex])
+            calratio = '{:>16.6f}'.format(tableDict['calratio'][dex])
+            calper = '{:>16.6f}'.format(tableDict['calper'][dex])
+            instant = '{:<.1s}'.format(tableDict['instant'][dex])
 
-            if tableDict['jdate'][dex] == -1:
-                jDateStr = '{:>8s}'.format(str(tableDict['jdate'][dex]))
-            else:
-                jDateStr = '{:>8d}'.format(tableDict['jdate'][dex])
+            if schema in ['css3.0','css3','css']:
+                tshift = '{:>6.2f}'.format(tableDict['tshift'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
-            if tableDict['calratio'][dex] == 1:
-                calratioStr = '{:>16s}'.format(str(tableDict['calratio'][dex]))
-            else:
-                calratioStr = '{:>16.6f}'.format(tableDict['calratio'][dex])
+            if schema in ['antelope', 'ant']:
+                tshift = '{:>6.2f}'.format(tableDict['tshift'][dex])
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
 
-            if tableDict['calper'][dex] == -1:
-                calperStr = '{:>16s}'.format(str(tableDict['calper'][dex]))
+            if schema in ['kbcore','kb','kbc']:
+                tshift = '{:>16.2f}'.format(tableDict['tshift'][dex])
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if len(chan) > 8:
+                warnings.warn('Chan field provided in sensor dictionary for index {} \
+                              exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+
+            if tab_delim == False:
+                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, chan, time, endtime, inid, chanid, jdate, calratio, \
+                                                                         calper, tshift, instant, lddate)
             else:
-                calperStr = '{:>16.6f}'.format(tableDict['calper'][dex])
-            
-            rowLine = '{:<6s} {:<8s} {:>17.5f} {:>17.5f} {} {} {} {} {} {:>16.2f} {:<1s}\n'.format(\
-                tableDict['sta'][dex], tableDict['chan'][dex],tableDict['time'][dex], tableDict['endtime'][dex], inidStr, \
-                chanidStr, jDateStr, calratioStr, calperStr, tableDict['tshift'][dex], tableDict['instant'][dex])
+                rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), chan.strip(' '), time.strip(' '), endtime.strip(' '), \
+                        inid.strip(' '), chanid.strip(' '), jdate.strip(' '), calratio.strip(' '), calper.strip(' '), tshift.strip(' '), instant.strip(' '), \
+                        lddate)
             
             tableLines = tableLines + rowLine
+
         fileName = 'sensor_table.txt'
 
-    elif tableDict['tablename'] == 'instrument':
+    if tableDict['tablename'] == 'instrument':
         for dex in range(len(tableDict['inid'])):
-            if tableDict['ncalper'][dex] == 1:
-                ncalperStr = '{:>16s}'.format(str(tableDict['ncalper'][dex]))
-            else:
-                ncalperStr = '{:>16.6f}'.format(tableDict['ncalper'][dex])
 
-            if tableDict['ncalib'][dex] == -1:
-                ncalibStr = '{:>16s}'.format(str(tableDict['ncalib'][dex]))
-            else:
-                ncalibStr = '{:>16.6f}'.format(tableDict['ncalib'][dex])
-            rowLine = '{:<8d} {:<50s} {:<6s} {:<1s} {:<1s} {:>11.7f} {} {} {:<64s} {:<32s} {:<6s}\n'.format( \
-                tableDict['inid'][dex], tableDict['insname'][dex],tableDict['instype'][dex], tableDict['band'][dex], \
-                tableDict['digital'][dex],tableDict['samprate'][dex], ncalibStr, ncalperStr, tableDict['dir'][dex], \
-                tableDict['dfile'][dex], tableDict['rsptype'][dex])
+            inid = '{:<8d}'.format(tableDict['inid'][dex])
+            insname = '{:<.50s}'.format(tableDict['insname'][dex])
+            instype = '{:<.6s}'.format(tableDict['instype'][dex])
+            band = '{:<.1s}'.format(tableDict['band'][dex])
+            digital = '{:<.1s}'.format(tableDict['digital'][dex])
+            samprate = '{:>11.7f}'.format(tableDict['samprate'][dex])
+            ncalib = '{:>16.6f}'.format(tableDict['ncalib'][dex])
+            ncalper = '{:>16.6f}'.format(tableDict['ncalper'][dex])
+            dpath = '{:<.64s}'.format(tableDict['dir'][dex])
+            dfile = '{:<.32s}'.format(tableDict['dfile'][dex])
+            rsptype = '{:<6s}'.format(tableDict['rsptype'][dex])
+
+            if len(dpath) > 64:
+                warnings.warn('Directory path provided in instrument dictionary for index {} \
+                              exceeds 64 characters and will be truncated to fit the 64 character limit'.format(dex))
+            if len(dfile) > 32:
+                warnings.warn('File name provided in instrument dictionary for index {} \
+                                exceeds 32 characters and will be truncated to fit the 32 character limit'.format(dex))
+            if len(insname) > 50:
+                warnings.warn('Insname field provided in instrument dictionary for index {} \
+                                exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+            if len(instype) > 6:
+                warnings.warn('Instype field provided in instrument dictionary for index {} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+            if len(rsptype) > 6:
+                warnings.warn('Rsptype field provided in instrument dictionary for index {} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
             
+            
+            if schema in ['css3.0','css3','css']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+            if schema in ['antelope', 'ant']:
+                lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+
+            if schema in ['kbcore','kb','kbc']:
+                lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
+
+
+            if tab_delim == False:
+                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(inid, insname, instype, band, digital, samprate, ncalib, \
+                        ncalper, dpath, dfile, rsptype, lddate)
+            else:
+                rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(inid.strip(' '), insname.strip(' '), instype.strip(' '), \
+                        band.strip(' '), digital.strip(' '), samprate.strip(' '), ncalib.strip(' '), ncalper.strip(' '), dpath.strip(' '), \
+                        dfile.strip(' '), rsptype.strip(' '), lddate)
+                
             tableLines = tableLines + rowLine
         fileName = 'instrument_table.txt'
+
+    
     
     if dirPath is None:
         dirPath = os.getcwd()
@@ -1049,7 +1302,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     """
     
     # get set of lines to be written in header separate from values lines and combine at the end
-    headerLines = "# Response file created using pisces write_pazfir funcion \n# on {}\n#\n".format(datetime.now().strftime('%Y/%m/%d %H:%M'))
+    headerLines = "# Response file created using pisces write_pazfir function \n# on {}\n#\n".format(datetime.now().strftime('%Y/%m/%d %H:%M'))
 
     # Add station info to header and assign variables
 
@@ -1097,7 +1350,8 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         sample_rate = stationDict['sample_rate']
         if sample_rate is None:
             sample_rate = 'UNKNOWN'
-    elsesample_rate = 'UNKNOWN'
+    else:
+        sample_rate = 'UNKNOWN'
     headerLines = headerLines + '#\t Sampling Rate: {}\n'.format(sample_rate)
     
     if sensor is not None:
@@ -1110,20 +1364,22 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         sensor = 'UNKNOWN'
     headerLines = headerLines + '#\t Sensor: {}\n'.format(sensor)
 
-    if pre_amplifier is not None:
-        pass
-    if 'pre_amplifier' in stationDict:
-        pre_amplifier = stationDict['pre_amplifier']
-        if pre_amplifier is not None:
-            headerLines = headerLines + '#\t Pre-amplifier: {}\n'.format(pre_amplifier)
-
     if data_logger is not None:
         pass
     elif 'data_logger' in stationDict:
         data_logger = stationDict['data_logger']
-        if data_logger is not None:
-            headerLines = headerLines + '#\t Data Logger: {}\n'.format(data_logger)
-    
+    else:
+        data_logger = 'UNKNOWN'
+    if data_logger is not None:
+        headerLines = headerLines + '#\t Data Logger: {}\n'.format(data_logger)
+
+    if pre_amplifier is not None:
+        pass
+    if 'pre_amplifier' in stationDict:
+        pre_amplifier = stationDict['pre_amplifier']
+    if pre_amplifier is not None:
+        headerLines = headerLines + '#\t Pre-amplifier: {}\n'.format(pre_amplifier)
+
     headerLines = headerLines + '#\n'
 
     # get frequency from first stage if out_freq is None type 
@@ -1186,7 +1442,11 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
                     "PASCAL": "PRESSURE",
                     "PASCALS": "PRESSURE",
                     "MBAR": "PRESSURE",
-                    "T": "TESLA"}
+                    "KPA": "PRESSURE",
+                    "T": "TESLA",
+                    "NT": "TESLA",
+                    "CELSIUS": "TEMPERATURE",
+                    "DEGREE": "ANGLE"}
     
     if inUnitKey not in unitMap:
         raise ValueError('Unknown input units of {}'.format(inUnitKey))
@@ -1203,7 +1463,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         outUnitType = 'DISP'
         newOutUnits = 'NM'
         if inUnitKey == 'NM':
-            headerLines = headerLines + '# Original units are DISP in NM.  No conversion required to \n# match KBCore/CSS3.0 database spec.\n#\n'.format(inUnitType, inUnitKey)
+            headerLines = headerLines + '# Original units are DISP in NM.  No conversion required to \n# match KBCore/CSS3.0 database spec.\n#\n'
         else:
             headerLines = headerLines + '# Original units are {} in {}.  Converting to DISP in NM to \n# match KBCore/CSS3.0 database spec.\n#\n'.format(inUnitType, inUnitKey)
 
@@ -1213,7 +1473,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             headerLines = headerLines + '# Original units are PRESSURE in {}.  Converting to PRESSURE in PA to match KBCore database spec.\n#\n'.format(inUnitKey)
         else:
             sensitivity = abs(response.get_evalresp_response_for_frequencies([out_freq], output='DEF'))[0]
-            headerLines = headerLines + '# Original units are PRESSURE in PA. No conversion required to match KBCore/CSS3.0 database spec.\n#\n'.format(inUnitKey)
+            headerLines = headerLines + '# Original units are PRESSURE in PA. No conversion required to match KBCore/CSS3.0 database spec.\n#\n'
         outUnitType = 'PRESSURE'
         newOutUnits = 'PA'
 
@@ -1468,7 +1728,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         
     linesWrite = headerLines + '#\n'+ linesWrite
     
-    if network == 'UKNOWN': network = '__'
+    if network == 'UNKNOWN': network = '__'
     if location == 'N/A': location = ''
     timeStr = starttime.strftime('%Y%j')
     extSet = set(extensions)
@@ -1482,6 +1742,8 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         fileExt = fileExt + 'iir'
     if 'fap' in uniqueExt:
         fileExt = fileExt + 'fap'
+    if len(uniqueExt) == 0:
+        fileExt = '-'
 
     fileName = '{}.{}.{}.{}.{}.{}'.format(network, station, channel, location, timeStr, fileExt)
 
@@ -1499,24 +1761,173 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     respFile.close()
 
     return sensitivity, out_freq, fileName
-    
 
-def sxml2pazfir(input_xml, out_freq=None, dir_path = None, write_tables = True):
+def format_sensor(sensorObj):
+    """ 
+    Takes the output from channel.sensor from an ObsPy Inventory-> channel object
+    and formats the available sensor information into a single string description 
+    of the instrument.
+
+    Parameters
+    ----------
+    sensorObj: object
+        Channel.sensor ObsPy object
+    Returns
+    -------
+    sensor: string
+        Description of the sensor based on information avialable in the sensor object
+    """
+
+    if sensorObj is not None:
+        if sensorObj.model:
+            sensor = sensorObj.model
+        elif sensorObj.manufacturer:
+            sensor = sensorObj.model
+        elif sensorObj.type:
+            sensor = sensorObj.type
+        elif sensorObj.description:
+            sensor = sensorObj.description
+        else:
+            sensor = 'UNKNOWN SENSOR'
+    else:
+        sensor = 'UNKNOWN SENSOR'
+    return sensor
+
+def format_datalogger(datalogObj):
+    """ 
+    Takes the output from channel.data_logger from an ObsPy Inventory-> channel object
+    and formats the available data logger information into a single string description 
+    of the datalogger.
+
+    Parameters
+    ----------
+    datalogObj: object
+        Channel.data_logger ObsPy object
+    Returns
+    -------
+    datalogger: string
+        Description of the data logger based on information avialable in the sensor object
+    """
+     
+    if datalogObj is not None:
+        if datalogObj.model:
+            datalogger = datalogObj.model
+        elif datalogObj.manufacturer:
+            datalogger = datalogObj.model
+        elif datalogObj.type:
+            datalogger = datalogObj.type
+        elif  datalogObj.description:
+            datalogger = datalogObj.description
+        else:
+            datalogger = 'UNKNOWN DATALOGGER'
+    else:
+        datalogger = 'UNKNOWN DATALOGGER'
+
+    return datalogger
+
+def format_preamp(preampObj):
+    """ 
+    Takes the output from channel.pre_amplifier from an ObsPy Inventory-> channel object
+    and formats the available preamplifier information into a single string description 
+    of the instrument or returns None if no information is available.
+
+    Parameters
+    ----------
+    preampObj: object
+        Channel.pre_amplifier ObsPy object
+    Returns
+    -------
+    preamp: string
+        Description of the sensor based on information avialable in the sensor object or 
+        returns None if no information is available.
+    """
+     
+    if preampObj is not None:
+        if preampObj.model:
+            preamp = preampObj.model
+        elif preampObj.manufacturer:
+            preamp = preampObj.model
+        elif preampObj.type:
+            preamp = preampObj.type
+        elif preampObj.decription:
+            preamp = preampObj.description
+        else:
+            preamp = None
+    else:
+        preamp = None
+    return preamp
+
+def format_description(chanObj):
+    """ 
+        Takes an ObsPy Channel Object from an ObsPy Inventory-> channel objectand formats 
+        the available sensor, datalogger, and preamplifier information into a single string
+        description of the instrument.
+    
+        Parameters
+        ----------
+        chanObj: object
+            Channel ObsPy object
+        Returns
+        -------
+        sensorDesc: string
+            Description of the sensor, data logger, and preamplifier based on information avialable in the channel 
+            object.
+        """
+
+    if chanObj.sensor:
+        sensor = format_sensor(chanObj.sensor)
+    else:
+        sensor = None
+
+    if chanObj.data_logger:
+        datalogger = format_datalogger(chanObj.data_logger)
+    else:
+        datalogger = None
+
+    if chanObj.pre_amplifier:
+        preamp = format_sensor(chanObj.pre_amplifier)
+    else:
+        preamp = None
+
+    if sensor:
+        sensorDesc = sensor
+        if len(sensorDesc) < 50 and datalogger:
+            sensorDesc = '{} + {}'.format(sensor, datalogger)
+            if preamp and len(sensorDesc) < 50:
+                sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+        else:
+            if preamp and len(sensorDesc) < 50:
+                sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+    elif datalogger:
+        sensorDesc = 'UNKNOWN SENSOR + {}'.format(datalogger)
+        if preamp and len(sensorDesc) < 50:
+            sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+    elif preamp:
+         sensorDesc = 'UNKNOWN SENSOR + UNKNOWN DATALOGGER {}'.format(preamp)
+    else:
+        sensorDesc = 'UNKNOWN EQUIPMENT'
+
+    return sensorDesc
+
+def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_tables = True, tab_delim = True):
     """
     Takes a StationXML file or an ObsPy Inventory object and writes out a pazfir style file
-    for every response contained within the file/object as well as writes optional sensor and 
-    instrument flat files with metadata for every channel.  File are automatically named based
+    for every response contained within the file/object and optionally writes network, affiliation
+    site, sitechan, sensor, and instrument flat files.  Files are automatically named based
     on provided network, station, location, channel, and starttime in year and julian day as 
     well as given a file extenstion descriptive of the stage types contained within the file.
     This is done such that the corresponding file name is not more than 32 characters which is
     the maximum allowed string length for the dir column in the instrument tables for CSS3.0-
-    like schemas.  This function will also return the dictionaries used to create the sensor 
-    and instrument flatfiles.
+    like schemas.  This function will also return the dictionaries used to create all of the 
+    flatfiles.
 
     Parameters
     ----------
     input_xml: string or Inventory object
         If a filename  is provided, the file will be read in as an Inventory object
+    schema: string
+            Dictates the schema to which a file is written.  The options are "KBCORE", "CSS3.0",
+            and "ANTELOPE" and capilization is unimportant.
     out_freq: float
         Frequency at which to calculate the output sensitivity.  If no frequency is provided, 
         the normalization or gain frequency in the first stage of response will be used.
@@ -1528,26 +1939,40 @@ def sxml2pazfir(input_xml, out_freq=None, dir_path = None, write_tables = True):
        'instrument.txt', formatted according to the KBCore spec will be written to the output
         directory.  If false, no sensor or instrument tables will be written, but the pazfir 
         files will be.
+    tab_delim: True or False
+            False will output a fixed-width formatted file and True will output a tab delimited file
 
     Returns
     -------
+    netDict: dict
+        Dictionary containing all of the network metadata in the Inventory object as  
+        specified by the input Schema.  
+    affilDict: dict
+        Dictionary containing all of the affiliates networks and stations in the Inventory object 
+        as specified by the input Schema. 
+    siteDict: dict
+        Dictionary containing all of the station metadata in the Inventory object as specified by 
+        the input Schema.
+    sitechanDict: dict
+        Dictionary containing all of the channel metadata in the Inventory object as specified by 
+        the input Schema.   Chanid is automatically assigned based on channel in the object
     sensorDict: dict
         Dictionary containing all of the sensor metadata in the Inventory object as  
-        specified by the KBCore Schema.  Chanid and Inid are automatically assigned based 
+        specified by the input Schema.  Chanid and Inid are automatically assigned based 
         on channel and response indices in the object
     instrumentDict: dict
         Dictionary containing all of the sensor metadata in Inventory object as 
-        specified by the KBCore Schema. Inid is automatically assigned based on the response
+        specified by the input Schema. Inid is automatically assigned based on the response
         index within the object and will correspond to the correct chanid in the sensor table
 
     Examples:
     ---------
-    sensor, instrument  = sxml2pazfir('stationxml_path', write_tables = False)
-    sxml2pazfir(InventoryObject, out_freq = 1.0, dir_path = 'path_to_directory')
+    network, affiliation, site, sitechan, sensor, instrument  = sxml2pazfir('stationxml_path', write_tables = False)
+    sxml2db(InventoryObject, schema = 'CSS3.0', out_freq = 1.0, dir_path = 'path_to_directory')
 
     """
 
-    # input can be inv object or file path as string
+        # input can be inv object or file path as string
     if type(input_xml) is str:
         invObj = read_inventory(input_xml)
     else:
@@ -1555,78 +1980,274 @@ def sxml2pazfir(input_xml, out_freq=None, dir_path = None, write_tables = True):
 
     if dir_path is None:
         dir_path = os.getcwd()
-    
-    inid = 0
-    chanid = 0
 
+    schema = schema.lower()
+    
+    # initialize inid and chanid counts
+    inid = 1
+    chanid = 0
+    
+    # initialize dictionaries
+    netDict = {'tablename':'network', 'uniqueID': [], 'net':[], 'netname':[], 'nettype':[], 'auth':[], 'commid':[], 'lddate':[]}
+
+    affilDict = {'tablename':'affiliation', 'uniqueID': [], 'net':[], 'sta':[], 'time':[], 'endtime':[], 'lddate':[]}
+
+    # sta, ondate, offdate, lat, lon, elev, staname, statype, refsta, dnorth, deast
+    siteDict = {'tablename':'site', 'uniqueID': [], 'sta':[], 'ondate':[], 'offdate':[], 'lat':[], 'lon':[], 'elev':[], \
+                  'staname':[], 'statype':[], 'refsta':[], 'dnorth':[], 'deast':[], 'lddate':[]}
+    
+    # sta, chan, ondate, chanid, offdate, ctype, edepth, hang, vang, descrip
+    sitechanDict = {'tablename':'sitechan', 'uniqueID': [], 'uniqueIDsta': [], 'sta':[], 'chan':[], 'ondate':[], 'chanid':[], 'offdate':[], 'ctype':[], \
+                      'edepth':[], 'hang':[], 'vang':[], 'descrip':[], 'lddate':[]}
+    
     # sta, chan, time, endtime, inid, chanid, jdate, calratio, calper, thsift (clock errors), instant
     sensorDict = {'tablename':'sensor', 'sta':[], 'chan':[], 'time':[], 'endtime':[], 'inid':[], 'chanid':[], \
-                  'jdate':[], 'calratio':[], 'calper':[], 'tshift':[], 'instant':[]}
+                  'jdate':[], 'calratio':[], 'calper':[], 'tshift':[], 'instant':[], 'lddate':[]}
+        
      # inid, insname, instype, band, digital (d/a), samprate, ncalib, ncalper, dir, dfile, rsptype
     instrumentDict = {'tablename':'instrument','inid':[], 'insname':[], 'instype':[], 'band':[], 'digital':[], \
-                     'samprate':[], 'ncalib':[], 'ncalper':[], 'dir':[], 'dfile':[], 'rsptype':[]} 
+                     'samprate':[], 'ncalib':[], 'ncalper':[], 'dir':[], 'dfile':[], 'rsptype':[], 'lddate':[]} 
 
+    lddate = datetime.now()
+    
+    # Loop through inventory
     for net in invObj.networks:
         netCode = net.code
+        netName = net.description
+        netType = '-'
+        auth = 'pisces:sxml2db'
+        commid = -1
+
+        if netCode in netDict['uniqueID']:
+            # if unique stay already in table, do nothing
+            pass
+        else:
+            netDict['uniqueID'].append(netCode); netDict['net'].append(netCode); netDict['netname'].append(netName);netDict['nettype'].append(netType);
+            netDict['auth'].append(auth); netDict['commid'].append(commid); netDict['lddate'].append(lddate) 
+
         for sta in net.stations:
             staCode = sta.code
-            for chan in sta.channels:
-                chanCode = chan.code
-                locCode =chan.location_code
-                sampRate = chan.sample_rate
-                sensorDesc = chan.sensor.description
-                startDate = chan.start_date
-                endDate = chan.end_date
-                dataLogger = chan.data_logger
-                preAmp = chan.pre_amplifier
-                
-                # for table formation
-                chanLocCode = chanCode + locCode
-                bandCode = chanCode[0].lower()
-                jDate = int(startDate.strftime('%Y%j'))
-
-                if sensorDesc is None:
-                    sensorDesc = '-'
-
-                if startDate is None:
-                    startDate = UTCDateTime(-9999999999.999)
-                    jDate 
-                if endDate is None:
-                    endDate =  UTCDateTime(9999999999.999)
-                
-                #check if response information exists, if so, go into response loop
-                if len(chan.response.response_stages) > 0: 
-                    sensitivity, out_freq, fileName =  write_pazfir(chan.response, staCode, chanCode, startDate, out_freq = out_freq, dir_path = dir_path, network=netCode, location=locCode, \
-                                                          endtime=endDate, sample_rate=sampRate, sensor=sensorDesc, data_logger=dataLogger, pre_amplifier=preAmp)
-
-                    # inid, insname, instype, band, digital (d/a), samprate, ncalib, ncalper, dir, dfile, resptype
-                    ncalper = 1/out_freq
-                    ncalib = 1/sensitivity
-                    rspType = fileName.split('.')[-1]
-                    
-                    instrumentDict['inid'].append(inid); instrumentDict['insname'].append(sensorDesc)
-                    instrumentDict['instype'].append('-'), instrumentDict['band'].append(bandCode); instrumentDict['digital'].append('d')
-                    instrumentDict['samprate'].append(sampRate); instrumentDict['ncalib'].append(ncalib); instrumentDict['ncalper'].append(ncalper)
-                    instrumentDict['dir'].append(dir_path), instrumentDict['dfile'].append(fileName); instrumentDict['rsptype'].append(rspType)
-                   
-                    sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
-                    sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(inid)
-                    sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDate); sensorDict['calratio'].append(1)
-                    sensorDict['calper'].append(ncalper); sensorDict['tshift'].append(0); sensorDict['instant'].append('y')
-                    
-                    inid += 1
-                    chanid +=1
-
+            lat = sta.latitude
+            lon = sta.longitude
+            elev = sta.elevation/1000
+            staname = sta.description
+            statype = 'ss'
+            refsta = '-'
+            dnorth = 0
+            deast = 0
+            
+            # conditionals in case of None values to schema specific nulls
+            if lat is None:
+                lat = -999.0
+            if lon is None:
+                lon = -999.0
+            if elev is None:
+                elev = -999.0
+            
+            # note as of July 2026, fdsn indicates creation_date and termination_date will be deprecated in the future
+            if sta.start_date:
+                staOndate = int(sta.start_date.strftime('%Y%j'))
+                startTimestamp = sta.start_date.timestamp
+            else:
+                if sta.creation_date:
+                    staOndate = int(sta.creation_date.strftime('%Y%j'))
+                    startTimestamp = sta.creation_date.timestamp
                 else:
-                    sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
-                    sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(inid)
-                    sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDate); sensorDict['calratio'].append(1)
-                    sensorDict['calper'].append(-1); sensorDict['tshift'].append(0); sensorDict['instant'].append('y')
+                    staOndate = -1
+                    startTimestamp = -9999999999.999
                     
-                    chanid +=1
+            if sta.end_date:
+                 staOffdate = int(sta.end_date.strftime('%Y%j'))
+                 endTimestamp = sta.end_date.timestamp
+            else:
+                if sta.termination_date:
+                    staOffdate = int(sta.termination_date.strftime('%Y%j'))
+                    endTimestamp = sta.termination_date.timestamp
+                else:
+                    staOffdate = -1  
+                    endTimestamp = 9999999999.999
+            
+            if staname is None:
+                staname = '-'
+            
+            # track station uniqueness in table
+            uniqueIDsta = '{}/{}'.format(staCode, staOndate)
+            uniqueIDaff = '{}/{}/{}'.format(netCode, staCode, str(sta.start_date.timestamp))
+
+            if uniqueIDaff in affilDict['uniqueID']:
+                # if unique stay already in table, do nothing
+                pass
+            else:
+                affilDict['uniqueID'].append(uniqueIDaff); affilDict['net'].append(netCode); affilDict['sta'].append(staCode);
+                affilDict['time'].append(startTimestamp); affilDict['endtime'].append(endTimestamp); affilDict['lddate'].append(lddate)
+
+            
+            if uniqueIDsta in siteDict['uniqueID']:
+                # if unique stay already in table, do nothing
+                pass
+            else:
+                # otherwise add to dictionary(table)
+                siteDict['sta'].append(staCode); siteDict['ondate'].append(staOndate); siteDict['offdate'].append(staOffdate); siteDict['lat'].append(lat);
+                siteDict['lon'].append(lon); siteDict['elev'].append(elev); siteDict['staname'].append(staname); siteDict['statype'].append(statype);
+                siteDict['refsta'].append(refsta); siteDict['dnorth'].append(dnorth); siteDict['deast'].append(deast), siteDict['uniqueID'].append(uniqueIDsta);
+                siteDict['lddate'].append(lddate)
+            
+            if sta.channels is not None:
+                # chanCodePrev = None
+                # startDatePrev = None
+                for chan in sta.channels:
+                    chanCode = chan.code
+                    startDate = chan.start_date
+                    locCode = chan.location_code
+                    sampRate = chan.sample_rate
+                    
+                    endDate = chan.end_date
+                    depth = chan.depth/1000  
+                    hang = chan.azimuth
+                    vang = 90.0 - chan.dip  ## double check this as vang convention differs between FDSN and CSS3/KBCore
+                    
+                    # beam or normal?  
+                    if chanCode[2] in ['T','R','t','r']:
+                        ctype = 'b'
+                    else:
+                        ctype = 'n'
+                        
+                    # for table formation
+                    chanLocCode = chanCode + locCode
+                    bandCode = chanCode[0].lower()
+                    
+                    sensorDesc = format_description(chan)
+
+                    sensor = format_sensor(chan.sensor)
+                    dataLogger = format_datalogger(chan.data_logger)
+                    preAmp = format_preamp(chan.pre_amplifier)
+
+                    if chan.sensor.type:
+                        instype = '{:<.6s}'.format(chan.sensor.type)
+                    else:
+                        instype = '-'
+               
+                    if not chan.description:
+                        if chan.types:
+                            chanDesc = ','.join(chan.types)
+                        else:
+                            chanDesc = '-'
+                    else:
+                        chanDesc = chan.description
+    
+                    if startDate is None:
+                        startDate = UTCDateTime(9999999999.999)
+                        jDateOn = -1
+                    else:
+                        jDateOn = int(startDate.strftime('%Y%j'))
+                        
+                    if endDate is None:
+                        endDate =  UTCDateTime(9999999999.999)
+                        jDateOff = 2286324
+                    else:
+                        jDateOff = int(endDate.strftime('%Y%j'))
+                    
+                    # create sitechan dictionary tracking uniqueness among channels relative to stations and sensors
+                    uniqueIDchan = '{}/{}'.format(staCode, chanLocCode)
+
+                    if chanid == 0:
+                        # if first channel automatically create key:values pairs
+                        chanid += 1
+                        sitechanDict['sta'].append(staCode); sitechanDict['chan'].append(chanLocCode); sitechanDict['ondate'].append(jDateOn);
+                        sitechanDict['chanid'].append(chanid); sitechanDict['offdate'].append(jDateOff); sitechanDict['ctype'].append(ctype)
+                        sitechanDict['edepth'].append(depth); sitechanDict['hang'].append(hang); sitechanDict['vang'].append(vang)
+                        sitechanDict['descrip'].append(chanDesc), sitechanDict['uniqueID'].append(uniqueIDchan); sitechanDict['uniqueIDsta'].append(uniqueIDsta)
+                        sitechanDict['lddate'].append(lddate)
+                    else:
+                        # if not first channel, evaluate if station/channel combination exists
+                        if uniqueIDchan in sitechanDict['uniqueID']: 
+                            # if station/channel exists, check whether offdate needs to be updated or a new entry corresponding to a changed site entry needs to be created
+                            newStaFlag = None
+                            updateOff = None
+                            updateDex = None
+                            for chanDex in range(len(sitechanDict['chanid'])):
+                                if sitechanDict['uniqueID'][chanDex] == uniqueIDchan and sitechanDict['uniqueIDsta'][chanDex] == uniqueIDsta and jDateOff >= sitechanDict['offdate'][chanDex]:
+                                    # if correct station/value/ondate exists, then flag to update offdate with correct index location
+                                    updateOff = True
+                                    updateDex = chanDex
+
+                                elif sitechanDict['uniqueID'][chanDex] == uniqueIDchan and sitechanDict['uniqueIDsta'][chanDex] != uniqueIDsta:
+                                    # if a new entry needs to be created, flag here
+                                    newStaFlag = True
+               
+                                else:
+                                    pass
+                            
+                            # first update offdate    
+                            if updateOff == True:
+                                sitechanDict['offdate'][updateDex] = jDateOff
+                                
+                            else:
+                                # if offdate does not need to be updated and a new station conditional is flagged, then create new entry
+                                if newStaFlag == True:
+                                    chanid += 1
+                                    sitechanDict['sta'].append(staCode); sitechanDict['chan'].append(chanLocCode); sitechanDict['ondate'].append(jDateOn);
+                                    sitechanDict['chanid'].append(chanid); sitechanDict['offdate'].append(jDateOff); sitechanDict['ctype'].append(ctype)
+                                    sitechanDict['edepth'].append(depth); sitechanDict['hang'].append(hang); sitechanDict['vang'].append(vang)
+                                    sitechanDict['descrip'].append(chanDesc), sitechanDict['uniqueID'].append(uniqueIDchan); sitechanDict['uniqueIDsta'].append(uniqueIDsta)
+                                    sitechanDict['lddate'].append(lddate)
+                                    
+                        else:
+                            # if station/channel does not exit in dictionary add new key:value pairs
+                            chanid += 1
+                            sitechanDict['sta'].append(staCode); sitechanDict['chan'].append(chanLocCode); sitechanDict['ondate'].append(jDateOn);
+                            sitechanDict['chanid'].append(chanid); sitechanDict['offdate'].append(jDateOff); sitechanDict['ctype'].append(ctype)
+                            sitechanDict['edepth'].append(depth); sitechanDict['hang'].append(hang); sitechanDict['vang'].append(vang)
+                            sitechanDict['descrip'].append(chanDesc), sitechanDict['uniqueID'].append(uniqueIDchan); sitechanDict['uniqueIDsta'].append(uniqueIDsta)
+                            sitechanDict['lddate'].append(lddate)
+                           
+                    
+                    
+                    #check if response information exists, if so, go into response loop
+                    if len(chan.response.response_stages) > 0: 
+                        sensitivity, out_freq, fileName =  write_pazfir(chan.response, staCode, chanCode, startDate, out_freq = out_freq, dir_path = dir_path, network=netCode, location=locCode, \
+                                                              endtime=endDate, sample_rate=sampRate, sensor=sensor, data_logger=dataLogger, pre_amplifier=preAmp)
+    
+                        # inid, insname, instype, band, digital (d/a), samprate, ncalib, ncalper, dir, dfile, resptype
+                        ncalper = 1/out_freq
+                        ncalib = 1/sensitivity
+
+                        if schema in ['css3.0','css3','css','kbcore','kb','kbc']:
+                            rspType = fileName.split('.')[-1]
+                            if rspType == '':
+                                rspType = '-'
+                                
+                        if schema in ['antelope', 'ant']:
+                            rspType = 'D'
+                        
+                        instrumentDict['inid'].append(inid); instrumentDict['insname'].append(sensorDesc)
+                        instrumentDict['instype'].append(instype), instrumentDict['band'].append(bandCode); instrumentDict['digital'].append('d')
+                        instrumentDict['samprate'].append(sampRate); instrumentDict['ncalib'].append(ncalib); instrumentDict['ncalper'].append(ncalper)
+                        instrumentDict['dir'].append(dir_path), instrumentDict['dfile'].append(fileName); instrumentDict['rsptype'].append(rspType)
+                        instrumentDict['lddate'].append(lddate)
+                       
+                        
+                        sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
+                        sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(inid)
+                        sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDateOn); sensorDict['calratio'].append(1)
+                        sensorDict['calper'].append(ncalper); sensorDict['tshift'].append(0); sensorDict['instant'].append('y'); sensorDict['lddate'].append(lddate)
+                        
+                        inid += 1
+    
+                    else:
+                        nullInid = -1
+                        sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
+                        sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(nullInid)
+                        sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDateOn); sensorDict['calratio'].append(1)
+                        sensorDict['calper'].append(-1); sensorDict['tshift'].append(0); sensorDict['instant'].append('y'); sensorDict['lddate'].append(lddate)
+                    
 
     if write_tables == True:
-        write_dict_to_flatfile(sensorDict, dir_path)
-        write_dict_to_flatfile(instrumentDict, dir_path)
+        write_dict_to_flatfile(netDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
+        write_dict_to_flatfile(affilDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
+        write_dict_to_flatfile(siteDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
+        write_dict_to_flatfile(sitechanDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
+        write_dict_to_flatfile(sensorDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
+        write_dict_to_flatfile(instrumentDict, dirPath = dir_path, schema = schema, tab_delim=tab_delim)
 
-    return sensorDict, instrumentDict
+    return netDict, affilDict, siteDict, sitechanDict, sensorDict, instrumentDict
