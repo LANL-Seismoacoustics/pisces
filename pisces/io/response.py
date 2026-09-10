@@ -771,6 +771,10 @@ def get_errors_from_obspy_uncertainties(varType):
         Maximum complex error if input is  ComplexWithUncertainties or float if 
         input is CoefficientWithUncertainties
     """
+    if type(varType.lower_uncertainty) == str:
+        varType.lower_uncertainty = float(varType.lower_uncertainty)
+    if type(varType.upper_uncertainty) == str:
+            varType.upper_uncertainty = float(varType.upper_uncertainty)
 
     varErrors = [varType.lower_uncertainty, varType.upper_uncertainty]
     varErrorNotNone = []
@@ -851,6 +855,13 @@ def get_stationxml_lines(respStage):
     respStageLines: string
         Lines to be added to the header describing the input stage object
     """
+
+    if respStage.input_units is None:
+        respStage.input_units = 'UNKNOWN'
+
+    if respStage.output_units is None:
+        respStage.output_units = 'UNKNOWN'
+        
 
     respStageLines = '# Stage {}: Original StationXML Stage\n'.format(respStage.stage_sequence_number)
     respStageLines = respStageLines + '#\tInput Units: {} ({})\n'.format(respStage.input_units.upper(),respStage.input_units_description)
@@ -1015,10 +1026,11 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
 
     if tableDict['tablename'] == 'site':
         for dex in range(len(tableDict['sta'])):
-
             if schema in ['kbcore','kb','kbc']:
                 if tableDict['offdate'][dex] == -1:
                     offDate = 2286324
+                else:
+                    offDate = tableDict['offdate'][dex]
             else:
                 offDate = tableDict['offdate'][dex]
 
@@ -1073,6 +1085,8 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
             if schema in ['kbcore','kb','kbc']:
                 if tableDict['offdate'][dex] == -1:
                     offDate = 2286324
+                else:
+                    offDate = tableDict['offdate'][dex]
             else:
                 offDate = tableDict['offdate'][dex]
 
@@ -1092,6 +1106,10 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
 
             if schema in ['antelope', 'ant']:
                 lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
+                if hang == -1:
+                    hang = -999.9
+                if vang == -1:
+                    vang = -999.9
 
             if schema in ['kbcore','kb','kbc']:
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
@@ -1401,8 +1419,14 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     delays = []      # XX test this: make sure delays can be summed into one final value and implemented as a final group delay stage
 
     # Unit handling
-    inUnitKey = response.instrument_sensitivity.input_units.upper()
-    outUnitKey = response.instrument_sensitivity.output_units.upper()
+    if response.instrument_sensitivity.input_units is None or response.instrument_sensitivity.input_units in ['NONE',"none",'None']:
+        inUnitKey = 'UNKNOWN'
+    else:
+        inUnitKey = response.instrument_sensitivity.input_units.upper()
+    if response.instrument_sensitivity.output_units is None or response.instrument_sensitivity.output_units in ['NONE',"none",'None']:
+        outUnitKey = 'UNKNOWN'
+    else:
+        outUnitKey = response.instrument_sensitivity.output_units.upper()
 
     unitMap = {"M": "DISP",
                     "NM": "DISP",
@@ -1446,7 +1470,30 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
                     "T": "TESLA",
                     "NT": "TESLA",
                     "CELSIUS": "TEMPERATURE",
-                    "DEGREE": "ANGLE"}
+                    "C": "TEMPERATURE",
+                    "DEGC": "TEMPERATURE",
+                    "KELVIN": "TEMPERATURE",
+                    "K": "TEMPERATURE",
+                    "DEGREE": "ANGLE",
+                    "DEG": "ANGLE",
+                    "RADIANS": "ANGLE",
+                    "RAD": "ANGLE",
+                    "M/M": "STRAIN",
+                    "UM/UM": "STRAIN",
+                    "M**3/M**3": "STRAIN",
+                    "S": "TIME (SECONDS)",
+                    "SEC": "TIME (SECONDS)",
+                    "PERCENT": "HUMIDITY",
+                    "%": "HUMIDITY",
+                    "A": "CURRENT",
+                    "HZ": "FREQUENCY",
+                    "HERTZ": "FREQUENCY",
+                    "RAD/S": "ANGULAR VEL",
+                    "RAD/S**2": "ANGULAR ACC",
+                    "BIT/S": "BIT RATE",
+                    "NUMBER": "NUMBER COUNT",
+                    "CYCLES" : "CYCLES",
+                    "UNKNOWN": "UNKNOWN"}
     
     if inUnitKey not in unitMap:
         raise ValueError('Unknown input units of {}'.format(inUnitKey))
@@ -2102,10 +2149,16 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                     sampRate = chan.sample_rate
                     
                     endDate = chan.end_date
-                    depth = chan.depth/1000  
-                    hang = chan.azimuth
-                    vang = 90.0 - chan.dip  ## double check this as vang convention differs between FDSN and CSS3/KBCore
-                    
+                    depth = chan.depth/1000
+                    if chan.azimuth is not None:  
+                        hang = chan.azimuth
+                    else:
+                        hang = -1
+                    if chan.dip is not None:
+                        vang = 90.0 - chan.dip  ## double check this as vang convention differs between FDSN and CSS3/KBCore
+                    else:
+                        vang = -1
+
                     # beam or normal?  
                     if chanCode[2] in ['T','R','t','r']:
                         ctype = 'b'
@@ -2143,7 +2196,7 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                         
                     if endDate is None:
                         endDate =  UTCDateTime(9999999999.999)
-                        jDateOff = 2286324
+                        jDateOff = -1
                     else:
                         jDateOff = int(endDate.strftime('%Y%j'))
                     
@@ -2204,35 +2257,46 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                     
                     
                     #check if response information exists, if so, go into response loop
-                    if len(chan.response.response_stages) > 0: 
-                        sensitivity, out_freq, fileName =  write_pazfir(chan.response, staCode, chanCode, startDate, out_freq = out_freq, dir_path = dir_path, network=netCode, location=locCode, \
+                    if len(chan.response.response_stages) > 0:
+                        print(netCode, staCode, chanCode, startDate) 
+                        try:
+                            sensitivity, out_freq, fileName =  write_pazfir(chan.response, staCode, chanCode, startDate, out_freq = out_freq, dir_path = dir_path, network=netCode, location=locCode, \
                                                               endtime=endDate, sample_rate=sampRate, sensor=sensor, data_logger=dataLogger, pre_amplifier=preAmp)
-    
-                        # inid, insname, instype, band, digital (d/a), samprate, ncalib, ncalper, dir, dfile, resptype
-                        ncalper = 1/out_freq
-                        ncalib = 1/sensitivity
+                        except NotImplementedError:
+                            print("Skipping {}.{}.{} because of a NotImplemented Error.  Writing to sensor table with an inid of -1 with no entry in the instrument table.".format(staCode, chanCode, startDate))
 
-                        if schema in ['css3.0','css3','css','kbcore','kb','kbc']:
-                            rspType = fileName.split('.')[-1]
-                            if rspType == '':
-                                rspType = '-'
-                                
-                        if schema in ['antelope', 'ant']:
-                            rspType = 'D'
+                            nullInid = -1
+                            sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
+                            sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(nullInid)
+                            sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDateOn); sensorDict['calratio'].append(1)
+                            sensorDict['calper'].append(-1); sensorDict['tshift'].append(0); sensorDict['instant'].append('y'); sensorDict['lddate'].append(lddate)
+
+                        else:
+                            # inid, insname, instype, band, digital (d/a), samprate, ncalib, ncalper, dir, dfile, resptype
+                            ncalper = 1/out_freq
+                            ncalib = 1/sensitivity
+
+                            if schema in ['css3.0','css3','css','kbcore','kb','kbc']:
+                                rspType = fileName.split('.')[-1]
+                                if rspType == '':
+                                    rspType = '-'
+                                    
+                            if schema in ['antelope', 'ant']:
+                                rspType = 'D'
+                            
+                            instrumentDict['inid'].append(inid); instrumentDict['insname'].append(sensorDesc)
+                            instrumentDict['instype'].append(instype), instrumentDict['band'].append(bandCode); instrumentDict['digital'].append('d')
+                            instrumentDict['samprate'].append(sampRate); instrumentDict['ncalib'].append(ncalib); instrumentDict['ncalper'].append(ncalper)
+                            instrumentDict['dir'].append(dir_path), instrumentDict['dfile'].append(fileName); instrumentDict['rsptype'].append(rspType)
+                            instrumentDict['lddate'].append(lddate)
                         
-                        instrumentDict['inid'].append(inid); instrumentDict['insname'].append(sensorDesc)
-                        instrumentDict['instype'].append(instype), instrumentDict['band'].append(bandCode); instrumentDict['digital'].append('d')
-                        instrumentDict['samprate'].append(sampRate); instrumentDict['ncalib'].append(ncalib); instrumentDict['ncalper'].append(ncalper)
-                        instrumentDict['dir'].append(dir_path), instrumentDict['dfile'].append(fileName); instrumentDict['rsptype'].append(rspType)
-                        instrumentDict['lddate'].append(lddate)
-                       
-                        
-                        sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
-                        sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(inid)
-                        sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDateOn); sensorDict['calratio'].append(1)
-                        sensorDict['calper'].append(ncalper); sensorDict['tshift'].append(0); sensorDict['instant'].append('y'); sensorDict['lddate'].append(lddate)
-                        
-                        inid += 1
+                            
+                            sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)
+                            sensorDict['time'].append(startDate.timestamp); sensorDict['endtime'].append(endDate.timestamp); sensorDict['inid'].append(inid)
+                            sensorDict['chanid'].append(chanid); sensorDict['jdate'].append(jDateOn); sensorDict['calratio'].append(1)
+                            sensorDict['calper'].append(ncalper); sensorDict['tshift'].append(0); sensorDict['instant'].append('y'); sensorDict['lddate'].append(lddate)
+                            
+                            inid += 1
     
                     else:
                         nullInid = -1
