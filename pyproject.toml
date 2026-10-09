@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pisces"
+version = "0.4.5.3"
+description = "A Practical Seismological Database Library in Python."
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "LANL-MIT" }
+authors = [{ name = "Jonathan MacCarthy", email = "jkmacc@lanl.gov" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = ["seismology", "geophysics", "database"]
+dependencies = ["numpy", "obspy>=1.4.1", "sqlalchemy>=1.4", "Click"]
+
+[project.urls]
+Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
+Download = "https://github.com/LANL-Seismoacoustics/pisces/tarball/0.4.2"
+
+[project.optional-dependencies]
+e1 = ["e1"]
+
+[project.scripts]
+pisces = "pisces.commands.main:cli"
+
+[tool.setuptools]
+packages = ["pisces", "pisces.schema", "pisces.io", "pisces.tables", "pisces.commands"]

@@ -9,3 +9,6 @@ apidocs
 pyrightconfig.json
 pisces.egg-info
 .session.vim
+# pixi environments
+.pixi/*
+!.pixi/config.toml
