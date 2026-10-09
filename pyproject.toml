@@ -26,7 +26,6 @@ dependencies = ["numpy", "obspy>=1.4.1", "sqlalchemy>=1.4", "Click"]
 
 [project.urls]
 Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
-Download = "https://github.com/LANL-Seismoacoustics/pisces/tarball/0.4.2"
 
 [project.optional-dependencies]
 e1 = ["e1"]
