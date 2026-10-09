@@ -21,6 +21,7 @@ import os
 from obspy import UTCDateTime
 import obspy.core.event as qml
 from sqlalchemy import inspect
+from sqlalchemy.orm import object_session
 
 import pisces as ps
 from pisces.util import _get_entities
@@ -117,7 +118,14 @@ def _denull(result):
     Replace CSS/KBCore null values in a table row with None.
     Useful to avoid unnecessarily verbose QuakeML or JSON serializations.
 
+    The row is first expunged from its session, if any, so that nulling its values can't be
+    flushed back to the database as an UPDATE.
+
     """
+    session = object_session(result)
+    if session is not None:
+        session.expunge(result)
+
     for c in result.__table__.columns:
         if getattr(result, c.name) == c.info['default']:
             setattr(result, c.name, None)
@@ -227,11 +235,11 @@ def qmltree(query, update_from=None):
         # these should always be present:
         # event, origin
         event = getattr(row, Event.__name__)  # event = row.MyEvent
-        eventkey = inspect(event).identity_key
+        eventkey = _key(event)
         tree[eventkey]['instance'] = event
 
         origin = getattr(row, Origin.__name__)
-        originkey = inspect(origin).identity_key
+        originkey = _key(origin)
         tree[eventkey]['origins'][originkey]['instance'] = origin
 
         # "picks" in quakeml are like CSS Arrival rows, and they're at the Event level
@@ -239,13 +247,13 @@ def qmltree(query, update_from=None):
         # so we'll ultimately just reuse arrivals for them.
         if Arrival:
             arrival = getattr(row, Arrival.__name__)
-            arrivalkey = inspect(arrival).identity_key
+            arrivalkey = _key(arrival)
             tree[eventkey]['origins'][originkey]['arrivals'][arrivalkey] = arrival
 
         if Assoc:
             # "arrivals" in quakeml are like CSS Assoc rows
             assoc = getattr(row, Assoc.__name__)
-            assockey = inspect(assoc).identity_key
+            assockey = _key(assoc)
             tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
 
         # "magnitudes" in quakeml are Netmag rows and are kept at the Event level,
@@ -253,7 +261,7 @@ def qmltree(query, update_from=None):
         # processing later (they're children of their Origin instead of disconnected from them).
         if Netmag:
             netmag = getattr(row, Netmag.__name__)
-            netmagkey = inspect(netmag).identity_key
+            netmagkey = _key(netmag)
             tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['instance'] = netmag
 
         # "station_magnitudes" in quakeml are Stamag rows, and are kept at the Event level,
@@ -261,7 +269,7 @@ def qmltree(query, update_from=None):
         # for easier processing later.
         if Stamag:
             stamag = getattr(row, Stamag.__name__)
-            stamagkey = inspect(stamag).identity_key
+            stamagkey = _key(stamag)
             tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['stamags'][stamagkey] = stamag
 
     return tree
