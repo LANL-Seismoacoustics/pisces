@@ -5,6 +5,7 @@
 Common io utilities.
 
 """
+import functools
 
 
 def _buildhdr(keymap, rec):
@@ -73,3 +74,156 @@ def _map_header(keymap, dold, nulldict=None):
                 pass
 
     return dnew
+
+
+class Registry:
+    """ Dictionary-like registry decorator.
+
+    Useful for keeping track of I/O functions for file formats or core schema classes.
+
+    Examples
+    --------
+    >>> register = Registry()
+
+    >>> @register('miniseed')
+    >>> def read_miniseed():
+    ...     pass
+
+    >>> 'miniseed' in register
+    True
+    >>> register['miniseed'] == read_miniseed
+    True
+
+    >>> @register('miniseed')
+    >>> def read_miniseed2():
+    ...     pass
+
+    KeyError: 'key already exists in registry.  use force=True to override it.'
+
+    >>> @register('miniseed', force=True)
+    >>> def read_miniseed2():
+    ...     pass
+
+    >>> register['miniseed'] == read_miniseed2
+    True
+
+    >>> CORETABLES = Registry()
+    >>> @CORETABLES('site')
+    ... class Site:
+    ...     pass
+
+    >>> register['site']
+    __main__.Site
+
+    """
+    # TODO: inherit/implement collections.abc.Mapping?
+    def __init__(self):
+        self._REGISTRY = {}
+
+    def __call__(self, key, force=False):
+        """ Function decorator that registers using a key.
+        """
+        def actual_decorator(func):
+            if key in self._REGISTRY and not force:
+                raise KeyError("key already exists in registry.  use force=True to override it.")
+            self._REGISTRY[key] = func
+
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wrapper
+
+        return actual_decorator
+
+    def __repr__(self):
+        return repr(self._REGISTRY)
+
+    def __getitem__(self, key):
+        return self._REGISTRY[key]
+
+    def __len__(self):
+        return len(self._REGISTRY)
+
+    def __iter__(self):
+        for key in self._REGISTRY:
+            yield key
+
+
+
+from collections.abc import Mapping
+
+class Registry2(Mapping):
+    """ Dictionary-like registry decorator.
+
+    Useful for keeping track of I/O functions for file formats or core schema classes.
+
+    Examples
+    --------
+    >>> formats = Registry()
+
+    >>> @formats.register('miniseed')
+    >>> def read_miniseed():
+    ...     pass
+
+    >>> 'miniseed' in formats
+    True
+    >>> formats['miniseed'] == read_miniseed
+    True
+
+    >>> @formats('miniseed')
+    >>> def read_miniseed2():
+    ...     pass
+
+    KeyError: 'key already exists in registry.  use force=True to override it.'
+
+    >>> @formats('miniseed', force=True)
+    >>> def read_miniseed2():
+    ...     pass
+
+    >>> formats['miniseed'] == read_miniseed2
+    True
+
+    >>> CORETABLES = Registry()
+    >>> @CORETABLES.register('site')
+    ... class Site:
+    ...     pass
+
+    >>> CORETABLES['site']
+    __main__.Site
+
+    # existing functions or classes can also be registered using inline decorator syntax
+    >>> from mytables import MyTable
+    >>> MyTable = CORETABLES.register('mytable')(MyTable)
+
+    """
+    # hijack normal Mapping init to initialize registry
+    def __init__(self, *args, **kwargs):
+        self._REGISTRY = dict(*args, **kwargs)
+
+    def __repr__(self):
+        return repr(self._REGISTRY)
+
+    def register(self, key, force=False):
+        """ Function decorator that registers using a key.
+        """
+        def actual_decorator(func):
+            if key in self._REGISTRY and not force:
+                raise KeyError("key already exists in registry.  use force=True to override it.")
+            self._REGISTRY[key] = func
+
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wrapper
+
+        return actual_decorator
+
+    def __getitem__(self, key):
+        return self._REGISTRY[key]
+
+    def __len__(self):
+        return len(self._REGISTRY)
+
+    def __iter__(self):
+        for key in self._REGISTRY:
+            yield key

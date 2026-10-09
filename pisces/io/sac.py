@@ -14,7 +14,6 @@ Converts a SAC header dictionary into a list of table dictionaries and vice-vers
 #   - make everything just translate dictionaries, not classes and make
 #     everything less obspy.Trace-centric
 #   - change db.flatfile.KBTABLEDICT to use pisces.schema.util.get_infovals
-#   - use pysac (hopefully obspy.io.sac, eventually)
 #   - make a bunch of column/header translation functions, like "kcmpnm_to_chan"
 #     and "chan_to_kcmpnm", and use them in higher-level functions, like
 #     "sachdr_to_wfdisc" and "wfdisc_to_sachdr".
@@ -82,32 +81,32 @@ SACDEFAULT = {'a': FDEFAULT, 'az': FDEFAULT, 'b': FDEFAULT, 'baz': FDEFAULT,
 # Decorator functions allow readable, reusable handling of header values.
 
 
-def cast_to_int(original_func):
+def int_(func):
     """
     Cast a function's argument to int before the function operates on it, like:
 
     Examples
     --------
-    >>> @cast_to_int
+    >>> @int_
     ... def nwfid_to_wfid(nwfid):
     ...     return nwfid
     >>> nwfid_to_wfid(12.3)
     12
 
     """
-    @functools.wraps(original_func)
+    @functools.wraps(func)
     def converter(hdr):
-        return original_func(int(hdr))
+        return func(int(hdr))
     return converter
 
 
-def cast_to_float(original_func):
+def float_(func):
     """
     Cast a function's argument to float before the function operates on it, like:
 
     Examples
     --------
-    >>> @cast_to_float
+    >>> @float_
     ... def stla_to_lat(stla):
     ...     return stla
     >>> lat = stla_to_lat(numpy.float32(12.3))
@@ -116,9 +115,9 @@ def cast_to_float(original_func):
     # not numpy.float32
 
     """
-    @functools.wraps(original_func)
+    @functools.wraps(func)
     def converter(hdr):
-        return original_func(float(hdr))
+        return func(float(hdr))
     return converter
 
 
