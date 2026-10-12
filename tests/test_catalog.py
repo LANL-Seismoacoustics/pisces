@@ -41,29 +41,13 @@ def test_QMLGenerator_origin(eventdata):
 # skipping remaining QMLGenerator tests b/c they're pretty simple methods.
 # Test the more complex functions that use it.
 
-def test_qmltree(eventdata):
+def test_catalog_deduplicates_redundant_rows(eventdata):
+    # One event/origin repeated across rows (once per netmag) must produce a single QuakeML
+    # Event and Origin, with one Magnitude per distinct Netmag row.
     session, data = eventdata
 
     event1001 = data['event']['evid1001']
-    eventkey = cat._key(event1001)
-
-    origin1 = data['origin']['orid1']
-    originkey = cat._key(origin1)
-
-    netmag1 = data['netmag']['magid1']
-    netmagkey1 = cat._key(netmag1)
-    netmag2 = data['netmag']['magid2']
-    netmagkey2 = cat._key(netmag2)
-    netmag3 = data['netmag']['magid3']
-    netmagkey3 = cat._key(netmag3)
-
-    expected = cat._dtree()
-    expected[eventkey]['instance'] = event1001
-    expected[eventkey]['origins'][originkey]['instance'] = origin1
-    expected[eventkey]['origins'][originkey]['netmags'][netmagkey1]['instance'] = netmag1
-    expected[eventkey]['origins'][originkey]['netmags'][netmagkey2]['instance'] = netmag2
-    expected[eventkey]['origins'][originkey]['netmags'][netmagkey3]['instance'] = netmag3
-    # TODO: add arrivals to the test
+    netmags = [data['netmag'][magid] for magid in ('magid1', 'magid2', 'magid3')]
 
     query = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
@@ -71,9 +55,18 @@ def test_qmltree(eventdata):
                .filter(kb.Event.evid == event1001.evid)
                .filter(kb.Origin.orid == kb.Netmag.orid)
     )
-    observed = cat.qmltree(query)
+    # the query really is redundant: one row per netmag, all with the same event/origin
+    assert query.count() == len(netmags)
 
-    assert observed == expected
+    observed = cat.catalog(query, resource_prefix=resource_prefix)
+
+    assert len(observed.events) == 1
+    qevent = observed.events[0]
+    assert len(qevent.origins) == 1
+    assert len(qevent.magnitudes) == len(netmags)
+    assert {mag.mag for mag in qevent.magnitudes} == {nm.magnitude for nm in netmags}
+    # every magnitude points at the one origin
+    assert {mag.origin_id for mag in qevent.magnitudes} == {qevent.origins[0].resource_id}
 
 
 def test_catalog(eventdata, eventqml):
@@ -94,3 +87,36 @@ def test_catalog(eventdata, eventqml):
                        )
 
     assert observed == expected
+
+
+def test_catalog_pairs_assocs_with_same_row_arrivals(eventdata):
+    # Assoc and Arrival arrive together on a row, and each QuakeML Arrival's pick_id must point at
+    # the Pick built from *that same row's* Arrival.
+    session, data = eventdata
+
+    event1001 = data['event']['evid1001']
+
+    query = (
+        session.query(kb.Event, kb.Origin, kb.Assoc, kb.Arrival)
+               .filter(kb.Event.evid == kb.Origin.evid)
+               .filter(kb.Event.evid == event1001.evid)
+               .filter(kb.Origin.orid == kb.Assoc.orid)
+               .filter(kb.Assoc.arid == kb.Arrival.arid)
+    )
+    rows = query.all()
+    assert rows, "fixture should produce assoc/arrival rows"
+
+    observed = cat.catalog(query, resource_prefix=resource_prefix)
+
+    qevent = observed.events[0]
+    qorigin = qevent.origins[0]
+    assert len(qorigin.arrivals) == len(rows)
+    assert len(qevent.picks) == len(rows)
+
+    # map each pick's resource_id to the station it came from, then confirm every QuakeML Arrival's
+    # pick_id resolves to the pick for the same station/phase as its source Assoc row.
+    pick_station = {pick.resource_id: pick.waveform_id.station_code for pick in qevent.picks}
+    for qarrival, row in zip(qorigin.arrivals, rows):
+        assoc = getattr(row, kb.Assoc.__name__)
+        assert qarrival.pick_id is not None
+        assert pick_station[qarrival.pick_id] == assoc.sta
