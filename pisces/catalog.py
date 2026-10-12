@@ -252,8 +252,6 @@ class QMLGenerator:
         description : str
             Passed directly to `obspy.core.event.Catalog` during creation.
         preferred_magauth, preferred_magtype : str or tuple of str [not implemented]
-            Accepted and ignored. See the module-level `catalog` function for what these are
-            intended to do.
 
         Returns
         -------
@@ -270,6 +268,21 @@ class QMLGenerator:
         >>> cat = qgen.catalog(description="my catalog")
 
         """
+        # preferred_magtype : str or tuple of str [not implemented]
+        # CSS-like databases don't have a concept of preferred magnitude, so you can provide a
+        # prioritized list of magnitude types to help select the preferred magnitude for an event. If
+        # multiple magnitudes of a given type are recorded, the first magnitude author found in
+        # `preferred_magauth` will be used. If `preferred_magauth` isn't provided, the first magnitude
+        # of the given type, whether from the Origin or Netmag table, is chosen.  This option has
+        # priority over `preferred_magauth` below. Not yet implemented.
+        # preferred_magauth : str or tuple of str [not implemented]
+        # CSS-like databases don't have a concept of preferred magnitude, so we provide a prioritized
+        # list of magnitude authors to help select the preferred magnitude for an event when multiple
+        # magnitudes are recorded.  If multiple magnitudes with a given author are recorded, the first
+        # one is selected. If used with the `preferred_magtype`, this option has lower priority.  I
+        # will only be used if multiple magnitudes of a given type are recorded, but none are in the
+        # `preferred_magtype`. Not yet implemented.
+
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
         resource_prefix = self.resource_prefix
