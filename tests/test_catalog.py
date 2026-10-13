@@ -132,3 +132,32 @@ def test_catalog_pairs_assocs_with_same_row_arrivals(eventdata):
         assoc = getattr(row, kb.Assoc.__name__)
         assert qarrival.pick_id is not None
         assert pick_station[qarrival.pick_id] == assoc.sta
+
+
+def test_catalog_adds_station_magnitudes_and_contributions(eventdata):
+    """Stamags link same-row Netmags and Arrival-derived amplitudes."""
+    session, data = eventdata
+    event = data['event']['evid1001']
+    netmag = data['netmag']['magid1']
+
+    query = (
+        session.query(kb.Event, kb.Origin, kb.Netmag, kb.Stamag, kb.Arrival)
+        .filter(kb.Event.evid == kb.Origin.evid)
+        .filter(kb.Event.evid == event.evid)
+        .filter(kb.Origin.orid == kb.Netmag.orid)
+        .filter(kb.Netmag.magid == netmag.magid)
+        .filter(kb.Stamag.magid == kb.Netmag.magid)
+        .filter(kb.Arrival.arid == kb.Stamag.arid)
+    )
+
+    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    qevent = observed.events[0]
+    qmagnitude = qevent.magnitudes[0]
+
+    assert len(qevent.station_magnitudes) == 2
+    assert {stamag.mag for stamag in qevent.station_magnitudes} == {5.3, 5.1}
+    assert {stamag.amplitude_id for stamag in qevent.station_magnitudes} == {
+        amplitude.resource_id for amplitude in qevent.amplitudes
+    }
+    assert len(qmagnitude.station_magnitude_contributions) == 2
+    assert {contribution.weight for contribution in qmagnitude.station_magnitude_contributions} == {1.0}

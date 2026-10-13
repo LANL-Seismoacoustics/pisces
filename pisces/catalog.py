@@ -11,6 +11,8 @@ Examples
 >>> cat = catalog(query, resource_prefix='smi:local', description='my catalog')
 
 """
+import warnings
+
 from obspy import UTCDateTime
 import obspy.core.event as qml
 from sqlalchemy import inspect
@@ -248,6 +250,23 @@ class QMLGenerator:
         )
         return magnitude
 
+    def station_magnitude(self, stamag, origin_id=None, amplitude_id=None):
+        """Initialize an obspy.core.event.StationMagnitude from a database Stamag row."""
+        stamag = _denull(stamag)
+        prefix = self.resource_prefix
+        fields = {
+            "resource_id": qml.ResourceIdentifier(
+                id=f"{prefix}/stationmagnitude/stamag.ampid={stamag.ampid}"),
+            "origin_id": origin_id,
+            "mag": stamag.magnitude,
+            "station_magnitude_type": stamag.magtype,
+            "amplitude_id": amplitude_id,
+            "waveform_id": qml.WaveformStreamID(station_code=stamag.sta),
+        }
+        if stamag.uncertainty is not None:
+            fields["mag_errors"] = qml.QuantityError(uncertainty=stamag.uncertainty)
+        return qml.StationMagnitude(**fields)
+
     def catalog(self, description=None, comments=None, preferred_magauth=None, preferred_magtype=None):
         """ Initialize an empty obspy Catalog.
 
@@ -411,6 +430,12 @@ def catalog(*queries,
     event2, origin3, assoc5, arrival5
     ...
 
+    Stamag rows always create QuakeML StationMagnitudes. Their same-row Netmag receives a
+    StationMagnitudeContribution only when ``magdef == 'd'``; it has ``weight=1.0`` and maps
+    ``magres`` to ``residual``. ``magdef == 'n'`` creates no contribution. Any other value emits a
+    warning and creates no contribution. Stamag amplitude links use ``arid`` to reference the
+    existing Arrival-derived QuakeML Amplitude; CSS/KBCore ``ampid`` is not currently supported.
+
     Examples
     --------
     >>> cat = catalog(event_query, resource_prefix='smi:lanl.gov', description='my catalog')
@@ -427,7 +452,11 @@ def catalog(*queries,
     qevents = {}
     qorigins = {}
     qpicks = {}
+    qamplitudes = {}
+    qamplitudes_by_arid = {}
     qmagnitudes = {}
+    qstation_magnitudes = {}
+    qcontributions = set()
 
     table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival')
 
@@ -471,6 +500,7 @@ def catalog(*queries,
 
             # QuakeML "picks" and "amplitudes" are both CSS Arrival rows, stored at the Event level.
             qpick = None
+            qamplitude = None
             if Arrival:
                 arrival = getattr(row, Arrival.__name__)
                 arrivalkey = _key(arrival)
@@ -480,8 +510,11 @@ def catalog(*queries,
                     qpicks[arrivalkey] = qpick
                     qevent.picks.append(qpick)
 
+                if not (qamplitude := qamplitudes.get(arrivalkey)):
                     qamplitude = qgen.amplitude(arrival, pick_id=qpick.resource_id)
                     qamplitude.waveform_id = qpick.waveform_id
+                    qamplitudes[arrivalkey] = qamplitude
+                    qamplitudes_by_arid[arrival.arid] = qamplitude
                     qevent.amplitudes.append(qamplitude)
 
             # QuakeML "arrivals" are CSS Assoc rows, stored at the Origin level.
@@ -505,8 +538,38 @@ def catalog(*queries,
                     qevent.magnitudes.append(qmagnitude)
 
             if Stamag:
-                # TODO: station_magnitudes/stamags. Stamag pairs with Netmag on the same row,
-                # exactly as Assoc pairs with Arrival, so the parent magnitude is `qmagnitude`.
-                pass
+                stamag = getattr(row, Stamag.__name__)
+                stamagkey = _key(stamag)
+                magdef = stamag.magdef
+                magres = stamag.magres
+                qamplitude = qamplitudes_by_arid.get(stamag.arid)
+                amplitude_id = qamplitude.resource_id if qamplitude else None
+                if not (qstation_magnitude := qstation_magnitudes.get(stamagkey)):
+                    qstation_magnitude = qgen.station_magnitude(
+                        stamag,
+                        origin_id=qorigin.resource_id,
+                        amplitude_id=amplitude_id,
+                    )
+                    qstation_magnitudes[stamagkey] = qstation_magnitude
+                    qevent.station_magnitudes.append(qstation_magnitude)
+                elif amplitude_id is not None and qstation_magnitude.amplitude_id is None:
+                    qstation_magnitude.amplitude_id = amplitude_id
+
+                if qmagnitude and (contribution_key := (netmagkey, stamagkey)) not in qcontributions:
+                    if magdef == "d":
+                        qmagnitude.station_magnitude_contributions.append(
+                            qml.StationMagnitudeContribution(
+                                station_magnitude_id=qstation_magnitude.resource_id,
+                                residual=magres,
+                                weight=1.0,
+                            )
+                        )
+                    elif magdef != "n":
+                        warnings.warn(
+                            f"Stamag magdef {magdef!r} is neither 'd' nor 'n'; "
+                            "omitting StationMagnitudeContribution.",
+                            stacklevel=2,
+                        )
+                    qcontributions.add(contribution_key)
 
     return cat
