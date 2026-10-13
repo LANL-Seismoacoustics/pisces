@@ -9,7 +9,7 @@ import pytest
 from obspy import UTCDateTime
 from sqlalchemy import or_
 
-from pisces.tables.kbcore import Event, Origin, Netmag, Stamag, Site
+from pisces.tables.kbcore import Amplitude, Event, Origin, Netmag, Stamag, Site
 from pisces import events
 from pisces.util import literal_sql
 
@@ -308,6 +308,56 @@ def test_filter_magnitudes_origin_netmag_stamag(session):
     assert literal_sql(observed) == literal_sql(expected)
 
 
+def test_filter_magnitudes_stamag_amplitude(session):
+    """Amplitude rows join their Stamag source on ampid."""
+    q = session.query(Origin, Netmag, Stamag, Amplitude)
+
+    observed = events.filter_magnitudes(q, mb=(None, 4))
+    expected = (
+        session.query(Origin, Netmag, Stamag, Amplitude)
+        .filter(Stamag.magid == Netmag.magid)
+        .filter(Netmag.orid == Origin.orid)
+        .filter(Stamag.orid == Origin.orid)
+        .filter(Stamag.ampid == Amplitude.ampid)
+        .filter(Stamag.magtype.like('mb'))
+        .filter(Stamag.magnitude <= 4)
+    )
+
+    assert literal_sql(observed) == literal_sql(expected)
+
+
+def test_filter_magnitudes_amplitude_filters(session):
+    """Amplitude SNR and type filters apply after the Stamag join."""
+    q = session.query(Origin, Stamag, Amplitude)
+
+    observed = events.filter_magnitudes(q, snr=(3, None), amptype="A*")
+    expected = (
+        session.query(Origin, Stamag, Amplitude)
+        .filter(Stamag.orid == Origin.orid)
+        .filter(Stamag.ampid == Amplitude.ampid)
+        .filter(Amplitude.snr >= 3)
+        .filter(Amplitude.amptype.like("A%"))
+    )
+
+    assert literal_sql(observed) == literal_sql(expected)
+
+
+def test_filter_magnitudes_filter_only_amplitude(session):
+    """Amplitude can constrain Stamag rows without being selected."""
+    q = session.query(Origin, Stamag)
+
+    observed = events.filter_magnitudes(q, mb=(None, 4), amplitude=Amplitude)
+    expected = (
+        session.query(Origin, Stamag)
+        .filter(Stamag.orid == Origin.orid)
+        .filter(Stamag.ampid == Amplitude.ampid)
+        .filter(Stamag.magtype.like('mb'))
+        .filter(Stamag.magnitude <= 4)
+    )
+
+    assert literal_sql(observed) == literal_sql(expected)
+
+
 def test_filter_magnitudes_exceptions(session):
     """ Check for expected exceptions. """
 
@@ -328,6 +378,14 @@ def test_filter_magnitudes_exceptions(session):
     with pytest.raises(ValueError):
         q = events.filter_magnitudes(q, sta='sta1')
 
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, amplitude=Amplitude)
+
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, snr=(3, None))
+
+    with pytest.raises(ValueError):
+        q = events.filter_magnitudes(q, amptype="A*")
 
 # def test_filter_arrivals(session, eventdata):
 #     pass

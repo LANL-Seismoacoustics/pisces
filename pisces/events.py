@@ -163,11 +163,12 @@ def filter_magnitudes(
     net=None,
     sta=None,
     auth=None,
+    snr=None,
+    amptype=None,
     *,
-    event=None,
-    origin=None,
     netmag=None,
     stamag=None,
+    amplitude=None,
     **magnitudes,
 ):
     """Filter an event query by magnitude range using Origin, Netmag, and/or Stamag tables.
@@ -185,9 +186,16 @@ def filter_magnitudes(
         Station code filter; requires Stamag.
     auth : str or iterable of str
         Author filter, applied to Stamag, Netmag, or Origin in that priority order.
-    event, origin, netmag, stamag : ORM table class, optional
-        Table to use for filtering when it is not selected by ``query``. Supplying these keywords
-        has the same behavior as the legacy ``**magnitudes_and_tables`` API.
+    snr : tuple
+        ``(min|None, max|None)`` signal-to-noise range; requires Amplitude.
+    amptype : str or iterable of str
+        Amplitude type filter, wildcards allowed; requires Amplitude.
+    netmag, stamag : ORM table class, optional
+        Magnitude-domain table to use for filtering when it is not selected by ``query``.
+        Event and Origin come from the preceding ``filter_events`` query.
+    amplitude : ORM Amplitude table class, optional
+        Amplitude table to include or join for result rows. It requires Stamag and joins on
+        ``Stamag.ampid == Amplitude.ampid``.
     **magnitudes
         ``magtype=(min|None, max|None)`` filters, for example ``mb=(3.5, 5.5)``. ``all`` applies
         the range to every row-oriented magnitude type. Origin supports only ``mb``, ``ml``, and
@@ -199,18 +207,24 @@ def filter_magnitudes(
     Netmag.evid == Event.evid
     Netmag.magid == Stamag.magid
     Origin.orid == Stamag.orid
+    Stamag.ampid == Amplitude.ampid
 
     """
-    Event, Origin, Netmag, Stamag = _get_entities(query, "Event", "Origin", "Netmag", "Stamag")
-    Event = event or Event
-    Origin = origin or Origin
+    Event, Origin, Netmag, Stamag, Amplitude = _get_entities(
+        query, "Event", "Origin", "Netmag", "Stamag", "Amplitude"
+    )
     Netmag = netmag or Netmag
     Stamag = stamag or Stamag
+    Amplitude = amplitude or Amplitude
 
     magtypes = {mag.lower() for mag in magnitudes}
     origin_magtypes = {"mb", "ml", "ms"}
     nonorigin_magtypes = magtypes - origin_magtypes
 
+    if (snr or amptype) and not Amplitude:
+        raise ValueError("Amplitude table required for 'snr' and 'amptype' parameters.")
+    if Amplitude and not Stamag:
+        raise ValueError("Stamag table required for Amplitude rows.")
     if sta and not Stamag:
         raise ValueError("Stamag table required for 'sta' parameter.")
     if net and not Netmag:
@@ -229,6 +243,8 @@ def filter_magnitudes(
         joins.append(Netmag.orid == Origin.orid)
     if Stamag and Origin:
         joins.append(Stamag.orid == Origin.orid)
+    if Stamag and Amplitude:
+        joins.append(Stamag.ampid == Amplitude.ampid)
     query = query.filter(*joins)
 
     if Stamag:
@@ -264,6 +280,11 @@ def filter_magnitudes(
     if auth:
         auths = make_wildcard_list(auth)
         query = query.filter(or_(*(Magtable.auth.like(value) for value in auths)))
+    if snr:
+        query = query.filter(*range_filters((Amplitude.snr, *snr)))
+    if amptype:
+        amptypes = make_wildcard_list(amptype)
+        query = query.filter(or_(*(Amplitude.amptype.like(value) for value in amptypes)))
 
     return query
 
