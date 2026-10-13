@@ -38,6 +38,18 @@ def test_QMLGenerator_origin(eventdata):
     observed = qgen.origin(origin)
     assert observed == expected
 
+def test_QMLGenerator_amplitude(eventdata):
+    """Arrival amplitudes convert from CSS nanometers to QuakeML meters."""
+    _, data = eventdata
+    arrival = data['arrival']['ANMO1']
+    expected_amplitude = arrival.amp  # load the ORM row before _denull expunges it
+
+    observed = qgen.amplitude(arrival)
+
+    assert observed.generic_amplitude == expected_amplitude * 1e-9
+    assert observed.unit == 'm'
+
+
 # skipping remaining QMLGenerator tests b/c they're pretty simple methods.
 # Test the more complex functions that use it.
 

@@ -172,24 +172,28 @@ class QMLGenerator:
         """ Initialize an obspy.core.event.Pick from a database Arrival row. """
         arrival = _denull(arrival)
         prefix = self.resource_prefix
-        pick = qml.Pick(
-            resource_id=qml.ResourceIdentifier(
+        fields = {
+            "resource_id": qml.ResourceIdentifier(
                 id=f'{prefix}/pick/arrival.arid={arrival.arid}'),
-            waveform_id=qml.WaveformStreamID(
+            "waveform_id": qml.WaveformStreamID(
                 station_code=arrival.sta, channel_code=arrival.chan),
-            time=UTCDateTime(arrival.time),
-            time_errors=qml.QuantityError(uncertainty=arrival.deltim),
-            horizontal_slowness=arrival.slow,
-            horizontal_slowness_errors=qml.QuantityError(
-                uncertainty=arrival.delslo),
-            backazimuth=baz if (baz := arrival.azimuth -
-                                180) >= 0 else arrival.azimuth + 180,
-            backazimuth_errors=qml.QuantityError(uncertainty=arrival.delaz),
-            onset=FDSN_PICK_ONSET.get(arrival.qual, None),
-            phase_hint=arrival.iphase,
-            polarity=FDSN_POLARITY.get(arrival.fm, None),
-        )
-        return pick
+            "time": UTCDateTime(arrival.time),
+            "onset": FDSN_PICK_ONSET.get(arrival.qual),
+            "phase_hint": arrival.iphase,
+            "polarity": FDSN_POLARITY.get(arrival.fm),
+        }
+        if arrival.deltim is not None:
+            fields["time_errors"] = qml.QuantityError(uncertainty=arrival.deltim)
+        if arrival.slow is not None:
+            fields["horizontal_slowness"] = arrival.slow
+        if arrival.delslo is not None:
+            fields["horizontal_slowness_errors"] = qml.QuantityError(
+                uncertainty=arrival.delslo)
+        if arrival.azimuth is not None:
+            fields["backazimuth"] = (arrival.azimuth + 180) % 360
+        if arrival.delaz is not None:
+            fields["backazimuth_errors"] = qml.QuantityError(uncertainty=arrival.delaz)
+        return qml.Pick(**fields)
 
     def arrival(self, assoc, pick_id=None):
         """ Initialize an obspy.core.event.Arrival from a database Assoc row. """
@@ -211,21 +215,24 @@ class QMLGenerator:
         """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
         arrival = _denull(arrival)
         prefix = self.resource_prefix
-        amp = qml.Amplitude(
-            resource_id=qml.ResourceIdentifier(
+        fields = {
+            "resource_id": qml.ResourceIdentifier(
                 id=f'{prefix}/amplitude/arrival.arid={arrival.arid}'),
-            waveform_id=qml.WaveformStreamID(
+            "waveform_id": qml.WaveformStreamID(
                 station_code=arrival.sta, channel_code=arrival.chan),
-            pick_id=pick_id,
-            generic_amplitude=arrival.amp*1e9,  # nanometers to meters
-            unit='m',
-            type='A',
-            category='period',
-            period=arrival.per,
-            snr=arrival.snr,
-            magnitude_hint='M',
-        )
-        return amp
+            "pick_id": pick_id,
+            "unit": "m",
+            "type": "A",
+            "category": "period",
+            "magnitude_hint": "M",
+        }
+        if arrival.amp is not None:
+            fields["generic_amplitude"] = arrival.amp * 1e-9  # nanometers to meters
+        if arrival.per is not None:
+            fields["period"] = arrival.per
+        if arrival.snr is not None:
+            fields["snr"] = arrival.snr
+        return qml.Amplitude(**fields)
 
     def magnitude(self, netmag, origin_id=None):
         """ Initialize an obspy.core.event.Magnitude from a database Netmag row. """
