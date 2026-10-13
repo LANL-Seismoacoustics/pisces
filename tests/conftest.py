@@ -257,7 +257,16 @@ def eventdata(session):
         magid8=Netmag(magid=8, net='AFTAC', orid=3, evid=1003, magtype='MS', nsta=12, magnitude=6.30, uncertainty=0.14, auth='AEC', commid=39),
         magid9=Netmag(magid=9, net='AFTAC', orid=3, evid=1003, magtype='ML', nsta=20, magnitude=6.20, uncertainty=0.11, auth='AEC', commid=40),
     )
-    ## 13. stamag Table
+    ## 13. amplitude Table
+    data['amplitude'] = dict(
+        ampid1=Amplitude(ampid=1, arid=1, chan='BHZ', amp=9000.00, per=0.50, snr=20.00, amptype='A'),
+        ampid2=Amplitude(ampid=2, arid=3, chan='BHZ', amp=1400.00, per=0.48, snr=16.00, amptype='A'),
+        ampid3=Amplitude(ampid=3, arid=2, chan='BHN', amp=2500.00, per=1.00, snr=12.00, amptype='A'),
+        ampid4=Amplitude(ampid=4, arid=3, chan='BHZ', amp=1400.00, per=0.48, snr=16.00, amptype='A'),
+        ampid5=Amplitude(ampid=5, arid=5, chan='BHZ', amp=2200.00, per=0.52, snr=17.00, amptype='A'),
+        ampid6=Amplitude(ampid=6, arid=6, chan='BHZ', amp=2300.00, per=0.53, snr=18.00, amptype='A'),
+    )
+    ## 14. stamag Table
     data['stamag'] = dict(
         ampid1=Stamag(magid=1, ampid=1, sta='ANMO', arid=1, orid=1, evid=1001, phase='P', delta=2.50, magtype='mb', magnitude=5.30, uncertainty=0.15, magres=0.10, magdef='d', mmodel='veith', auth='USGS', commid=41),
         ampid2=Stamag(magid=1, ampid=2, sta='TPNV', arid=3, orid=1, evid=1001, phase='P', delta=1.80, magtype='mb', magnitude=5.10, uncertainty=0.12, magres=-0.10, magdef='d', mmodel='veith', auth='USGS', commid=42),

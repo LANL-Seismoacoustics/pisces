@@ -210,26 +210,37 @@ class QMLGenerator:
         )
         return qarrival
 
-    def amplitude(self, arrival, pick_id=None):
-        """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
-        arrival = _denull(arrival)
-        fields = {
-            "resource_id": qml.ResourceIdentifier(
-                id=f'{self.resource_prefix}/amplitude/arrival.arid={arrival.arid}'),
-            "waveform_id": qml.WaveformStreamID(
-                station_code=arrival.sta, channel_code=arrival.chan),
-            "pick_id": pick_id,
-            "unit": "m",
-            "type": "A",
-            "category": "period",
-            "magnitude_hint": "M",
-        }
-        if arrival.amp is not None:
-            fields["generic_amplitude"] = arrival.amp * 1e-9  # nanometers to meters
-        if arrival.per is not None:
-            fields["period"] = arrival.per
-        if arrival.snr is not None:
-            fields["snr"] = arrival.snr
+    def amplitude(self, row, pick_id=None, waveform_id=None):
+        """Initialize an obspy.core.event.Amplitude from an Arrival or Amplitude row."""
+        row = _denull(row)
+        if hasattr(row, "ampid"):
+            fields = {
+                "resource_id": qml.ResourceIdentifier(
+                    id=f"{self.resource_prefix}/amplitude/amplitude.ampid={row.ampid}"),
+                "pick_id": pick_id,
+                "waveform_id": waveform_id,
+                "unit": "m",
+                "type": row.amptype,
+                "category": "period",
+            }
+        else:
+            fields = {
+                "resource_id": qml.ResourceIdentifier(
+                    id=f"{self.resource_prefix}/amplitude/arrival.arid={row.arid}"),
+                "waveform_id": qml.WaveformStreamID(
+                    station_code=row.sta, channel_code=row.chan),
+                "pick_id": pick_id,
+                "unit": "m",
+                "type": "A",
+                "category": "period",
+                "magnitude_hint": "M",
+            }
+        if row.amp is not None:
+            fields["generic_amplitude"] = row.amp * 1e-9  # nanometers to meters
+        if row.per is not None:
+            fields["period"] = row.per
+        if row.snr is not None:
+            fields["snr"] = row.snr
         return qml.Amplitude(**fields)
 
     def magnitude(self, netmag, origin_id=None):
@@ -245,7 +256,7 @@ class QMLGenerator:
         )
         return magnitude
 
-    def station_magnitude(self, stamag, origin_id=None, amplitude_id=None):
+    def stationmagnitude(self, stamag, origin_id=None, amplitude_id=None):
         """Initialize an obspy.core.event.StationMagnitude from a database Stamag row."""
         stamag = _denull(stamag)
         fields = {
@@ -426,8 +437,9 @@ def catalog(*queries,
     Stamag rows always create QuakeML StationMagnitudes. Their same-row Netmag receives a
     StationMagnitudeContribution only when ``magdef == 'd'``; it has ``weight=1.0`` and maps
     ``magres`` to ``residual``. ``magdef == 'n'`` creates no contribution. Any other value emits a
-    warning and creates no contribution. Stamag amplitude links use ``arid`` to reference the
-    existing Arrival-derived QuakeML Amplitude; CSS/KBCore ``ampid`` is not currently supported.
+    warning and creates no contribution. When an Amplitude table is selected, Stamag links to its
+    QuakeML Amplitude by ``ampid``. Otherwise it falls back to the existing Arrival-derived
+    amplitude link by ``arid``.
 
     Examples
     --------
@@ -447,14 +459,15 @@ def catalog(*queries,
     qpicks = {}
     qamplitudes = {}
     qamplitudes_by_arid = {}
+    qamplitudes_by_ampid = {}
     qmagnitudes = {}
     qstation_magnitudes = {}
     qcontributions = set()
 
-    table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival')
+    table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival', 'Amplitude')
 
     for query in queries:
-        Event, Origin, Netmag, Stamag, Assoc, Arrival = _get_entities(query, *table_types)
+        Event, Origin, Netmag, Stamag, Assoc, Arrival, Amplitude = _get_entities(query, *table_types)
 
         if not (Event and Origin):
             msg = "Event and Origin tables must be present in each provided query."
@@ -503,11 +516,24 @@ def catalog(*queries,
                     qpicks[arrivalkey] = qpick
                     qevent.picks.append(qpick)
 
-                if not (qamplitude := qamplitudes.get(arrivalkey)):
+                if not Amplitude and not (qamplitude := qamplitudes.get(arrivalkey)):
                     qamplitude = qgen.amplitude(arrival, pick_id=qpick.resource_id)
                     qamplitude.waveform_id = qpick.waveform_id
                     qamplitudes[arrivalkey] = qamplitude
                     qamplitudes_by_arid[arrival.arid] = qamplitude
+                    qevent.amplitudes.append(qamplitude)
+
+            if Amplitude:
+                amplitude = getattr(row, Amplitude.__name__)
+                amplitudekey = _key(amplitude)
+                if not (qamplitude := qamplitudes.get(amplitudekey)):
+                    qamplitude = qgen.amplitude(
+                        amplitude,
+                        pick_id=qpick.resource_id if qpick else None,
+                        waveform_id=qpick.waveform_id if qpick else None,
+                    )
+                    qamplitudes[amplitudekey] = qamplitude
+                    qamplitudes_by_ampid[amplitude.ampid] = qamplitude
                     qevent.amplitudes.append(qamplitude)
 
             # QuakeML "arrivals" are CSS Assoc rows, stored at the Origin level.
@@ -535,10 +561,13 @@ def catalog(*queries,
                 stamagkey = _key(stamag)
                 magdef = stamag.magdef
                 magres = stamag.magres
-                qamplitude = qamplitudes_by_arid.get(stamag.arid)
+                qamplitude = (
+                    qamplitudes_by_ampid.get(stamag.ampid)
+                    if Amplitude else qamplitudes_by_arid.get(stamag.arid)
+                )
                 amplitude_id = qamplitude.resource_id if qamplitude else None
                 if not (qstation_magnitude := qstation_magnitudes.get(stamagkey)):
-                    qstation_magnitude = qgen.station_magnitude(
+                    qstation_magnitude = qgen.stationmagnitude(
                         stamag,
                         origin_id=qorigin.resource_id,
                         amplitude_id=amplitude_id,

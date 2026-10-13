@@ -161,3 +161,32 @@ def test_catalog_adds_station_magnitudes_and_contributions(eventdata):
     }
     assert len(qmagnitude.station_magnitude_contributions) == 2
     assert {contribution.weight for contribution in qmagnitude.station_magnitude_contributions} == {1.0}
+
+
+def test_catalog_uses_database_amplitudes_when_selected(eventdata):
+    """Selected Amplitude rows replace Arrival-derived amplitudes and link by ampid."""
+    session, data = eventdata
+    event = data['event']['evid1001']
+    netmag = data['netmag']['magid1']
+    amplitude = data['amplitude']['ampid1']
+
+    query = (
+        session.query(kb.Event, kb.Origin, kb.Netmag, kb.Stamag, kb.Amplitude)
+        .filter(kb.Event.evid == kb.Origin.evid)
+        .filter(kb.Event.evid == event.evid)
+        .filter(kb.Origin.orid == kb.Netmag.orid)
+        .filter(kb.Netmag.magid == netmag.magid)
+        .filter(kb.Stamag.magid == kb.Netmag.magid)
+        .filter(kb.Stamag.ampid == kb.Amplitude.ampid)
+        .filter(kb.Amplitude.ampid == amplitude.ampid)
+    )
+
+    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    qevent = observed.events[0]
+
+    assert len(qevent.amplitudes) == 1
+    qamplitude = qevent.amplitudes[0]
+    assert str(qamplitude.resource_id) == f'{resource_prefix}/amplitude/amplitude.ampid=1'
+    assert qamplitude.generic_amplitude == 9000.0e-9
+    assert qevent.station_magnitudes[0].amplitude_id == qamplitude.resource_id
+
