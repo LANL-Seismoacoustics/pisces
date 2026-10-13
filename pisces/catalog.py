@@ -248,7 +248,7 @@ class QMLGenerator:
         )
         return magnitude
 
-    def catalog(self, description=None, preferred_magauth=None, preferred_magtype=None):
+    def catalog(self, description=None, comments=None, preferred_magauth=None, preferred_magtype=None):
         """ Initialize an empty obspy Catalog.
 
         Returns a Catalog with creation info and resource id set, and no events. Events are added by
@@ -257,6 +257,8 @@ class QMLGenerator:
         Parameters
         ----------
         description : str
+            Passed directly to `obspy.core.event.Catalog` during creation.
+        comments : list of obspy.core.event.Comment
             Passed directly to `obspy.core.event.Catalog` during creation.
         preferred_magauth, preferred_magtype : str or tuple of str [not implemented]
 
@@ -299,6 +301,7 @@ class QMLGenerator:
             resource_id=qml.ResourceIdentifier(
                 prefix=f'{resource_prefix}/catalog'),  # uses a uuid after prefix
             description=description,
+            comments=comments,
         )
 
         return cat
@@ -415,7 +418,7 @@ def catalog(*queries,
 
     """
     qgen = QMLGenerator(resource_prefix=resource_prefix)
-    cat = qgen.catalog(description=description)
+    cat = qgen.catalog(description=description, comments=comments)
 
     # Flat {database row identity: QuakeML object} maps, one per QuakeML type, shared across all
     # queries so a later query referencing an earlier query's event merges into it.
