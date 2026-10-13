@@ -159,10 +159,9 @@ class QMLGenerator:
     def origin(self, origin):
         """ Return an obspy.core.event.Origin from a database Origin row. """
         origin = _denull(origin)
-        prefix = self.resource_prefix
         qorigin = qml.Origin(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/origin/origin.orid={origin.orid}'),
+                id=f'{self.resource_prefix}/origin/origin.orid={origin.orid}'),
             time=UTCDateTime(origin.time),
             longitude=origin.lon,
             latitude=origin.lat,
@@ -173,10 +172,9 @@ class QMLGenerator:
     def pick(self, arrival):
         """ Initialize an obspy.core.event.Pick from a database Arrival row. """
         arrival = _denull(arrival)
-        prefix = self.resource_prefix
         fields = {
             "resource_id": qml.ResourceIdentifier(
-                id=f'{prefix}/pick/arrival.arid={arrival.arid}'),
+                id=f'{self.resource_prefix}/pick/arrival.arid={arrival.arid}'),
             "waveform_id": qml.WaveformStreamID(
                 station_code=arrival.sta, channel_code=arrival.chan),
             "time": UTCDateTime(arrival.time),
@@ -200,10 +198,9 @@ class QMLGenerator:
     def arrival(self, assoc, pick_id=None):
         """ Initialize an obspy.core.event.Arrival from a database Assoc row. """
         assoc = _denull(assoc)
-        prefix = self.resource_prefix
         qarrival = qml.Arrival(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/arrival/assoc.arid={assoc.arid}'),
+                id=f'{self.resource_prefix}/arrival/assoc.arid={assoc.arid}'),
             pick_id=pick_id,
             phase=assoc.phase,
             distance=assoc.delta,
@@ -216,10 +213,9 @@ class QMLGenerator:
     def amplitude(self, arrival, pick_id=None):
         """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
         arrival = _denull(arrival)
-        prefix = self.resource_prefix
         fields = {
             "resource_id": qml.ResourceIdentifier(
-                id=f'{prefix}/amplitude/arrival.arid={arrival.arid}'),
+                id=f'{self.resource_prefix}/amplitude/arrival.arid={arrival.arid}'),
             "waveform_id": qml.WaveformStreamID(
                 station_code=arrival.sta, channel_code=arrival.chan),
             "pick_id": pick_id,
@@ -239,10 +235,9 @@ class QMLGenerator:
     def magnitude(self, netmag, origin_id=None):
         """ Initialize an obspy.core.event.Magnitude from a database Netmag row. """
         netmag = _denull(netmag)
-        prefix = self.resource_prefix
         magnitude = qml.Magnitude(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/magnitude/netmag.magid={netmag.magid}'),
+                id=f'{self.resource_prefix}/magnitude/netmag.magid={netmag.magid}'),
             mag=netmag.magnitude,
             magnitude_type=netmag.magtype,
             station_count=netmag.nsta,
@@ -253,10 +248,9 @@ class QMLGenerator:
     def station_magnitude(self, stamag, origin_id=None, amplitude_id=None):
         """Initialize an obspy.core.event.StationMagnitude from a database Stamag row."""
         stamag = _denull(stamag)
-        prefix = self.resource_prefix
         fields = {
             "resource_id": qml.ResourceIdentifier(
-                id=f"{prefix}/stationmagnitude/stamag.ampid={stamag.ampid}"),
+                id=f"{self.resource_prefix}/stationmagnitude/stamag.ampid={stamag.ampid}"),
             "origin_id": origin_id,
             "mag": stamag.magnitude,
             "station_magnitude_type": stamag.magtype,
@@ -313,12 +307,11 @@ class QMLGenerator:
 
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
-        resource_prefix = self.resource_prefix
         cat = qml.Catalog(
             creation_info=qml.CreationInfo(
                 author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
             resource_id=qml.ResourceIdentifier(
-                prefix=f'{resource_prefix}/catalog'),  # uses a uuid after prefix
+                prefix=f'{self.resource_prefix}/catalog'),  # uses a uuid after prefix
             description=description,
             comments=comments,
         )
