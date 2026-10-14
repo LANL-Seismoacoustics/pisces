@@ -22,6 +22,9 @@ import pisces as ps
 from pisces.util import _get_entities
 
 
+PREFERRED_MAGNITUDES = ("mb", "mw", "ms")
+
+
 # Convert KB Core etypes to FDSN event types, best good-faith mapping
 # These are also used for a backwards mapping below, so where there multiple backwards mappings,
 # the final one is preferred/used. Relies on order-preserving dictionaries in Python 3.7+.
@@ -272,7 +275,7 @@ class QMLGenerator:
             fields["mag_errors"] = qml.QuantityError(uncertainty=stamag.uncertainty)
         return qml.StationMagnitude(**fields)
 
-    def catalog(self, description=None, comments=None, preferred_magauth=None, preferred_magtype=None):
+    def catalog(self, description=None, comments=None):
         """ Initialize an empty obspy Catalog.
 
         Returns a Catalog with creation info and resource id set, and no events. Events are added by
@@ -284,7 +287,6 @@ class QMLGenerator:
             Passed directly to `obspy.core.event.Catalog` during creation.
         comments : list of obspy.core.event.Comment
             Passed directly to `obspy.core.event.Catalog` during creation.
-        preferred_magauth, preferred_magtype : str or tuple of str [not implemented]
 
         Returns
         -------
@@ -301,21 +303,6 @@ class QMLGenerator:
         >>> cat = qgen.catalog(description="my catalog")
 
         """
-        # preferred_magtype : str or tuple of str [not implemented]
-        # CSS-like databases don't have a concept of preferred magnitude, so you can provide a
-        # prioritized list of magnitude types to help select the preferred magnitude for an event. If
-        # multiple magnitudes of a given type are recorded, the first magnitude author found in
-        # `preferred_magauth` will be used. If `preferred_magauth` isn't provided, the first magnitude
-        # of the given type, whether from the Origin or Netmag table, is chosen.  This option has
-        # priority over `preferred_magauth` below. Not yet implemented.
-        # preferred_magauth : str or tuple of str [not implemented]
-        # CSS-like databases don't have a concept of preferred magnitude, so we provide a prioritized
-        # list of magnitude authors to help select the preferred magnitude for an event when multiple
-        # magnitudes are recorded.  If multiple magnitudes with a given author are recorded, the first
-        # one is selected. If used with the `preferred_magtype`, this option has lower priority.  I
-        # will only be used if multiple magnitudes of a given type are recorded, but none are in the
-        # `preferred_magtype`. Not yet implemented.
-
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
         cat = qml.Catalog(
@@ -334,8 +321,7 @@ def catalog(*queries,
     resource_prefix='smi:local',
     description=None,
     comments=None,
-    preferred_magauth=None,
-    preferred_magtype=('mw', 'mb', 'ms')
+    preferred_magnitude=PREFERRED_MAGNITUDES,
 ):
     """
     Build an ObsPy Catalog from one or more CSS/KBCore database result sets.
@@ -370,20 +356,11 @@ def catalog(*queries,
         e.g. 'smi:lanl.gov' will result in 'smi:lanl.gov/event/<evid>' for events, etc...
     description, comments : str
         Passed directly to `obspy.core.event.Catalog` during creation.
-    preferred_magtype : str or tuple of str
-        CSS-like databases don't have a concept of preferred magnitude, so you can provide a
-        prioritized list of magnitude types to help select the preferred magnitude for an event. If
-        multiple magnitudes of a given type are recorded, the first magnitude author found in
-        `preferred_magauth` will be used. If `preferred_magauth` isn't provided, the first magnitude
-        of the given type, whether from the Origin or Netmag table, is chosen.  This option has
-        priority over `preferred_magauth` below. Not yet implemented.
-    preferred_magauth : str or tuple of str
-        CSS-like databases don't have a concept of preferred magnitude, so we provide a prioritized
-        list of magnitude authors to help select the preferred magnitude for an event when multiple
-        magnitudes are recorded.  If multiple magnitudes with a given author are recorded, the first
-        one is selected. If used with the `preferred_magtype`, this option has lower priority.  I
-        will only be used if multiple magnitudes of a given type are recorded, but none are in the
-        `preferred_magtype`. Not yet implemented.
+    preferred_magnitude : tuple of str
+        Magnitude types in preferred order, case-insensitive. The first matching Netmag on the
+        event's preferred Origin becomes the QuakeML preferred magnitude. Defaults to
+        ``("mb", "mw", "ms")``. This marks ``preferred_magnitude_id`` but retains all supplied
+        magnitude rows.
 
     Returns
     -------
@@ -461,6 +438,7 @@ def catalog(*queries,
     qamplitudes_by_arid = {}
     qamplitudes_by_ampid = {}
     qmagnitudes = {}
+    qpreferred_magnitudes = {}
     qstation_magnitudes = {}
     qcontributions = set()
 
@@ -555,6 +533,17 @@ def catalog(*queries,
                     qmagnitude = qgen.magnitude(netmag, origin_id=qorigin.resource_id)
                     qmagnitudes[netmagkey] = qmagnitude
                     qevent.magnitudes.append(qmagnitude)
+                    if netmag.orid == event.prefor:
+                        try:
+                            priority = tuple(
+                                magtype.casefold() for magtype in preferred_magnitude
+                            ).index(netmag.magtype.casefold())
+                        except (AttributeError, ValueError):
+                            pass
+                        else:
+                            current = qpreferred_magnitudes.get(eventkey)
+                            if current is None or priority < current[0]:
+                                qpreferred_magnitudes[eventkey] = (priority, qmagnitude)
 
             if Stamag:
                 stamag = getattr(row, Stamag.__name__)
@@ -593,5 +582,9 @@ def catalog(*queries,
                             stacklevel=2,
                         )
                     qcontributions.add(contribution_key)
+
+    for eventkey, qevent in qevents.items():
+        if preferred := qpreferred_magnitudes.get(eventkey):
+            qevent.preferred_magnitude_id = preferred[1].resource_id
 
     return cat

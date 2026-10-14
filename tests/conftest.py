@@ -344,6 +344,7 @@ def eventqml(eventdata):
         magnitudes=[qmag1, qmag2, qmag3],
         # amplitudes=None,
         preferred_origin_id=qorigin1.resource_id,
+        preferred_magnitude_id=qmag1.resource_id,
         event_type="explosion",
     )
     cat = qml.Catalog(

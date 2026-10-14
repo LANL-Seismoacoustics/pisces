@@ -190,3 +190,22 @@ def test_catalog_uses_database_amplitudes_when_selected(eventdata):
     assert qamplitude.generic_amplitude == 9000.0e-9
     assert qevent.station_magnitudes[0].amplitude_id == qamplitude.resource_id
 
+
+
+def test_catalog_marks_preferred_magnitude(eventdata):
+    """The preferred-origin mb magnitude wins the fixed priority order."""
+    session, data = eventdata
+    event = data['event']['evid1001']
+
+    query = (
+        session.query(kb.Event, kb.Origin, kb.Netmag)
+        .filter(kb.Event.evid == kb.Origin.evid)
+        .filter(kb.Event.evid == event.evid)
+        .filter(kb.Origin.orid == kb.Netmag.orid)
+    )
+
+    observed = cat.catalog(query, resource_prefix=resource_prefix)
+
+    assert observed.events[0].preferred_magnitude_id == qml.ResourceIdentifier(
+        id=f'{resource_prefix}/magnitude/netmag.magid=1'
+    )
