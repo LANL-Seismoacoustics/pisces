@@ -187,7 +187,9 @@ class Client(object):
         magnitudetype: str = None,
         eventtype: str = None,
         includeallorigins: bool = True,
+        includeallmagnitudes: bool = False,
         includearrivals: bool = False,
+        preferred_magnitude: tuple = ("mb", "mw", "ms"),
         eventid: str = None,
         limit: int = None,
         offset: int = None,
@@ -268,6 +270,12 @@ class Client(object):
         includeallorigins : bool, optional (Origin [, Event])
             Specify if all origins for the event should be included. Default is False,
             which returns the preferred origin only and requires the Origin and Event table.
+        includeallmagnitudes : bool, optional [Netmag]
+            Include all network magnitudes. Default is False, which returns only the preferred
+            network magnitude for each event.
+        preferred_magnitude : tuple of str, optional
+            Network magnitude types in preferred order, case-insensitive. Defaults to
+            ``("mb", "mw", "ms")``.
         includearrivals : bool, optional [Assoc, Arrival]
             Specify if phase arrivals should be included. Default is False.
         eventid : str or int, optional [Event | Origin]
@@ -311,14 +319,9 @@ class Client(object):
             Missing or improper inputs.
 
         """
-        # includeallmagnitudes : bool, optional [ignored]
-        #     KB Core has no concept of a preferred magnitude, so all network magnitudes are returned
-        #     (i.e. always True). If more refined magnitudes are desired, users are
-        #     recommended to also specify a magnitudetype and/or contributor.
         try:
             Origin = self.tables["origin"]
             Event = self.tables["event"]  # needed for QuakeML output
-            # needed b/c includeallmagnitudes is always true
             Netmag = self.tables["netmag"]
         except KeyError:
             msg = "Event, Origin, and Netmag tables required."
@@ -389,13 +392,30 @@ class Client(object):
         if updatedafter:
             q = q.filter(Origin.lddate > updatedafter)
 
-        # includeallmagnitudes is always True, so return all magnitudes
-        # joins with Netmag even if magnitudes is empty, so no "if" clause
-        # TODO: add Stamag
-        # TODO: implement includeallmagnitudes=False and preferred_magnitudes kwarg
-        # TODO: implement 'all' magnitudetype
+        # Join Netmag even if magnitude filters are empty so the catalog can select a preferred
+        # magnitude. ``includeallmagnitudes=False`` ranks and retains one Netmag per event below.
         q = q.add_entity(Netmag)
         q = events.filter_magnitudes(q, **magnitudes)
+        if not includeallmagnitudes:
+            preferred_types = tuple(magtype.casefold() for magtype in preferred_magnitude)
+            priority = sa.case(
+                *[(sa.func.lower(Netmag.magtype) == magtype, rank)
+                  for rank, magtype in enumerate(preferred_types, start=1)],
+                else_=len(preferred_types) + 1,
+            )
+            preferred = (
+                q.with_entities(
+                    Netmag.magid.label("magid"),
+                    sa.func.row_number().over(
+                        partition_by=Event.evid,
+                        order_by=priority,
+                    ).label("rank"),
+                )
+                .filter(Netmag.orid == Event.prefor)
+                .filter(sa.func.lower(Netmag.magtype).in_(preferred_types))
+                .subquery()
+            )
+            q = q.filter(Netmag.magid == preferred.c.magid).filter(preferred.c.rank == 1)
         # [(event, origin, netmag)] expected structure
 
         # arrival stuff
