@@ -26,6 +26,7 @@ def test_get_events_geographic(session):
         minlatitude=10, maxlatitude=11,
         minlongitude=13, maxlongitude=14,
         mindepth=15,
+        includeallmagnitudes=True,
         asquery=True
     )
     expected = (
@@ -42,7 +43,9 @@ def test_get_events_geographic(session):
 def test_get_events_eventid(session):
     """ Specify an event and its preferred origin. """
     client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
-    observed = client.get_events(eventid=1, includeallorigins=False, asquery=True)
+    observed = client.get_events(
+        eventid=1, includeallorigins=False, includeallmagnitudes=True, asquery=True
+    )
     expected = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
                .filter(kb.Event.evid == kb.Origin.evid)
@@ -57,7 +60,9 @@ def test_get_events_eventid(session):
 def test_get_events_misc(session):
     """ Specify events by contributor and event type. """
     client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
-    observed = client.get_events(contributor='USGS', eventtype='explosion', asquery=True)
+    observed = client.get_events(
+        contributor='USGS', eventtype='explosion', includeallmagnitudes=True, asquery=True
+    )
     expected = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
                .filter(kb.Event.evid == kb.Origin.evid)
@@ -74,7 +79,7 @@ def test_get_events_magnitudes(session):
     client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
 
     # target a magnitude and range
-    observed = client.get_events(minmagnitude=3, maxmagnitude=4, magnitudetype='mb', asquery=True)
+    observed = client.get_events(minmagnitude=3, maxmagnitude=4, magnitudetype='mb', includeallmagnitudes=True, asquery=True)
     expected = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
                .filter(kb.Event.evid == kb.Origin.evid)
@@ -87,7 +92,7 @@ def test_get_events_magnitudes(session):
     # assert observed.statement.compare(expected.statement)
 
     # any magnitude, half-range
-    observed = client.get_events(minmagnitude=3, asquery=True)
+    observed = client.get_events(minmagnitude=3, includeallmagnitudes=True, asquery=True)
     expected = (
         session.query(kb.Event, kb.Origin, kb.Netmag)
                .filter(kb.Event.evid == kb.Origin.evid)
@@ -101,7 +106,7 @@ def test_get_events_magnitudes(session):
     # error b/c there's no Netmag
     client = Client(session, origin=kb.Origin, event=kb.Event)
     with pytest.raises(ValueError):
-        observed = client.get_events(minmagnitude=3, asquery=True)
+        observed = client.get_events(minmagnitude=3, includeallmagnitudes=True, asquery=True)
 
 
 
@@ -139,3 +144,13 @@ def test_get_waveforms_defaults(dbsession):
         st[0].stats.starttime == tr.stats.starttime and
         st[0].stats.endtime == tr.stats.endtime
     )
+
+
+def test_get_events_uses_preferred_magnitude(session, eventdata):
+    """The FDSN default returns only the preferred mb Netmag per event."""
+    client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
+
+    observed = client.get_events(eventid=1001)
+
+    assert len(observed.events) == 1
+    assert [magnitude.magnitude_type for magnitude in observed.events[0].magnitudes] == ['mb']

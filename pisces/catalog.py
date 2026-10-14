@@ -1,29 +1,28 @@
 """
+Convert CSS 3.0 / NNSA KB Core database query results into ObsPy Catalog / QuakeML objects.
 
+The main entry point is `catalog`, which accepts the flat, redundant result sets produced by the
+`pisces.events.filter_*` functions and returns an `obspy.core.event.Catalog`.
 
 Examples
 --------
 
 >>> from pisces.catalog import catalog
->>> cat = catalog(query,
-            resource_prefix='smi:local',
-            description=None,
-            comments=None,
-            preferred_magauth=None,
-            preferred_magtype=('mw', 'mb', 'ms')
-        )
+>>> cat = catalog(query, resource_prefix='smi:local', description='my catalog')
 
 """
-from collections import defaultdict
-from itertools import zip_longest
-import os
+import warnings
 
 from obspy import UTCDateTime
 import obspy.core.event as qml
 from sqlalchemy import inspect
+from sqlalchemy.orm import object_session
 
 import pisces as ps
 from pisces.util import _get_entities
+
+
+PREFERRED_MAGNITUDES = ("mb", "mw", "ms")
 
 
 # Convert KB Core etypes to FDSN event types, best good-faith mapping
@@ -102,169 +101,24 @@ def _key(row):
     return inspect(row).identity_key
 
 
-def _dtree():
-    """
-    A dictionary tree that doesn't require you to explicitly create subdictionaries
-    before assigning to them ("autovivication").
-
-    source: https://gist.github.com/hrldcpr/2012250
-
-    """
-    return defaultdict(_dtree)
-
 def _denull(result):
     """
     Replace CSS/KBCore null values in a table row with None.
     Useful to avoid unnecessarily verbose QuakeML or JSON serializations.
 
+    The row is first expunged from its session, if any, so that nulling its values can't be
+    flushed back to the database as an UPDATE.
+
     """
+    session = object_session(result)
+    if session is not None:
+        session.expunge(result)
+
     for c in result.__table__.columns:
         if getattr(result, c.name) == c.info['default']:
             setattr(result, c.name, None)
 
     return result
-
-
-def pretty(d, out=None, indent=0, raw=False):
-    """ Pretty-print a qmltree tree to see its structure
-
-    """
-    out = out or []
-    for key, value in d.items():
-        if isinstance(key, tuple):
-            if 'instance' in value:
-                out.append('  ' * indent + repr(value['instance']))
-            else:
-                out.append('  ' * indent + repr(value))
-        elif key == 'instance':
-            pass
-        else:
-            out.append('  ' * indent + str(key))
-
-        if isinstance(value, dict):
-            out = pretty(value, out, indent+1, raw=True)
-        else:
-            pass
-
-    return out if raw else os.linesep.join(out)
-
-
-def qmltree(query, update_from=None):
-    """
-    Sort database queries/results into a QuakeML-like event tree.
-
-    Turn redundant tabular data from a database into nonredudant hierarchical data
-    that can be easily traversed to produce a QuakeML/obspy.Catalog (see `ETree.catalog`).
-
-    Parameters
-    ----------
-    query : one or more sqlalchemy.orm.Query instances
-        one or more result sets from events.filter_* functions.
-
-    update_from : dtree
-        Optionally, start from an existing qml tree
-
-    Notes
-    -----
-    The tree has the following structure:
-    {
-      eventkey1: {
-        'instance': event1,         # quakeml Event
-        'origins': {
-           originkey1: {
-             'instance': origin1,    # quakeml Origin
-             'assocs': {
-               assockey1: assoc1,  # quakeml Arrival
-               assockey2: assoc2,
-               ...
-             },
-             'arrivals': {
-               arrivalkey1: arrival1,  # quakeml Pick
-               arrivalkey2: arrival2,
-               ...
-             },
-             'netmags': {
-               netmagkey1: {
-                 'instance': netmag1, # quakeml Magnitude
-                 'stamags': {
-                   stamagkey1: stamag1,    # quakeml StationMagnitude
-                   stamagkey2: stamag2,
-                   ...
-                 }
-               }
-             }
-           }
-        }
-      }
-    }
-
-    Keys are the (hashable) output of `sqlalchemy.inspect(instance).identity_key`.
-
-    Access parts of the tree like:
-
-    tree[eventkey]['instance'] = event
-    tree[eventkey]['arrivals'][arrivalkey] = arrival
-    tree[eventkey]['amplitudes'][arrivalkey] = arrival
-    tree[eventkey]['origins'][originkey]['instance'] = origin
-    tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
-    tree[eventkey]['origins'][originkey]['netmags'][netmagkey] = netmag
-
-    """
-    tree = update_from or _dtree()
-
-    table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival')
-    Event, Origin, Netmag, Stamag, Assoc, Arrival = _get_entities(query, *table_types)
-
-    if not (Event and Origin):
-        msg = "Event and Origin tables must be present in each provided query."
-        raise ValueError(msg)
-
-    for row in query:
-        # get available instances
-        # we use the 'db' prefix to disambiguate database row instances from
-        # similarly-named QuakeML elements, e.g. dborigin/origin
-
-        # these should always be present:
-        # event, origin
-        event = getattr(row, Event.__name__)  # event = row.MyEvent
-        eventkey = inspect(event).identity_key
-        tree[eventkey]['instance'] = event
-
-        origin = getattr(row, Origin.__name__)
-        originkey = inspect(origin).identity_key
-        tree[eventkey]['origins'][originkey]['instance'] = origin
-
-        # "picks" in quakeml are like CSS Arrival rows, and they're at the Event level
-        # "amplitudes" in quakeml are also stored in Arrival rows, and at the Event level,
-        # so we'll ultimately just reuse arrivals for them.
-        if Arrival:
-            arrival = getattr(row, Arrival.__name__)
-            arrivalkey = inspect(arrival).identity_key
-            tree[eventkey]['origins'][originkey]['arrivals'][arrivalkey] = arrival
-
-        if Assoc:
-            # "arrivals" in quakeml are like CSS Assoc rows
-            assoc = getattr(row, Assoc.__name__)
-            assockey = inspect(assoc).identity_key
-            tree[eventkey]['origins'][originkey]['assocs'][assockey] = assoc
-
-        # "magnitudes" in quakeml are Netmag rows and are kept at the Event level,
-        # but Netmag rows are generally tied to origins. we keep them at Origin level for easier
-        # processing later (they're children of their Origin instead of disconnected from them).
-        if Netmag:
-            netmag = getattr(row, Netmag.__name__)
-            netmagkey = inspect(netmag).identity_key
-            tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['instance'] = netmag
-
-        # "station_magnitudes" in quakeml are Stamag rows, and are kept at the Event level,
-        # but Stamag rows are generally also tied to origins.  We'll keep them at Origin level
-        # for easier processing later.
-        if Stamag:
-            stamag = getattr(row, Stamag.__name__)
-            stamagkey = inspect(stamag).identity_key
-            tree[eventkey]['origins'][originkey]['netmags'][netmagkey]['stamags'][stamagkey] = stamag
-
-    return tree
 
 
 class QMLGenerator:
@@ -308,10 +162,9 @@ class QMLGenerator:
     def origin(self, origin):
         """ Return an obspy.core.event.Origin from a database Origin row. """
         origin = _denull(origin)
-        prefix = self.resource_prefix
         qorigin = qml.Origin(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/origin/origin.orid={origin.orid}'),
+                id=f'{self.resource_prefix}/origin/origin.orid={origin.orid}'),
             time=UTCDateTime(origin.time),
             longitude=origin.lon,
             latitude=origin.lat,
@@ -322,33 +175,35 @@ class QMLGenerator:
     def pick(self, arrival):
         """ Initialize an obspy.core.event.Pick from a database Arrival row. """
         arrival = _denull(arrival)
-        prefix = self.resource_prefix
-        pick = qml.Pick(
-            resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/pick/arrival.arid={arrival.arid}'),
-            waveform_id=qml.WaveformStreamID(
+        fields = {
+            "resource_id": qml.ResourceIdentifier(
+                id=f'{self.resource_prefix}/pick/arrival.arid={arrival.arid}'),
+            "waveform_id": qml.WaveformStreamID(
                 station_code=arrival.sta, channel_code=arrival.chan),
-            time=UTCDateTime(arrival.time),
-            time_errors=qml.QuantityError(uncertainty=arrival.deltim),
-            horizontal_slowness=arrival.slow,
-            horizontal_slowness_errors=qml.QuantityError(
-                uncertainty=arrival.delslo),
-            backazimuth=baz if (baz := arrival.azimuth -
-                                180) >= 0 else arrival.azimuth + 180,
-            backazimuth_errors=qml.QuantityError(uncertainty=arrival.delaz),
-            onset=FDSN_PICK_ONSET.get(arrival.qual, None),
-            phase_hint=arrival.iphase,
-            polarity=FDSN_POLARITY.get(arrival.fm, None),
-        )
-        return pick
+            "time": UTCDateTime(arrival.time),
+            "onset": FDSN_PICK_ONSET.get(arrival.qual),
+            "phase_hint": arrival.iphase,
+            "polarity": FDSN_POLARITY.get(arrival.fm),
+        }
+        if arrival.deltim is not None:
+            fields["time_errors"] = qml.QuantityError(uncertainty=arrival.deltim)
+        if arrival.slow is not None:
+            fields["horizontal_slowness"] = arrival.slow
+        if arrival.delslo is not None:
+            fields["horizontal_slowness_errors"] = qml.QuantityError(
+                uncertainty=arrival.delslo)
+        if arrival.azimuth is not None:
+            fields["backazimuth"] = (arrival.azimuth + 180) % 360
+        if arrival.delaz is not None:
+            fields["backazimuth_errors"] = qml.QuantityError(uncertainty=arrival.delaz)
+        return qml.Pick(**fields)
 
     def arrival(self, assoc, pick_id=None):
         """ Initialize an obspy.core.event.Arrival from a database Assoc row. """
         assoc = _denull(assoc)
-        prefix = self.resource_prefix
         qarrival = qml.Arrival(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/arrival/assoc.arid={assoc.arid}'),
+                id=f'{self.resource_prefix}/arrival/assoc.arid={assoc.arid}'),
             pick_id=pick_id,
             phase=assoc.phase,
             distance=assoc.delta,
@@ -358,33 +213,45 @@ class QMLGenerator:
         )
         return qarrival
 
-    def amplitude(self, arrival, pick_id=None):
-        """ Initialize an obspy.core.event.Amplitude from a database Arrival row. """
-        arrival = _denull(arrival)
-        prefix = self.resource_prefix
-        amp = qml.Amplitude(
-            resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/amplitude/arrival.arid={arrival.arid}'),
-            waveform_id=qml.WaveformStreamID(
-                station_code=arrival.sta, channel_code=arrival.chan),
-            pick_id=pick_id,
-            generic_amplitude=arrival.amp*1e9,  # nanometers to meters
-            unit='m',
-            type='A',
-            category='period',
-            period=arrival.per,
-            snr=arrival.snr,
-            magnitude_hint='M',
-        )
-        return amp
+    def amplitude(self, row, pick_id=None, waveform_id=None):
+        """Initialize an obspy.core.event.Amplitude from an Arrival or Amplitude row."""
+        row = _denull(row)
+        if hasattr(row, "ampid"):
+            fields = {
+                "resource_id": qml.ResourceIdentifier(
+                    id=f"{self.resource_prefix}/amplitude/amplitude.ampid={row.ampid}"),
+                "pick_id": pick_id,
+                "waveform_id": waveform_id,
+                "unit": "m",
+                "type": row.amptype,
+                "category": "period",
+            }
+        else:
+            fields = {
+                "resource_id": qml.ResourceIdentifier(
+                    id=f"{self.resource_prefix}/amplitude/arrival.arid={row.arid}"),
+                "waveform_id": qml.WaveformStreamID(
+                    station_code=row.sta, channel_code=row.chan),
+                "pick_id": pick_id,
+                "unit": "m",
+                "type": "A",
+                "category": "period",
+                "magnitude_hint": "M",
+            }
+        if row.amp is not None:
+            fields["generic_amplitude"] = row.amp * 1e-9  # nanometers to meters
+        if row.per is not None:
+            fields["period"] = row.per
+        if row.snr is not None:
+            fields["snr"] = row.snr
+        return qml.Amplitude(**fields)
 
     def magnitude(self, netmag, origin_id=None):
         """ Initialize an obspy.core.event.Magnitude from a database Netmag row. """
         netmag = _denull(netmag)
-        prefix = self.resource_prefix
         magnitude = qml.Magnitude(
             resource_id=qml.ResourceIdentifier(
-                id=f'{prefix}/magnitude/netmag.magid={netmag.magid}'),
+                id=f'{self.resource_prefix}/magnitude/netmag.magid={netmag.magid}'),
             mag=netmag.magnitude,
             magnitude_type=netmag.magtype,
             station_count=netmag.nsta,
@@ -392,33 +259,39 @@ class QMLGenerator:
         )
         return magnitude
 
-    def catalog(self, description=None, preferred_magauth=None, preferred_magtype=None):
-        """ Initialize an obspy Catalog.
+    def stationmagnitude(self, stamag, origin_id=None, amplitude_id=None):
+        """Initialize an obspy.core.event.StationMagnitude from a database Stamag row."""
+        stamag = _denull(stamag)
+        fields = {
+            "resource_id": qml.ResourceIdentifier(
+                id=f"{self.resource_prefix}/stationmagnitude/stamag.ampid={stamag.ampid}"),
+            "origin_id": origin_id,
+            "mag": stamag.magnitude,
+            "station_magnitude_type": stamag.magtype,
+            "amplitude_id": amplitude_id,
+            "waveform_id": qml.WaveformStreamID(station_code=stamag.sta),
+        }
+        if stamag.uncertainty is not None:
+            fields["mag_errors"] = qml.QuantityError(uncertainty=stamag.uncertainty)
+        return qml.StationMagnitude(**fields)
+
+    def catalog(self, description=None, comments=None):
+        """ Initialize an empty obspy Catalog.
+
+        Returns a Catalog with creation info and resource id set, and no events. Events are added by
+        the module-level `catalog` function.
 
         Parameters
         ----------
         description : str
             Passed directly to `obspy.core.event.Catalog` during creation.
-        preferred_magtype : str or tuple of str [not implemented]
-            CSS-like databases don't have a concept of preferred magnitude, so you can provide a
-            prioritized list of magnitude types to help select the preferred magnitude for an event. If
-            multiple magnitudes of a given type are recorded, the first magnitude author found in
-            `preferred_magauth` will be used. If `preferred_magauth` isn't provided, the first magnitude
-            of the given type, whether from the Origin or Netmag table, is chosen.  This option has
-            priority over `preferred_magauth` below. Not yet implemented.
-        preferred_magauth : str or tuple of str [not implemented]
-            CSS-like databases don't have a concept of preferred magnitude, so we provide a prioritized
-            list of magnitude authors to help select the preferred magnitude for an event when multiple
-            magnitudes are recorded.  If multiple magnitudes with a given author are recorded, the first
-            one is selected. If used with the `preferred_magtype`, this option has lower priority.  I
-            will only be used if multiple magnitudes of a given type are recorded, but none are in the
-            `preferred_magtype`. Not yet implemented.
-
-        For other parameters, see `catalog` function.
+        comments : list of obspy.core.event.Comment
+            Passed directly to `obspy.core.event.Catalog` during creation.
 
         Returns
         -------
         obspy.core.events.Catalog
+            An empty catalog.
 
         TODO:
         - focal mechanisms
@@ -426,19 +299,19 @@ class QMLGenerator:
 
         Examples
         --------
-        >>> etree = ETree(event_query1, event_query2, 'smi:my.institute.edu')
-        >>> cat = etree.catalog("my catalog", "this was hard to program", ('USGS', 'LANL'), ('Mw', 'mb'))
+        >>> qgen = QMLGenerator(resource_prefix='smi:my.institute.edu')
+        >>> cat = qgen.catalog(description="my catalog")
 
         """
         # It becomes necessary to distinguish QuakeML "Event" objects from database Event instances.
         # We adopt the "q" prefix to distinguish QuakeML elements from database table rows
-        resource_prefix = self.resource_prefix
         cat = qml.Catalog(
             creation_info=qml.CreationInfo(
                 author=f'Pisces v{ps.__version__}', creation_time=UTCDateTime()),
             resource_id=qml.ResourceIdentifier(
-                prefix=f'{resource_prefix}/catalog'),  # uses a uuid after prefix
+                prefix=f'{self.resource_prefix}/catalog'),  # uses a uuid after prefix
             description=description,
+            comments=comments,
         )
 
         return cat
@@ -448,10 +321,24 @@ def catalog(*queries,
     resource_prefix='smi:local',
     description=None,
     comments=None,
-    preferred_magauth=None,
-    preferred_magtype=('mw', 'mb', 'ms')
+    preferred_magnitude=PREFERRED_MAGNITUDES,
 ):
     """
+    Build an ObsPy Catalog from one or more CSS/KBCore database result sets.
+
+    Query results are flat and redundant: a joined row repeats its parent values once per child, so
+    the same Event appears on every row of its Origins, the same Origin on every row of its Netmags,
+    and so on. This function walks each result set once, converting each distinct database row to
+    its QuakeML counterpart the first time that row is seen and reusing it thereafter, so repeated
+    rows collapse into a single QuakeML object.
+
+    Rows are the unit of correspondence: Assoc/Arrival and Netmag/Stamag that arrive together on one
+    row are related to each other, and are linked accordingly.
+
+    Multiple queries accumulate into one catalog. A query whose rows reference an Event or Origin
+    already seen in an earlier query merges into that existing QuakeML object rather than
+    duplicating it, so related result sets (events, then arrivals, then magnitudes) can be combined.
+
     Parameters
     ----------
     queries : sqlalchemy.orm.Query instances
@@ -463,25 +350,32 @@ def catalog(*queries,
         query = session.query(Event, Origin, Netmag, Stamag)
         # from filter_arrivals
         query = session.query(Event, Origin, Assoc, Arrival)
+        Event and Origin must be present in every query.
     resource_prefix : str
         The prefix used when creating ResourceIndentifier ids.
         e.g. 'smi:lanl.gov' will result in 'smi:lanl.gov/event/<evid>' for events, etc...
     description, comments : str
         Passed directly to `obspy.core.event.Catalog` during creation.
-    preferred_magtype : str or tuple of str
-        CSS-like databases don't have a concept of preferred magnitude, so you can provide a
-        prioritized list of magnitude types to help select the preferred magnitude for an event. If
-        multiple magnitudes of a given type are recorded, the first magnitude author found in
-        `preferred_magauth` will be used. If `preferred_magauth` isn't provided, the first magnitude
-        of the given type, whether from the Origin or Netmag table, is chosen.  This option has
-        priority over `preferred_magauth` below. Not yet implemented.
-    preferred_magauth : str or tuple of str
-        CSS-like databases don't have a concept of preferred magnitude, so we provide a prioritized
-        list of magnitude authors to help select the preferred magnitude for an event when multiple
-        magnitudes are recorded.  If multiple magnitudes with a given author are recorded, the first
-        one is selected. If used with the `preferred_magtype`, this option has lower priority.  I
-        will only be used if multiple magnitudes of a given type are recorded, but none are in the
-        `preferred_magtype`. Not yet implemented.
+    preferred_magnitude : tuple of str
+        Magnitude types in preferred order, case-insensitive. The first matching Netmag on the
+        event's preferred Origin becomes the QuakeML preferred magnitude. Defaults to
+        ``("mb", "mw", "ms")``. This marks ``preferred_magnitude_id`` but retains all supplied
+        magnitude rows.
+
+    Returns
+    -------
+    obspy.core.event.Catalog
+        Events in the order first encountered. Empty if no queries are provided.
+
+    Raises
+    ------
+    ValueError
+        If a query doesn't include both an Event and an Origin table.
+
+    Notes
+    -----
+    Incoming rows look like the following, which is the redundancy this function collapses. Note how
+    parent values repeat down each block:
 
     event1, origin1
     event1, origin2
@@ -517,63 +411,180 @@ def catalog(*queries,
     event2, origin3, assoc5, arrival5
     ...
 
+    Stamag rows always create QuakeML StationMagnitudes. Their same-row Netmag receives a
+    StationMagnitudeContribution only when ``magdef == 'd'``; it has ``weight=1.0`` and maps
+    ``magres`` to ``residual``. ``magdef == 'n'`` creates no contribution. Any other value emits a
+    warning and creates no contribution. When an Amplitude table is selected, Stamag links to its
+    QuakeML Amplitude by ``ampid``. Otherwise it falls back to the existing Arrival-derived
+    amplitude link by ``arid``.
+
+    Examples
+    --------
+    >>> cat = catalog(event_query, resource_prefix='smi:lanl.gov', description='my catalog')
+    >>> cat = catalog(event_query, arrival_query)  # merged into one catalog
+
     """
     qgen = QMLGenerator(resource_prefix=resource_prefix)
-    cat = qgen.catalog(description=description)
+    cat = qgen.catalog(description=description, comments=comments)
 
-    previous = None
+    # Flat {database row identity: QuakeML object} maps, one per QuakeML type, shared across all
+    # queries so a later query referencing an earlier query's event merges into it.
+    # De-duplication and QuakeML construction happen together, in a single pass per query, so raw
+    # database rows are never retained past the row that produced them.
+    qevents = {}
+    qorigins = {}
+    qpicks = {}
+    qamplitudes = {}
+    qamplitudes_by_arid = {}
+    qamplitudes_by_ampid = {}
+    qmagnitudes = {}
+    qpreferred_magnitudes = {}
+    qstation_magnitudes = {}
+    qcontributions = set()
+
+    table_types = ('Event', 'Origin', 'Netmag', 'Stamag', 'Assoc', 'Arrival', 'Amplitude')
+
     for query in queries:
-        tree = qmltree(query, update_from=previous)
-        previous = tree
+        Event, Origin, Netmag, Stamag, Assoc, Arrival, Amplitude = _get_entities(query, *table_types)
 
-    for eventkey in tree:
-        # b/c event nodes aren't leaf nodes (we use its key to get child nodes),
-        # we need to use 'instance' get the actual instance
-        event = tree[eventkey]['instance']
+        if not (Event and Origin):
+            msg = "Event and Origin tables must be present in each provided query."
+            raise ValueError(msg)
 
-        # QML Event from a database Event row
-        qevent = qgen.event(event)
+        for row in query:
+            # Rows are redundant: the same event/origin/netmag appears on many rows. Each is
+            # converted the first time it's seen, and looked up by identity thereafter.
+            # The "q" prefix distinguishes QuakeML elements from database table rows.
 
-        origins = tree[eventkey]['origins']
-        for originkey in origins:
-            origin = origins[originkey]['instance']
-            qorigin = qgen.origin(origin)
-            qevent.origins.append(qorigin)
+            # Event and Origin are always present.
+            event = getattr(row, Event.__name__)  # event = row.MyEvent
+            eventkey = _key(event)
+            if not (qevent := qevents.get(eventkey)):
+                # same as: qevent = qevents[eventkey] = qgen.event(event)
+                qevent = qgen.event(event)
+                qevents[eventkey] = qevent
+                cat.events.append(qevent)
 
-            if origin.orid == event.prefor:
-                # this as the preferred origin
-                qevent.preferred_origin_id = qorigin.resource_id
-                qevent.event_type = FDSN_EVENT_TYPE.get(origin.etype, "not reported")
+            origin = getattr(row, Origin.__name__)
+            originkey = _key(origin)
+            if not (qorigin := qorigins.get(originkey)):
+                # same as: qorigin = qorigins[originkey] = qgen.origin(origin)
+                qorigin = qgen.origin(origin)
+                qorigins[originkey] = qorigin
+                qevent.origins.append(qorigin)
 
-            # process parallel lists of Assoc and Arrival rows
-            assocs = tree[eventkey]['origins'][originkey]['assocs']
-            arrivals = tree[eventkey]['origins'][originkey]['arrivals']
-            for assockey, arrivalkey in zip_longest(assocs, arrivals):
-                # if the lists aren't parallel (e.g. one list is empty), the key is None
-                # and the database row is an empty defaultdict, which is Falsy
-                if arrival := arrivals[arrivalkey]:
+                if origin.orid == event.prefor:
+                    # this is the preferred origin
+                    qevent.preferred_origin_id = qorigin.resource_id
+                    qevent.event_type = FDSN_EVENT_TYPE.get(origin.etype, "not reported")
+
+            # Assoc/Arrival and Netmag/Stamag arrive together on the same row, and the join
+            # guarantees that same-row pairs correspond. Children below therefore reference the
+            # parent built or found just above, in this row's local scope.
+
+            # QuakeML "picks" and "amplitudes" are both CSS Arrival rows, stored at the Event level.
+            qpick = None
+            qamplitude = None
+            if Arrival:
+                arrival = getattr(row, Arrival.__name__)
+                arrivalkey = _key(arrival)
+                if not (qpick := qpicks.get(arrivalkey)):
+                    # same as: qpick = qpicks[arrivalkey] = qgen.pick(arrival)
                     qpick = qgen.pick(arrival)
-                    # Picks are stored at the Event level.
+                    qpicks[arrivalkey] = qpick
                     qevent.picks.append(qpick)
 
+                if not Amplitude and not (qamplitude := qamplitudes.get(arrivalkey)):
                     qamplitude = qgen.amplitude(arrival, pick_id=qpick.resource_id)
                     qamplitude.waveform_id = qpick.waveform_id
+                    qamplitudes[arrivalkey] = qamplitude
+                    qamplitudes_by_arid[arrival.arid] = qamplitude
                     qevent.amplitudes.append(qamplitude)
 
-                if assoc := assocs[assockey]:
-                    qarrival = qgen.arrival(assoc, pick_id=qpick.resource_id)
-                    # stored at the Origin level.
-                    qorigin.arrivals.append(qarrival)
+            if Amplitude:
+                amplitude = getattr(row, Amplitude.__name__)
+                amplitudekey = _key(amplitude)
+                if not (qamplitude := qamplitudes.get(amplitudekey)):
+                    qamplitude = qgen.amplitude(
+                        amplitude,
+                        pick_id=qpick.resource_id if qpick else None,
+                        waveform_id=qpick.waveform_id if qpick else None,
+                    )
+                    qamplitudes[amplitudekey] = qamplitude
+                    qamplitudes_by_ampid[amplitude.ampid] = qamplitude
+                    qevent.amplitudes.append(qamplitude)
 
-            netmags = tree[eventkey]['origins'][originkey]['netmags']
-            for netmagkey in netmags:
-                netmag = netmags[netmagkey]['instance']
-                qmagnitude = qgen.magnitude(netmag, origin_id=qorigin.resource_id)
-                # stored at the Event level.
-                qevent.magnitudes.append(qmagnitude)
+            # QuakeML "arrivals" are CSS Assoc rows, stored at the Origin level.
+            if Assoc:
+                assoc = getattr(row, Assoc.__name__)
+                qarrival = qgen.arrival(
+                    assoc,
+                    pick_id=qpick.resource_id if qpick else None,
+                )
+                qorigin.arrivals.append(qarrival)
 
-            # TODO: station_magnitudes/stamags
+            # QuakeML "magnitudes" are Netmag rows, stored at the Event level.
+            qmagnitude = None
+            if Netmag:
+                netmag = getattr(row, Netmag.__name__)
+                netmagkey = _key(netmag)
+                if not (qmagnitude := qmagnitudes.get(netmagkey)):
+                    # same as: qmagnitude = qmagnitudes[netmagkey] = qgen.magnitude(...)
+                    qmagnitude = qgen.magnitude(netmag, origin_id=qorigin.resource_id)
+                    qmagnitudes[netmagkey] = qmagnitude
+                    qevent.magnitudes.append(qmagnitude)
+                    if netmag.orid == event.prefor:
+                        try:
+                            priority = tuple(
+                                magtype.casefold() for magtype in preferred_magnitude
+                            ).index(netmag.magtype.casefold())
+                        except (AttributeError, ValueError):
+                            pass
+                        else:
+                            current = qpreferred_magnitudes.get(eventkey)
+                            if current is None or priority < current[0]:
+                                qpreferred_magnitudes[eventkey] = (priority, qmagnitude)
 
-        cat.events.append(qevent)
+            if Stamag:
+                stamag = getattr(row, Stamag.__name__)
+                stamagkey = _key(stamag)
+                magdef = stamag.magdef
+                magres = stamag.magres
+                qamplitude = (
+                    qamplitudes_by_ampid.get(stamag.ampid)
+                    if Amplitude else qamplitudes_by_arid.get(stamag.arid)
+                )
+                amplitude_id = qamplitude.resource_id if qamplitude else None
+                if not (qstation_magnitude := qstation_magnitudes.get(stamagkey)):
+                    qstation_magnitude = qgen.stationmagnitude(
+                        stamag,
+                        origin_id=qorigin.resource_id,
+                        amplitude_id=amplitude_id,
+                    )
+                    qstation_magnitudes[stamagkey] = qstation_magnitude
+                    qevent.station_magnitudes.append(qstation_magnitude)
+                elif amplitude_id is not None and qstation_magnitude.amplitude_id is None:
+                    qstation_magnitude.amplitude_id = amplitude_id
+
+                if qmagnitude and (contribution_key := (netmagkey, stamagkey)) not in qcontributions:
+                    if magdef == "d":
+                        qmagnitude.station_magnitude_contributions.append(
+                            qml.StationMagnitudeContribution(
+                                station_magnitude_id=qstation_magnitude.resource_id,
+                                residual=magres,
+                                weight=1.0,
+                            )
+                        )
+                    elif magdef != "n":
+                        warnings.warn(
+                            f"Stamag magdef {magdef!r} is neither 'd' nor 'n'; "
+                            "omitting StationMagnitudeContribution.",
+                            stacklevel=2,
+                        )
+                    qcontributions.add(contribution_key)
+
+    for eventkey, qevent in qevents.items():
+        if preferred := qpreferred_magnitudes.get(eventkey):
+            qevent.preferred_magnitude_id = preferred[1].resource_id
 
     return cat
