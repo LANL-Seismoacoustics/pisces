@@ -87,6 +87,11 @@ def make_atomic(last, **rows):
         sitechan.chanid = next(last.chanid)
 
     # arrivals correspond to assocs
+    # BUG: sitechan/origin/event are leaked loop variables from the loops
+    # above. If rows['sitechan'] or rows['origin']/['event'] is empty for
+    # this file, these names are either unbound (NameError) or stale values
+    # left over from a previous file in the batch (silent cross-file
+    # contamination of chanid/orid). Flagged, not fixed.
     for (arrival, assoc) in zip(rows.get('arrival', []), rows.get('assoc', [])):
         arrival.arid = next(last.arid)
         arrival.chanid = sitechan.chanid
