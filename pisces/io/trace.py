@@ -1,5 +1,17 @@
 """
-Conversions between ObsPy Trace objects and table-like objects.
+Conversions between KB Core Wfdisc rows and ObsPy Trace objects.
+
+`wfdisc2trace` builds a `Trace` whose `.stats` always reflects the `wfdisc`
+row's own column values (station/channel/sample rate/start time/etc.), via
+`read_waveform`'s dispatch (`pisces.io.readwaveform.WAVEFORM_READERS`).
+Every registered waveform reader -- including the ones that read a real
+file format internally, like `'sd'` miniSEED or `'sc'` SAC -- returns only a
+raw sample array, discarding whatever in-file header ObsPy may have parsed
+along the way. So there is no file-reported sub-header
+(`.stats.mseed`/`.stats.sac`) to reconcile here: the `wfdisc` row is the
+only source of truth for `wfdisc2trace`'s output. Code that wants a file's
+original header (not reconciled against any table) should read that file
+directly with plain ObsPy instead.
 
 """
 import os
@@ -9,7 +21,10 @@ from pisces.io.util import _buildhdr
 
 
 def wfdisc2obspyhdr(wf):
-    """ ObsPy Stats dict from Wfdisc instance.
+    """
+    Build an ObsPy Stats instance purely from a Wfdisc row's own column
+    values (sta/chan/samprate/nsamp/calib/time) -- no file is read.
+
     """
     keymap = {'npts': 'nsamp', 'calib': 'calib', 'channel': 'chan',
               'sampling_rate': 'samprate', 'station': 'sta'}
@@ -22,8 +37,8 @@ def wfdisc2obspyhdr(wf):
 
 def wfdisc2trace(wf):
     """
-    Takes a fielded wfdisc row record and produces a minimal obspy Trace with
-    some SAC header fields included, or None.
+    Takes a fielded wfdisc row record and produces a Trace whose header
+    (`.stats`) always reflects the wfdisc row's own values, or None.
 
     Raises
     ------
