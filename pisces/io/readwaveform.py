@@ -38,7 +38,7 @@ from obspy.core import read
 from pisces.io.util import Registry
 
 try:
-    from e1 import e_compression
+    import e1
     E1_INSTALLED = True
 except ImportError:
     E1_INSTALLED = False
@@ -163,7 +163,9 @@ def read_e1(DATAFILE, BYTEOFFSET, NUM):
     if not E1_INSTALLED:
         msg = "'e1' module not installed.  Visit https://github.com/LANL-Seismoacoustics/e1 for details."
         raise ValueError(msg)
-    return e_compression(DATAFILE, BYTEOFFSET, NUM)
+    with open(DATAFILE, 'rb') as f:
+        f.seek(BYTEOFFSET)
+        return e1.decompress_file(f, NUM)
 
 
 @WAVEFORM_READERS('s3')

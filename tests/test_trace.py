@@ -1,5 +1,5 @@
 """
-Tests for pisces.io.trace (Wfdisc row <-> ObsPy Trace).
+Tests for pisces.trace (Wfdisc row <-> ObsPy Trace).
 
 """
 import os
@@ -7,7 +7,7 @@ import tempfile
 
 import numpy as np
 
-from pisces.io.trace import wfdisc2obspyhdr, wfdisc2trace
+from pisces.trace import wfdisc2obspyhdr, wfdisc2trace
 from pisces.tables.kbcore import Wfdisc
 
 
