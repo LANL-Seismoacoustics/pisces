@@ -2,15 +2,40 @@
 # By: Jeremy Webster
 
 """
-Home to read_waveform and all format-specific reading functions.
+Raw waveform sample-vector reading, dispatched by ``wfdisc.datatype``.
+
+Plain NumPy-compatible binary layouts (``NPTYPE`` below) are read generically
+by `read_numpy`, keyed only by their NumPy dtype string -- no registration
+needed. Everything else (data requiring a real decoder: miniSEED, SEGY,
+compressed formats, etc.) is read by a function registered in
+`WAVEFORM_READERS`, keyed by its `wfdisc.datatype` string.
+
+`WAVEFORM_READERS` is a plain `pisces.io.util.Registry`, so new datatypes can
+be added from user code without editing pisces, e.g.::
+
+    from pisces.io.readwaveform import WAVEFORM_READERS
+
+    @WAVEFORM_READERS('my_dtype')
+    def read_my_dtype(path, byteoffset=0, nsamp=None):
+        ...
+
+Note that ``'sd'`` (miniSEED/SEED) and ``'sc'`` (SAC), as well as the numeric
+NumPy types, are not official KB Core `wfdisc.datatype` values -- they're
+pisces conveniences, and the files they point to may hold header metadata
+that's stale relative to the database tables. ``'sc'`` in particular is
+mostly redundant with the plain float NumPy types (SAC's own on-disk sample
+array *is* just a big/little-endian ``f4`` vector at a known byte offset);
+it's kept here only as a convenience for reading a standalone SAC file
+wholesale through ObsPy, ignoring `byteoffset`/`nsamp`.
 
 """
-import ctypes as C
 import os
 from io import BytesIO
 
 import numpy as np
 from obspy.core import read
+
+from pisces.io.util import Registry
 
 try:
     from e1 import e_compression
@@ -18,16 +43,27 @@ try:
 except ImportError:
     E1_INSTALLED = False
 
-# TODO: implement other datatypes
+# registry of functions: (path, byteoffset, nsamp) -> ndarray, keyed by
+# wfdisc.datatype string.
+WAVEFORM_READERS = Registry()
 
-# NumPy-supported datatypes {datatype: numpy.dtype}
-NPTYPE = {'t4': '>f4', 't8': '>f8', 's4': '>i4', 's2': '>i2', 's1': '>i1',
-          'f8': '<f8', 'f4': '<f4', 'i4': '<i4', 'i2': '<i2', 'i1': '<i1',
-          'p8': '<f8', 'p4': '<f4', 't4': '>f4', 'u4': '<f4'}
-
-# ObsPy-supported datatypes
-OBSPYTYPE = {'sc': 'SAC', 'sy': 'SEGY'}
-# NOTE: 'sd' can also mean full SEED.
+# NumPy-supported datatypes {datatype: numpy.dtype}, read generically by
+# read_numpy() below; not individually registered.
+NPTYPE = {
+    't4': '>f4',
+    't8': '>f8',
+    's4': '>i4',
+    's2': '>i2',
+    's1': '>i1',
+    'f8': '<f8',
+    'f4': '<f4',
+    'i4': '<i4',
+    'i2': '<i2',
+    'i1': '<i1',
+    'p8': '<f8',
+    'p4': '<f4',
+    'u4': '<f4',
+}
 
 
 def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
@@ -40,10 +76,12 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
         Path and name of data file.
     DATATYPE : string
         {'f4', 'i1', 'i2', 'i4', 'p4', 't8', 's2', 'p8', 's4', 'f8', 'u4', 't4',
-         's1', 'sd', 'e1', 'sc', 'sy'}
+         's1', 'sd', 'e1', 'sc', 'sy', 's3', ...}
         Data type string (from wfdisc.datatype).
-        'sd', 'sc', and 'sy' are SEED/miniSEED, SAC, and SEGY
+        'sd', 'sc', and 'sy' are SEED/miniSEED, SAC, and SEGY (pisces
+        conveniences, not official KB Core values -- see module docstring).
         'e1' requires installation of the "e1" python module.
+        Additional datatypes can be registered via `WAVEFORM_READERS`.
     BYTEOFFSET : int
         Number of bytes from beginning of file.
     NUM : int
@@ -67,34 +105,18 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     with obspy.core.read or something else.
 
     """
-    # TODO: do something with return flags
     if DATATYPE in NPTYPE:
-        data = numpy_read(DATAFILE, BYTEOFFSET, NUM, 'rb', NPTYPE[DATATYPE])
-    elif DATATYPE in OBSPYTYPE:
-        data = read(DATAFILE, format=OBSPYTYPE[DATATYPE])[0].data
-    elif DATATYPE == 'sd':
-        # this datatype is not well-suited for a wfdisc, as it supports
-        # multiplexing and wfdisc does not
-        data = read_seed(DATAFILE, BYTEOFFSET, NUM)
-    elif DATATYPE == 'e1':
-        # data = read_e1(DATAFILE, BYTEOFFSET, NUM)
-        if not E1_INSTALLED:
-            msg = "'e1' module not installed.  Visit https://github.com/LANL-Seismoacoustics/e1 for details."
-            raise ValueError(msg)
-        else:
-            data = e_compression(DATAFILE, BYTEOFFSET, NUM)
-    elif DATATYPE == 's3':
-        data = read_s3(DATAFILE, BYTEOFFSET, NUM)
-    else:
+        return read_numpy(DATAFILE, BYTEOFFSET, NUM, 'rb', NPTYPE[DATATYPE])
+
+    try:
+        reader = WAVEFORM_READERS[DATATYPE]
+    except KeyError:
         raise ValueError("Unrecognized data format: {0}".format(DATATYPE))
 
-    # if len(data) not NUM:
-    #    # TODO: raise something here
-    #    pass
-
-    return data
+    return reader(DATAFILE, BYTEOFFSET, NUM)
 
 
+@WAVEFORM_READERS('sd')
 def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
     """Read a SEED or miniSEED 'sd' datatype.
     """
@@ -117,6 +139,34 @@ def read_seed(DATAFILE, BYTEOFFSET=0, NUM=None):
     return tr.data
 
 
+@WAVEFORM_READERS('sc')
+def read_sac(DATAFILE, BYTEOFFSET=0, NUM=None):
+    """
+    Read a standalone SAC file's data through ObsPy, ignoring BYTEOFFSET/NUM.
+
+    See the module docstring -- 'sc' is a pisces convenience, redundant with
+    the plain float NumPy datatypes for most purposes.
+
+    """
+    return read(DATAFILE, format='SAC')[0].data
+
+
+@WAVEFORM_READERS('sy')
+def read_segy(DATAFILE, BYTEOFFSET=0, NUM=None):
+    """Read a standalone SEGY file's data through ObsPy."""
+    return read(DATAFILE, format='SEGY')[0].data
+
+
+@WAVEFORM_READERS('e1')
+def read_e1(DATAFILE, BYTEOFFSET, NUM):
+    """Read an 'e1'-compressed datatype. Requires the 'e1' package."""
+    if not E1_INSTALLED:
+        msg = "'e1' module not installed.  Visit https://github.com/LANL-Seismoacoustics/e1 for details."
+        raise ValueError(msg)
+    return e_compression(DATAFILE, BYTEOFFSET, NUM)
+
+
+@WAVEFORM_READERS('s3')
 def read_s3(DATAFILE, BYTEOFFSET, NUM):
     """
     Read signed big-endian 3-byte integers into a 4-byte native NumPy array.
@@ -145,17 +195,15 @@ def read_s3(DATAFILE, BYTEOFFSET, NUM):
     return i4_shifted.squeeze()
 
 
-
-def numpy_read(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
+def read_numpy(DATAFILE, BYTEOFFSET, NUM, PERMISSION, DTYPE):
     """
     Read NumPy-compatible binary data.
 
     Modeled after MatSeis function read_file in util/waveread.m.
 
     """
-    f = open(DATAFILE, PERMISSION)
-    f.seek(BYTEOFFSET, 0)
-    data = np.fromfile(f, dtype=np.dtype(DTYPE), count=NUM)
-    f.close()
+    with open(DATAFILE, PERMISSION) as f:
+        f.seek(BYTEOFFSET, 0)
+        data = np.fromfile(f, dtype=np.dtype(DTYPE), count=NUM)
 
     return data
