@@ -14,7 +14,7 @@ here: a header value is either a real value or ``None``.
 The public, format-agnostic entry point is ``trace2tables(trace)``, which
 takes a plain ObsPy ``Trace``, matching the rest of the io subpackage.
 Internally it converts once to a ``SACTrace`` and passes that to each
-registered per-table function (``trace2site``, ``trace2origin``, etc.),
+registered per-table function (``sac2site``, ``sac2origin``, etc.),
 since ``SACTrace``'s attributes are the natural vocabulary for writing
 SAC-specific conversion logic (clean attribute names, nulls as ``None``,
 enums as strings) -- nicer to write against than raw ``Trace.stats.sac``.
@@ -35,10 +35,10 @@ from pisces.io.util import _cast_int, _cast_float, _clean_str, Registry
 
 # registry of functions: SACTrace -> list of table row dicts, keyed by
 # canonical table name. Users can add entries from their own code, e.g.:
-#   from pisces.io.sac import TRACE2TABLES
-#   @TRACE2TABLES('my_table')
+#   from pisces.io.sac import SAC2TABLES
+#   @SAC2TABLES('my_table')
 #   def trace2mytable(sac): ...
-TRACE2TABLES = Registry()
+SAC2TABLES = Registry()
 
 # ievtyp -> etype
 ETYPEDICT = {
@@ -118,8 +118,8 @@ def _sac2row(sac, fields, nulls=()):
     return row
 
 
-@TRACE2TABLES('site')
-def trace2site(sac):
+@SAC2TABLES('site')
+def sac2site(sac):
     """SACTrace -> list of 0 or 1 site table row dicts."""
     row = _sac2row(sac, {'kstnm': 'sta', 'stla': 'lat', 'stlo': 'lon',
                           'stel': 'elev'})
@@ -131,9 +131,9 @@ def trace2site(sac):
     return [row] if row else []
 
 
-def trace2arraysite(sac):
+def sac2arraysite(sac):
     """
-    Like `trace2site`, but also pulls array deast/dnorth (km) out of SAC's
+    Like `sac2site`, but also pulls array deast/dnorth (km) out of SAC's
     user7/user8 fields, per the LANL db2sac/BBFK convention.
 
     """
@@ -147,8 +147,8 @@ def trace2arraysite(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('sitechan')
-def trace2sitechan(sac):
+@SAC2TABLES('sitechan')
+def sac2sitechan(sac):
     """SACTrace -> list of 0 or 1 sitechan table row dicts."""
     row = _sac2row(sac, {'kstnm': 'sta', 'kcmpnm': 'chan', 'cmpaz': 'hang',
                           'cmpinc': 'vang', 'stdp': 'edepth'})
@@ -160,8 +160,8 @@ def trace2sitechan(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('affiliation')
-def trace2affiliation(sac):
+@SAC2TABLES('affiliation')
+def sac2affiliation(sac):
     """SACTrace -> list of 0 or 1 affiliation table row dicts."""
     row = _sac2row(sac, {'knetwk': 'net', 'kstnm': 'sta'})
     _clean_str(row, ['net', 'sta'])
@@ -170,8 +170,8 @@ def trace2affiliation(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('instrument')
-def trace2instrument(sac):
+@SAC2TABLES('instrument')
+def sac2instrument(sac):
     """SACTrace -> list of 0 or 1 instrument table row dicts."""
     row = _sac2row(sac, {'kinst': 'insname', 'iinst': 'instype'})
     if sac.delta:
@@ -179,8 +179,8 @@ def trace2instrument(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('origin')
-def trace2origin(sac):
+@SAC2TABLES('origin')
+def sac2origin(sac):
     """
     SACTrace -> list of 0 or 1 origin table row dicts.
 
@@ -228,8 +228,8 @@ def trace2origin(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('event')
-def trace2event(sac):
+@SAC2TABLES('event')
+def sac2event(sac):
     """SACTrace -> list of 0 or 1 event table row dicts."""
     row = _sac2row(sac, {'nevid': 'evid', 'kevnm': 'evname'})
     _clean_str(row, ['evname'])
@@ -237,8 +237,8 @@ def trace2event(sac):
     return [row] if row else []
 
 
-@TRACE2TABLES('assoc')
-def trace2assoc(sac, pickmap=None):
+@SAC2TABLES('assoc')
+def sac2assoc(sac, pickmap=None):
     """
     SACTrace -> list of 0-10 assoc table row dicts, one per filled t[0-9]
     pick header. An alternate t[0-9]->phase mapping can be supplied via
@@ -274,11 +274,11 @@ def trace2assoc(sac, pickmap=None):
     return rows
 
 
-@TRACE2TABLES('arrival')
-def trace2arrival(sac, pickmap=None):
+@SAC2TABLES('arrival')
+def sac2arrival(sac, pickmap=None):
     """
     SACTrace -> list of 0-10 arrival table row dicts, one per filled t[0-9]
-    pick header. Same phase-naming convention as `trace2assoc`.
+    pick header. Same phase-naming convention as `sac2assoc`.
 
     """
     pick2phase = dict(PICK2PHASE)
@@ -307,8 +307,8 @@ def trace2arrival(sac, pickmap=None):
     return rows
 
 
-@TRACE2TABLES('wfdisc')
-def trace2wfdisc(sac):
+@SAC2TABLES('wfdisc')
+def sac2wfdisc(sac):
     """
     SACTrace -> list of 0 or 1 wfdisc table row dicts.
 
@@ -372,11 +372,11 @@ def trace2tables(trace, tables=None):
     sac = SACTrace.from_obspy_trace(trace)
 
     if tables is None:
-        tables = list(TRACE2TABLES)
+        tables = list(SAC2TABLES)
 
     out = {}
     for table in tables:
-        rows = TRACE2TABLES[table](sac)
+        rows = SAC2TABLES[table](sac)
         if rows:
             out[table] = rows
 
