@@ -10,7 +10,7 @@ that's `pisces.trace`/`pisces.catalog`/`pisces.inventory`'s job.
 `wfdisc.datatype` string, via the `WAVEFORM_READERS` registry. New
 datatypes can be registered from user code without editing pisces::
 
-    from pisces.io.readwaveform import WAVEFORM_READERS
+    from pisces.io.waveforms import WAVEFORM_READERS
 
     @WAVEFORM_READERS('myc')
     def read_myc(path, byteoffset=0, nsamp=None):
@@ -24,4 +24,4 @@ Per-format header<->table-row conversion lives one module per format
 (`pisces.io.sac`, `pisces.io.mseed`), each exposing `trace2tables`.
 
 """
-from pisces.io.readwaveform import read_waveform, WAVEFORM_READERS
+from pisces.io.waveforms import read_waveform, WAVEFORM_READERS

@@ -3,7 +3,7 @@ Conversions between KB Core Wfdisc rows and ObsPy Trace objects.
 
 `wfdisc2trace` builds a `Trace` whose `.stats` always reflects the `wfdisc`
 row's own column values (station/channel/sample rate/start time/etc.), via
-`read_waveform`'s dispatch (`pisces.io.readwaveform.WAVEFORM_READERS`).
+`read_waveform`'s dispatch (`pisces.io.waveforms.WAVEFORM_READERS`).
 Every registered waveform reader -- including the ones that read a real
 file format internally, like `'sd'` miniSEED or `'sc'` SAC -- returns only a
 raw sample array, discarding whatever in-file header ObsPy may have parsed
@@ -16,7 +16,7 @@ directly with plain ObsPy instead.
 """
 import os
 from obspy.core import UTCDateTime, Trace, Stats
-from pisces.io.readwaveform import read_waveform
+from pisces.io.waveforms import read_waveform
 from pisces.io.util import _buildhdr
 
 

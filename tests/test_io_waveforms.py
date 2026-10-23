@@ -5,7 +5,17 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
-import pisces.io.readwaveform as rwf
+import importlib
+import sys
+
+import pisces.io.waveforms as rwf
+
+
+def test_readwaveform_module_warns_on_import():
+    """The compatibility module warns users to import waveforms instead."""
+    sys.modules.pop('pisces.io.readwaveform', None)
+    with pytest.warns(DeprecationWarning, match='pisces.io.waveforms'):
+        importlib.import_module('pisces.io.readwaveform')
 
 
 def test_read_waveform_nptype_dispatch():
