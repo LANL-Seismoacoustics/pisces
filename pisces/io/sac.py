@@ -1,6 +1,12 @@
 """
 Conversions between SAC headers and KB Core table rows.
 
+Use this module after reading a SAC file with ObsPy when preparing file-backed
+waveform records. It extracts the station, channel, event, pick, and waveform
+metadata that is present in the SAC header. The result is a starting point for
+database metadata: callers must validate producer-supplied header values and
+supply database-specific fields and identifiers before persisting rows.
+
 SAC file reading/parsing itself is left entirely to ObsPy
 (:class:`obspy.io.sac.sactrace.SACTrace`, :func:`obspy.read`). This module's
 only job is the conversion between a SAC header -- always accessed through

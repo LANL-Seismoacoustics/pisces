@@ -2,6 +2,12 @@
 Conversions between ObsPy Trace headers (as read from miniSEED) and KB Core
 table rows.
 
+Use this module after reading a miniSEED file with ObsPy when preparing
+file-backed waveform records. It extracts waveform and basic network, station,
+and channel identity metadata available from the trace header. miniSEED alone
+does not provide a complete station or channel record, and callers must
+validate or supply database-specific fields before persisting rows.
+
 Mirrors `pisces.io.sac`'s shape: a registry of per-table functions
 (`TRACE2TABLES`), each taking an ObsPy `Trace`, and a `trace2tables(trace)`
 entry point that calls all (or a selected subset) of them.

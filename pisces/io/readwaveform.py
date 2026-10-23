@@ -4,6 +4,12 @@
 """
 Raw waveform sample-vector reading, dispatched by ``wfdisc.datatype``.
 
+This module reads the samples from files already described by a waveform
+record; it does not import file-header metadata into database tables. For
+SAC or miniSEED header import, use :mod:`pisces.io.sac` or
+:mod:`pisces.io.mseed`, respectively. Files remain in place: callers provide
+the path and offset stored by their waveform record.
+
 Plain NumPy-compatible binary layouts (``NPTYPE`` below) are read generically
 by `read_numpy`, keyed only by their NumPy dtype string -- no registration
 needed. Everything else (data requiring a real decoder: miniSEED, SEGY,
