@@ -19,7 +19,7 @@ Python is multi-platform, SQLAlchemy is database-agnostic, and the whole stack i
 
 ## Features
 
-* Import/export waveforms directly to/from your database.
+* Import SAC and miniSEED waveform files into database tables, then retrieve them as ObsPy traces for analysis.
 * Easy importing/exporting of text "flat-file" data tables.
 * Build database queries using Python objects and methods ([SQLAlchemy](http://www.sqlalchemy.org)), not by concatenating SQL strings.
 * Integration with [ObsPy](http://www.obspy.org).
@@ -38,10 +38,9 @@ installation.md
 :caption: Tutorials
 :maxdepth: 2
 
-tutorial/tables.md
-tutorial/queries.md
 tutorial/waveforms.md
 tutorial/flatfiles.md
+tutorial/fdsn.md
 ```
 
 

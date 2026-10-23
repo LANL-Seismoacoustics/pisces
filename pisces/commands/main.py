@@ -170,7 +170,7 @@ def mseed2db_command(db, files, file_list, prefix, absolute_paths):
     Notes
     -----
     The datatype in the wfdisc table will be "sd", which is _not_ a standard
-    datatype.  It will unpack into int32 arrays if pisces.io.readwaveform is used.
+    datatype. It will unpack into int32 arrays if pisces.io.waveforms is used.
     The miniSEED header is very minimal, so it will produce site and sitechan
     entries that are incomplete.  Notably, site will not have coordinates in it.
 

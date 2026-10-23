@@ -2,16 +2,6 @@
 
 How to read and write waveforms.
 
-
----
-
-
-## Introduction
-
-
-
----
-
 ## Retrieving waves from a query
 
 Waveforms are described in the `Wfdisc` table, and there are two ways to get waveforms from a query.
@@ -104,43 +94,46 @@ method, which supports several output formats, including miniSEED.
 ---
 
 
-## Adding waveforms to the database
+## Adding waveform files to a database
 
-Database-building scripts are in development, but adding waveforms to a database
-is still relatively easy.  Using [ObsPy](http://www.obspy.org), any number of
-waveform [formats](https://docs.obspy.org/packages/autogen/obspy.core.stream.read.html)
-can be read and the basic header "scraped" into a `Wfdisc` row.
+Pisces can use SAC and miniSEED files as the waveform files behind a CSS 3.0
+or KB Core-style database. Importing records each file's location and the
+metadata available in its header; it does not copy or convert the waveform
+samples.
 
-Here's an example for a SAC file.
+### Choose a format
 
-```python
-import os
-from glob import glob
+**SAC** files can contribute waveform, station, channel, network, instrument,
+event, origin, arrival, and association metadata when those headers are
+present. This makes SAC useful when a file includes both waveform and event
+context.
 
-from obspy import read
-from pisces import db_connect
-from pisces.tables.css3 import Wfdisc
+**miniSEED** files provide waveform data and basic network, station, and
+channel identity. They generally do not contain enough information to make a
+complete station or channel record.
 
+### Review imported metadata
 
-session = db_connect(conn='sqlite:///mydatabase.sqlite')
+A file header is not a complete database. Before relying on imported records,
+review and fill in metadata that the format cannot provide, such as:
 
-Wfdisc.__table__.create(session.bind)
+- station and channel effective dates and station coordinates;
+- database identifiers and links between related event records;
+- the file location recorded with each waveform, particularly when data is
+  moved to another system.
 
-FTYPE = 'SAC'
+SAC header fields are conventions maintained by the data producer. For example,
+event details and phase picks are available only when they were written to the
+file. Treat file import as a starting point for database metadata, then
+validate it against the authoritative deployment and event information.
 
-for ifile in glob("*.SAC"):
-   tr = read(ifile, format='SAC')[0]
-   idir, idfile = os.path.split(ifile)
-   wf = Wfdisc(sta=tr.stats.station, chan=tr.stats.channel, 
-               samprate=tr.stats.sampling_rate, nsamp=tr.stats.npts, 
-               time=tr.stats.starttime.timestamp, foff=634, dir=idir,
-               dfile=idfile, endtime=tr.stats.endtime.timestamp)
-   session.add(wf)
+Once waveform records point at accessible files, retrieve them as ObsPy
+`Trace` objects through the `Wfdisc` workflow above. Pisces uses the database
+record for the returned trace's identifying and timing metadata, so corrections
+made in the database are reflected when the waveform is read.
 
-session.commit()
-session.close()
-
-```
+For Python import details and the exact fields available from each format, see
+the API reference for `pisces.io.sac` and `pisces.io.mseed`.
 
 ---
 
