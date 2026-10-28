@@ -2077,7 +2077,7 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
             lat = sta.latitude
             lon = sta.longitude
             elev = sta.elevation/1000
-            staname = sta.description
+            staname = sta.site.name
             statype = 'ss'
             refsta = '-'
             dnorth = 0
