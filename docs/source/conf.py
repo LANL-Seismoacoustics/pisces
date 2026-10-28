@@ -38,6 +38,11 @@ extensions = [
         ]
 autosummary_generate = False
 suppress_warnings = ["myst.header"]
+# source_suffix = {
+#     '.rst': 'restructuredtext',
+#     '.txt': 'markdown',
+#     '.md': 'markdown',
+# }
 # autodoc2_render_plugin = "myst"
 # autodoc2_packages = [
 #      {

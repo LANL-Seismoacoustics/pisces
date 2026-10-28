@@ -23,7 +23,7 @@ import logging
 
 from pisces.util import db_connect, get_tables, travel_times, make_table
 from pisces.schema.util import string_formatter
-from pisces.io.trace import wfdisc2trace
+from pisces.trace import wfdisc2trace
 from pisces.schema import kbcore
-from pisces.io.readwaveform import read_waveform
+from pisces.io.waveforms import read_waveform
 from pisces import request

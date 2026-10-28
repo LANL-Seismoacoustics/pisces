@@ -7,6 +7,8 @@ Common io utilities.
 """
 import functools
 
+from pisces.util import deprecated
+
 
 def _buildhdr(keymap, rec):
     """
@@ -31,6 +33,8 @@ def _buildhdr(keymap, rec):
     return hdr
 
 
+@deprecated('Unused internally; prefer plain dict comprehensions or the '
+            'pisces.io.util cast/strip helpers (_cast_int, _cast_float, _clean_str).')
 def _map_header(keymap, dold, nulldict=None):
     """
     Returns a dictionary of values from dictionary dold,
@@ -74,6 +78,30 @@ def _map_header(keymap, dold, nulldict=None):
                 pass
 
     return dnew
+
+
+def _cast_int(d, keys):
+    """In place: cast d[key] to int for each key present and non-None."""
+    for key in keys:
+        if d.get(key) is not None:
+            d[key] = int(d[key])
+    return d
+
+
+def _cast_float(d, keys):
+    """In place: cast d[key] to float for each key present and non-None."""
+    for key in keys:
+        if d.get(key) is not None:
+            d[key] = float(d[key])
+    return d
+
+
+def _clean_str(d, keys):
+    """In place: strip whitespace from d[key] for each key present and non-None."""
+    for key in keys:
+        if d.get(key) is not None:
+            d[key] = d[key].strip()
+    return d
 
 
 class Registry:
@@ -137,86 +165,6 @@ class Registry:
 
     def __repr__(self):
         return repr(self._REGISTRY)
-
-    def __getitem__(self, key):
-        return self._REGISTRY[key]
-
-    def __len__(self):
-        return len(self._REGISTRY)
-
-    def __iter__(self):
-        for key in self._REGISTRY:
-            yield key
-
-
-
-from collections.abc import Mapping
-
-class Registry2(Mapping):
-    """ Dictionary-like registry decorator.
-
-    Useful for keeping track of I/O functions for file formats or core schema classes.
-
-    Examples
-    --------
-    >>> formats = Registry()
-
-    >>> @formats.register('miniseed')
-    >>> def read_miniseed():
-    ...     pass
-
-    >>> 'miniseed' in formats
-    True
-    >>> formats['miniseed'] == read_miniseed
-    True
-
-    >>> @formats('miniseed')
-    >>> def read_miniseed2():
-    ...     pass
-
-    KeyError: 'key already exists in registry.  use force=True to override it.'
-
-    >>> @formats('miniseed', force=True)
-    >>> def read_miniseed2():
-    ...     pass
-
-    >>> formats['miniseed'] == read_miniseed2
-    True
-
-    >>> CORETABLES = Registry()
-    >>> @CORETABLES.register('site')
-    ... class Site:
-    ...     pass
-
-    >>> CORETABLES['site']
-    __main__.Site
-
-    # existing functions or classes can also be registered using inline decorator syntax
-    >>> from mytables import MyTable
-    >>> MyTable = CORETABLES.register('mytable')(MyTable)
-
-    """
-    # hijack normal Mapping init to initialize registry
-    def __init__(self, *args, **kwargs):
-        self._REGISTRY = dict(*args, **kwargs)
-
-    def __repr__(self):
-        return repr(self._REGISTRY)
-
-    def register(self, key, force=False):
-        """ Function decorator that registers using a key.
-        """
-        def actual_decorator(func):
-            if key in self._REGISTRY and not force:
-                raise KeyError("key already exists in registry.  use force=True to override it.")
-            self._REGISTRY[key] = func
-
-            @functools.wraps(func)
-            def wrapper(*args, **kwargs):
-                return func(*args, **kwargs)
-            return wrapper
-
-        return actual_decorator
 
     def __getitem__(self, key):
         return self._REGISTRY[key]

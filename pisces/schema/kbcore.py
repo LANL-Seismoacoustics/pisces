@@ -71,7 +71,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from pisces.schema.util import PiscesMeta
 from pisces.schema.util import parse_str, parse_int, parse_float
-from pisces.io.trace import wfdisc2trace
+from pisces.trace import wfdisc2trace
 from copy import deepcopy as dc
 
 # TODO: check __table_args__ syntax for final empty {}

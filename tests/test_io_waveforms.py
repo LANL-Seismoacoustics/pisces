@@ -1,8 +1,68 @@
+import os
 import tempfile
+
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
 
-import pisces.io.readwaveform as rwf
+import importlib
+import sys
+
+import pisces.io.waveforms as rwf
+
+
+def test_readwaveform_module_warns_on_import():
+    """The compatibility module warns users to import waveforms instead."""
+    sys.modules.pop('pisces.io.readwaveform', None)
+    with pytest.warns(DeprecationWarning, match='pisces.io.waveforms'):
+        importlib.import_module('pisces.io.readwaveform')
+
+
+def test_read_waveform_nptype_dispatch():
+    """read_waveform() dispatches NPTYPE-registered datatypes (e.g. 't4')
+    through read_numpy(), reading the right slice of a raw binary file.
+    """
+    data = np.arange(10, dtype='>f4')
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, 'x.bin')
+        with open(path, 'wb') as f:
+            data.tofile(f)
+        out = rwf.read_waveform(path, 't4', 0, 10)
+    assert_array_equal(out, data)
+
+
+def test_read_waveform_registered_dispatch():
+    """read_waveform() dispatches datatypes not in NPTYPE (e.g. 'sc') through
+    the WAVEFORM_READERS registry.
+    """
+    from obspy.io.sac import SACTrace
+    sac_data = np.arange(10, dtype='float32')
+    sac = SACTrace(delta=0.01, data=sac_data)
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, 'x.sac')
+        sac.write(path)
+        out = rwf.read_waveform(path, 'sc', 0, 10)
+    assert_array_equal(out, sac_data)
+
+
+def test_read_waveform_unknown_datatype():
+    """read_waveform() raises ValueError for a datatype that is neither in
+    NPTYPE nor registered in WAVEFORM_READERS.
+    """
+    with pytest.raises(ValueError):
+        rwf.read_waveform('bogus_path', 'not_a_real_datatype', 0, 10)
+
+
+def test_waveform_readers_user_registration():
+    """Users can register a new wfdisc.datatype reader on WAVEFORM_READERS
+    from their own code, and read_waveform() dispatches to it.
+    """
+    @rwf.WAVEFORM_READERS('test_custom_dtype')
+    def _read_custom(path, byteoffset=0, nsamp=None):
+        return np.array([1, 2, 3])
+
+    out = rwf.read_waveform('unused_path', 'test_custom_dtype', 0, 3)
+    assert_array_equal(out, [1, 2, 3])
 
 
 def test_read_s3():
