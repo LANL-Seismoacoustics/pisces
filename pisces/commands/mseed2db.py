@@ -65,9 +65,8 @@ def main(session, files=None, file_list=None, prefix=None, absolute_paths=False)
         # order, with enough header information to calculate that.
         foff = 0
         for tr in st:
-            rows = mseed.mseedhdr2tables(tr.stats, wfdisc=tables['wfdisc'],
-                                         site=tables['site'], sitechan=tables['sitechan'],
-                                         affiliation=tables['affiliation'])
+            dicts = mseed.trace2tables(tr, tables=tables.keys())
+            rows = dicts2rows(dicts, tables)
 
             foff += tr.stats.mseed.number_of_records * tr.stats.mseed.record_length
             rows['wfdisc'][0].foff = foff

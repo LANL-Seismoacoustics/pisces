@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pisces"
-version = "0.4.5.3"
+dynamic = ["version"]
 description = "A Practical Seismological Database Library in Python."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { text = "LANL-MIT" }
@@ -35,3 +35,6 @@ pisces = "pisces.commands.main:cli"
 
 [tool.setuptools]
 packages = ["pisces", "pisces.schema", "pisces.io", "pisces.tables", "pisces.commands"]
+
+[tool.setuptools.dynamic]
+version = { attr = "pisces.__version__" }

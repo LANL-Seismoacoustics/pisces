@@ -6,7 +6,8 @@ import os
 import sys
 import glob
 import argparse
-import imp
+import importlib.util
+import importlib.machinery
 
 from sqlalchemy import create_engine
 import sqlalchemy.exc as exc
@@ -37,8 +38,11 @@ def get_plugins(plugins):
                 raise ValueError(msg)
             pth = pth.split(os.path.sep)
             modname = pth.pop(-1)
-            f, pathname, descr = imp.find_module(modname, pth)
-            mod = imp.load_module(modname, f, pathname, descr)
+            spec = importlib.machinery.PathFinder().find_spec(modname, pth)
+            if spec is None:
+                raise ImportError("Can't find module {} in {}".format(modname, pth))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
             plugin_functions.append(getattr(mod, fn))
 
     return plugin_functions
@@ -83,6 +87,11 @@ def make_atomic(last, **rows):
         sitechan.chanid = next(last.chanid)
 
     # arrivals correspond to assocs
+    # BUG: sitechan/origin/event are leaked loop variables from the loops
+    # above. If rows['sitechan'] or rows['origin']/['event'] is empty for
+    # this file, these names are either unbound (NameError) or stale values
+    # left over from a previous file in the batch (silent cross-file
+    # contamination of chanid/orid). Flagged, not fixed.
     for (arrival, assoc) in zip(rows.get('arrival', []), rows.get('assoc', [])):
         arrival.arid = next(last.arid)
         arrival.chanid = sitechan.chanid
@@ -147,7 +156,7 @@ def main(**kwargs):
 
         # sachdr2tables produces table dictionaries
         # rows needs to be a dict of lists, for make_atomic
-        dicts = sac.sachdr2tables(tr.stats.sac, tables=tables.keys())
+        dicts = sac.trace2tables(tr, tables=tables.keys())
         rows = dicts2rows(dicts, tables)
 
         # manage dir, dfile, datatype
