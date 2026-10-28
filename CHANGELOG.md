@@ -1,5 +1,12 @@
 # Changelog
 
+## `main`/`master`
+
+* New `pisces.fdsn.Client` class that follows the ObsPy FDSN Client class, including producing
+  comparable outputs (e.g. `.get_events` method that produces a `Catalog` object).
+* Bump required Python version to 3.10+
+* New `pisces.catalog` module containing CSS/KBCore conversions to ObsPy Catalog / QuakeML.
+
 ## 0.4.3
 
 * Add initial response reader module.

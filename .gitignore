@@ -5,3 +5,10 @@ build
 __pycache__
 .vscode
 apidocs
+.session.vim
+pyrightconfig.json
+pisces.egg-info
+.session.vim
+# pixi environments
+.pixi/*
+!.pixi/config.toml

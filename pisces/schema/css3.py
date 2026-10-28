@@ -18,7 +18,7 @@ from obspy.core import UTCDateTime
 from pisces.schema.util import PiscesMeta
 from pisces.schema.util import parse_int, parse_float, parse_str
 
-from pisces.io.trace import wfdisc2trace
+from pisces.trace import wfdisc2trace
 from copy import deepcopy as dc
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
