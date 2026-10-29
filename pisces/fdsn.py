@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from obspy import UTCDateTime
 from obspy.core.event.header import EventType
 
-from pisces import events
+from pisces.query import events
 import pisces.request as req
 from pisces import util
 from pisces.catalog import KBCORE_EVENT_TYPE, catalog
@@ -352,7 +352,7 @@ class Client(object):
             msg = "Arrival and Assoc tables required for includeallarrivals."
             raise ValueError(msg)
 
-        if orderby not in ("time", "time-asc", "magnitude", "magnitude-asc", None):
+        if orderby and orderby not in ("time", "time-asc", "magnitude", "magnitude-asc"):
             msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
             raise ValueError(msg)
 

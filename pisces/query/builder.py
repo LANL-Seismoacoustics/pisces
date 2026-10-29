@@ -64,8 +64,9 @@ from typing import Self
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
-from . import catalog, events, stations
-from .util import _get_entities
+from .. import catalog
+from . import events, stations
+from ..util import _get_entities
 
 
 class QueryBuilder:

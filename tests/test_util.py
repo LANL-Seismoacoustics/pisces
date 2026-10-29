@@ -8,7 +8,7 @@ import sqlalchemy as sa
 
 import pisces.util as util
 from pisces.tables.kbcore import *
-from pisces import events
+from pisces.query import events
 
 
 def test_glob_to_like():

@@ -10,7 +10,7 @@ from obspy import UTCDateTime
 from sqlalchemy import or_
 
 from pisces.tables.kbcore import Amplitude, Event, Origin, Netmag, Stamag, Site
-from pisces import events
+from pisces.query import events
 from pisces.util import literal_sql
 
 # print(observed.statement.compile(compile_kwargs={"literal_binds": True}))

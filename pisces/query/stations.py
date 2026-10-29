@@ -1,6 +1,13 @@
 from sqlalchemy import func, or_
+<<<<<<< HEAD
 from pisces.util import make_wildcard_list, _get_entities, range_filters, jdate_to_utc
+||||||| parent of fa6dde8 (Fix imports)
+from pisces.util import make_wildcard_list, _get_entities, range_filters
+=======
+>>>>>>> fa6dde8 (Fix imports)
 from obspy.core import UTCDateTime
+
+from ..util import make_wildcard_list, _get_entities, range_filters
 
 
 def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=None, **tables):
