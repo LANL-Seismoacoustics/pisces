@@ -721,39 +721,6 @@ def load_config(config):
     return session, tables
 
 
-def make_wildcard_list(toList):
-    """
-    Take a list, tuple, or comma separated string of variables and output a list
-    with sql wildcards '%' and '_'
-
-    Parameters
-    ----------
-    toList : list, tuple, or comma separated string or variables
-
-    Returns
-    -------
-    nowList: list of variables contained in the toList variable
-
-    """
-
-    # check if toList is a list and if not, make it a list
-    if type(toList) is list:
-        nowList = toList
-
-    elif type(toList) is tuple:
-        nowList = list(toList)
-
-    elif type(toList) is str:
-        nowList = toList.split(',')
-    else:
-        raise TypeError('input to function make_wildcard_list is not a list, tuple, or comma separated string of variables')
-
-    for x in range(len(nowList)):
-       nowList[x] = nowList[x].replace('*','%')
-       nowList[x] = nowList[x].replace('?','_')
-
-    return nowList
-
 def glob_to_like(text, escape='\\'):
     """
     Replace FDSN wildcards to equivalent SQL wildcards.
@@ -980,7 +947,7 @@ def jdate_to_utc(jdate):
     """Convert KB Core Julian date (YYYYDDD) to UTCDateTime."""
     if jdate is None or jdate in (-1, -999, -9999999):
         return None
-    
+
     try:
         year = int(jdate / 1000)
         day = int(jdate % 1000)

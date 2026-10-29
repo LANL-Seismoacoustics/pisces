@@ -24,12 +24,6 @@ def test_has_sql_wildcards():
     assert not util.has_sql_wildcards('*HZ')
     assert not util.has_sql_wildcards('?HZ')
 
-def test_make_wildcard_list():
-    assert util.make_wildcard_list('*HZ') == ['%HZ']
-    assert util.make_wildcard_list('?HZ') == ['_HZ']
-    assert util.make_wildcard_list('*HZ,HHZ') == ['%HZ', 'HHZ']
-    assert util.make_wildcard_list(('*HZ', 'HHZ')) == ['%HZ', 'HHZ']
-
 
 def test_string_expressions():
     expression = util.string_expression(Sitechan.chan, ['BHZ'])

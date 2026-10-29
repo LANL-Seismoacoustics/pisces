@@ -8,7 +8,7 @@ from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
 
 from pisces.fdsn import wfdisc2trace
-from pisces.util import make_wildcard_list
+from pisces.query.util import make_wildcard_list
 
 import warnings
 
