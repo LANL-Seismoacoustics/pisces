@@ -1,5 +1,5 @@
 from sqlalchemy import func, or_
-from pisces.util import make_wildcard_list, _get_entities, range_filters
+from pisces.util import make_wildcard_list, _get_entities, range_filters, jdate_to_utc
 from obspy.core import UTCDateTime
 
 
@@ -91,7 +91,7 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
     """
 
     # get desired tables from the query
-    Network, Affiliation, Site = _get_entities(query, "Network", "Affiliation","Site")
+    Network, Affiliation, Site = _get_entities(query, "Network", "Affiliation", "Site")
     # override if provided
     Network = tables.get("network", None) or Network
     Affiliation = tables.get("affiliation", None) or Affiliation
@@ -240,6 +240,10 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
     if not any([Site, Sitechan]):
         msg = "Site or Sitechan table required."
         raise ValueError(msg)
+    
+    if Site and Sensor and not Sitechan:
+        msg = "Sitechan table required to join Site and Sensor."
+        raise ValueError(msg)
 
     if any([region, staname, refsta]) and not Site:
         # Site keywords supplied, but no Site table present
@@ -256,6 +260,8 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
     # Join Site and Sitechan if both present
     if Site and Sitechan:
         query = query.filter(Site.sta == Sitechan.sta)
+        query = query.filter(Sitechan.ondate.between(Site.ondate, Site.offdate))
+
     
     # If Sensor is present join first on Sitechan.chanid if Sitechan present
     if Sensor and Sitechan:
@@ -290,14 +296,12 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
             if t1:
                 query = query.filter(t1 <= Sitechan.offdate)
             if t2: 
-                query = query.filter(t1 >= Sitechan.ondate)
-            if Sitechan and Site:
-                query =query.filter(Sitechan.ondate.between(Site.ondate, Site.offdate))
+                query = query.filter(t2 >= Sitechan.ondate)
         else:
             if t1:
                 query = query.filter(t1 <= Site.offdate)
             if t2: 
-                query = query.filter(t1 >= Site.ondate)
+                query = query.filter(t2 >= Site.ondate)
     
     # collect range restrictions on columns
     range_restr = []
@@ -395,6 +399,8 @@ def filter_responses(query, sta = None, chan = None, times = None, **tables):
     # If Sitechan is present join on Sitechan.chanid
     if Sitechan:
         query = query.filter(Sitechan.chanid == Sensor.chanid)
+        # not sure I need this line?
+        # query = query.filter(Sensor.time.between(jdate_to_utc(Sitechan.ondate).timestamp, jdate_to_utc(Sitechan.offdate).timestamp)) 
 
     if sta:
         sta = make_wildcard_list(sta)

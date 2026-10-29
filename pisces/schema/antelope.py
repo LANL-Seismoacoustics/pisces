@@ -334,12 +334,11 @@ class Affiliation(Base):
 
     @declared_attr
     def __table_args__(cls):
-        return (PrimaryKeyConstraint('net', 'sta', 'time'),)
+        return (PrimaryKeyConstraint('net', 'sta'),)
 
     net = net.copy()
     sta = sta.copy()
-    time = time.copy()
-    endtime = endtime.copy()
+
     lddate = lddate.copy()
 
 
