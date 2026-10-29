@@ -17,7 +17,6 @@ from pisces.tables.kbcore import (
     Site,
     Sitechan,
 )
-from pisces.util import literal_sql
 
 
 def client(session):

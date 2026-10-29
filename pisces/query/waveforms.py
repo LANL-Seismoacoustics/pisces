@@ -47,7 +47,7 @@ from obspy import UTCDateTime
 from sqlalchemy import func, and_, or_, literal
 from sqlalchemy.orm import Query
 
-from ..util import _get_entities, make_wildcard_list
+from pisces.util import _get_entities, make_wildcard_list
 
 
 def filter_waveforms(

@@ -16,13 +16,13 @@ Build an event query without selecting or passing table classes yourself::
 
     # more readable?
     q = (
-        QueryBuilder(session, 
-            event=Event, 
-            origin=Origin, 
+        QueryBuilder(session,
+            event=Event,
+            origin=Origin,
             netmag=Netmag
             )
         .events(
-            region=(west, east, south, north), 
+            region=(west, east, south, north),
             prefor=True,
         )
         .magnitudes(
@@ -37,16 +37,16 @@ Build a station query from networks down through responses. Network and station 
 on the initial ``stations`` call; each later fluent method adds the tables its filter needs::
 
     responses = (
-        QueryBuilder(session, 
-            network=Network, 
-            affiliation=Affiliation, 
+        QueryBuilder(session,
+            network=Network,
+            affiliation=Affiliation,
             site=Site,
-            sitechan=Sitechan, 
-            sensor=Sensor, 
+            sitechan=Sitechan,
+            sensor=Sensor,
             instrument=Instrument
             )
         .stations(
-            net="IU", 
+            net="IU",
             region=(west, east, south, north)
             )
         .channels(
@@ -82,9 +82,16 @@ from typing import Self
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
-from .. import catalog
-from . import events, stations
-from ..util import _get_entities
+from pisces.fdsn import catalog
+from pisces.query import (
+    filter_events,
+    filter_networks,
+    filter_stations,
+    filter_magnitudes,
+    filter_arrivals,
+    filter_responses,
+)
+from pisces.util import _get_entities
 
 
 class QueryBuilder:
@@ -127,12 +134,12 @@ class QueryBuilder:
         etype=None,
     ) -> EventQuery:
         """
-        Start an Event/Origin query and apply :func:`pisces.events.filter_events`.
+        Start an Event/Origin query and apply :func:`pisces.query.filter_events`.
 
         """
         Event = self._table("event")
         Origin = self._table("origin")
-        stmt = events.filter_events(
+        stmt = filter_events(
             select(Event, Origin),
             region=region,
             times=times,
@@ -161,14 +168,14 @@ class QueryBuilder:
     ) -> StationQuery:
         """Start a Network/Affiliation/Site query.
 
-        Network filters use the names from :func:`pisces.stations.filter_networks`; the ``auth``
+        Network filters use the names from :func:`pisces.query.filter_networks`; the ``auth``
         and ``times`` names are disambiguated here as ``network_auth`` and ``affiliation_times``.
-        Station filters otherwise match :func:`pisces.stations.filter_stations`.
+        Station filters otherwise match :func:`pisces.query.filter_stations`.
         """
         Network = self._table("network")
         Affiliation = self._table("affiliation")
         Site = self._table("site")
-        stmt = stations.filter_networks(
+        stmt = filter_networks(
             select(Network, Affiliation, Site),
             net=net,
             netname=netname,
@@ -176,7 +183,7 @@ class QueryBuilder:
             sta=sta,
             times=affiliation_times,
         )
-        stmt = stations.filter_stations(
+        stmt = filter_stations(
             stmt,
             sta=sta,
             times=times,
@@ -207,7 +214,7 @@ class EventQuery:
             raise ValueError("EventQuery statements must include Event and Origin.")
 
     def magnitudes(self, *, net=None, auth=None, **magnitudes) -> Self:
-        """Include Netmag rows and apply :func:`pisces.events.filter_magnitudes`.
+        """Include Netmag rows and apply :func:`pisces.query.filter_magnitudes`.
 
         Keyword magnitude ranges match ``filter_magnitudes``: for example,
         ``mw=(4, 6)`` or ``mb=(None, 5)``. Station magnitude filtering (``sta=...``) is not in this
@@ -219,14 +226,14 @@ class EventQuery:
             stmt = self.statement.add_columns(Netmag)
         else:
             stmt = self.statement
-        stmt = events.filter_magnitudes(stmt, net=net, auth=auth, **magnitudes)
+        stmt = filter_magnitudes(stmt, net=net, auth=auth, **magnitudes)
         return type(self)(self.client, stmt)
 
     def arrivals(
         self, *, sta=None, auth=None, times=None, orid=None, phase=None
     ) -> Self:
         """
-        Include Assoc and Arrival rows and apply :func:`pisces.events.filter_arrivals`.
+        Include Assoc and Arrival rows and apply :func:`pisces.query.filter_arrivals`.
 
         """
         Assoc = self.client._table("assoc")
@@ -237,7 +244,7 @@ class EventQuery:
             stmt = stmt.add_columns(Assoc)
         if not selected_arrival:
             stmt = stmt.add_columns(Arrival)
-        stmt = events.filter_arrivals(
+        stmt = filter_arrivals(
             stmt,
             sta=sta,
             auth=auth,
@@ -270,19 +277,19 @@ class StationQuery:
             raise ValueError("StationQuery statements must include Network, Affiliation, and Site.")
 
     def channels(self, *, sta=None, chan=None, times=None) -> Self:
-        """Include Sitechan rows and apply :func:`pisces.stations.filter_stations`."""
+        """Include Sitechan rows and apply :func:`pisces.query.filter_stations`."""
         Sitechan = self.client._table("sitechan")
         if _get_entities(self.statement, "Sitechan")[0]:
             stmt = self.statement
         else:
             stmt = self.statement.add_columns(Sitechan)
-        stmt = stations.filter_stations(stmt, sta=sta, chan=chan, times=times)
+        stmt = filter_stations(stmt, sta=sta, chan=chan, times=times)
 
         return type(self)(self.client, stmt)
 
 
     def responses(self, *, sta=None, chan=None, times=None) -> Self:
-        """Include response rows and apply :func:`pisces.stations.filter_responses`.
+        """Include response rows and apply :func:`pisces.query.filter_responses`.
 
         Sitechan is added first because it links the Site chain to Sensor. The returned chain can
         be realized as a response-level inventory with :meth:`inventory`.
@@ -302,7 +309,7 @@ class StationQuery:
             stmt = stmt.add_columns(Sensor)
         if not selected_instrument:
             stmt = stmt.add_columns(Instrument)
-        stmt = stations.filter_responses(stmt, sta=sta, chan=chan, times=times)
+        stmt = filter_responses(stmt, sta=sta, chan=chan, times=times)
 
         return type(self)(self.client, stmt)
 
