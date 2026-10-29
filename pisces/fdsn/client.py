@@ -17,7 +17,7 @@ from obspy.core.event.header import EventType
 from pisces.query import events
 import pisces.request as req
 from pisces import util
-from pisces.catalog import KBCORE_EVENT_TYPE, catalog
+from pisces.fdsn.catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 

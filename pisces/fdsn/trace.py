@@ -15,9 +15,10 @@ directly with plain ObsPy instead.
 
 """
 import os
-from obspy.core import UTCDateTime, Trace, Stats
+from obspy.core import UTCDateTime, Trace, Stats, Stream
 from pisces.io.waveforms import read_waveform
 from pisces.io.util import _buildhdr
+from pisces.util import _get_entities
 
 
 def wfdisc2obspyhdr(wf):
@@ -57,3 +58,19 @@ def wfdisc2trace(wf):
         tr = None
 
     return tr
+
+
+# TODO: make this return a generator of Traces, to avoid memory probablems?
+# i.e.  return (wfdisc2trace(getattr(row, Wfdisc.__name__) for row in q)
+# callers can do: st = Stream(result_of_stream)
+# not sure if obspy Stream(generator) would like it, though
+def stream(q):
+    Wfdisc, = _get_entities(q, "Wfdisc")
+    st = Stream([
+        wfdisc2trace(
+            getattr(row, Wfdisc.__name__) # get the wfdisc attribute of the row, whatever the Wfdisc table is called.
+        )
+        for row in q
+    ])
+
+    return st

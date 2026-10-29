@@ -7,7 +7,7 @@ from sqlalchemy import func, or_
 from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
 
-from pisces.trace import wfdisc2trace
+from pisces.fdsn import wfdisc2trace
 from pisces.util import make_wildcard_list
 
 import warnings
