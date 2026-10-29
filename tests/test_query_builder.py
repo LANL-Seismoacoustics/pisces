@@ -17,6 +17,7 @@ from pisces.tables.kbcore import (
     Site,
     Sitechan,
 )
+from pisces.util import literal_sql
 
 
 def client(session):
@@ -27,6 +28,10 @@ def client(session):
         netmag=Netmag,
         assoc=Assoc,
         arrival=Arrival,
+        network=Network,
+        affiliation=Affiliation,
+        site=Site,
+        sitechan=Sitechan,
     )
 
 
@@ -132,6 +137,7 @@ def test_stations_and_channels(session):
         .where(Site.lon.between(-107.0, -106.0))
         .where(Site.lat.between(34.0, 35.0))
         .where(Site.sta == Sitechan.sta)
+        .where(Sitechan.ondate.between(Site.ondate, Site.offdate))
         .where(Site.sta == Affiliation.sta)
         .where(Sitechan.chan.like("BH_"))
     )
