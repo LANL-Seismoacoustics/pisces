@@ -8,14 +8,19 @@ Examples
 --------
 Build an event query without selecting or passing table classes yourself::
 
-    query = (
+    q = (
         QueryBuilder(session, event=Event, origin=Origin, netmag=Netmag)
         .events(region=(west, east, south, north), prefor=True)
         .magnitudes(mw=(4, 6))
     )
-    # or, more readable?
-    query = (
-        QueryBuilder(session, event=Event, origin=Origin, netmag=Netmag)
+
+    # more readable?
+    q = (
+        QueryBuilder(session, 
+            event=Event, 
+            origin=Origin, 
+            netmag=Netmag
+            )
         .events(
             region=(west, east, south, north), 
             prefor=True,
@@ -24,6 +29,7 @@ Build an event query without selecting or passing table classes yourself::
             mw=(4, 6),
         )
     )
+
     # Realize the chain with normal SQLAlchemy.
     rows = session.execute(query.statement).all()
 
@@ -31,30 +37,42 @@ Build a station query from networks down through responses. Network and station 
 on the initial ``stations`` call; each later fluent method adds the tables its filter needs::
 
     responses = (
-        QueryBuilder(session, network=Network, affiliation=Affiliation, site=Site,
-                     sitechan=Sitechan, sensor=Sensor, instrument=Instrument)
-        .stations(net="IU", region=(west, east, south, north))
-        .channels(chan="BH?")
+        QueryBuilder(session, 
+            network=Network, 
+            affiliation=Affiliation, 
+            site=Site,
+            sitechan=Sitechan, 
+            sensor=Sensor, 
+            instrument=Instrument
+            )
+        .stations(
+            net="IU", 
+            region=(west, east, south, north)
+            )
+        .channels(
+            chan="BH?"
+            )
         .responses()
     )
     rows = session.execute(responses.statement).all()
 
 The underlying SQLAlchemy statement is available for inspection or further composition::
 
-    print(query.statement)
-    stmt = query.statement.order_by(Origin.time)
+    print(q.statement)
+    stmt = q.statement.order_by(Origin.time)
     rows = session.execute(stmt).all()
 
 The fluent API adds tables before applying their filters, so this is valid::
 
-    client.events().arrivals(phase="P", sta="ANMO")
+    q.events().arrivals(phase="P", sta="ANMO")
 
 while unsupported domain transitions are absent rather than becoming runtime query errors::
 
-    client.events().responses()  # no such method
+    q.events().responses()  # no such method
 
 Terminal ``catalog()`` and ``inventory()`` methods establish the intended domain API. Their
 converters are not implemented yet; until then, execute ``query.statement`` yourself.
+
 """
 from __future__ import annotations
 
@@ -259,7 +277,9 @@ class StationQuery:
         else:
             stmt = self.statement.add_columns(Sitechan)
         stmt = stations.filter_stations(stmt, sta=sta, chan=chan, times=times)
+
         return type(self)(self.client, stmt)
+
 
     def responses(self, *, sta=None, chan=None, times=None) -> Self:
         """Include response rows and apply :func:`pisces.stations.filter_responses`.
@@ -283,7 +303,9 @@ class StationQuery:
         if not selected_instrument:
             stmt = stmt.add_columns(Instrument)
         stmt = stations.filter_responses(stmt, sta=sta, chan=chan, times=times)
+
         return type(self)(self.client, stmt)
+
 
     def inventory(self):
         """Build an ObsPy Inventory at the deepest layer included in this chain.

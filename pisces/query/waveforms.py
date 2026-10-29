@@ -4,21 +4,6 @@ Query-building functions for getting waveforms.
 Based on the outputs of filter_stations
 
 
-
-pisces/
-    query/
-        __init__.py: from .* import filter_*
-        events.py: query = filter_events/magnitudes/arrivals
-        stations.py: query = filter_networks/stations/responses
-        waveforms.py: query = filter_waveforms
-        client.py: with QueryClient(...).query() as q: ...
-    fdsn/
-        __init__.py: from .* import Client, catalog, inventory, stream
-        client.py: Client(...).get_events/stations/waveforms
-        catalog.py: cat = catalog(query)
-        inventory.py: cat = inventory(query)
-        stream.py: st = stream(query)
-
 from obspy import UTCDateTime
 from pisces.query import filter_stations, filter_waveforms
 from pisces.fdsn import stream
