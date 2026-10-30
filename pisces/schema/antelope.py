@@ -16,7 +16,7 @@ from pisces.schema.util import PiscesMeta
 from pisces.schema.util import parse_int, parse_float, parse_str
 from copy import deepcopy as dc
 
-from pisces.trace import wfdisc2trace
+from pisces.fdsn import wfdisc2trace
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 

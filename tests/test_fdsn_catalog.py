@@ -2,10 +2,10 @@ import obspy.core.event as qml
 from obspy import UTCDateTime
 
 import pisces.tables.kbcore as kb
-import pisces.catalog as cat
+from pisces.fdsn.catalog import catalog, QMLGenerator
 
 resource_prefix='smi:local'
-qgen = cat.QMLGenerator(resource_prefix=resource_prefix)
+qgen = QMLGenerator(resource_prefix=resource_prefix)
 
 def test_QMLGenerator_event(eventdata):
     session, data = eventdata
@@ -70,7 +70,7 @@ def test_catalog_deduplicates_redundant_rows(eventdata):
     # the query really is redundant: one row per netmag, all with the same event/origin
     assert query.count() == len(netmags)
 
-    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    observed = catalog(query, resource_prefix=resource_prefix)
 
     assert len(observed.events) == 1
     qevent = observed.events[0]
@@ -93,7 +93,7 @@ def test_catalog(eventdata, eventqml):
                .filter(kb.Event.evid == event1001.evid)
                .filter(kb.Origin.orid == kb.Netmag.orid)
     )
-    observed = cat.catalog(query,
+    observed = catalog(query,
                            resource_prefix=resource_prefix,
                            description='A test catalog',
                        )
@@ -118,7 +118,7 @@ def test_catalog_pairs_assocs_with_same_row_arrivals(eventdata):
     rows = query.all()
     assert rows, "fixture should produce assoc/arrival rows"
 
-    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    observed = catalog(query, resource_prefix=resource_prefix)
 
     qevent = observed.events[0]
     qorigin = qevent.origins[0]
@@ -150,7 +150,7 @@ def test_catalog_adds_station_magnitudes_and_contributions(eventdata):
         .filter(kb.Arrival.arid == kb.Stamag.arid)
     )
 
-    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    observed = catalog(query, resource_prefix=resource_prefix)
     qevent = observed.events[0]
     qmagnitude = qevent.magnitudes[0]
 
@@ -181,7 +181,7 @@ def test_catalog_uses_database_amplitudes_when_selected(eventdata):
         .filter(kb.Amplitude.ampid == amplitude.ampid)
     )
 
-    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    observed = catalog(query, resource_prefix=resource_prefix)
     qevent = observed.events[0]
 
     assert len(qevent.amplitudes) == 1
@@ -204,7 +204,7 @@ def test_catalog_marks_preferred_magnitude(eventdata):
         .filter(kb.Origin.orid == kb.Netmag.orid)
     )
 
-    observed = cat.catalog(query, resource_prefix=resource_prefix)
+    observed = catalog(query, resource_prefix=resource_prefix)
 
     assert observed.events[0].preferred_magnitude_id == qml.ResourceIdentifier(
         id=f'{resource_prefix}/magnitude/netmag.magid=1'

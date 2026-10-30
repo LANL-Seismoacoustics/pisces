@@ -6,7 +6,7 @@ Tests for the pisces.request module
 from obspy import UTCDateTime
 import pytest
 
-from pisces import stations
+from pisces.query import stations
 from pisces.tables.kbcore import *
 
 def test_query_network_nets(session, get_stations_data):

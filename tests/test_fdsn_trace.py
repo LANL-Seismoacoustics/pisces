@@ -7,7 +7,7 @@ import tempfile
 
 import numpy as np
 
-from pisces.trace import wfdisc2obspyhdr, wfdisc2trace
+from pisces.fdsn.trace import wfdisc2obspyhdr, wfdisc2trace
 from pisces.tables.kbcore import Wfdisc
 
 

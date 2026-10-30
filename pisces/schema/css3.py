@@ -18,7 +18,7 @@ from obspy.core import UTCDateTime
 from pisces.schema.util import PiscesMeta
 from pisces.schema.util import parse_int, parse_float, parse_str
 
-from pisces.trace import wfdisc2trace
+from pisces.fdsn import wfdisc2trace
 from copy import deepcopy as dc
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
@@ -860,15 +860,15 @@ class Stamag(Base):
     auth = dc(auth)
     commid = dc(commid)
     lddate = dc(lddate)
-    
-    
+
+
 class Stassoc(Base):
     __abstract__ = True
-    
+
     @declared_attr
     def __table_args__(cls):
         return (PrimaryKeyConstraint('stassid'),)
-        
+
     stassid = dc(stassid)
     sta = dc(sta)
     etype = dc(etype)
@@ -885,7 +885,7 @@ class Stassoc(Base):
     auth = dc(auth)
     commid = dc(commid)
     lddate = dc(lddate)
-        
+
 
 class Wfdisc(Base):
     __abstract__ = True

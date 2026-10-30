@@ -34,7 +34,15 @@ e1 = ["e1"]
 pisces = "pisces.commands.main:cli"
 
 [tool.setuptools]
-packages = ["pisces", "pisces.schema", "pisces.io", "pisces.tables", "pisces.commands"]
+packages = [
+    "pisces",
+    "pisces.commands",
+    "pisces.fdsn",
+    "pisces.io",
+    "pisces.query",
+    "pisces.schema",
+    "pisces.tables"
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "pisces.__version__" }
