@@ -20,7 +20,7 @@ Optionally, include a plugin to read the [`e1`](https://github.com/LANL-Seismoac
 pip install pisces[e1]
 ```
 
-Install current master from GitHub:
+Install current main from GitHub:
 ```bash
 pip install git+https://github.com/LANL-seismoacoustics/pisces
 ```

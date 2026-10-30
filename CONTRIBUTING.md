@@ -54,7 +54,7 @@ Please see the project Wiki for a description of the git branching model.
     ```
     * For fixes and reorganizations:
     ```
-    $ git checkout -b name-of-your-bugfix-or-feature origin/master
+    $ git checkout -b name-of-your-bugfix-or-feature origin/main
     ```
 
 5. Commit your changes and push your branch to the remote.
