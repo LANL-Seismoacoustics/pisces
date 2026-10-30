@@ -131,7 +131,6 @@ def distance_filter(
     return filter(distfn, query)
 
     """
-    pass
 
 def glob_to_like(text, escape='\\'):
     """

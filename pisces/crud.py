@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Module containing functions for in-memory and in-database table creation and
 in-database table dropping.
@@ -24,9 +23,10 @@ Glossary
 import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base
 
-from pisces.schema.util import PiscesMeta
-import pisces.tables.css3 as css3
 import pisces.tables.kbcore as kb
+from pisces.schema.util import PiscesMeta
+from pisces.tables import css3
+
 
 def make_table_names(*tables, **kwargs):
     """
@@ -82,7 +82,7 @@ def make_table_names(*tables, **kwargs):
         elif schema == 'kbcore':
             CORETABLES = kb.CORETABLES
         else:
-            msg = "Unknown schema: {}".format(schema)
+            msg = f"Unknown schema: {schema}"
             raise ValueError(msg)
 
         tables = CORETABLES.keys()
@@ -131,7 +131,7 @@ def split_table_names(*tablenames, schema=None):
         elif schema == 'kbcore':
             schematables = kb.CORETABLES.keys()
         else:
-            msg = "Unknown schema: {}".format(schema)
+            msg = f"Unknown schema: {schema}"
             raise ValueError(msg)
 
     out = []
@@ -213,12 +213,12 @@ def make_tables(*tables, prefix='', owner=None, schema='css3'):
     elif schema == 'kbcore':
         CORETABLES = kb.CORETABLES
     else:
-        msg = "Unknown schema: {}".format(schema)
+        msg = f"Unknown schema: {schema}"
         raise ValueError(msg)
 
     non_schema_tables = set(tables) - set(CORETABLES.keys())
     if non_schema_tables:
-        msg = "Unknown tables: {}".format(non_schema_tables)
+        msg = f"Unknown tables: {non_schema_tables}"
         raise ValueError(msg)
 
     # I don't use 'owner' here, b/c we will be making classes. 'owner' is used

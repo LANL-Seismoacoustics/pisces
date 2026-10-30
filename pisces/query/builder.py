@@ -84,12 +84,12 @@ from sqlalchemy.orm import Session
 
 from pisces.fdsn import catalog
 from pisces.query import (
-    filter_events,
-    filter_networks,
-    filter_stations,
-    filter_magnitudes,
     filter_arrivals,
+    filter_events,
+    filter_magnitudes,
+    filter_networks,
     filter_responses,
+    filter_stations,
 )
 from pisces.util import _get_entities
 

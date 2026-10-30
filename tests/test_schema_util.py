@@ -4,12 +4,11 @@ Test for general schema utility functions and classes.
 """
 import pytest
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import DeferredReflection
+from sqlalchemy.ext.declarative import DeferredReflection, declared_attr
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.declarative import declared_attr
 
 from pisces import db_connect
-import pisces.schema.util as util
+from pisces.schema import util
 
 
 @pytest.fixture(scope='function')

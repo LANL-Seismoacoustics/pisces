@@ -1,22 +1,26 @@
-# coding: utf-8
 """
 Antelope v4.11 Datascope database schema
 
 
 """
+from copy import deepcopy as dc
 from datetime import datetime
-from sqlalchemy import Date, DateTime, Float, Numeric, String, Integer
-from sqlalchemy import Column, Table, func
-from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, Index
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.declarative import declared_attr
 
 from obspy.core import UTCDateTime
-from pisces.schema.util import PiscesMeta
-from pisces.schema.util import parse_int, parse_float, parse_str
-from copy import deepcopy as dc
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+)
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_base
 
 from pisces.fdsn import wfdisc2trace
+from pisces.schema.util import PiscesMeta, parse_float, parse_int, parse_str
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 
@@ -374,7 +378,7 @@ class Arrival(Base):
     @declared_attr
     def __table_args__(cls):
         return (PrimaryKeyConstraint('arid'),
-                UniqueConstraint(u'sta', u'time', u'chan', u'iphase', u'auth'),)
+                UniqueConstraint('sta', 'time', 'chan', 'iphase', 'auth'),)
 
     sta = dc(sta)
     time = dc(time)
@@ -488,7 +492,7 @@ class Lastid(Base):
     @declared_attr
     def __table_args__(cls):
         return (PrimaryKeyConstraint('keyname'),
-                UniqueConstraint(u'keyname', u'keyvalue'),)
+                UniqueConstraint('keyname', 'keyvalue'),)
 
     keyname = dc(keyname)
     keyvalue = dc(keyvalue)

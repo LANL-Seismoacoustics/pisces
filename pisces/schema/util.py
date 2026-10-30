@@ -9,6 +9,7 @@ from collections import namedtuple
 
 import sqlalchemy as sa
 from sqlalchemy.orm import DeclarativeMeta, declarative_base
+
 try:
     from sqlalchemy.orm.decl_base import _declarative_constructor
 except ModuleNotFoundError:
@@ -135,7 +136,7 @@ def string_formatter(meta, structure):
             structfmt.append(itabfmt)
         elif item in colfmtdct:
             # e.g. {0:format} {1:format}
-            structfmt.append("{{{}:{}}}".format(idx, colfmtdct[item]))
+            structfmt.append(f"{{{idx}:{colfmtdct[item]}}}")
     return ' '.join(structfmt)
 
 # -------- Methods for PiscesMeta --------
@@ -284,7 +285,7 @@ def from_string(cls, line, default_on_error=None):
                 val = None
                 # val = c.info['default']
             else:
-                msg = ", column {}: '{}', positions [{}:{}]".format(col, line[pos:pos + w], pos, pos + w)
+                msg = f", column {col}: '{line[pos:pos + w]}', positions [{pos}:{pos + w}]"
                 # XXX: breaks for Python 3
                 raise type(e)(str(e) + msg)
 
@@ -327,9 +328,9 @@ def _eq(self, other):
 def _update_docstring(cls):
     s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.')
                    for c in cls.__table__.columns])
-    s += "\n\nFORMAT STRING:\n{}\n".format(cls._format_string)
+    s += f"\n\nFORMAT STRING:\n{cls._format_string}\n"
     try:
-        s += "\n\nSQL CREATE STATEMENT:\n{}\n".format(sa.schema.CreateTable(cls.__table__))
+        s += f"\n\nSQL CREATE STATEMENT:\n{sa.schema.CreateTable(cls.__table__)}\n"
     except sa.exc.CompileError:
         # One or more columns are of a type that doesn't render to strings.
         pass
@@ -371,9 +372,8 @@ class PiscesMeta(DeclarativeMeta):
         except ValueError:
             # not a schema-qualified name
             dct['_tableowner'] = None
-            pass
 
-        return super(PiscesMeta, cls).__new__(cls, clsname, parents, dct)
+        return super().__new__(cls, clsname, parents, dct)
 
     def __init__(cls, clsname, parents, dct):
 
@@ -383,7 +383,7 @@ class PiscesMeta(DeclarativeMeta):
         # _not_ called for class instances (rows).  The's dct['__init__']
 
         # this is SQLA's DeclarativeMeta.__init__
-        super(PiscesMeta, cls).__init__(clsname, parents, dct)
+        super().__init__(clsname, parents, dct)
 
         # store Column info dictionary in base._column_info_registry
         for key, val in dct.items():

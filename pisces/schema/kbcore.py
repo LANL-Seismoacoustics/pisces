@@ -61,18 +61,23 @@ Define a new abstract class in this schema.
 >>>     lddate = dc(kb.lddate)
 
 """
+from copy import deepcopy as dc
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, String, Integer
-from sqlalchemy import Column
-from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_base
 
-from pisces.schema.util import PiscesMeta
-from pisces.schema.util import parse_str, parse_int, parse_float
 from pisces.fdsn import wfdisc2trace
-from copy import deepcopy as dc
+from pisces.schema.util import PiscesMeta, parse_float, parse_int, parse_str
 
 # TODO: check __table_args__ syntax for final empty {}
 # TODO: use http://docs.sqlalchemy.org/en/rel_0_8/orm/extensions/hybrid.html?

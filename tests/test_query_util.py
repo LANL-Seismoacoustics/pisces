@@ -2,8 +2,9 @@
 """
 import sqlalchemy as sa
 
-from pisces.tables.kbcore import Site, Sitechan
 from pisces.query import util
+from pisces.tables.kbcore import Site, Sitechan
+
 
 def test_make_wildcard_list():
     assert util.make_wildcard_list('*HZ') == ['%HZ']

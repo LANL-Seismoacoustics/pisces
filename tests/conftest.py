@@ -2,13 +2,13 @@
 Useful Pytest fixtures for Pisces tests.
 
 """
+import obspy.core.event as qml
 import pytest
 from obspy import UTCDateTime
-import obspy.core.event as qml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import pisces as ps
+from pisces import __version__
 from pisces.tables.kbcore import *
 
 engine = create_engine('sqlite:///:memory:', echo=False)
@@ -349,7 +349,7 @@ def eventqml(eventdata):
     )
     cat = qml.Catalog(
         creation_info=qml.CreationInfo(
-            author=f'Pisces v{ps.__version__}',
+            author=f'Pisces v{__version__}',
             creation_time=UTCDateTime()
         ),
         resource_id=qml.ResourceIdentifier(

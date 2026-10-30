@@ -3,11 +3,12 @@ Tests for the pisces.request module
 
 
 """
-from obspy import UTCDateTime
 import pytest
+from obspy import UTCDateTime
 
 from pisces.query import stations
 from pisces.tables.kbcore import *
+
 
 def test_query_network_nets(session, get_stations_data):
     """ Tests involving network-level queries. """

@@ -1,29 +1,24 @@
-# -*- coding: utf-8 -*-
 """
 Common Pisces utility functions.
 
 """
-from collections import defaultdict
-import logging
-import math
-from getpass import getpass
-import warnings
 import functools
 import inspect
+import logging
+import math
 import traceback
+import warnings
+from getpass import getpass
 from importlib import import_module
 
 import numpy as np
-import sqlalchemy as sa
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.orm.exc import UnmappedInstanceError
-
 import obspy.geodetics as geod
+import sqlalchemy as sa
 from obspy.core import AttribDict, UTCDateTime
 from obspy.taup import TauPyModel
+from sqlalchemy.exc import IntegrityError, ProgrammingError
+from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from pisces.schema.util import PiscesMeta
 
@@ -40,7 +35,7 @@ def deprecated(message: str = ''):
         def function_wrapper(*args, **kwargs):
             current_call_source = '|'.join(traceback.format_stack(inspect.currentframe()))
             if current_call_source not in function_wrapper.last_call_source:
-                warnings.warn("Function {} is now deprecated! {}".format(func.__name__, message),
+                warnings.warn(f"Function {func.__name__} is now deprecated! {message}",
                               category=DeprecationWarning, stacklevel=2)
                 function_wrapper.last_call_source.add(current_call_source)
 
@@ -116,7 +111,7 @@ def db_connect(*args, **kwargs):
             userpsswd = ''
         else:
             if user and not psswd:
-                psswd = getpass("Enter password for {0}: ".format(user))
+                psswd = getpass(f"Enter password for {user}: ")
                 userpsswd = ':'.join([user, psswd])
             elif psswd and not user:
                 user = getpass("Enter username for given password: ")
@@ -133,7 +128,7 @@ def db_connect(*args, **kwargs):
         else:
             serverport = ''
 
-        conn = "{0}://{1}{2}/{3}".format(backend, userpsswd, serverport, instance)
+        conn = f"{backend}://{userpsswd}{serverport}/{instance}"
 
     engine = sa.create_engine(conn)
     session = Session(bind=engine)
@@ -177,7 +172,7 @@ def url_connect(url):
     """
     this_url = sa.engine.url.make_url(url)
     if this_url.username and not this_url.password:
-        this_url.password = getpass("Enter password for {0}: ".format(this_url.username))
+        this_url.password = getpass(f"Enter password for {this_url.username}: ")
 
     e = sa.create_engine(this_url)
 

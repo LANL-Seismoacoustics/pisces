@@ -24,4 +24,4 @@ Per-format header<->table-row conversion lives one module per format
 (`pisces.io.sac`, `pisces.io.mseed`), each exposing `trace2tables`.
 
 """
-from pisces.io.waveforms import read_waveform, WAVEFORM_READERS
+from pisces.io.waveforms import WAVEFORM_READERS, read_waveform

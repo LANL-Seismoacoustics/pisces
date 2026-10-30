@@ -3,21 +3,19 @@ Pisces Client mirrors the ObsPy FDSN Client interface.
 
 """
 import builtins
-from functools import cached_property
 import logging
-import types
 import os
 import warnings
+from functools import cached_property
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
 from obspy import UTCDateTime
 from obspy.core.event.header import EventType
+from sqlalchemy.orm import Session
 
-from pisces.query import filter_events, filter_magnitudes, filter_arrivals
 import pisces.request as req
-from pisces.query import util
 from pisces.fdsn.catalog import KBCORE_EVENT_TYPE, catalog
+from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
 
 log = logging.getLogger(__name__)
 
@@ -106,7 +104,7 @@ def _evid_list(eventid):
     return evids
 
 
-class Client(object):
+class Client:
     """
     Basic database request client.
 
@@ -640,7 +638,6 @@ class Client(object):
                 msg = "Site, sitechan, sensor, and instrument tables required for response level metadata."
                 raise ValueError(msg)
 
-    #
 
     # determine time filters
 

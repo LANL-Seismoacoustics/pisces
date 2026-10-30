@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from obspy.io.sac import SACTrace
 
-import pisces.io.sac as sac
+from pisces.io import sac
 
 
 def make_sac_trace(**kwargs):

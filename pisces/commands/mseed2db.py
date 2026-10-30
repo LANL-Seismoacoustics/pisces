@@ -5,11 +5,13 @@ Functions that support bulk conversion of miniSEED files to database tables.
 import os
 
 from obspy import read
-import sqlalchemy.exc as exc
+from sqlalchemy import exc
 
-from pisces.util import get_lastids, url_connect
-from .util import get_or_create_tables, dicts2rows, get_files
-import pisces.io.mseed as mseed
+from pisces.io import mseed
+from pisces.util import get_lastids
+
+from .util import dicts2rows, get_files, get_or_create_tables
+
 
 def make_atomic(last, **rows):
     """
@@ -92,11 +94,11 @@ def main(session, files=None, file_list=None, prefix=None, absolute_paths=False)
                     try:
                         session.add_all(instances)
                         session.commit()
-                    except exc.IntegrityError as e:
+                    except exc.IntegrityError:
                         # duplicate or nonexistant primary keys
                         session.rollback()
-                        print("rollback {}".format(table))
-                    except exc.OperationalError as e:
+                        print(f"rollback {table}")
+                    except exc.OperationalError:
                         # no such table, or database is locked
                         session.rollback()
-                    print("rollback {}".format(table))
+                    print(f"rollback {table}")

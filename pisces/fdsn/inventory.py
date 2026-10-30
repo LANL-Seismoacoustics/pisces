@@ -1,11 +1,14 @@
-from obspy.core.inventory import (
-    Inventory, Network as ObsNetwork, Station, Channel,
-    Site as ObsPySite, Equipment, Comment)
-from obspy import UTCDateTime
-from pisces.io.response import read_pazfir
 import warnings
 from collections import defaultdict
+
+from obspy import UTCDateTime
+from obspy.core.inventory import Channel, Comment, Equipment, Inventory, Station
+from obspy.core.inventory import Network as ObsNetwork
+from obspy.core.inventory import Site as ObsPySite
+
+from pisces.io.response import read_pazfir
 from pisces.util import _get_entities, jdate_to_utc
+
 
 def schema_import(schema):
     schema = schema.lower()
@@ -14,13 +17,34 @@ def schema_import(schema):
         raise ValueError(f"schema must be one of {VALID_SCHEMAS}")
     
     if schema == 'kbcore':
-        from pisces.schema.kbcore import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+        from pisces.schema.kbcore import (
+            Affiliation,
+            Instrument,
+            Network,
+            Sensor,
+            Site,
+            Sitechan,
+        )
 
     if schema == 'css3':
-        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+        from pisces.schema.css3 import (
+            Affiliation,
+            Instrument,
+            Network,
+            Sensor,
+            Site,
+            Sitechan,
+        )
     
     if schema == 'antelope':
-        from pisces.schema.css3 import Network, Affiliation, Site, Sitechan, Sensor, Instrument
+        from pisces.schema.css3 import (
+            Affiliation,
+            Instrument,
+            Network,
+            Sensor,
+            Site,
+            Sitechan,
+        )
     
     return Network, Affiliation, Site, Sitechan, Sensor, Instrument
 
