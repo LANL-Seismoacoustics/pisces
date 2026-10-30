@@ -1,8 +1,8 @@
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from obspy.core import UTCDateTime
 
-from pisces.util import _get_entities, range_filters, jdate_to_utc
-from pisces.query.util import make_wildcard_list
+from pisces.util import _get_entities, jdate_to_utc
+from pisces.query.util import make_wildcard_list, range_filters
 
 
 def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=None, **tables):

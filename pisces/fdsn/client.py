@@ -14,9 +14,9 @@ from sqlalchemy.orm import Session
 from obspy import UTCDateTime
 from obspy.core.event.header import EventType
 
-from pisces.query import events
+from pisces.query import filter_events, filter_magnitudes, filter_arrivals
 import pisces.request as req
-from pisces import util
+from pisces.query import util
 from pisces.fdsn.catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
@@ -378,15 +378,15 @@ class Client(object):
 
         # geographic / categorical stuff
         q = self.session.query(Event, Origin)
-        q = events.filter_events(q,
-                                 region=region,
-                                 times=times,
-                                 depth=depth,
-                                 evid=evid,
-                                 prefor=prefor,
-                                 auth=auth,
-                                 etype=etype,
-                                 )
+        q = filter_events(q,
+                          region=region,
+                          times=times,
+                          depth=depth,
+                          evid=evid,
+                          prefor=prefor,
+                          auth=auth,
+                          etype=etype,
+                          )
         # [(event, origin)] expected structure
 
         if updatedafter:
@@ -395,7 +395,7 @@ class Client(object):
         # Join Netmag even if magnitude filters are empty so the catalog can select a preferred
         # magnitude. ``includeallmagnitudes=False`` ranks and retains one Netmag per event below.
         q = q.add_entity(Netmag)
-        q = events.filter_magnitudes(q, **magnitudes)
+        q = filter_magnitudes(q, **magnitudes)
         if not includeallmagnitudes:
             preferred_types = tuple(magtype.casefold() for magtype in preferred_magnitude)
             priority = sa.case(
@@ -422,7 +422,7 @@ class Client(object):
         if includearrivals:
             # XXX: potential cartesian join with Netmag stuff
             q = q.add_entity(Assoc).add_entity(Arrival)
-            q = events.filter_arrivals(q)
+            q = filter_arrivals(q)
             # [(event, origin, netmag, assoc, arrival)]
 
         # XXX: implement proper preferred origin sorting, limit, offset
@@ -732,7 +732,7 @@ class Client(object):
 
         # Replace '*' and '?' with '%' and '_'
         wildcardables = (network, station, location, channel)
-        wildcardables = [util.glob_to_like(item) for item in wildcardables]
+        wildcardables = [util.glob_to_like(item) for item in wildcardables] # TODO: replace with something in pisces.query.util
         network, station, location, channel = wildcardables
 
         # turn any "comma lists" into Python lists
@@ -751,7 +751,7 @@ class Client(object):
         if networks:
             try:
                 q = q.filter(Wfdisc.sta == Affil.sta)
-                q = q.filter(util.string_expression(Affil.net, networks))
+                q = q.filter(util.string_expression(Affil.net, networks)) # TODO: replace with something in pisces.query.util?
             except AttributeError:
                 # Affil is None and has no ".sta" or ".net"
                 msg = "No Affiliation table provided for network filtering."
