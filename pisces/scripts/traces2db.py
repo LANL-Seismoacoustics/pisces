@@ -307,8 +307,8 @@ def main(argv=None):
                 try:
                     from pisces_gndd import gndd_connect
                     session = gndd_connect(options.user)
-                except ImportError as e:
-                    raise e
+                except ImportError:
+                    raise
             else:
                 if options.conn:
                     session = ps.db_connect(conn=options.conn)
@@ -324,9 +324,9 @@ def main(argv=None):
 
             try:
                 files = get_file_iterator(options)
-            except OSError as e:
+            except OSError:
                 # file list doesn't exist
-                raise e
+                raise
                 exit_code = 1
             except ValueError:
                 # input neither a file list nor input files
@@ -457,11 +457,11 @@ def main(argv=None):
                                     # TODO: make this more descriptive
                                     print(f" Duplicate row in {tableval.__table__.name}")
                                     session.rollback()
-                                except OperationalError as e:
+                                except OperationalError:
                                     # no such table name.  shouldn't happen.
                                     # database is locked.
                                     session.rollback()
-                                    raise e
+                                    raise
                                 # except InvalidRequestError:
                                 #    #XXX: what is this error?
                                 #    #maybe tried to insert None
