@@ -323,7 +323,7 @@ def load_tables(session, *tables, **kwargs):
 
     metadata = sa.MetaData()
 
-    table_classes = dict()
+    table_classes = {}
     for table, tablename in tablenames.items():
         itable = sa.Table(tablename, metadata, autoload=True,
                           autoload_with=session.bind, schema=owner)
