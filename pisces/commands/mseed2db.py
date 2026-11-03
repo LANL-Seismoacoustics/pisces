@@ -49,7 +49,7 @@ def main(session, files=None, file_list=None, prefix=None, absolute_paths=False)
     if file_list:
         files = get_files(file_list)
     else:
-        files = files
+        files = files or []
 
     tables = get_or_create_tables(session, prefix=prefix, create=True)
 

@@ -2,6 +2,7 @@
 Helper functions for command-line utilities.
 
 """
+import pisces as ps
 from pisces.tables.kbcore import CORETABLES
 
 
