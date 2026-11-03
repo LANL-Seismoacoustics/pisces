@@ -5,7 +5,7 @@ Based on the outputs of filter_stations
 
 
 from obspy import UTCDateTime
-from pisces.query import filter_stations, filter_waveforms
+from .stations import filter_stations
 from pisces.fdsn import stream
 
 now = UTCDateTime.now().timestamp
@@ -46,8 +46,9 @@ from obspy import UTCDateTime
 from sqlalchemy import and_, func, literal, or_
 from sqlalchemy.orm import Query
 
-from pisces.query.util import make_wildcard_list
 from pisces.util import _get_entities
+
+from .util import make_wildcard_list
 
 
 def filter_waveforms(

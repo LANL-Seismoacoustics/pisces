@@ -11,8 +11,9 @@ the result set, but won't be added to the query SELECT statement.
 from obspy import UTCDateTime
 from sqlalchemy import and_, or_, true
 
-from pisces.query.util import make_wildcard_list, range_filters
 from pisces.util import _get_entities
+
+from .util import make_wildcard_list, range_filters
 
 
 # TODO: add Origerr to this?
