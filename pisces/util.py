@@ -22,6 +22,8 @@ from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from pisces.schema.util import PiscesMeta
 
+log = logging.getLogger(__name__)
+
 
 def deprecated(message: str = ''):
     """
@@ -112,12 +114,12 @@ def db_connect(*args, **kwargs):
         else:
             if user and not psswd:
                 psswd = getpass(f"Enter password for {user}: ")
-                userpsswd = ':'.join([user, psswd])
+                userpsswd = f'{user}:{psswd}'
             elif psswd and not user:
                 user = getpass("Enter username for given password: ")
-                userpsswd = ':'.join([user, psswd])
+                userpsswd = f'{user}:{psswd}'
             elif user and psswd:
-                userpsswd = ':'.join([user, psswd])
+                userpsswd = f'{user}:{psswd}'
             else:
                 userpsswd = ':'
 
@@ -488,7 +490,7 @@ def add_rows(session, rows, recurse=False):
         # ProgrammingError: string encoding problem
         # UnmappedInstanceError: tried to add something like a list or None
         session.rollback()
-        logging.warning(str(e))
+        log.warning(str(e))
     except IntegrityError:
         print(str(e))
         session.rollback()
@@ -620,10 +622,13 @@ def get_or_create_tables(session, create=True, **tables):
 
     # TODO: check options for which tables to produce.
 
+    from pisces.tables.kbcore import CORETABLES
+
+    prefix = tables.get('prefix')
     tables = {}
-    for coretable in CORETABLES:
+    for coretable in CORETABLES.values():
         # build the table name
-        if options['prefix'] == None:
+        if prefix is None:
             fulltablename = coretable.name
         else:
             fulltablename = prefix + coretable.name
