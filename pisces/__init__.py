@@ -16,7 +16,7 @@ architectures, or licensing concerns.
 
 """
 
-__version__ = "0.4.5.3"
+__version__ = "0.4.9"
 
 import logging
 
