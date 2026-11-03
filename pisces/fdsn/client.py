@@ -3,27 +3,26 @@ Pisces Client mirrors the ObsPy FDSN Client interface.
 
 """
 import builtins
-from functools import cached_property
 import logging
-import types
 import os
 import warnings
+from functools import cached_property
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
-from obspy import UTCDateTime
+from obspy import Stream, UTCDateTime
 from obspy.core.event.header import EventType
+from sqlalchemy.orm import Session
 
-from pisces.query import filter_events, filter_magnitudes, filter_arrivals
 import pisces.request as req
-from pisces.query import util
-from pisces.fdsn.catalog import KBCORE_EVENT_TYPE, catalog
+from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
+
+from .catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 
 
 def _None_if_none(*values):
-    return None if all([val is None for val in values]) else values
+    return None if all(val is None for val in values) else values
 
 
 def origins_to_fdsntext(origins, header=False):
@@ -106,7 +105,7 @@ def _evid_list(eventid):
     return evids
 
 
-class Client(object):
+class Client:
     """
     Basic database request client.
 
@@ -172,29 +171,29 @@ class Client(object):
         self,
         starttime: UTCDateTime = None,
         endtime: UTCDateTime = None,
-        minlatitude: float = None,
-        maxlatitude: float = None,
-        minlongitude: float = None,
-        maxlongitude: float = None,
-        latitude: float = None,
-        longitude: float = None,
-        minradius: float = None,
-        maxradius: float = None,
-        mindepth: float = None,
-        maxdepth: float = None,
-        minmagnitude: float = None,
-        maxmagnitude: float = None,
-        magnitudetype: str = None,
-        eventtype: str = None,
+        minlatitude: float | None = None,
+        maxlatitude: float | None = None,
+        minlongitude: float | None = None,
+        maxlongitude: float | None = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        minradius: float | None = None,
+        maxradius: float | None = None,
+        mindepth: float | None = None,
+        maxdepth: float | None = None,
+        minmagnitude: float | None = None,
+        maxmagnitude: float | None = None,
+        magnitudetype: str | None = None,
+        eventtype: str | None = None,
         includeallorigins: bool = True,
         includeallmagnitudes: bool = False,
         includearrivals: bool = False,
         preferred_magnitude: tuple = ("mb", "mw", "ms"),
-        eventid: str = None,
-        limit: int = None,
-        offset: int = None,
-        orderby: bool = None,
-        contributor: str = None,
+        eventid: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        orderby: bool | None = None,
+        contributor: str | None = None,
         updatedafter: UTCDateTime = None,
         asquery: bool = False,
         **kwargs,
@@ -356,7 +355,7 @@ class Client(object):
             msg = "orderby must be one of ('time', 'time-asc', 'magnitude', 'magnitude-asc')"
             raise ValueError(msg)
 
-        if eventtype and any([e.lower() not in EventType for e in eventtype.split(',')]):
+        if eventtype and any(e.lower() not in EventType for e in eventtype.split(',')):
             msg = f"eventtype '{eventtype}' not recognized.  choose from {list(KBCORE_EVENT_TYPE.keys())}"
             raise ValueError(msg)
 
@@ -455,23 +454,23 @@ class Client(object):
         startafter: UTCDateTime = None,
         endbefore: UTCDateTime = None,
         endafter: UTCDateTime = None,
-        network: str = None,
-        station: str = None,
-        channel: str = None,
-        minlatitude: float = None,
-        maxlatitude: float = None,
-        minlongitude: float = None,
-        maxlongitude: float = None,
-        latitude: float = None,
-        longitude: float = None,
-        minradius: float = None,
-        maxradius: float = None,
-        level: str = None,
+        network: str | None = None,
+        station: str | None = None,
+        channel: str | None = None,
+        minlatitude: float | None = None,
+        maxlatitude: float | None = None,
+        minlongitude: float | None = None,
+        maxlongitude: float | None = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        minradius: float | None = None,
+        maxradius: float | None = None,
+        level: str | None = None,
         # includerestricted: bool = None,
         # includeavailability: bool = None,
         updatedafter: UTCDateTime = None,
-        matchtimeseries: bool = None,
-        filename: str = None,
+        matchtimeseries: bool | None = None,
+        filename: str | None = None,
         format: str = "xml",
         **kwargs
     ):
@@ -640,7 +639,6 @@ class Client(object):
                 msg = "Site, sitechan, sensor, and instrument tables required for response level metadata."
                 raise ValueError(msg)
 
-    #
 
     # determine time filters
 
@@ -868,7 +866,7 @@ class Client(object):
         st = Stream()
 
         for network, station, location, channel, starttime, endtime in bulk:
-            ist = client.get_waveforms(
+            ist = self.get_waveforms(
                 network,
                 station,
                 location,

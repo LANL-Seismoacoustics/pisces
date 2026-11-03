@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Pisces is a practical and extensible data management library in Python.  It
 leverages existing widely-used free and open-source technologies, such as SQL
@@ -17,13 +16,13 @@ architectures, or licensing concerns.
 
 """
 
-__version__ = "0.4.5.3"
+__version__ = "0.4.9"
 
 import logging
 
-from pisces.util import db_connect, get_tables, travel_times, make_table
-from pisces.schema.util import string_formatter
-from pisces.fdsn import wfdisc2trace
-from pisces.schema import kbcore
-from pisces.io.waveforms import read_waveform
 from pisces import request
+from pisces.fdsn import wfdisc2trace
+from pisces.io.waveforms import read_waveform
+from pisces.schema import kbcore
+from pisces.schema.util import string_formatter
+from pisces.util import db_connect, get_tables, make_table, travel_times

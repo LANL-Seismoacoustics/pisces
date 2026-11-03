@@ -2,6 +2,7 @@
 Helper functions for command-line utilities.
 
 """
+import pisces as ps
 from pisces.tables.kbcore import CORETABLES
 
 
@@ -93,9 +94,9 @@ def get_files(file_list, file_check=None):
         try:
             with open(file_list[0], 'r') as listfile:
                 files = (line.strip() for line in listfile if line.strip())
-        except IOError:
-            msg = "{0} does not exist.".format(file_list[0])
-            raise IOError(msg)
+        except OSError:
+            msg = f"{file_list[0]} does not exist."
+            raise OSError(msg)
     else:
         files = file_list
 

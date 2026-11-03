@@ -83,15 +83,10 @@ from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from pisces.fdsn import catalog
-from pisces.query import (
-    filter_events,
-    filter_networks,
-    filter_stations,
-    filter_magnitudes,
-    filter_arrivals,
-    filter_responses,
-)
 from pisces.util import _get_entities
+
+from .events import filter_arrivals, filter_events, filter_magnitudes
+from .stations import filter_networks, filter_responses, filter_stations
 
 
 class QueryBuilder:

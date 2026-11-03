@@ -2,24 +2,19 @@
 Functions that support bulk conversion of SAC files to database tables.
 
 """
+import importlib.machinery
+import importlib.util
 import os
 import sys
-import glob
-import argparse
-import importlib.util
-import importlib.machinery
-
-from sqlalchemy import create_engine
-import sqlalchemy.exc as exc
-import sqlalchemy.orm.exc as oexc
 
 from obspy import read
 from obspy.io.sac.core import _is_sac
+from sqlalchemy import exc
 
-import pisces as ps
-from pisces.util import get_lastids, url_connect
-import pisces.io.sac as sac
-from .util import get_or_create_tables, dicts2rows, get_files
+from pisces.io import sac
+from pisces.util import get_lastids
+
+from .util import dicts2rows, get_files, get_or_create_tables
 
 
 def get_plugins(plugins):
@@ -40,7 +35,7 @@ def get_plugins(plugins):
             modname = pth.pop(-1)
             spec = importlib.machinery.PathFinder().find_spec(modname, pth)
             if spec is None:
-                raise ImportError("Can't find module {} in {}".format(modname, pth))
+                raise ImportError(f"Can't find module {modname} in {pth}")
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
             plugin_functions.append(getattr(mod, fn))
@@ -133,7 +128,7 @@ def main(**kwargs):
         List of SAC file names.
 
     """
-    print("sac2db: {}".format(kwargs))
+    print(f"sac2db: {kwargs}")
     session = kwargs['session']
 
     if kwargs.get('file_list'):
@@ -199,11 +194,11 @@ def main(**kwargs):
                 try:
                     session.add_all(instances)
                     session.commit()
-                except exc.IntegrityError as e:
+                except exc.IntegrityError:
                     # duplicate or nonexistant primary keys
                     session.rollback()
-                    print("rollback {}".format(table))
-                except exc.OperationalError as e:
+                    print(f"rollback {table}")
+                except exc.OperationalError:
                     # no such table, or database is locked
                     session.rollback()
-                    print("rollback {}".format(table))
+                    print(f"rollback {table}")

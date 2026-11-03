@@ -173,5 +173,4 @@ class Registry:
         return len(self._REGISTRY)
 
     def __iter__(self):
-        for key in self._REGISTRY:
-            yield key
+        yield from self._REGISTRY

@@ -2,8 +2,8 @@
 Concrete canonical tables for KB Core schema.
 
 """
-from pisces.schema.util import CoreTable
 import pisces.schema.kbcore as kb
+from pisces.schema.util import CoreTable
 
 __all__ = [
     'Affiliation',
@@ -20,8 +20,8 @@ __all__ = [
     'Origin',
     'Remark',
     'Sensor',
-    'Sitechan',
     'Site',
+    'Sitechan',
     'Sregion',
     'Stamag',
     'Wfdisc',

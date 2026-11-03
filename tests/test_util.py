@@ -4,7 +4,7 @@ Test functions in pisces.util
 """
 from configparser import ConfigParser
 
-import pisces.util as util
+from pisces import util
 
 
 def test_load_config_file():

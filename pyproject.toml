@@ -23,6 +23,7 @@ classifiers = [
 ]
 keywords = ["seismology", "geophysics", "database"]
 dependencies = ["numpy", "obspy>=1.4.1", "sqlalchemy>=1.4", "Click"]
+requires-python = ">=3.11"
 
 [project.urls]
 Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
@@ -46,3 +47,7 @@ packages = [
 
 [tool.setuptools.dynamic]
 version = { attr = "pisces.__version__" }
+
+[tool.ruff.lint.extend-per-file-ignores]
+# Ignore `E402` (imported but not used) in all `__init__.py` files.
+"__init__.py" = ["F401"]

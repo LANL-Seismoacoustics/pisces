@@ -35,13 +35,12 @@ it's kept here only as a convenience for reading a standalone SAC file
 wholesale through ObsPy, ignoring `byteoffset`/`nsamp`.
 
 """
-import os
 from io import BytesIO
 
 import numpy as np
 from obspy.core import read
 
-from pisces.io.util import Registry
+from .util import Registry
 
 try:
     import e1
@@ -117,7 +116,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
     try:
         reader = WAVEFORM_READERS[DATATYPE]
     except KeyError:
-        raise ValueError("Unrecognized data format: {0}".format(DATATYPE))
+        raise ValueError(f"Unrecognized data format: {DATATYPE}")
 
     return reader(DATAFILE, BYTEOFFSET, NUM)
 

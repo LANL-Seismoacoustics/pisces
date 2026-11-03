@@ -15,9 +15,11 @@ directly with plain ObsPy instead.
 
 """
 import os
-from obspy.core import UTCDateTime, Trace, Stats, Stream
-from pisces.io.waveforms import read_waveform
+
+from obspy.core import Stats, Stream, Trace, UTCDateTime
+
 from pisces.io.util import _buildhdr
+from pisces.io.waveforms import read_waveform
 from pisces.util import _get_entities
 
 

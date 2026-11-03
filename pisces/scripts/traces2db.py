@@ -13,20 +13,18 @@ obspy.io.sac, obspy.io.mseed, ect...).
 April 14, 2015, OM
 
 """
-import sys
 import glob
 import os
-
+import sys
 from optparse import OptionParser
 
-import pisces as ps
-
-import pisces.schema.kbcore as kb
-import pisces.io.sac as sac
-
-from sqlalchemy.exc import NoSuchTableError, IntegrityError, OperationalError
+from obspy.core import AttribDict, read
+from sqlalchemy.exc import IntegrityError, NoSuchTableError, OperationalError
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from obspy.core import read, AttribDict
+
+import pisces as ps
+import pisces.schema.kbcore as kb
+from pisces.io import sac
 
 # -------------------------------------------------------------
 #
@@ -91,7 +89,7 @@ def reflect_or_create_tables(options):
             try:
                 tables[table] = ps.get_tables(session.bind, [fulltabnm])[0]
             except NoSuchTableError:
-                print("{0} doesn't exist. Adding it.".format(fulltabnm))
+                print(f"{fulltabnm} doesn't exist. Adding it.")
                 tables[table] = ps.make_table(fulltabnm, PROTOTYPES[table])
                 tables[table].__table__.create(session.bind, checkfirst=True)
 
@@ -112,9 +110,9 @@ def get_file_iterator(options):
             lfile = open(options.l, 'r')
             # make a generator of non-blank lines
             files = (line.strip() for line in lfile if line.strip())
-        except IOError:
-            msg = "{0} does not exist.".format(options.l)
-            raise IOError(msg)
+        except OSError:
+            msg = f"{options.l} does not exist."
+            raise OSError(msg)
     else:
         msg = "Must provide input files or file list."
         raise ValueError(msg)
@@ -309,8 +307,8 @@ def main(argv=None):
                 try:
                     from pisces_gndd import gndd_connect
                     session = gndd_connect(options.user)
-                except ImportError as e:
-                    raise e
+                except ImportError:
+                    raise
             else:
                 if options.conn:
                     session = ps.db_connect(conn=options.conn)
@@ -326,9 +324,9 @@ def main(argv=None):
 
             try:
                 files = get_file_iterator(options)
-            except IOError as e:
+            except OSError:
                 # file list doesn't exist
-                raise e
+                raise
                 exit_code = 1
             except ValueError:
                 # input neither a file list nor input files
@@ -454,24 +452,24 @@ def main(argv=None):
                                     session.rollback()
                                     # XXX: is add_all what I mean to do here?
                                     session.add_all(tableval)
-                                except IntegrityError as e:
+                                except IntegrityError:
                                     # duplicate or nonexistant primary/unique keys
                                     # TODO: make this more descriptive
-                                    print(" Duplicate row in {0}".format(tableval.__table__.name))
+                                    print(f" Duplicate row in {tableval.__table__.name}")
                                     session.rollback()
-                                except OperationalError as e:
+                                except OperationalError:
                                     # no such table name.  shouldn't happen.
                                     # database is locked.
                                     session.rollback()
-                                    raise e
+                                    raise
                                 # except InvalidRequestError:
                                 #    #XXX: what is this error?
                                 #    #maybe tried to insert None
                                 #    session.rollback()
 
-                    except (IOError, TypeError):
+                    except (OSError, TypeError):
                         # can't read file or doesn't exist.
-                        print("Couldn't read file {0}.".format(ifile))
+                        print(f"Couldn't read file {ifile}.")
 
                 # close list file here
                 if options.l:

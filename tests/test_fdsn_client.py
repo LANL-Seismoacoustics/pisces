@@ -10,13 +10,13 @@ import os.path
 import tempfile
 
 import numpy as np
+import pytest
 from obspy import UTCDateTime
 
 import pisces.tables.kbcore as kb
 from pisces.fdsn import Client
 from pisces.util import literal_sql
 
-import pytest
 
 def test_get_events_geographic(session):
     """ Geographic tests """

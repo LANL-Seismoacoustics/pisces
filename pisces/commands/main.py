@@ -22,9 +22,9 @@ To add a subcommand to the main command, do the following:
 import click
 
 from pisces import __version__
+from pisces.commands import mseed2db, sac2db
 from pisces.util import url_connect
-from pisces.commands import sac2db
-from pisces.commands import mseed2db
+
 
 def split_commas(ctx, param, value):
     """
@@ -76,7 +76,6 @@ def cli():
         
 
     """
-    pass
 
 
 # ------------------------------- INIT ----------------------------------------
@@ -89,7 +88,7 @@ def create_command(**kwargs):
     Not yet implemented.
 
     """
-    print("create: {}".format(kwargs))
+    print(f"create: {kwargs}")
 
 
 # ------------------------------- DROP ----------------------------------------
@@ -102,7 +101,7 @@ def drop_command(**kwargs):
     Not yet implemented.
 
     """
-    print("drop: {}".format(kwargs))
+    print(f"drop: {kwargs}")
 
 
 # ------------------------------- SAC2DB --------------------------------------
