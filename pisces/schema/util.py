@@ -66,7 +66,7 @@ def get_infovals(meta, structure, key):
     # TODO: make this more efficient
 
     # cache all tables
-    tabledct = dict([(itable.name, itable) for itable in list(meta.tables.values())])
+    tabledct = {itable.name: itable for itable in list(meta.tables.values())}
     # cache all unique column info values in metadata in a dict
     colvaldct = {}
     for t in list(meta.tables.values()):
@@ -122,7 +122,7 @@ def string_formatter(meta, structure):
     # string_formatter(KBBase.metadata, ['lat','lon']).format(o) # fails
     # o = session.query(Origin.lat, Origin.lon).first()
     # string_formatter(KBBase.metadata, ['lat','lon']).format(o) # succeeds
-    tabledct = dict([(itable.name, itable) for itable in list(meta.tables.values())])
+    tabledct = {itable.name: itable for itable in list(meta.tables.values())}
     colfmtdct = {}
     for t in list(meta.tables.values()):
         for c in t.columns:
@@ -176,7 +176,7 @@ def _init(self, *args, **kwargs):
         for c, ival in zip(self.__table__.columns, args):
             dflt = c.info.get('default', None)
             if ival is None:
-                if hasattr(dflt, '__call__'):
+                if callable(dflt):
                     # handle callables, like datetime.datetime.now
                     setattr(self, self._attrname[c.name], dflt())
                 else:
@@ -190,7 +190,7 @@ def _init(self, *args, **kwargs):
         for c, ival in [(col, getattr(self, self._attrname[col.name], None)) for col in self.__table__.columns]:
             dflt = c.info.get('default', None)
             if ival is None:
-                if hasattr(dflt, '__call__'):
+                if callable(dflt):
                     setattr(self, self._attrname[c.name], dflt())
                 else:
                     setattr(self, self._attrname[c.name], dflt)
@@ -228,7 +228,7 @@ def _repr(self):
     items = [(col.name, getattr(self, col.name)) for col in
              self.__mapper__.primary_key]
 
-    return "{0}({1})".format(self.__class__.__name__, ', '.join(['{0}={1!r}'.format(*_) for _ in items]))
+    return "{}({})".format(self.__class__.__name__, ', '.join(['{}={!r}'.format(*_) for _ in items]))
 
 
 def from_string(cls, line, default_on_error=None):
@@ -321,8 +321,8 @@ def _len(self):
 
 def _eq(self, other):
     """ True if primary key values are all equal. """
-    return all([getattr(self, self._attrname[c.name]) == getattr(other, other._attrname[c.name])
-                for c in self.__table__.primary_key.columns])
+    return all(getattr(self, self._attrname[c.name]) == getattr(other, other._attrname[c.name])
+                for c in self.__table__.primary_key.columns)
 
 
 def _update_docstring(cls):
