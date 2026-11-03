@@ -24,7 +24,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import declarative_base
 
 from pisces.fdsn import wfdisc2trace
-from pisces.schema.util import PiscesMeta, parse_float, parse_int, parse_str
+
+from .util import PiscesMeta, parse_float, parse_int, parse_str
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 

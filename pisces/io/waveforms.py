@@ -40,7 +40,7 @@ from io import BytesIO
 import numpy as np
 from obspy.core import read
 
-from pisces.io.util import Registry
+from .util import Registry
 
 try:
     import e1

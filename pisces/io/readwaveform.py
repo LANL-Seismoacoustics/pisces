@@ -8,4 +8,4 @@ warnings.warn(
     stacklevel=2,
 )
 
-from pisces.io.waveforms import *
+from .waveforms import *

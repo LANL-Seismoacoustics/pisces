@@ -36,7 +36,7 @@ updated* ``Trace``/``.stats.sac`` suitable for writing back out with
 import obspy.geodetics as geod
 from obspy.io.sac import SACTrace
 
-from pisces.io.util import Registry, _cast_float, _cast_int, _clean_str
+from .util import Registry, _cast_float, _cast_int, _clean_str
 
 # registry of functions: SACTrace -> list of table row dicts, keyed by
 # canonical table name. Users can add entries from their own code, e.g.:

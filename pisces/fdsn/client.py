@@ -14,8 +14,9 @@ from obspy.core.event.header import EventType
 from sqlalchemy.orm import Session
 
 import pisces.request as req
-from pisces.fdsn.catalog import KBCORE_EVENT_TYPE, catalog
 from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
+
+from .catalog import KBCORE_EVENT_TYPE, catalog
 
 log = logging.getLogger(__name__)
 
