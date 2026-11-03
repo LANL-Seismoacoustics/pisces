@@ -13,14 +13,13 @@ Examples
 """
 import warnings
 
-from obspy import UTCDateTime
 import obspy.core.event as qml
+from obspy import UTCDateTime
 from sqlalchemy import inspect
 from sqlalchemy.orm import object_session
 
 import pisces as ps
 from pisces.util import _get_entities
-
 
 PREFERRED_MAGNITUDES = ("mb", "mw", "ms")
 

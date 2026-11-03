@@ -2,15 +2,16 @@
 Convenience functions for building common queries.
 
 """
+import warnings
+
 import numpy as np
-from sqlalchemy import func, or_
-from obspy.core import UTCDateTime, Stream
 import obspy.geodetics as geod
+from obspy.core import Stream, UTCDateTime
+from sqlalchemy import or_
 
 from pisces.fdsn import wfdisc2trace
 from pisces.query.util import make_wildcard_list
 
-import warnings
 
 def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
                     wfids=None, daylong=False, asquery=False, verbose=False):
@@ -577,11 +578,11 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     for wf in wf_rows:
         try:
             tr = wfdisc2trace(wf)
-        except IOError:
+        except OSError:
             # can't read file
             # XXX: wow, why let unreadable traces slip past instead of raising an error?
             msg = f"Can't read {wf.dir}/{wf.dfile}."
-            raise IOError(msg)
+            raise OSError(msg)
             # tr = None
 
         if tr:
@@ -595,7 +596,7 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
         min_t = float(min(start_t))
         max_t = float(max(end_t))
         if (abs(min_t - start_t) > tol) or (abs(max_t - end_t) > tol):
-            msg = "Trace times are outside of tolerance: {} seconds".format(tol)
+            msg = f"Trace times are outside of tolerance: {tol} seconds"
             # XXX: change this to a real Pisces exception
             raise ValueError(msg)
 

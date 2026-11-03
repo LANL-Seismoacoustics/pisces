@@ -2,7 +2,7 @@ import obspy.core.event as qml
 from obspy import UTCDateTime
 
 import pisces.tables.kbcore as kb
-from pisces.fdsn.catalog import catalog, QMLGenerator
+from pisces.fdsn.catalog import QMLGenerator, catalog
 
 resource_prefix='smi:local'
 qgen = QMLGenerator(resource_prefix=resource_prefix)

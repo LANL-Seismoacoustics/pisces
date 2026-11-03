@@ -13,12 +13,11 @@ tables in mydb.sqlite database.
 
 """
 
-import sys
 import glob
+import sys
 
 import pisces as ps
-import pisces.tables.css3 as css3
-
+from pisces.tables import css3
 
 db = sys.argv[1]
 

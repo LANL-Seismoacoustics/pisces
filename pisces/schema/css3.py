@@ -7,19 +7,25 @@ Center for Seismic Studies relational database schema 3.0 (CSS3.0)
 
 
 """
+from copy import deepcopy as dc
 from datetime import datetime
-from sqlalchemy import DateTime, Float, String, Integer
-from sqlalchemy import Column
-from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.declarative import declared_attr
 
 from obspy.core import UTCDateTime
-from pisces.schema.util import PiscesMeta
-from pisces.schema.util import parse_int, parse_float, parse_str
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+)
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_base
 
 from pisces.fdsn import wfdisc2trace
-from copy import deepcopy as dc
+
+from .util import PiscesMeta, parse_float, parse_int, parse_str
 
 Base = declarative_base(metaclass=PiscesMeta, constructor=None)
 

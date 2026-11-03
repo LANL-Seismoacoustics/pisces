@@ -22,7 +22,7 @@ object standing in for the file header the way `SACTrace` does for SAC.
 Read-only for now; see `misc/io.md` for the planned write-path shape.
 
 """
-from pisces.io.util import Registry
+from .util import Registry
 
 # registry of functions: Trace -> list of table row dicts, keyed by
 # canonical table name. Users can add entries from their own code, e.g.:

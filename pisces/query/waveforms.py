@@ -5,7 +5,7 @@ Based on the outputs of filter_stations
 
 
 from obspy import UTCDateTime
-from pisces.query import filter_stations, filter_waveforms
+from .stations import filter_stations
 from pisces.fdsn import stream
 
 now = UTCDateTime.now().timestamp
@@ -41,14 +41,14 @@ M — Data center modified, time-series values have not been changed.
 STATUS is the restricted status, one of: OPEN, RESTRICTED, or PARTIAL
 
 """
-from typing import Optional
 
 from obspy import UTCDateTime
-from sqlalchemy import func, and_, or_, literal
+from sqlalchemy import and_, func, literal, or_
 from sqlalchemy.orm import Query
 
 from pisces.util import _get_entities
-from pisces.query.util import make_wildcard_list
+
+from .util import make_wildcard_list
 
 
 def filter_waveforms(
@@ -222,7 +222,7 @@ def extent(
     chan: str,
     starttime: float,
     endtime: float,
-    merge: Optional[str] = None,
+    merge: str | None = None,
     includerestricted: bool = True
 ) -> Query:
     """ Find the earliest and latest time series data available in the wfdisc table.

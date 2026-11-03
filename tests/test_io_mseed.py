@@ -2,10 +2,10 @@
 Tests for pisces.io.mseed trace<->table conversions.
 
 """
-from obspy import Trace
 import numpy as np
+from obspy import Trace
 
-import pisces.io.mseed as mseed
+from pisces.io import mseed
 
 
 def make_trace(**stats):

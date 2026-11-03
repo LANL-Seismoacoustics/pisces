@@ -3,23 +3,22 @@
 # Ported to python 3.5.2 on 01-24-17
 # by: Jeremy Webster
 
+import argparse
+import glob
+import imp
 import os
 import sys
-import glob
 from collections import namedtuple
-import argparse
-import imp
-
-import sqlalchemy.exc as exc
 
 from obspy import read
 from obspy.io.sac.core import _is_sac
+from sqlalchemy import exc
 
 import pisces as ps
-from pisces.util import get_lastids, url_connect
 import pisces.schema.kbcore as kba
 import pisces.tables.kbcore as kb
-import pisces.io.sac as sac
+from pisces.io import sac
+from pisces.util import get_lastids, url_connect
 
 # user supplies their own class, inherited from kbcore, or just uses .tables
 # the prototype tables have a .from_sac or .from_mseed classmethod.
@@ -208,9 +207,9 @@ def get_files(options):
         try:
             listfile = open(options.files[0], 'r')
             files = (line.strip() for line in listfile if line.strip())
-        except IOError:
-            msg = "{0} does not exist.".format(options.files[0])
-            raise IOError(msg)
+        except OSError:
+            msg = f"{options.files[0]} does not exist."
+            raise OSError(msg)
     else:
         files = options.files
 
@@ -409,11 +408,11 @@ def main(argv=None):
                 except exc.IntegrityError:
                     # duplicate or nonexistant primary keys
                     session.rollback()
-                    print("rollback {}".format(table))
+                    print(f"rollback {table}")
                 except exc.OperationalError:
                     # no such table, or database is locked
                     session.rollback()
-                    print("rollback {}".format(table))
+                    print(f"rollback {table}")
 
 
 if __name__ == '__main__':

@@ -131,7 +131,6 @@ def distance_filter(
     return filter(distfn, query)
 
     """
-    pass
 
 def glob_to_like(text, escape='\\'):
     """
@@ -209,7 +208,7 @@ def string_expression(selectable, string_filters):
             expression = selectable == string_filter
     else:
         # use OR (for wildcards) or IN
-        if any([has_sql_wildcards(string_filter) for string_filter in string_filters]):
+        if any(has_sql_wildcards(string_filter) for string_filter in string_filters):
             # can't use IN, must use LIKE with OR
             # produces query.filter(or_(selectable.like(thing1), selectable == thing2, ...))
             clauses = [selectable.like(string_filter) if has_sql_wildcards(string_filter)

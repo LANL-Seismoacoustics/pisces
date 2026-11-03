@@ -1,15 +1,24 @@
-import numpy as np
-from obspy.core.inventory import response
+import os
 import warnings
-from obspy import read_inventory
 from datetime import datetime
 from math import pi
-from scipy.signal import group_delay
+
+import numpy as np
+from obspy import read_inventory
 from obspy.core import UTCDateTime
-import os
-from obspy.core.inventory.response import ComplexWithUncertainties, PolesZerosResponseStage, \
-    CoefficientsTypeResponseStage,PolynomialResponseStage,ResponseListResponseStage, \
-    ResponseStage, FIRResponseStage, FloatWithUncertainties
+from obspy.core.inventory import response
+from obspy.core.inventory.response import (
+    CoefficientsTypeResponseStage,
+    ComplexWithUncertainties,
+    FIRResponseStage,
+    FloatWithUncertainties,
+    PolesZerosResponseStage,
+    PolynomialResponseStage,
+    ResponseListResponseStage,
+    ResponseStage,
+)
+from scipy.signal import group_delay
+
 
 def get_pazfir_lines(path):
     """
@@ -767,13 +776,13 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
             delayDiff = abs(fileDelay-calculatedDelay)
 
             if delayDiff > 0.001:
-                warnings.warn('Group delay reported in file ({}) differs from calculated group delay ({}) by more than 0.001 second'.format(fileDelay, calculatedDelay))
+                warnings.warn(f'Group delay reported in file ({fileDelay}) differs from calculated group delay ({calculatedDelay}) by more than 0.001 second')
 
     
     # are there weird stages?
                 
         else:
-            warnings.warn('Ignoring unexpected stage type {}.  Pazfir files evaulation recommended.'.format(stageType[i]))
+            warnings.warn(f'Ignoring unexpected stage type {stageType[i]}.  Pazfir files evaulation recommended.')
             break
         
         
@@ -862,21 +871,21 @@ def get_source_type_from_units(inType, outType, stageNum):
     if inType in ['DISP','VEL','ACC','PRESSURE','TESLA'] and outType in ['VOLTS','COUNTS']:
         sourceType = 'instrument'
         if outType == 'COUNTS':
-            linesOut = '# Setting stage {} source description to "instrument" though stage \n# input units are in {} and stage output units are in {}.\n#\n'.format(stageNum, inType, outType)
+            linesOut = f'# Setting stage {stageNum} source description to "instrument" though stage \n# input units are in {inType} and stage output units are in {outType}.\n#\n'
         else:
-            linesOut = '# Assuming stage {} source description is "instrument" as stage \n# input units are in {} and stage output units are in {}.\n#\n'.format(stageNum, inType, outType)
+            linesOut = f'# Assuming stage {stageNum} source description is "instrument" as stage \n# input units are in {inType} and stage output units are in {outType}.\n#\n'
     elif inType == 'VOLTS' and outType == 'VOLTS':
         sourceType = 'digitizer'
-        linesOut = '# Assuming stage {} source description is "preamplifier" as stage \n# input units and stage output units are in VOLTS.\n#\n'.format(stageNum)
+        linesOut = f'# Assuming stage {stageNum} source description is "preamplifier" as stage \n# input units and stage output units are in VOLTS.\n#\n'
     elif inType == 'VOLTS' and outType == 'COUNTS':
         sourceType = 'digitizer'
-        linesOut = '# Assuming stage {} source description is "digitizer" as stage \n# input units are in VOLTS and stage output units are in COUNTS.\n#\n'.format(stageNum)
+        linesOut = f'# Assuming stage {stageNum} source description is "digitizer" as stage \n# input units are in VOLTS and stage output units are in COUNTS.\n#\n'
     elif inType == 'COUNTS' and outType == 'COUNTS':
         sourceType = 'anti-alias'
-        linesOut = '# Assuming stage {} source description is "anti-alias" as stage \n# input units and stage output units are in COUNTS.\n#\n'.format(stageNum)
+        linesOut = f'# Assuming stage {stageNum} source description is "anti-alias" as stage \n# input units and stage output units are in COUNTS.\n#\n'
     else:
         sourceType = 'unknown'
-        linesOut = '# Setting stage {} source description to "unknown" as stage \n# input and output units of {} and {} are unexpected combination.\n#\n'.format(stageNum, inType, outType)
+        linesOut = f'# Setting stage {stageNum} source description to "unknown" as stage \n# input and output units of {inType} and {outType} are unexpected combination.\n#\n'
 
     return sourceType, linesOut
 
@@ -906,37 +915,37 @@ def get_stationxml_lines(respStage):
         respStage.output_units = 'UNKNOWN'
         
 
-    respStageLines = '# Stage {}: Original StationXML Stage\n'.format(respStage.stage_sequence_number)
-    respStageLines = respStageLines + '#\tInput Units: {} ({})\n'.format(respStage.input_units.upper(),respStage.input_units_description)
-    respStageLines = respStageLines + '#\tOutput Units: {} ({})\n'.format(respStage.output_units.upper(),respStage.output_units_description)
-    respStageLines = respStageLines + '#\tStage Gain: {} at {} Hz\n'.format(respStage.stage_gain,respStage.stage_gain_frequency)
-    respStageLines = respStageLines + '#\tStage Type: {} \n'.format(respStage.__class__.__name__)
+    respStageLines = f'# Stage {respStage.stage_sequence_number}: Original StationXML Stage\n'
+    respStageLines = respStageLines + f'#\tInput Units: {respStage.input_units.upper()} ({respStage.input_units_description})\n'
+    respStageLines = respStageLines + f'#\tOutput Units: {respStage.output_units.upper()} ({respStage.output_units_description})\n'
+    respStageLines = respStageLines + f'#\tStage Gain: {respStage.stage_gain} at {respStage.stage_gain_frequency} Hz\n'
+    respStageLines = respStageLines + f'#\tStage Type: {respStage.__class__.__name__} \n'
     
     if respStage.__class__.__name__ == 'PolesZerosResponseStage':
-        respStageLines = respStageLines + '#\tTransfer Function: {} \n'.format(respStage.pz_transfer_function_type)
-        respStageLines = respStageLines + '#\tNormalization Factor: {} at {} Hz \n'.format(respStage.normalization_factor, respStage.normalization_frequency)
-        respStageLines = respStageLines + '#\tNumber of Poles: {}\n'.format(len(respStage.poles))
-        respStageLines = respStageLines + '#\tNumber of Zeros: {}\n'.format(len(respStage.zeros))
+        respStageLines = respStageLines + f'#\tTransfer Function: {respStage.pz_transfer_function_type} \n'
+        respStageLines = respStageLines + f'#\tNormalization Factor: {respStage.normalization_factor} at {respStage.normalization_frequency} Hz \n'
+        respStageLines = respStageLines + f'#\tNumber of Poles: {len(respStage.poles)}\n'
+        respStageLines = respStageLines + f'#\tNumber of Zeros: {len(respStage.zeros)}\n'
 
     elif respStage.__class__.__name__ == 'CoefficientsTypeResponseStage':
-        respStageLines = respStageLines + '#\tTransfer Function: {} \n'.format(respStage.cf_transfer_function_type)
-        respStageLines = respStageLines + '#\tNumber of Numerators: {}\n'.format(len(respStage.numerator))
-        respStageLines = respStageLines + '#\tNumber of Denominators: {}\n'.format(len(respStage.denominator))
+        respStageLines = respStageLines + f'#\tTransfer Function: {respStage.cf_transfer_function_type} \n'
+        respStageLines = respStageLines + f'#\tNumber of Numerators: {len(respStage.numerator)}\n'
+        respStageLines = respStageLines + f'#\tNumber of Denominators: {len(respStage.denominator)}\n'
     
     elif respStage.__class__.__name__ == 'FIRResponseStage':
         respStageLines = respStageLines + '#\tTransfer Function: DIGITAL \n'
-        respStageLines = respStageLines + '#\tNumber of Numerators: {}\n'.format(len(respStage.coefficients))
+        respStageLines = respStageLines + f'#\tNumber of Numerators: {len(respStage.coefficients)}\n'
     
     elif respStage.__class__.__name__ == 'ResponseListResponseStage':
-        respStageLines = respStageLines + '#\tNumber of FAP measurements: {}\n'.format(len(respStage.response_list_elements))
+        respStageLines = respStageLines + f'#\tNumber of FAP measurements: {len(respStage.response_list_elements)}\n'
     
     if respStage.decimation_factor is not None:
         respStageLines = respStageLines + '#\tDecimation: \n'
-        respStageLines = respStageLines + '#\t\tInput Sample Rate: {}\n'.format(respStage.decimation_input_sample_rate)
-        respStageLines = respStageLines + '#\t\tDecimation Factor: {}\n'.format(respStage.decimation_factor)
-        respStageLines = respStageLines + '#\t\tDecimation Offset: {}\n'.format(respStage.decimation_offset)
-        respStageLines = respStageLines + '#\t\tDecimation Delay: {}\n'.format(respStage.decimation_delay)
-        respStageLines = respStageLines + '#\t\tDecimation Correction: {}\n'.format(respStage.decimation_correction)
+        respStageLines = respStageLines + f'#\t\tInput Sample Rate: {respStage.decimation_input_sample_rate}\n'
+        respStageLines = respStageLines + f'#\t\tDecimation Factor: {respStage.decimation_factor}\n'
+        respStageLines = respStageLines + f'#\t\tDecimation Offset: {respStage.decimation_offset}\n'
+        respStageLines = respStageLines + f'#\t\tDecimation Delay: {respStage.decimation_delay}\n'
+        respStageLines = respStageLines + f'#\t\tDecimation Correction: {respStage.decimation_correction}\n'
 
     respStageLines = respStageLines + '#\n'
 
@@ -979,14 +988,14 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
             nettype = '{:<.4s}'.format(tableDict['nettype'][dex])
 
             if len(net) > 8:
-                warnings.warn('Net field provided in network dictionary for index {} \
-                                exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+                warnings.warn(f'Net field provided in network dictionary for index {dex} \
+                                exceeds 8 characters and will be truncated to fit the 8 character limit')
             if len(netname) > 80:
-                warnings.warn('Netname field provided in network dictionary for index {} \
-                                exceeds 80 characters and will be truncated to fit the 80 character limit'.format(dex))
+                warnings.warn(f'Netname field provided in network dictionary for index {dex} \
+                                exceeds 80 characters and will be truncated to fit the 80 character limit')
             if len(nettype) > 4:
-                            warnings.warn('Nettype field provided in network dictionary for index {} \
-                                            exceeds 4 characters and will be truncated to fit the 4 character limit'.format(dex))
+                            warnings.warn(f'Nettype field provided in network dictionary for index {dex} \
+                                            exceeds 4 characters and will be truncated to fit the 4 character limit')
 
             if schema in ['css3.0','css3','css']:
                 auth = '{:<.15s}'.format(tableDict['auth'][dex])
@@ -994,8 +1003,8 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
                 if len(auth) > 15:
-                    warnings.warn('Auth field provided in network dictionary for index {} \
-                                    exceeds 15 characters and will be truncated to fit the 15 character limit'.format(dex))
+                    warnings.warn(f'Auth field provided in network dictionary for index {dex} \
+                                    exceeds 15 characters and will be truncated to fit the 15 character limit')
 
             if schema in ['antelope', 'ant']:
                 auth = '{:<.15s}'.format(tableDict['auth'][dex])
@@ -1003,8 +1012,8 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = '{:>17.5f}'.format(tableDict['lddate'][dex].timestamp())
 
                 if len(auth) > 15:
-                    warnings.warn('Auth field provided in network dictionary for index {} \
-                                    exceeds 15 characters and will be truncated to fit the 15 character limit'.format(dex))
+                    warnings.warn(f'Auth field provided in network dictionary for index {dex} \
+                                    exceeds 15 characters and will be truncated to fit the 15 character limit')
 
             if schema in ['kbcore','kb','kbc']:
                 auth = '{:<.20s}'.format(tableDict['auth'][dex])
@@ -1012,11 +1021,11 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
                 if len(auth) > 20:
-                    warnings.warn('Auth field provided in network dictionary for index {} \
-                                    exceeds 20 characters and will be truncated to fit the 20 character limit'.format(dex))
+                    warnings.warn(f'Auth field provided in network dictionary for index {dex} \
+                                    exceeds 20 characters and will be truncated to fit the 20 character limit')
 
             if tab_delim == False:
-                rowLine = '{} {} {} {} {} {}\n'.format(net, netname, nettype, auth, commid, lddate)
+                rowLine = f'{net} {netname} {nettype} {auth} {commid} {lddate}\n'
                 
             else:
                 rowLine = '{}\t{}\t{}\t{}\t{}\t{}\n'.format(net.strip(' '), netname.strip(' '), nettype.strip(' '), auth.strip(' '), \
@@ -1035,11 +1044,11 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
             endtime = '{:>17.5f}'.format(tableDict['endtime'][dex])
 
             if len(net) > 8:
-                warnings.warn('Net field provided in affiliation dictionary for index {} \
-                                exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+                warnings.warn(f'Net field provided in affiliation dictionary for index {dex} \
+                                exceeds 8 characters and will be truncated to fit the 8 character limit')
             if len(sta) > 6:
-                warnings.warn('Sta field provided in affiliation dictionary for index {} \
-                              exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+                warnings.warn(f'Sta field provided in affiliation dictionary for index {dex} \
+                              exceeds 6 characters and will be truncated to fit the 6 character limit')
 
             if schema in ['css3.0','css3','css']:
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
@@ -1052,13 +1061,13 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
 
             if schema in ['css3.0','css3','css','antelope', 'ant']:
                 if tab_delim == False:
-                    rowLine = '{} {} {}\n'.format(net, sta, lddate)     
+                    rowLine = f'{net} {sta} {lddate}\n'     
                 else:
                     rowLine = '{}\t{}\t{}\n'.format(net.strip(' '), sta.strip(' '), lddate)
 
             if schema in ['kbcore','kb','kbc']:
                 if tab_delim == False:
-                    rowLine = '{} {} {} {} {}\n'.format(net, sta, time, endtime, lddate)     
+                    rowLine = f'{net} {sta} {time} {endtime} {lddate}\n'     
                 else:
                     rowLine = '{}\t{}\t{}\t{}\t{}\n'.format(net.strip(' '), sta.strip(' '), time.strip(' '), endtime.strip(' '), lddate)
 
@@ -1079,7 +1088,7 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
 
             sta = '{:<.6s}'.format(tableDict['sta'][dex])
             ondate = '{:>8d}'.format(tableDict['ondate'][dex])
-            offdate = '{:>8d}'.format(offDate)
+            offdate = f'{offDate:>8d}'
             elev = '{:>9.4f}'.format(tableDict['elev'][dex])
             staname = '{:<.50s}'.format(tableDict['staname'][dex])
             statype = '{:<.4s}'.format(tableDict['statype'][dex])    
@@ -1103,16 +1112,15 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
             if len(sta) > 6:
-                warnings.warn('Sta field provided in site dictionary for index {} \
-                              exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+                warnings.warn(f'Sta field provided in site dictionary for index {dex} \
+                              exceeds 6 characters and will be truncated to fit the 6 character limit')
 
             if len(staname) > 50:
-                warnings.warn('Staname field provided in sute dictionary for index {} \
-                              exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+                warnings.warn(f'Staname field provided in sute dictionary for index {dex} \
+                              exceeds 50 characters and will be truncated to fit the 50 character limit')
 
             if tab_delim == False:
-                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, ondate, offdate, lat, lon, \
-                        elev, staname, statype, refsta, dnorth, deast, lddate)
+                rowLine = f'{sta} {ondate} {offdate} {lat} {lon} {elev} {staname} {statype} {refsta} {dnorth} {deast} {lddate}\n'
             else:
                 rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), ondate.strip(' '), \
                         offdate.strip(' '), lat.strip(' '), lon.strip(' '), elev.strip(' '), staname.strip(' '), \
@@ -1137,7 +1145,7 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
             chan = '{:>.8s}'.format(tableDict['chan'][dex])
             ondate = '{:>8d}'.format(tableDict['ondate'][dex])
             chanid = '{:>8d}'.format(tableDict['chanid'][dex])
-            offdate = '{:>8d}'.format(offDate)
+            offdate = f'{offDate:>8d}'
             ctype = '{:>.4s}'.format(tableDict['ctype'][dex])
             edepth = '{:>9.4f}'.format(tableDict['edepth'][dex])
             hang = '{:>6.1f}'.format(tableDict['hang'][dex])
@@ -1158,21 +1166,20 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
             if len(sta) > 6:
-                warnings.warn('Sta field provided in sitechan dictionary for index {} \
-                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))    
+                warnings.warn(f'Sta field provided in sitechan dictionary for index {dex} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit')    
 
             if len(chan) > 8:
-                warnings.warn('Chan field provided in sitechan dictionary for index {} \
-                              exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+                warnings.warn(f'Chan field provided in sitechan dictionary for index {dex} \
+                              exceeds 8 characters and will be truncated to fit the 8 character limit')
 
             if len(descrip) > 50:
-                warnings.warn('Descrip field provided in sitechan dictionary for index {} \
-                              exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+                warnings.warn(f'Descrip field provided in sitechan dictionary for index {dex} \
+                              exceeds 50 characters and will be truncated to fit the 50 character limit')
 
 
             if tab_delim == False:
-                rowLine = '{} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, chan, ondate, chanid, offdate, ctype, edepth, hang, vang, \
-                        descrip, lddate)
+                rowLine = f'{sta} {chan} {ondate} {chanid} {offdate} {ctype} {edepth} {hang} {vang} {descrip} {lddate}\n'
             else:
                  rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), chan.strip(' '), ondate.strip(' '), \
                         chanid.strip(' '), offdate.strip(' '), ctype.strip(' '), edepth.strip(' '), hang.strip(' '), vang.strip(' '), \
@@ -1208,12 +1215,11 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
                 lddate = tableDict['lddate'][dex].strftime("%y/%m/%d %H:%M:%S")
 
             if len(chan) > 8:
-                warnings.warn('Chan field provided in sensor dictionary for index {} \
-                              exceeds 8 characters and will be truncated to fit the 8 character limit'.format(dex))
+                warnings.warn(f'Chan field provided in sensor dictionary for index {dex} \
+                              exceeds 8 characters and will be truncated to fit the 8 character limit')
 
             if tab_delim == False:
-                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(sta, chan, time, endtime, inid, chanid, jdate, calratio, \
-                                                                         calper, tshift, instant, lddate)
+                rowLine = f'{sta} {chan} {time} {endtime} {inid} {chanid} {jdate} {calratio} {calper} {tshift} {instant} {lddate}\n'
             else:
                 rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(sta.strip(' '), chan.strip(' '), time.strip(' '), endtime.strip(' '), \
                         inid.strip(' '), chanid.strip(' '), jdate.strip(' '), calratio.strip(' '), calper.strip(' '), tshift.strip(' '), instant.strip(' '), \
@@ -1239,20 +1245,20 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
             rsptype = '{:<6s}'.format(tableDict['rsptype'][dex])
 
             if len(dpath) > 64:
-                warnings.warn('Directory path provided in instrument dictionary for index {} \
-                              exceeds 64 characters and will be truncated to fit the 64 character limit'.format(dex))
+                warnings.warn(f'Directory path provided in instrument dictionary for index {dex} \
+                              exceeds 64 characters and will be truncated to fit the 64 character limit')
             if len(dfile) > 32:
-                warnings.warn('File name provided in instrument dictionary for index {} \
-                                exceeds 32 characters and will be truncated to fit the 32 character limit'.format(dex))
+                warnings.warn(f'File name provided in instrument dictionary for index {dex} \
+                                exceeds 32 characters and will be truncated to fit the 32 character limit')
             if len(insname) > 50:
-                warnings.warn('Insname field provided in instrument dictionary for index {} \
-                                exceeds 50 characters and will be truncated to fit the 50 character limit'.format(dex))
+                warnings.warn(f'Insname field provided in instrument dictionary for index {dex} \
+                                exceeds 50 characters and will be truncated to fit the 50 character limit')
             if len(instype) > 6:
-                warnings.warn('Instype field provided in instrument dictionary for index {} \
-                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+                warnings.warn(f'Instype field provided in instrument dictionary for index {dex} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit')
             if len(rsptype) > 6:
-                warnings.warn('Rsptype field provided in instrument dictionary for index {} \
-                                exceeds 6 characters and will be truncated to fit the 6 character limit'.format(dex))
+                warnings.warn(f'Rsptype field provided in instrument dictionary for index {dex} \
+                                exceeds 6 characters and will be truncated to fit the 6 character limit')
             
             
             if schema in ['css3.0','css3','css']:
@@ -1266,8 +1272,7 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
 
 
             if tab_delim == False:
-                rowLine = '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(inid, insname, instype, band, digital, samprate, ncalib, \
-                        ncalper, dpath, dfile, rsptype, lddate)
+                rowLine = f'{inid} {insname} {instype} {band} {digital} {samprate} {ncalib} {ncalper} {dpath} {dfile} {rsptype} {lddate}\n'
             else:
                 rowLine = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(inid.strip(' '), insname.strip(' '), instype.strip(' '), \
                         band.strip(' '), digital.strip(' '), samprate.strip(' '), ncalib.strip(' '), ncalper.strip(' '), dpath.strip(' '), \
@@ -1282,15 +1287,14 @@ def write_dict_to_flatfile(tableDict, dirPath = None, tab_delim = False, schema 
         dirPath = os.getcwd()
 
     if dirPath[-1] == '/':
-        outpath = '{}{}'.format(dirPath,fileName)
+        outpath = f'{dirPath}{fileName}'
     else:
-        outpath = '{}/{}'.format(dirPath,fileName)
+        outpath = f'{dirPath}/{fileName}'
 
     tableFile = open(outpath,'w')
     tableFile.write(tableLines)
     tableFile.close()
 
-    return
     
 
 def write_pazfir(response, station, channel, starttime, out_freq = None, dir_path = None, network = None, location = None, \
@@ -1377,9 +1381,9 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             network = 'UNKNOWN'
     else:
         network = 'UNKNOWN'
-    headerLines = headerLines + '#\t Network: {}\n'.format(network)
+    headerLines = headerLines + f'#\t Network: {network}\n'
 
-    headerLines = headerLines + '#\t Station: {}\n'.format(station)
+    headerLines = headerLines + f'#\t Station: {station}\n'
     
     if location is not None:
         pass
@@ -1389,11 +1393,11 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             location = 'N/A'
     else:
         location = 'N/A'
-    headerLines = headerLines + '#\t Location: {}\n'.format(location)
+    headerLines = headerLines + f'#\t Location: {location}\n'
     
-    headerLines = headerLines + '#\t Channel: {}\n'.format(channel)
+    headerLines = headerLines + f'#\t Channel: {channel}\n'
     
-    headerLines = headerLines + '#\t Start Date: {}\n'.format(starttime)
+    headerLines = headerLines + f'#\t Start Date: {starttime}\n'
 
     if endtime is not None:
         pass
@@ -1403,7 +1407,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             endtime = 'UNKNOWN'
         elif endtime.timestamp == 9999999999.999:
             endtime = 'PRESENT'
-    headerLines = headerLines + '#\t End Date: {}\n'.format(endtime)
+    headerLines = headerLines + f'#\t End Date: {endtime}\n'
 
     if sample_rate is not None:
         pass
@@ -1413,7 +1417,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             sample_rate = 'UNKNOWN'
     else:
         sample_rate = 'UNKNOWN'
-    headerLines = headerLines + '#\t Sampling Rate: {}\n'.format(sample_rate)
+    headerLines = headerLines + f'#\t Sampling Rate: {sample_rate}\n'
     
     if sensor is not None:
         pass
@@ -1423,7 +1427,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             sensor = 'UNKNOWN'
     else:
         sensor = 'UNKNOWN'
-    headerLines = headerLines + '#\t Sensor: {}\n'.format(sensor)
+    headerLines = headerLines + f'#\t Sensor: {sensor}\n'
 
     if data_logger is not None:
         pass
@@ -1432,14 +1436,14 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     else:
         data_logger = 'UNKNOWN'
     if data_logger is not None:
-        headerLines = headerLines + '#\t Data Logger: {}\n'.format(data_logger)
+        headerLines = headerLines + f'#\t Data Logger: {data_logger}\n'
 
     if pre_amplifier is not None:
         pass
     if 'pre_amplifier' in stationDict:
         pre_amplifier = stationDict['pre_amplifier']
     if pre_amplifier is not None:
-        headerLines = headerLines + '#\t Pre-amplifier: {}\n'.format(pre_amplifier)
+        headerLines = headerLines + f'#\t Pre-amplifier: {pre_amplifier}\n'
 
     headerLines = headerLines + '#\n'
 
@@ -1451,7 +1455,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             out_freq = response.response_stages[0].stage_gain_frequency
         
         headerLines = headerLines + '# No frequency at which to output response information provided.\n'
-        headerLines = headerLines + '# Using frequency {} Hz in Stage 1: {}\n#\n'.format(out_freq, response.response_stages[0].__class__.__name__)
+        headerLines = headerLines + f'# Using frequency {out_freq} Hz in Stage 1: {response.response_stages[0].__class__.__name__}\n#\n'
 
 
     # create a list of lines to be written after header
@@ -1539,9 +1543,9 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
                     "UNKNOWN": "UNKNOWN"}
     
     if inUnitKey not in unitMap:
-        raise ValueError('Unknown input units of {}'.format(inUnitKey))
+        raise ValueError(f'Unknown input units of {inUnitKey}')
     if outUnitKey not in unitMap:
-        raise ValueError('Unknown output units of {}'.format(outUnitKey))
+        raise ValueError(f'Unknown output units of {outUnitKey}')
 
     # outUnitType = unitMap[outUnitKey]
     # if outUnitType != 'COUNTS':
@@ -1555,12 +1559,12 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         if inUnitKey == 'NM':
             headerLines = headerLines + '# Original units are DISP in NM.  No conversion required to \n# match KBCore/CSS3.0 database spec.\n#\n'
         else:
-            headerLines = headerLines + '# Original units are {} in {}.  Converting to DISP in NM to \n# match KBCore/CSS3.0 database spec.\n#\n'.format(inUnitType, inUnitKey)
+            headerLines = headerLines + f'# Original units are {inUnitType} in {inUnitKey}.  Converting to DISP in NM to \n# match KBCore/CSS3.0 database spec.\n#\n'
 
     elif inUnitType == 'PRESSURE':
         if inUnitKey == 'MBAR':
             sensitivity = abs(response.get_evalresp_response_for_frequencies([out_freq], output='DEF')*100)[0] # convert MBARS to PA
-            headerLines = headerLines + '# Original units are PRESSURE in {}.  Converting to PRESSURE in PA to match KBCore database spec.\n#\n'.format(inUnitKey)
+            headerLines = headerLines + f'# Original units are PRESSURE in {inUnitKey}.  Converting to PRESSURE in PA to match KBCore database spec.\n#\n'
         else:
             sensitivity = abs(response.get_evalresp_response_for_frequencies([out_freq], output='DEF'))[0]
             headerLines = headerLines + '# Original units are PRESSURE in PA. No conversion required to match KBCore/CSS3.0 database spec.\n#\n'
@@ -1569,15 +1573,15 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
 
     else:
         sensitivity = abs(response.get_evalresp_response_for_frequencies([out_freq], output='DEF'))[0]
-        headerLines = headerLines + '# Original units are {} in {}.  No unit conversions performed as these units are not included in KBCore/CSS3.0 database spec.\n'.format(inUnitType, inUnitKey)
+        headerLines = headerLines + f'# Original units are {inUnitType} in {inUnitKey}.  No unit conversions performed as these units are not included in KBCore/CSS3.0 database spec.\n'
         outUnitType = unitMap[outUnitKey]
         newOutUnits = outUnitKey
     
-    headerLines = headerLines + '# Calculated Sensitivity is {:.6f} at {} Hz in {} in {}\n#\n'.format(sensitivity, out_freq, outUnitType, newOutUnits)
+    headerLines = headerLines + f'# Calculated Sensitivity is {sensitivity:.6f} at {out_freq} Hz in {outUnitType} in {newOutUnits}\n#\n'
     headerLines = headerLines + '# Stage 0: Original StationXML Instrument Sensitivity Stage \n'
-    headerLines = headerLines + '#\tSensitivity value: {} at {} Hz \n'.format(response.instrument_sensitivity.value, response.instrument_sensitivity.frequency)
-    headerLines = headerLines + '#\tInput Units: {} ({}) \n'.format(response.instrument_sensitivity.input_units, response.instrument_sensitivity.input_units_description)
-    headerLines = headerLines + '#\tOutput Units: {} ({}) \n'.format(response.instrument_sensitivity.output_units, response.instrument_sensitivity.output_units_description)
+    headerLines = headerLines + f'#\tSensitivity value: {response.instrument_sensitivity.value} at {response.instrument_sensitivity.frequency} Hz \n'
+    headerLines = headerLines + f'#\tInput Units: {response.instrument_sensitivity.input_units} ({response.instrument_sensitivity.input_units_description}) \n'
+    headerLines = headerLines + f'#\tOutput Units: {response.instrument_sensitivity.output_units} ({response.instrument_sensitivity.output_units_description}) \n'
     headerLines = headerLines + '#\n'
 
     # firTrigger = False
@@ -1626,7 +1630,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             if respStage.decimation_delay is not None:
                 delays.append(respStage.decimation_delay)
 
-            pazLine = '{:<12} {:<2} {:<12} {:<6} {}'.format(t_v_m, stageNum, sourceType, stageType, dataSource)
+            pazLine = f'{t_v_m:<12} {stageNum:<2} {sourceType:<12} {stageType:<6} {dataSource}'
             stageLines = stageLines + pazLine + '\n'
 
             stageLines = stageLines + f'{A0: 10.6e}' + '\n'
@@ -1667,7 +1671,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         elif isinstance(respStage,CoefficientsTypeResponseStage):
 
             if respStage.cf_transfer_function_type in ['ANALOG (RADIANS/SECOND)','ANALOG (HERTZ)']:
-                raise NotImplementedError('Conversion of CoefficientsTypeResponseStage transfer function of type "{}" to type "DIGITAL" not implemented'.format(respStage.cf_transfer_function_type))
+                raise NotImplementedError(f'Conversion of CoefficientsTypeResponseStage transfer function of type "{respStage.cf_transfer_function_type}" to type "DIGITAL" not implemented')
 
             stageInUnitType = unitMap[respStage.input_units.upper()]
             stageOutUnitType = unitMap[respStage.output_units.upper()]
@@ -1700,7 +1704,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             if respStage.decimation_delay is not None:
                 delays.append(respStage.decimation_delay)
 
-            firLine = '{:<12} {:<2} {:<12} {:<6} {}'.format(t_v_m, stageNum, sourceType, stageType, dataSource)
+            firLine = f'{t_v_m:<12} {stageNum:<2} {sourceType:<12} {stageType:<6} {dataSource}'
             stageLines = stageLines + firLine + '\n'
             stageLines = stageLines + f'{decimSampRate: 10.6e}' + '\n'
             stageLines = stageLines + str(numNum) +'\n'
@@ -1744,7 +1748,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
                 
                 decimSampRate = respStage.decimation_input_sample_rate
 
-                firLine = '{:<12} {:<2} {:<12} {:<6} {}'.format(t_v_m, stageNum, sourceType, stageType, dataSource)
+                firLine = f'{t_v_m:<12} {stageNum:<2} {sourceType:<12} {stageType:<6} {dataSource}'
                 stageLines = stageLines + firLine + '\n'
                 stageLines = stageLines + f'{decimSampRate: 10.6e}' + '\n'
                 stageLines = stageLines + str(numNum) +'\n'
@@ -1784,7 +1788,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
             if respStage.decimation_delay is not None:
                 delays.append(respStage.decimation_delay)
 
-            fapLine = '{:<12} {:<2} {:<12} {:<6} {}'.format(t_v_m, stageNum, sourceType, stageType, dataSource)
+            fapLine = f'{t_v_m:<12} {stageNum:<2} {sourceType:<12} {stageType:<6} {dataSource}'
             stageLines = stageLines + fapLine + '\n'
 
             fapNum = len(respStage.response_list_elements)
@@ -1814,7 +1818,7 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
         
         else:
             wrongStage = respStage.__class__.__name__
-            raise TypeError('Unsupported Stage Type: {}'.format(wrongStage))
+            raise TypeError(f'Unsupported Stage Type: {wrongStage}')
         
     linesWrite = headerLines + '#\n'+ linesWrite
     
@@ -1835,15 +1839,15 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     if len(uniqueExt) == 0:
         fileExt = '-'
 
-    fileName = '{}.{}.{}.{}.{}.{}'.format(network, station, channel, location, timeStr, fileExt)
+    fileName = f'{network}.{station}.{channel}.{location}.{timeStr}.{fileExt}'
 
     if dir_path is None:
         dir_path = os.getcwd()
 
     if dir_path[-1] == '/':
-        outpath = '{}{}'.format(dir_path,fileName)
+        outpath = f'{dir_path}{fileName}'
     else:
-        outpath = '{}/{}'.format(dir_path,fileName)
+        outpath = f'{dir_path}/{fileName}'
 
     respFile = open(outpath,'w')
     # for respLine in linesWrite:
@@ -1982,18 +1986,18 @@ def format_description(chanObj):
     if sensor:
         sensorDesc = sensor
         if len(sensorDesc) < 50 and datalogger:
-            sensorDesc = '{} + {}'.format(sensor, datalogger)
+            sensorDesc = f'{sensor} + {datalogger}'
             if preamp and len(sensorDesc) < 50:
-                sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+                sensorDesc = f'{sensorDesc} + {preamp}'
         else:
             if preamp and len(sensorDesc) < 50:
-                sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+                sensorDesc = f'{sensorDesc} + {preamp}'
     elif datalogger:
-        sensorDesc = 'UNKNOWN SENSOR + {}'.format(datalogger)
+        sensorDesc = f'UNKNOWN SENSOR + {datalogger}'
         if preamp and len(sensorDesc) < 50:
-            sensorDesc = '{} + {}'.format(sensorDesc, preamp)
+            sensorDesc = f'{sensorDesc} + {preamp}'
     elif preamp:
-         sensorDesc = 'UNKNOWN SENSOR + UNKNOWN DATALOGGER {}'.format(preamp)
+         sensorDesc = f'UNKNOWN SENSOR + UNKNOWN DATALOGGER {preamp}'
     else:
         sensorDesc = 'UNKNOWN EQUIPMENT'
 
@@ -2161,8 +2165,8 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                 staname = '-'
             
             # track station uniqueness in table
-            uniqueIDsta = '{}/{}'.format(staCode, staOndate)
-            uniqueIDaff = '{}/{}/{}'.format(netCode, staCode, str(sta.start_date.timestamp))
+            uniqueIDsta = f'{staCode}/{staOndate}'
+            uniqueIDaff = f'{netCode}/{staCode}/{sta.start_date.timestamp!s}'
 
             if uniqueIDaff in affilDict['uniqueID']:
                 # if unique stay already in table, do nothing
@@ -2219,7 +2223,7 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                     preAmp = format_preamp(chan.pre_amplifier)
 
                     if chan.sensor.type:
-                        instype = '{:<.6s}'.format(chan.sensor.type)
+                        instype = f'{chan.sensor.type:<.6s}'
                     else:
                         instype = '-'
                
@@ -2244,7 +2248,7 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                         jDateOff = int(endDate.strftime('%Y%j'))
                     
                     # create sitechan dictionary tracking uniqueness among channels relative to stations and sensors
-                    uniqueIDchan = '{}/{}'.format(staCode, chanLocCode)
+                    uniqueIDchan = f'{staCode}/{chanLocCode}'
 
                     if chanid == 0:
                         # if first channel automatically create key:values pairs
@@ -2306,7 +2310,7 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
                             sensitivity, out_freq, fileName =  write_pazfir(chan.response, staCode, chanCode, startDate, out_freq = out_freq, dir_path = dir_path, network=netCode, location=locCode, \
                                                               endtime=endDate, sample_rate=sampRate, sensor=sensor, data_logger=dataLogger, pre_amplifier=preAmp)
                         except NotImplementedError:
-                            print("Skipping {}.{}.{} because of a NotImplemented Error.  Writing to sensor table with an inid of -1 with no entry in the instrument table.".format(staCode, chanCode, startDate))
+                            print(f"Skipping {staCode}.{chanCode}.{startDate} because of a NotImplemented Error.  Writing to sensor table with an inid of -1 with no entry in the instrument table.")
 
                             nullInid = -1
                             sensorDict['sta'].append(staCode); sensorDict['chan'].append(chanLocCode)

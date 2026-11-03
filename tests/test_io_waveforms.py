@@ -1,12 +1,11 @@
+import importlib
 import os
+import sys
 import tempfile
 
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
-
-import importlib
-import sys
 
 import pisces.io.waveforms as rwf
 
