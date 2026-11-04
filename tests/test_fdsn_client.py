@@ -12,10 +12,10 @@ import tempfile
 import numpy as np
 import pytest
 from obspy import UTCDateTime
+from sqlalchemy import and_, or_
 
 import pisces.tables.kbcore as kb
 from pisces.fdsn import Client
-from pisces.util import literal_sql
 
 
 def test_get_stations_network(session):
@@ -226,11 +226,12 @@ def test_get_events_magnitudes(session):
                .filter(kb.Event.evid == kb.Origin.evid)
                .filter(kb.Netmag.evid == kb.Event.evid)
                .filter(kb.Netmag.orid == kb.Origin.orid)
-               .filter(kb.Netmag.magtype.like('mb'))
-               .filter(kb.Netmag.magnitude.between(3, 4))
+               .filter(or_(and_(
+                   kb.Netmag.magtype.like('mb'),
+                   kb.Netmag.magnitude.between(3, 4),
+               )))
     )
-    assert literal_sql(observed) == literal_sql(expected)
-    # assert observed.statement.compare(expected.statement)
+    assert observed.statement.compare(expected.statement)
 
     # any magnitude, half-range
     observed = client.get_events(minmagnitude=3, includeallmagnitudes=True, asquery=True)
@@ -239,10 +240,9 @@ def test_get_events_magnitudes(session):
                .filter(kb.Event.evid == kb.Origin.evid)
                .filter(kb.Netmag.evid == kb.Event.evid)
                .filter(kb.Netmag.orid == kb.Origin.orid)
-               .filter(kb.Netmag.magnitude >= 3)
+               .filter(or_(and_(kb.Netmag.magnitude >= 3)))
     )
-    assert literal_sql(observed) == literal_sql(expected)
-    # assert observed.statement.compare(expected.statement)
+    assert observed.statement.compare(expected.statement)
 
     # error b/c there's no Netmag
     client = Client(session, origin=kb.Origin, event=kb.Event)
