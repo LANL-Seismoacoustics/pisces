@@ -14,9 +14,18 @@ from obspy.core.event.header import EventType
 from sqlalchemy.orm import Session
 
 import pisces.request as req
-from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
+from pisces.query import (
+    filter_arrivals,
+    filter_events,
+    filter_magnitudes,
+    filter_networks,
+    filter_responses,
+    filter_stations,
+    util,
+)
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
+from .inventory import build_inventory
 
 log = logging.getLogger(__name__)
 
@@ -465,13 +474,14 @@ class Client:
         longitude: float | None = None,
         minradius: float | None = None,
         maxradius: float | None = None,
-        level: str | None = None,
+        level: str = "station",
         # includerestricted: bool = None,
         # includeavailability: bool = None,
         updatedafter: UTCDateTime = None,
         matchtimeseries: bool | None = None,
         filename: str | None = None,
         format: str = "xml",
+        asquery: bool = False,
         **kwargs
     ):
     #     """
@@ -559,17 +569,17 @@ class Client:
     #     maxlongitude : float
     #         Limit to stations with a longitude smaller than the specified maximum.
     #     latitude : float
-    #         Specify the latitude to be used for a radius search.
+    #         Specify the latitude to be used for a radius search. Accepted for
+    #         FDSN compatibility but currently ignored.
     #     longitude : float
-    #         Specify the longitude to be used for a radius search.
+    #         Specify the longitude to be used for a radius search. Accepted for
+    #         FDSN compatibility but currently ignored.
     #     minradius : float
-    #         Limit results to stations within the specified minimum number of
-    #         degrees from the geographic point defined by the latitude and
-    #         longitude parameters.
+    #         Minimum radius in degrees. Accepted for FDSN compatibility but
+    #         currently ignored.
     #     maxradius : float
-    #         Limit results to stations within the specified maximum number of
-    #         degrees from the geographic point defined by the latitude and
-    #         longitude parameters.
+    #         Maximum radius in degrees. Accepted for FDSN compatibility but
+    #         currently ignored.
     #     level : str
     #         Specify the level of detail for the results ("network", "station",
     #         "channel", "response"), e.g. specify "response" to get full
@@ -605,45 +615,65 @@ class Client:
     #     """
 
         level = level.lower()
-        VALID_LEVELS = ['network', 'station', 'channel', 'response']
-        if level not in VALID_LEVELS:
-            raise ValueError(f"level must be one of {VALID_LEVELS}")
+        valid_levels = ['network', 'station', 'channel', 'response']
+        if level not in valid_levels:
+            raise ValueError(f"level must be one of {valid_levels}")
+
+        required_tables = {
+            'network': ('network',),
+            'station': ('network', 'affiliation', 'site'),
+            'channel': ('network', 'affiliation', 'site', 'sitechan'),
+            'response': ('network', 'affiliation', 'site', 'sitechan', 'sensor', 'instrument'),
+        }[level]
+        if any(table not in self.tables for table in required_tables):
+            names = ', '.join(required_tables)
+            raise ValueError(f"{names} tables required for {level} level metadata.")
+
+        Network = self.tables.get('network')
+        Affiliation = self.tables.get('affiliation')
+        Site = self.tables.get('site')
+        Sitechan = self.tables.get('sitechan')
+        Sensor = self.tables.get('sensor')
+        Instrument = self.tables.get('instrument')
+
+        times = _None_if_none(starttime, endtime)
+        region = _None_if_none(
+            minlongitude, maxlongitude, minlatitude, maxlatitude
+        )
 
         if level == 'network':
-            try:
-                Network = self.tables["network"]
-            except KeyError:
-                msg = "Network table required for network level metadata."
-                raise ValueError(msg)
+            q = self.session.query(Network)
+            if Affiliation:
+                q = q.add_entity(Affiliation)
+            q = filter_networks(q, net=network, sta=station, times=times)
+        else:
+            q = self.session.query(Network, Affiliation, Site)
+            q = filter_networks(q, net=network, sta=station, times=times)
 
-        elif level == 'station':
-            try:
-                Site = self.tables["site"]
-            except KeyError:
-                msg = "Site table required for station level metadata."
-                raise ValueError(msg)
-        elif level == 'channel':
-            try:
-                Site = self.tables["site"]
-                Sitechan = self.tables["sitechan"]
-            except KeyError:
-                msg = "Site and sitechan tables required for channel level metadata."
-                raise ValueError(msg)
-        elif level == 'response':
-            try:
-                Site = self.tables["site"]
-                Sitechan = self.tables["sitechan"]
-                Sensor = self.tables["sensor"]
-                Instrument = self.tables["instrument"]
-            except KeyError:
-                msg = "Site, sitechan, sensor, and instrument tables required for response level metadata."
-                raise ValueError(msg)
+            if level in ('channel', 'response'):
+                q = q.add_entity(Sitechan)
 
+            q = filter_stations(
+                q,
+                sta=station,
+                chan=channel,
+                times=times,
+                region=region,
+            )
 
-    # determine time filters
+            if level == 'response':
+                q = q.add_entity(Sensor).add_entity(Instrument)
+                q = filter_responses(
+                    q,
+                    sta=station,
+                    chan=channel,
+                    times=times,
+                )
 
+        if asquery:
+            return q
 
-    #     pass
+        return build_inventory(q, level=level)
 
     def get_waveforms(
         self,
