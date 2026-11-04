@@ -648,7 +648,7 @@ class Client:
             q = filter_networks(q, net=network, sta=station, times=times)
         else:
             q = self.session.query(Network, Affiliation, Site)
-            q = filter_networks(q, net=network, sta=station, times=times)
+            q = filter_networks(q, net=network)
 
             if level in ('channel', 'response'):
                 q = q.add_entity(Sitechan)

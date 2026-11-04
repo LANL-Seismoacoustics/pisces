@@ -51,7 +51,6 @@ def test_get_stations_station(session):
         .filter(kb.Network.net == kb.Affiliation.net)
         .filter(kb.Site.sta == kb.Affiliation.sta)
         .filter(kb.Network.net.like('IU'))
-        .filter(kb.Affiliation.sta.like('ANMO'))
         .filter(kb.Site.sta == kb.Affiliation.sta)
         .filter(kb.Site.sta.like('ANMO'))
     )
@@ -84,6 +83,72 @@ def test_get_stations_channel(session):
     assert observed.statement.compare(expected.statement)
 
 
+def test_get_stations_region(session):
+    """Station requests apply rectangular longitude and latitude filters."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+    )
+
+    observed = client.get_stations(
+        minlongitude=-107,
+        maxlongitude=-106,
+        minlatitude=34,
+        maxlatitude=35,
+        asquery=True,
+    )
+    expected = (
+        session.query(kb.Network, kb.Affiliation, kb.Site)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.lon.between(-107, -106))        .filter(kb.Site.lat.between(34, 35))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_stations_combined_filters(session):
+    """Station requests combine network, station, channel, and region filters."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+        sitechan=kb.Sitechan,
+    )
+
+    observed = client.get_stations(
+        network='IU',
+        station='ANMO',
+        channel='BH?',
+        minlongitude=-107,
+        maxlongitude=-106,
+        minlatitude=34,
+        maxlatitude=35,
+        level='channel',
+        asquery=True,
+    )
+    expected = (
+        session.query(kb.Network, kb.Affiliation, kb.Site)
+        .add_entity(kb.Sitechan)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Network.net.like('IU'))
+        .filter(kb.Site.sta == kb.Sitechan.sta)
+        .filter(kb.Sitechan.ondate.between(kb.Site.ondate, kb.Site.offdate))
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.sta.like('ANMO'))
+        .filter(kb.Sitechan.chan.like('BH_'))
+        .filter(kb.Site.lon.between(-107, -106))
+        .filter(kb.Site.lat.between(34, 35))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
 def test_get_stations_response(session):
     """Response requests add response entities and apply response filters."""
     client = Client(
@@ -106,7 +171,6 @@ def test_get_stations_response(session):
         .add_entity(kb.Instrument)
         .filter(kb.Network.net == kb.Affiliation.net)
         .filter(kb.Site.sta == kb.Affiliation.sta)
-        .filter(kb.Affiliation.sta.like('ANMO'))
         .filter(kb.Site.sta == kb.Sitechan.sta)
         .filter(kb.Sitechan.ondate.between(kb.Site.ondate, kb.Site.offdate))
         .filter(kb.Site.sta == kb.Affiliation.sta)
