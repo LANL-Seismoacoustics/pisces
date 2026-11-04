@@ -14,9 +14,18 @@ from obspy.core.event.header import EventType
 from sqlalchemy.orm import Session
 
 import pisces.request as req
-from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
+from pisces.query import (
+    filter_arrivals,
+    filter_events,
+    filter_magnitudes,
+    filter_networks,
+    filter_responses,
+    filter_stations,
+    util,
+)
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
+from .inventory import build_inventory
 
 log = logging.getLogger(__name__)
 
@@ -465,185 +474,147 @@ class Client:
         longitude: float | None = None,
         minradius: float | None = None,
         maxradius: float | None = None,
-        level: str | None = None,
+        level: str = "station",
         # includerestricted: bool = None,
         # includeavailability: bool = None,
         updatedafter: UTCDateTime = None,
         matchtimeseries: bool | None = None,
         filename: str | None = None,
         format: str = "xml",
+        asquery: bool = False,
         **kwargs
     ):
-    #     """
-    #     Query station station data.
+        """Build a station metadata query or Inventory.
 
-    #     Examples
-    #     --------
+        Parameters
+        ----------
+        starttime, endtime : UTCDateTime, optional
+            Filter metadata epochs overlapping the requested interval. Network-level
+            queries filter Affiliation epochs; station-level queries filter Site,
+            Sitechan, and response epochs in their respective tables.
+        network, station, channel : str, optional
+            Comma-separated codes or ``*``/``?`` wildcard patterns.
+        minlatitude, maxlatitude, minlongitude, maxlongitude : float, optional
+            Rectangular geographic bounds applied to Site rows.
+        level : {"network", "station", "channel", "response"}, optional
+            Metadata detail level. Defaults to ``"station"``.
+        asquery : bool, optional
+            Return the SQLAlchemy query instead of building an ObsPy Inventory.
+        Returns
+        -------
+        sqlalchemy.orm.Query or obspy.core.inventory.Inventory
+            The SQLAlchemy query when ``asquery=True``; otherwise the requested
+            station metadata as an Inventory.
 
-    #     >>> starttime = UTCDateTime("2001-01-01")
-    #     >>> endtime = UTCDateTime("2001-01-02")
-    #     >>> inventory = client.get_stations(network="IU", station="A*",
-    #     ...                                 starttime=starttime,
-    #     ...                                 endtime=endtime)
-    #     >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    #     Inventory created at ...
-    #         Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
-    #                     ...
-    #         Sending institution: IRIS-DMC (IRIS-DMC)
-    #         Contains:
-    #                 Networks (1):
-    #                         IU
-    #                 Stations (3):
-    #                         IU.ADK (Adak, Aleutian Islands, Alaska)
-    #                         IU.AFI (Afiamalu, Samoa)
-    #                         IU.ANMO (Albuquerque, New Mexico, USA)
-    #                 Channels (0):
-
-    #     The result is an `obspy.core.inventory.inventory.Inventory`
-    #     object which models a StationXML file.
-
-    #     The `level` argument determines the amount of returned information.
-    #     `level="station"` is useful for availability queries whereas
-    #     `level="response"` returns the full response information for the
-    #     requested channels. `level` can furthermore be set to `"network"`
-    #     and `"channel"`.
-
-    #     >>> inventory = client.get_stations(
-    #     ...     starttime=starttime, endtime=endtime,
-    #     ...     network="IU", sta="ANMO", loc="00", channel="*Z",
-    #     ...     level="response")
-    #     >>> print(inventory)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    #     Inventory created at ...
-    #         Created by: IRIS WEB SERVICE: fdsnws-station | version: ...
-    #                     ...
-    #         Sending institution: IRIS-DMC (IRIS-DMC)
-    #         Contains:
-    #             Networks (1):
-    #                 IU
-    #             Stations (1):
-    #                 IU.ANMO (Albuquerque, New Mexico, USA)
-    #             Channels (4):
-    #                 IU.ANMO.00.BHZ, IU.ANMO.00.LHZ, IU.ANMO.00.UHZ,
-    #                 IU.ANMO.00.VHZ
-
-    #     Parameters
-    #     ----------
-    #     starttime : UTCDateTime
-    #         Limit to metadata epochs starting on or after the specified start time.
-    #     endtime : UTCDateTime
-    #         Limit to metadata epochs ending on or before the specified end time.
-    #     startbefore : .UTCDateTime
-    #         Limit to metadata epochs starting before specified time.
-    #     startafter : UTCDateTime
-    #         Limit to metadata epochs starting after specified time.
-    #     endbefore : UTCDateTime
-    #         Limit to metadata epochs ending before specified time.
-    #     endafter : UTCDateTime
-    #         Limit to metadata epochs ending after specified time.
-    #     network : str
-    #         Select one or more network codes. Can be SEED network codes or data
-    #         center defined codes. Multiple codes are comma-separated (e.g.
-    #         "IU,TA").
-    #     station : str
-    #         Select one or more SEED station codes. Multiple codes are comma-separated
-    #         (e.g. "ANMO,PFO").
-    #     channel : str
-    #         Select one or more SEED channel codes. Multiple codes are
-    #         comma-separated (e.g. "BHZ,HHZ").
-    #     minlatitude : float
-    #         Limit to stations with a latitude larger than the specified minimum.
-    #     maxlatitude : float
-    #         Limit to stations with a latitude smaller than the specified maximum.
-    #     minlongitude : float
-    #         Limit to stations with a longitude larger than the specified minimum.
-    #     maxlongitude : float
-    #         Limit to stations with a longitude smaller than the specified maximum.
-    #     latitude : float
-    #         Specify the latitude to be used for a radius search.
-    #     longitude : float
-    #         Specify the longitude to be used for a radius search.
-    #     minradius : float
-    #         Limit results to stations within the specified minimum number of
-    #         degrees from the geographic point defined by the latitude and
-    #         longitude parameters.
-    #     maxradius : float
-    #         Limit results to stations within the specified maximum number of
-    #         degrees from the geographic point defined by the latitude and
-    #         longitude parameters.
-    #     level : str
-    #         Specify the level of detail for the results ("network", "station",
-    #         "channel", "response"), e.g. specify "response" to get full
-    #         information including instrument response for each channel.
-    #     includerestricted : bool
-    #         Specify if results should include information for restricted stations.
-    #     includeavailability : bool
-    #         Specify if results should include information about time series data availability.
-    #     updatedafter : UTCDateTime
-    #         Limit to metadata updated after specified date; updates are data center specific.
-    #     matchtimeseries : bool
-    #         Only include data for which matching time series data is available.
-    #     filename : str or file
-    #         If given, the downloaded data will be saved there instead of being
-    #         parsed to an ObsPy object. Thus it will contain the raw data from
-    #         the webservices.
-    #     format : str
-    #         The format in which to request station information. "xml"
-    #         (StationXML) or "text" (FDSN station text format). XML has more
-    #         information but text is much faster.
-
-    #     Returns
-    #     -------
-    #     Inventory
-    #         Inventory with requested station information.
-
-    #     Any additional keyword arguments will be passed to the webservice as
-    #     additional arguments. If you pass one of the default parameters and the
-    #     webservice does not support it, a warning will be issued. Passing any
-    #     non-default parameters that the webservice does not support will raise
-    #     an error.
-
-    #     """
+        Raises
+        ------
+        ValueError
+            If ``level`` is invalid or the tables required for that level are absent.
+        """
+        #     startbefore : .UTCDateTime
+        #         Limit to metadata epochs starting before specified time.
+        #     startafter : UTCDateTime
+        #         Limit to metadata epochs starting after specified time.
+        #     endbefore : UTCDateTime
+        #         Limit to metadata epochs ending before specified time.
+        #     endafter : UTCDateTime
+        #         Limit to metadata epochs ending after specified time.
+        #     latitude : float
+        #         Specify the latitude to be used for a radius search. Accepted for
+        #         FDSN compatibility but currently ignored.
+        #     longitude : float
+        #         Specify the longitude to be used for a radius search. Accepted for
+        #         FDSN compatibility but currently ignored.
+        #     minradius : float
+        #         Limit results to stations within the specified minimum number of
+        #         degrees from the geographic point defined by the latitude and
+        #         longitude parameters. Accepted for FDSN compatibility but currently
+        #         ignored.
+        #     maxradius : float
+        #         Limit results to stations within the specified maximum number of
+        #         degrees from the geographic point defined by the latitude and
+        #         longitude parameters. Accepted for FDSN compatibility but currently
+        #         ignored.
+        #     includerestricted : bool
+        #         Specify if results should include information for restricted stations.
+        #     includeavailability : bool
+        #         Specify if results should include information about time series data availability.
+        #     updatedafter : UTCDateTime
+        #         Limit to metadata updated after specified date; updates are data center specific.
+        #     matchtimeseries : bool
+        #         Only include data for which matching time series data is available.
+        #     filename : str or file
+        #         If given, the downloaded data will be saved there instead of being
+        #         parsed to an ObsPy object. Thus it will contain the raw data from
+        #         the webservices.
+        #     format : str
+        #         The format in which to request station information. "xml"
+        #         (StationXML) or "text" (FDSN station text format). XML has more
+        #         information but text is much faster.
+        #
+        #     These parameters are accepted for FDSN compatibility but are not
+        #     implemented for local database queries.
 
         level = level.lower()
-        VALID_LEVELS = ['network', 'station', 'channel', 'response']
-        if level not in VALID_LEVELS:
-            raise ValueError(f"level must be one of {VALID_LEVELS}")
+        valid_levels = ['network', 'station', 'channel', 'response']
+        if level not in valid_levels:
+            raise ValueError(f"level must be one of {valid_levels}")
+
+        required_tables = {
+            'network': ('network',),
+            'station': ('network', 'affiliation', 'site'),
+            'channel': ('network', 'affiliation', 'site', 'sitechan'),
+            'response': ('network', 'affiliation', 'site', 'sitechan', 'sensor', 'instrument'),
+        }[level]
+        if any(table not in self.tables for table in required_tables):
+            names = ', '.join(required_tables)
+            raise ValueError(f"{names} tables required for {level} level metadata.")
+
+        Network = self.tables.get('network')
+        Affiliation = self.tables.get('affiliation')
+        Site = self.tables.get('site')
+        Sitechan = self.tables.get('sitechan')
+        Sensor = self.tables.get('sensor')
+        Instrument = self.tables.get('instrument')
+
+        times = _None_if_none(starttime, endtime)
+        region = _None_if_none(
+            minlongitude, maxlongitude, minlatitude, maxlatitude
+        )
 
         if level == 'network':
-            try:
-                Network = self.tables["network"]
-            except KeyError:
-                msg = "Network table required for network level metadata."
-                raise ValueError(msg)
+            q = self.session.query(Network)
+            if Affiliation:
+                q = q.add_entity(Affiliation)
+            q = filter_networks(q, net=network, sta=station, times=times)
+        else:
+            q = self.session.query(Network, Affiliation, Site)
+            q = filter_networks(q, net=network)
 
-        elif level == 'station':
-            try:
-                Site = self.tables["site"]
-            except KeyError:
-                msg = "Site table required for station level metadata."
-                raise ValueError(msg)
-        elif level == 'channel':
-            try:
-                Site = self.tables["site"]
-                Sitechan = self.tables["sitechan"]
-            except KeyError:
-                msg = "Site and sitechan tables required for channel level metadata."
-                raise ValueError(msg)
-        elif level == 'response':
-            try:
-                Site = self.tables["site"]
-                Sitechan = self.tables["sitechan"]
-                Sensor = self.tables["sensor"]
-                Instrument = self.tables["instrument"]
-            except KeyError:
-                msg = "Site, sitechan, sensor, and instrument tables required for response level metadata."
-                raise ValueError(msg)
+            if level in ('channel', 'response'):
+                q = q.add_entity(Sitechan)
 
+            q = filter_stations(
+                q,
+                sta=station,
+                chan=channel,
+                times=times,
+                region=region,
+            )
 
-    # determine time filters
+            if level == 'response':
+                q = q.add_entity(Sensor).add_entity(Instrument)
+                q = filter_responses(
+                    q,
+                    sta=station,
+                    chan=channel,
+                    times=times,
+                )
 
+        if asquery:
+            return q
 
-    #     pass
+        return build_inventory(q, level=level)
 
     def get_waveforms(
         self,
