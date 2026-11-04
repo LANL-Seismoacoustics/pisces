@@ -18,6 +18,147 @@ from pisces.fdsn import Client
 from pisces.util import literal_sql
 
 
+def test_get_stations_network(session):
+    """Network requests build a filtered Network/Affiliation query."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+    )
+
+    observed = client.get_stations(network='IU', level='network', asquery=True)
+    expected = (
+        session.query(kb.Network, kb.Affiliation)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Network.net.like('IU'))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_stations_station(session):
+    """Station requests join Network, Affiliation, and Site with station filters."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+    )
+
+    observed = client.get_stations(network='IU', station='ANMO', asquery=True)
+    expected = (
+        session.query(kb.Network, kb.Affiliation, kb.Site)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Network.net.like('IU'))
+        .filter(kb.Affiliation.sta.like('ANMO'))
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.sta.like('ANMO'))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_stations_channel(session):
+    """Channel requests add Sitechan before applying channel filters."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+        sitechan=kb.Sitechan,
+    )
+
+    observed = client.get_stations(channel='BH?', level='channel', asquery=True)
+    expected = (
+        session.query(kb.Network, kb.Affiliation, kb.Site)
+        .add_entity(kb.Sitechan)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.sta == kb.Sitechan.sta)
+        .filter(kb.Sitechan.ondate.between(kb.Site.ondate, kb.Site.offdate))
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Sitechan.chan.like('BH_'))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_stations_response(session):
+    """Response requests add response entities and apply response filters."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+        sitechan=kb.Sitechan,
+        sensor=kb.Sensor,
+        instrument=kb.Instrument,
+    )
+
+    observed = client.get_stations(
+        station='ANMO', channel='BHZ', level='response', asquery=True
+    )
+    expected = (
+        session.query(kb.Network, kb.Affiliation, kb.Site)
+        .add_entity(kb.Sitechan)
+        .add_entity(kb.Sensor)
+        .add_entity(kb.Instrument)
+        .filter(kb.Network.net == kb.Affiliation.net)
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Affiliation.sta.like('ANMO'))
+        .filter(kb.Site.sta == kb.Sitechan.sta)
+        .filter(kb.Sitechan.ondate.between(kb.Site.ondate, kb.Site.offdate))
+        .filter(kb.Site.sta == kb.Affiliation.sta)
+        .filter(kb.Site.sta.like('ANMO'))
+        .filter(kb.Sitechan.chan.like('BHZ'))
+        .filter(kb.Sensor.inid == kb.Instrument.inid)
+        .filter(kb.Sitechan.chanid == kb.Sensor.chanid)
+        .filter(kb.Sensor.sta.like('ANMO'))
+        .filter(kb.Sensor.chan.like('BHZ'))
+    )
+
+    assert observed.statement.compare(expected.statement)
+
+
+def test_get_stations_missing_tables(session):
+    """Station-level requests require Network, Affiliation, and Site tables."""
+    client = Client(session, site=kb.Site)
+
+    with pytest.raises(ValueError, match='network, affiliation, site'):
+        client.get_stations()
+
+
+def test_get_stations_invalid_level(session):
+    """An unknown station metadata level raises ValueError."""
+    client = Client(session, network=kb.Network)
+
+    with pytest.raises(ValueError, match='level must be one of'):
+        client.get_stations(level='invalid')
+
+
+def test_get_stations_radius_ignored(session):
+    """Radius arguments are accepted for compatibility but do not alter the query."""
+    client = Client(
+        session,
+        network=kb.Network,
+        affiliation=kb.Affiliation,
+        site=kb.Site,
+    )
+
+    observed = client.get_stations(network='IU', asquery=True)
+    with_radius = client.get_stations(
+        network='IU',
+        latitude=35,
+        longitude=-107,
+        minradius=1,
+        maxradius=2,
+        asquery=True,
+    )
+
+    assert with_radius.statement.compare(observed.statement)
+
+
 def test_get_events_geographic(session):
     """ Geographic tests """
     client = Client(session, origin=kb.Origin, event=kb.Event, netmag=kb.Netmag)
@@ -38,7 +179,7 @@ def test_get_events_geographic(session):
                .filter(kb.Netmag.evid == kb.Event.evid)
                .filter(kb.Netmag.orid == kb.Origin.orid)
     )
-    assert literal_sql(observed) == literal_sql(expected)
+    assert observed.statement.compare(expected.statement)
 
 def test_get_events_eventid(session):
     """ Specify an event and its preferred origin. """
