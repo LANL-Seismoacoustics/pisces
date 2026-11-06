@@ -195,42 +195,17 @@ def availability(
             "restricted_substring has no effect when includerestricted=True",
             UserWarning,
         )
-    if not includerestricted and not restricted_substring:
-        raise ValueError(
-            "restricted_substring is required when includerestricted=False"
+    if restricted_substring is not None and includerestricted:
+        warnings.warn(
+            "restricted_substring has no effect when includerestricted=True",
+            UserWarning,
         )
 
-    Affiliation, Wfdisc = _get_entities(query, "Affiliation", "Wfdisc")
-    Site, Network = _get_entities(query, "Site", "Network")
-    if not Affiliation or not Wfdisc:
-        raise ValueError("availability query must include Wfdisc and Affiliation")
-    if not includerestricted and (not Site or not Network):
-        raise ValueError(
-            "availability query must include Site and Network when excluding restricted data"
-        )
-
-    q = query.filter(Affiliation.sta == Wfdisc.sta)
-    if Network:
-        q = q.filter(Network.net == Affiliation.net)
-    if Site:
-        q = q.filter(Site.sta == Affiliation.sta)
-    if not includerestricted:
-        restricted = or_(
-            Site.staname.contains(restricted_substring),
-            Network.netname.contains(restricted_substring),
-        )
-        q = q.filter(~restricted)
-
-    base = q.with_entities(
-        Affiliation.net.label("network"),
-        Wfdisc.sta.label("station"),
-        Wfdisc.chan.label("channel"),
-        Wfdisc.samprate.label("samplerate"),
-        Wfdisc.time.label("earliest"),
-        Wfdisc.endtime.label("latest"),
-        Wfdisc.wfid.label("wfid"),
-        Wfdisc.lddate.label("updated"),
-    ).distinct().subquery()
+    base = _availability_rows(
+        query,
+        includerestricted=includerestricted,
+        restricted_substring=restricted_substring,
+    ).subquery()
     partition = [
         base.c.network, base.c.station, base.c.channel, base.c.samplerate
     ]
@@ -240,7 +215,7 @@ def availability(
         order_by=ordering,
         rows=(None, -1),
     )
-    ordered = q.session.query(
+    ordered = query.session.query(
         base,
         previous_latest.label("previous_latest"),
     ).subquery()
@@ -249,7 +224,7 @@ def availability(
         (ordered.c.earliest > ordered.c.previous_latest + mergegaps, 1),
         else_=0,
     )
-    numbered = q.session.query(
+    numbered = query.session.query(
         ordered,
         starts_span.label("starts_span"),
     ).subquery()
@@ -269,7 +244,7 @@ def availability(
         order_by=numbered_ordering,
         rows=(None, 0),
     )
-    numbered = q.session.query(
+    numbered = query.session.query(
         numbered,
         span_number.label("span_number"),
     ).subquery()
@@ -284,7 +259,7 @@ def availability(
     ]
     if show == "latestupdate":
         grouped_columns.append(func.max(numbered.c.updated).label("updated"))
-    grouped = q.session.query(*grouped_columns).group_by(
+    grouped = query.session.query(*grouped_columns).group_by(
         numbered.c.network,
         numbered.c.station,
         numbered.c.channel,
@@ -338,93 +313,77 @@ def availability(
 
 
 
-# this is availability/extent
-def extent(
-    query: Query,
-    net: str,
-    sta: str,
-    chan: str,
-    starttime: float,
-    endtime: float,
-    merge: str | None = None,
-    includerestricted: bool = True
-) -> Query:
-    """ Find the earliest and latest time series data available in the wfdisc table.
-
-    Parameters
-    ----------
-    query : SQLAlchemy query object
-        Includes Affiliation, Wfdisc tables
-    net, sta, chan : str
-        Network, station, channel code pattern. Supports wildcards: * for any sequence,
-        ? for single character, comma-separated for multiple patterns
-    starttime : float
-        Start of time period (in epoch seconds)
-    endtime : float
-        End of time period (in epoch seconds)
-    merge : str {samprate, quality} [not yet implemented]
-        Can be multiple values, comma-separated
-    includerestricted : bool
-        Include (default) or exclude restricted data.
-
-    Returns
-    -------
-    results : Query
-        SQLAlchemy Query that returns result tuples with the following attributes:
-        (NET, STA, LOC, CHAN, QUAL, SAMPRATE, EARLIEST, LATEST, UPDATED, SPANCOUNT, STATUS)
-
-    Joins
-    -----
-    Affiliation.sta == Wfdisc.sta
-
-    """
-    # Plan:
-        # get affil.net, wfdisc.sta, wfdisc.chan, wfdisc.time, wfdisc.endtime
-        # from above subquery, get min(time), max(endtime) for each distinct net, sta, chan
-    # TODO: most of this should be in the high-resolution "availability" function, but employed here.
-    session = query.session
+def _availability_rows(query, includerestricted=True, restricted_substring=None):
+    """Return the filtered, deduplicated Wfdisc rows used by availability APIs."""
     Affiliation, Wfdisc = _get_entities(query, "Affiliation", "Wfdisc")
+    Site, Network = _get_entities(query, "Site", "Network")
+    if not Affiliation or not Wfdisc:
+        raise ValueError("availability query must include Wfdisc and Affiliation")
+    if not includerestricted and not restricted_substring:
+        raise ValueError(
+            "restricted_substring is required when includerestricted=False"
+        )
+    if not includerestricted and (not Site or not Network):
+        raise ValueError(
+            "availability query must include Site and Network when excluding restricted data"
+        )
 
-    nets = make_wildcard_list(net)
-    stas = make_wildcard_list(sta)
-    chans = make_wildcard_list(chan)
+    q = query.filter(Affiliation.sta == Wfdisc.sta)
+    if Network:
+        q = q.filter(Network.net == Affiliation.net)
+    if Site:
+        q = q.filter(Site.sta == Affiliation.sta)
+    if not includerestricted:
+        q = q.filter(~or_(
+            Site.staname.contains(restricted_substring),
+            Network.netname.contains(restricted_substring),
+        ))
 
-    # XXX: need to consider affil.time, affil.endtime for stations
-    all_rows = session.query(
-        Affiliation.net,
-        Wfdisc.sta,
-        Wfdisc.chan,
-        Wfdisc.time,
-        Wfdisc.samprate,
-        Wfdisc.endtime,
-        Wfdisc.wfid,
-        Wfdisc.lddate,
-    ).filter(
-        Affiliation.sta == Wfdisc.sta,
-    ).filter(
-        or_(*[Affiliation.net.like(net) for net in nets]),
-        or_(*[Wfdisc.sta.like(sta) for sta in stas]),
-        or_(*[Wfdisc.chan.like(chan) for chan in chans]),
-    ).filter(
-        and_(Wfdisc.time <= endtime, Wfdisc.endtime >= starttime)
+    return q.with_entities(
+        Affiliation.net.label("network"),
+        Wfdisc.sta.label("station"),
+        Wfdisc.chan.label("channel"),
+        Wfdisc.samprate.label("samplerate"),
+        Wfdisc.time.label("earliest"),
+        Wfdisc.endtime.label("latest"),
+        Wfdisc.wfid.label("wfid"),
+        Wfdisc.lddate.label("updated"),
+    ).distinct()
+
+
+def extent(query, includerestricted=True, restricted_substring=None):
+    """Get earliest/latest extents for the rows represented by ``query``.
+
+    The query must already contain all waveform filters, typically through
+    :func:`filter_waveforms`, and include Wfdisc and Affiliation entities.
+    Extents are grouped by network, station, channel, and exact sample rate.
+    ``timespans`` is the number of contributing Wfdisc records, not merged
+    continuous spans. Location is always ``"--"`` and restriction is reported
+    as ``"PARTIAL"`` because KB Core does not provide restriction metadata.
+    """
+    if restricted_substring is not None and includerestricted:
+        warnings.warn(
+            "restricted_substring has no effect when includerestricted=True",
+            UserWarning,
+        )
+    rows = _availability_rows(
+        query, includerestricted=includerestricted,
+        restricted_substring=restricted_substring,
     ).subquery()
-
-    # select and aggregate from our superset, labeling columns as FDSN extent does
-    query = session.query(
-        all_rows.c.net.label('network'),
-        all_rows.c.sta.label('station'),
-        literal("--").label('location'),
-        all_rows.c.chan.label('channel'),
-        literal("R").label('quality'),
-        func.min(all_rows.c.time).label('earliest'),
-        func.max(all_rows.c.endtime).label('latest'),
-        func.count(all_rows.c.wfid).label('spancount'),
-        func.max(all_rows.c.lddate).label('updated'),
-        literal("PARTIAL").label('restriction'), #TODO: find a way to actually tell if this is restricted/open/partial
+    return query.session.query(
+        rows.c.network,
+        rows.c.station,
+        literal("--").label("location"),
+        rows.c.channel,
+        rows.c.samplerate,
+        func.min(rows.c.earliest).label("earliest"),
+        func.max(rows.c.latest).label("latest"),
+        func.max(rows.c.updated).label("updated"),
+        func.count(rows.c.wfid).label("timespans"),
+        literal("PARTIAL").label("restriction"),
     ).group_by(
-        all_rows.c.net, all_rows.c.sta, all_rows.c.chan
+        rows.c.network, rows.c.station, rows.c.channel, rows.c.samplerate
     ).order_by(
-        all_rows.c.net, all_rows.c.sta, all_rows.c.chan
+        rows.c.network, rows.c.station, rows.c.channel,
+        rows.c.samplerate, rows.c.earliest
     )
-
-    return query
