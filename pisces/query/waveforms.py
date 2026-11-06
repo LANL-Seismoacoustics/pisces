@@ -62,40 +62,40 @@ def filter_waveforms(
     clip=None,
     affiliation=None,
 ):
-    """ Request wfdisc rows.
+    """Request Wfdisc rows.
 
     Parameters
     ----------
     query : sqlalchemy.orm.Query
-    net, sta, chan : str
-        Network, station, channel code pattern. Supports wildcards: * for any sequence,
-        ? for single character, comma-separated for multiple patterns
-    times : tuple of (time, endtime) [Wfdisc]
-        Anything that obspy.UTCDateTime can consume is accepted.
-    recordlength : int (default is one day, 60*60*24=86400)
-        Number of seconds of typical wfdisc record length.  Knowing this can help ensure records
-        that straddle the end of the request times are properly returned. Set to something
-        Falsey to use standard time windowing, like recordlength=None
-    clip : str {'c', 'n'}
-        Filter on the Wfdisc.clip flag: "c" for clipped, "n" for not clipped.
-    affiliation : Affiliaton table class, required if "net is specified
-        If the incoming query didn't include the Affiliation table, adding it here _won't_ include
-        it in the results.  It's just used for filtering.
+        Query whose session is used to build the returned Wfdisc query.
+    net, sta, chan : str, optional
+        Network, station, and channel patterns. ``*`` and ``?`` wildcards and
+        comma-separated patterns are supported. ``net`` requires affiliation.
+    times : tuple of (time, endtime)
+        Values accepted by :class:`obspy.UTCDateTime`.
+    wfid : iterable of int, optional
+        Not implemented.
+    recordlength : int, optional
+        Typical Wfdisc record length in seconds (default: 86400). A falsey
+        value disables the record-length buffer.
+    clip : {"c", "n"}, optional
+        Not implemented; Wfdisc clip flags are not filtered.
+    affiliation : mapped table class, optional
+        Affiliation table used for network and epoch-overlap filtering.
+        Required when ``net`` is specified. Without it, station/channel/time
+        filtering still works.
 
     Returns
     -------
-    query
-        Filtered and joined version of the original query.
+    sqlalchemy.orm.Query
+        Query returning filtered Wfdisc rows.
 
-    Joins
+    Notes
     -----
-    Affiliation.sta == Wfdisc.sta,
-    Wfdisc.time <= Affiliation.endtime,
-    Wfdisc.endtime >= Affiliation.time,
-
+    Location filtering is not supported by this CSS Wfdisc query.
     """
     Affiliation, Wfdisc = _get_entities(query, "Affiliation", "Wfdisc")
-    Affiliation = affiliation or Affiliation # use provided Affiliation
+    Affiliation = affiliation or Affiliation
 
     if net and not Affiliation:
         msg = "Affiliation table required with `net` parameter."
@@ -106,29 +106,26 @@ def filter_waveforms(
         for t in times
     ]
 
-    # these lists may be empty
-    nets = make_wildcard_list(net)
-    stas = make_wildcard_list(sta)
-    chans = make_wildcard_list(chan)
+    nets = make_wildcard_list(net) if net is not None else []
+    stas = make_wildcard_list(sta) if sta is not None else []
+    chans = make_wildcard_list(chan) if chan is not None else []
 
-    # XXX: need to consider affil.time, affil.endtime for stations
-    q = query.session.query(
-        Wfdisc
-    ).filter(
-        or_(*[Wfdisc.sta.like(sta) for sta in stas]),
-        or_(*[Wfdisc.chan.like(chan) for chan in chans]),
-    ).filter(
-        Wfdisc.time <= Affiliation.endtime,
-        Wfdisc.endtime >= Affiliation.time,
-    )
+    q = query.session.query(Wfdisc)
 
-    if nets:
+    if stas:
+        q = q.filter(or_(*[Wfdisc.sta.like(pattern) for pattern in stas]))
+    if chans:
+        q = q.filter(or_(*[Wfdisc.chan.like(pattern) for pattern in chans]))
+
+    if Affiliation:
         q = q.filter(
             Affiliation.sta == Wfdisc.sta,
-            or_(*[Affiliation.net.like(net) for net in nets]),
             Wfdisc.time <= Affiliation.endtime,
             Wfdisc.endtime >= Affiliation.time,
         )
+
+    if nets:
+        q = q.filter(or_(*[Affiliation.net.like(pattern) for pattern in nets]))
 
     if recordlength:
         q = q.filter(

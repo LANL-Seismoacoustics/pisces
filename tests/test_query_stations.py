@@ -1,6 +1,5 @@
 """
-Tests for the pisces.request module
-
+Tests for the pisces.query.stations module.
 
 """
 import pytest
