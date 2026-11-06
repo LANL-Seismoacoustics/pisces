@@ -2,13 +2,20 @@
 Tests for the pisces.query.waveforms module.
 
 """
-from datetime import datetime
-
+import pytest
 from obspy import UTCDateTime
 from sqlalchemy import or_
 
 from pisces.query import availability, filter_waveforms
-from pisces.tables.kbcore import Affiliation, Wfdisc
+from pisces.tables.kbcore import Affiliation, Network, Site, Wfdisc
+
+
+def waveform_query(session):
+    """Build the pre-filtered query expected by availability."""
+    return filter_waveforms(
+        session.query(Wfdisc, Affiliation), net="IU", sta="ANMO", chan="BHZ",
+        times=(UTCDateTime(0), UTCDateTime(30)), recordlength=None,
+    )
 
 
 def test_query_waveforms_filters_codes_and_time(session):
@@ -87,73 +94,29 @@ def test_query_waveforms_disables_recordlength_buffer(session):
     assert observed.statement.compare(expected.statement)
 
 
-def add_waveform_data(session):
-    """Add small overlapping and gapped waveform records for availability tests."""
-    affiliation = Affiliation(net="IU", sta="ANMO", time=0, endtime=100)
-    rows = [
-        Wfdisc(sta="ANMO", chan="BHZ", time=0, endtime=10, samprate=40,
-               wfid=101, lddate=datetime(2020, 1, 1)),
-        Wfdisc(sta="ANMO", chan="BHZ", time=10, endtime=20, samprate=40,
-               wfid=102, lddate=datetime(2020, 1, 2)),
-        Wfdisc(sta="ANMO", chan="BHZ", time=22, endtime=30, samprate=40,
-               wfid=103, lddate=datetime(2020, 1, 3)),
-        Wfdisc(sta="ANMO", chan="BHZ", time=0, endtime=30, samprate=20,
-               wfid=104, lddate=datetime(2020, 1, 4)),
-    ]
-    session.add_all([affiliation, *rows])
-    session.commit()
-    return affiliation, rows
-
-
-def remove_waveform_data(session, affiliation, rows):
-    """Remove availability test rows."""
-    for row in rows:
-        session.delete(row)
-    session.delete(affiliation)
-    session.commit()
-
-
-def waveform_query(session):
-    """Build the pre-filtered query expected by availability."""
-    return filter_waveforms(
-        session.query(Wfdisc, Affiliation), net="IU", sta="ANMO", chan="BHZ",
-        times=(UTCDateTime(0), UTCDateTime(30)), recordlength=None,
-    )
-
-
-def test_query_waveforms_availability_merges_spans(session):
+def test_query_waveforms_availability_merges_spans(session, availability_data):
     """availability merges overlapping and touching spans by sample rate."""
-    affiliation, rows = add_waveform_data(session)
-    try:
-        observed = availability(waveform_query(session))
-        assert [(r.network, r.station, r.location, r.channel, r.samplerate,
-                 r.earliest, r.latest) for r in observed] == [
-            ("IU", "ANMO", "--", "BHZ", 20.0, 0.0, 30.0),
-            ("IU", "ANMO", "--", "BHZ", 40.0, 0.0, 20.0),
-            ("IU", "ANMO", "--", "BHZ", 40.0, 22.0, 30.0),
-        ]
-        assert observed[0]._mapping.keys() == observed[0]._fields
-    finally:
-        remove_waveform_data(session, affiliation, rows)
+    observed = availability(waveform_query(session))
+    assert [(r.network, r.station, r.location, r.channel, r.samplerate,
+             r.earliest, r.latest) for r in observed] == [
+        ("IU", "ANMO", "--", "BHZ", 20.0, 0.0, 30.0),
+        ("IU", "ANMO", "--", "BHZ", 40.0, 0.0, 20.0),
+        ("IU", "ANMO", "--", "BHZ", 40.0, 22.0, 30.0),
+    ]
+    assert observed[0]._mapping.keys() == observed[0]._fields
 
 
-def test_query_waveforms_availability_merges_gaps(session):
+def test_query_waveforms_availability_merges_gaps(session, availability_data):
     """availability merges spans separated by the mergegaps tolerance."""
-    affiliation, rows = add_waveform_data(session)
-    try:
-        observed = availability(waveform_query(session), mergegaps=2)
-        assert [(r.samplerate, r.earliest, r.latest) for r in observed
-                if r.samplerate == 40.0] == [(40.0, 0.0, 30.0)]
-    finally:
-        remove_waveform_data(session, affiliation, rows)
+    observed = availability(waveform_query(session), mergegaps=2)
+    assert [(r.samplerate, r.earliest, r.latest) for r in observed
+            if r.samplerate == 40.0] == [(40.0, 0.0, 30.0)]
 
 
-def test_query_waveforms_availability_merges_sample_rates(session):
+def test_query_waveforms_availability_merges_sample_rates(session, availability_data):
     """availability can merge spans from nearby sample rates in Python."""
-    affiliation, rows = add_waveform_data(session)
     extra = Wfdisc(sta="ANMO", chan="BHZ", time=20, endtime=35,
-                   samprate=39.95, wfid=105, lddate=datetime(2020, 1, 5))
-    rows.append(extra)
+                   samprate=39.95, wfid=105)
     session.add(extra)
     session.commit()
     try:
@@ -162,4 +125,76 @@ def test_query_waveforms_availability_merges_sample_rates(session):
             (20.0, 0.0, 30.0), (40.0, 0.0, 35.0),
         ]
     finally:
-        remove_waveform_data(session, affiliation, rows)
+        session.delete(extra)
+        session.commit()
+
+
+def test_query_waveforms_availability_shows_latest_update(session, availability_data):
+    """availability includes the latest update when requested."""
+    observed = availability(waveform_query(session), show="latestupdate")
+
+    assert observed[0].updated.year == 2020
+    assert observed[0].updated.day == 4
+    assert "updated" in observed[0]._fields
+
+
+def test_query_waveforms_availability_rejects_invalid_show(session, availability_data):
+    """availability rejects unsupported show values."""
+    with pytest.raises(ValueError, match="show"):
+        availability(waveform_query(session), show="unsupported")
+
+
+def test_query_waveforms_availability_requires_restriction_substring(
+    session, availability_data
+):
+    """Excluding restricted data requires a restriction substring."""
+    with pytest.raises(ValueError, match="restricted_substring"):
+        availability(waveform_query(session), includerestricted=False)
+
+
+def test_query_waveforms_availability_warns_on_unused_restriction_substring(
+    session, availability_data
+):
+    """A restriction substring warns when restricted data is included."""
+    with pytest.warns(UserWarning, match="no effect"):
+        availability(waveform_query(session), restricted_substring="restricted")
+
+
+def test_query_waveforms_availability_excludes_restricted_rows(
+    session, availability_data
+):
+    """availability excludes rows matching the restriction substring."""
+    query = filter_waveforms(
+        session.query(Wfdisc, Affiliation, Site, Network),
+        net="IU", sta="ANMO", chan="BHZ",
+        times=(UTCDateTime(0), UTCDateTime(30)), recordlength=None,
+    )
+
+    observed = availability(
+        query,
+        includerestricted=False,
+        restricted_substring="it is restricted",
+    )
+
+    assert observed == []
+
+
+def test_query_waveforms_availability_includes_restricted_rows(
+    session, availability_data
+):
+    """availability includes restricted rows by default."""
+    query = filter_waveforms(
+        session.query(Wfdisc, Affiliation, Site, Network),
+        net="IU", sta="ANMO", chan="BHZ",
+        times=(UTCDateTime(0), UTCDateTime(30)), recordlength=None,
+    )
+
+    observed = availability(query, includerestricted=True)
+
+    assert observed
+
+
+def test_query_waveforms_availability_requires_entities(session):
+    """availability requires Wfdisc and Affiliation entities."""
+    with pytest.raises(ValueError, match="Wfdisc and Affiliation"):
+        availability(session.query(Wfdisc))

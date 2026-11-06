@@ -2,6 +2,8 @@
 Useful Pytest fixtures for Pisces tests.
 
 """
+from datetime import datetime
+
 import obspy.core.event as qml
 import pytest
 from obspy import UTCDateTime
@@ -96,7 +98,34 @@ def get_stations_data(session):
     session.commit()
 
 
-# TODO: these are fixtures from test_fdsn that should be refactored here to avoid redundancy
+@pytest.fixture
+def availability_data(session):
+    """Provide controlled Wfdisc spans for availability query tests."""
+    affiliation = Affiliation(net='IU', sta='ANMO', time=0, endtime=100)
+    network = Network(net='IU', netname='it is restricted')
+    site = Site(sta='ANMO', staname='it is restricted')
+    rows = [
+        Wfdisc(sta='ANMO', chan='BHZ', time=0, endtime=10, samprate=40,
+               wfid=101, lddate=datetime(2020, 1, 1)),
+        Wfdisc(sta='ANMO', chan='BHZ', time=10, endtime=20, samprate=40,
+               wfid=102, lddate=datetime(2020, 1, 2)),
+        Wfdisc(sta='ANMO', chan='BHZ', time=22, endtime=30, samprate=40,
+               wfid=103, lddate=datetime(2020, 1, 3)),
+        Wfdisc(sta='ANMO', chan='BHZ', time=0, endtime=30, samprate=20,
+               wfid=104, lddate=datetime(2020, 1, 4)),
+    ]
+    session.add_all([affiliation, network, site, *rows])
+    session.commit()
+    yield affiliation, rows
+    for row in rows:
+        session.delete(row)
+    session.delete(affiliation)
+    session.delete(network)
+    session.delete(site)
+    session.commit()
+
+
+# TODO: these fixtures from test_fdsn that should be refactored here to avoid redundancy
 @pytest.fixture(scope='session')
 def engine():
     return create_engine('sqlite://')

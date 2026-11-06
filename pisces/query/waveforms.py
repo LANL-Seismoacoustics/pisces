@@ -210,6 +210,10 @@ def availability(
         )
 
     q = query.filter(Affiliation.sta == Wfdisc.sta)
+    if Network:
+        q = q.filter(Network.net == Affiliation.net)
+    if Site:
+        q = q.filter(Site.sta == Affiliation.sta)
     if not includerestricted:
         restricted = or_(
             Site.staname.contains(restricted_substring),
