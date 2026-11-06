@@ -546,7 +546,7 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     return res
 
 
-@deprecated("Use pisces.fdsn.trace.stream and trim_stream instead.")
+@deprecated("Use pisces.fdsn.stream.stream and trim_stream instead.")
 def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     """
     Convert wfdisc rows to obspy stream, trim the data to starttime and endtime

@@ -1,5 +1,5 @@
 """
-Tests for pisces.trace (Wfdisc row <-> ObsPy Trace).
+Tests for pisces.fdsn.stream (Wfdisc row <-> ObsPy Trace).
 
 """
 import os
@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 from obspy import Stream, Trace, UTCDateTime
 
-import pisces.fdsn.trace as trace
-from pisces.fdsn.trace import stream, trim_stream, wfdisc2obspyhdr, wfdisc2trace
+import pisces.fdsn.stream as trace
+from pisces.fdsn.stream import stream, trim_stream, wfdisc2obspyhdr, wfdisc2trace
 from pisces.tables.kbcore import Wfdisc
 
 

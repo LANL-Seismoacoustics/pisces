@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from pisces.query import filter_arrivals, filter_events, filter_magnitudes, filter_waveforms, util
 
-from .trace import stream, trim_stream
+from .stream import stream, trim_stream
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
 
