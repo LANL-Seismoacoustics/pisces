@@ -62,17 +62,56 @@ def wfdisc2trace(wf):
     return tr
 
 
-# TODO: make this return a generator of Traces, to avoid memory probablems?
-# i.e.  return (wfdisc2trace(getattr(row, Wfdisc.__name__) for row in q)
-# callers can do: st = Stream(result_of_stream)
-# not sure if obspy Stream(generator) would like it, though
 def stream(q):
+    """Convert Wfdisc rows to an ObsPy Stream.
+
+    Parameters
+    ----------
+    q : sqlalchemy.orm.Query
+        Query containing a Wfdisc entity.
+
+    Raises
+    ------
+    OSError
+        If a waveform file cannot be read.
+    """
     Wfdisc, = _get_entities(q, "Wfdisc")
-    st = Stream([
-        wfdisc2trace(
-            getattr(row, Wfdisc.__name__) # get the wfdisc attribute of the row, whatever the Wfdisc table is called.
-        )
-        for row in q
-    ])
+    traces = []
+    for row in q:
+        wf = row if isinstance(row, Wfdisc) else getattr(row, Wfdisc.__name__)
+        try:
+            tr = wfdisc2trace(wf)
+        except OSError as exc:
+            raise OSError(f"Can't read {wf.dir}/{wf.dfile}.") from exc
+        if tr:
+            traces.append(tr)
+
+    return Stream(traces)
+
+
+def trim_stream(st, starttime, endtime, tolerance=None):
+    """Trim an ObsPy Stream and optionally validate its time coverage.
+
+    Parameters
+    ----------
+    st : obspy.Stream
+        Stream to trim in place.
+    starttime, endtime : obspy.UTCDateTime
+        Requested trim interval.
+    tolerance : float, optional
+        Raise ``ValueError`` if the resulting stream does not cover the
+        requested interval within this many seconds.
+
+    Returns
+    -------
+    obspy.Stream
+        The trimmed input stream.
+    """
+    st.trim(starttime, endtime)
+    if all((tolerance, starttime, endtime)) and st:
+        min_t = min(tr.stats.starttime for tr in st)
+        max_t = max(tr.stats.endtime for tr in st)
+        if abs(min_t - starttime) > tolerance or abs(max_t - endtime) > tolerance:
+            raise ValueError(f"Trace times are outside of tolerance: {tolerance} seconds")
 
     return st

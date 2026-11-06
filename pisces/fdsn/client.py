@@ -13,8 +13,9 @@ from obspy import Stream, UTCDateTime
 from obspy.core.event.header import EventType
 from sqlalchemy.orm import Session
 
-import pisces.request as req
-from pisces.query import filter_arrivals, filter_events, filter_magnitudes, util
+from pisces.query import filter_arrivals, filter_events, filter_magnitudes, filter_waveforms, util
+
+from .trace import stream, trim_stream
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
 
@@ -675,7 +676,8 @@ class Client:
             comma-separated (e.g. "ANMO,PFO"). Wildcards are allowed.
         location : str
             Select one or more SEED location identifiers. Multiple identifiers
-            are comma-separated (e.g. "00,01"). Wildcards are allowed.
+            are comma-separated (e.g. "00,01"). Wildcards are allowed. Not
+            implemented for CSS Wfdisc tables.
         channel : str
             Select one or more SEED channel codes. Multiple codes are
             comma-separated (e.g. "BHZ,HHZ").
@@ -692,11 +694,15 @@ class Client:
             Limit results to continuous data segments of a minimum length
             specified in seconds.
         longestonly : bool, optional
-            Limit results to the longest continuous segment per channel.
+            Limit results to the longest continuous segment per channel. Not
+            implemented.
+        attach_response : bool, optional
+            Attach instrument responses. Not implemented.
         asquery : bool, optional
-            If True, doesn't return a Stream, but instead returns the SQLAlchemy
-            Query instance that was produced by the passed parameters.
-            for a channel. Does nothing if output to a file was specified.
+            If True, return the SQLAlchemy Query instance instead of a Stream.
+            ``minimumlength`` is supported; ``quality``, ``longestonly``,
+            ``attach_response``, and additional keyword arguments are not
+            implemented.
 
         Any additional keyword arguments will be passed to the query engine as
         additional arguments. If you pass one of the default parameters and the
@@ -728,34 +734,16 @@ class Client:
 
         location = "" if location == "--" else location
 
-        # Replace '*' and '?' with '%' and '_'
-        wildcardables = (network, station, location, channel)
-        wildcardables = [util.glob_to_like(item) for item in wildcardables] # TODO: replace with something in pisces.query.util
-        network, station, location, channel = wildcardables
-
-        # turn any "comma lists" into Python lists
-        listables = (network, station, location, channel)
-        listables = [listable.split(",") for listable in listables]
-        networks, stations, locations, channels = listables
-        # even single strings are now a single element list
-
-        t1, t2 = starttime.timestamp, endtime.timestamp
-
-        # Build the query
-        q = req.get_wfdisc_rows(
-            self.session, Wfdisc, sta=stations, chan=channel, t1=t1, t2=t2, asquery=True
+        # Build the query. Location is accepted for FDSN compatibility but is
+        # not represented in the CSS Wfdisc table.
+        q = filter_waveforms(
+            self.session.query(Wfdisc),
+            net=network,
+            sta=station,
+            chan=channel,
+            times=(starttime, endtime),
+            affiliation=Affil,
         )
-
-        if networks:
-            try:
-                q = q.filter(Wfdisc.sta == Affil.sta)
-                q = q.filter(util.string_expression(Affil.net, networks)) # TODO: replace with something in pisces.query.util?
-            except AttributeError:
-                # Affil is None and has no ".sta" or ".net"
-                msg = "No Affiliation table provided for network filtering."
-                log.error(msg)
-                # XXX: change this to pisces.exc.MissingTableError
-                raise ValueError(msg)
 
         if minimumlength:
             q = q.filter((Wfdisc.endtime - Wfdisc.time) > minimumlength)
@@ -763,7 +751,7 @@ class Client:
         if asquery:
             out = q
         else:
-            out = req.wfdisc_rows_to_stream(q, starttime, endtime)
+            out = trim_stream(stream(q), starttime, endtime)
         # log.debug(util.literal_sql(q))
 
         return out
