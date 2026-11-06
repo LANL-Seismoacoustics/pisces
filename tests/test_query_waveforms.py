@@ -4,9 +4,9 @@ Tests for the pisces.query.waveforms module.
 """
 import pytest
 from obspy import UTCDateTime
-from sqlalchemy import or_
+from sqlalchemy import func, literal, or_
 
-from pisces.query import availability, filter_waveforms
+from pisces.query import availability, extent, filter_waveforms
 from pisces.tables.kbcore import Affiliation, Network, Site, Wfdisc
 
 
@@ -192,6 +192,46 @@ def test_query_waveforms_availability_includes_restricted_rows(
     observed = availability(query, includerestricted=True)
 
     assert observed
+
+
+def test_query_waveforms_extent_aggregates_records(session, availability_data):
+    """extent builds labeled record-count aggregates by sample rate."""
+    query = waveform_query(session)
+    observed = extent(query)
+    base = query.with_entities(
+        Affiliation.net.label("network"), Wfdisc.sta.label("station"),
+        Wfdisc.chan.label("channel"), Wfdisc.samprate.label("samplerate"),
+        Wfdisc.time.label("earliest"), Wfdisc.endtime.label("latest"),
+        Wfdisc.wfid.label("wfid"), Wfdisc.lddate.label("updated"),
+    ).filter(Affiliation.sta == Wfdisc.sta).distinct().subquery()
+    expected = session.query(
+        base.c.network, base.c.station, literal("--").label("location"),
+        base.c.channel, base.c.samplerate,
+        func.min(base.c.earliest).label("earliest"),
+        func.max(base.c.latest).label("latest"),
+        func.max(base.c.updated).label("updated"),
+        func.count(base.c.wfid).label("timespans"),
+        literal("PARTIAL").label("restriction"),
+    ).group_by(
+        base.c.network, base.c.station, base.c.channel, base.c.samplerate
+    ).order_by(
+        base.c.network, base.c.station, base.c.channel,
+        base.c.samplerate, base.c.earliest
+    )
+    assert observed.statement.compare(expected.statement)
+
+def test_query_waveforms_extent_requires_restriction_substring(
+    session, availability_data
+):
+    """extent requires a substring when excluding restricted rows."""
+    with pytest.raises(ValueError, match="restricted_substring"):
+        extent(waveform_query(session), includerestricted=False)
+
+
+def test_query_waveforms_extent_requires_entities(session):
+    """extent requires Wfdisc and Affiliation entities."""
+    with pytest.raises(ValueError, match="Wfdisc and Affiliation"):
+        extent(session.query(Wfdisc))
 
 
 def test_query_waveforms_availability_requires_entities(session):
