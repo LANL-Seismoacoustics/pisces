@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from pisces.query import filter_arrivals, filter_events, filter_magnitudes, filter_waveforms, util
 
-from .stream import stream, trim_stream
+from .stream import availability, extent, stream, trim_stream
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
 
@@ -755,6 +755,138 @@ class Client:
         # log.debug(util.literal_sql(q))
 
         return out
+
+
+    def get_availability(
+        self,
+        network=None,
+        station=None,
+        channel=None,
+        starttime=None,
+        endtime=None,
+        mergegaps=0.0,
+        mergesamplerate=None,
+        show=None,
+        includerestricted=True,
+        restricted_substring=None,
+    ):
+        """Get waveform availability for a requested time window.
+
+        Parameters
+        ----------
+        network, station, channel : str, optional
+            Network, station, and channel patterns. Comma-separated values and
+            ``*``/``?`` wildcards are supported.
+        starttime, endtime : obspy.UTCDateTime
+            Required request bounds.
+        mergegaps : float, optional
+            Merge spans separated by no more than this many seconds.
+        mergesamplerate : float, optional
+            Merge spans whose sample rates differ by no more than this amount.
+        show : {None, "latestupdate"}, optional
+            Include the latest contributing update time.
+        includerestricted : bool, optional
+            Include restricted data by default.
+        restricted_substring : str, optional
+            Substring used to identify restricted Site or Network metadata when
+            ``includerestricted=False``.
+        """
+        # TODO: support quality, merge, orderby, limit, format, and nodata.
+        if starttime is None or endtime is None:
+            raise ValueError("starttime and endtime are required")
+        try:
+            Wfdisc = self.tables["wfdisc"]
+            Affiliation = self.tables["affiliation"]
+        except KeyError:
+            raise ValueError("Wfdisc and Affiliation tables required.")
+
+        tables = [Wfdisc, Affiliation]
+        if not includerestricted:
+            try:
+                Site = self.tables["site"]
+                Network = self.tables["network"]
+            except KeyError:
+                raise ValueError(
+                    "Site and Network tables required when excluding restricted data."
+                )
+            tables.extend((Site, Network))
+
+        query = filter_waveforms(
+            self.session.query(*tables),
+            net=network,
+            sta=station,
+            chan=channel,
+            times=(starttime, endtime),
+            recordlength=None,
+        )
+        return availability(
+            query,
+            mergegaps=mergegaps,
+            mergesamplerate=mergesamplerate,
+            show=show,
+            includerestricted=includerestricted,
+            restricted_substring=restricted_substring,
+        )
+
+
+    def get_extent(
+        self,
+        network=None,
+        station=None,
+        channel=None,
+        starttime=None,
+        endtime=None,
+        includerestricted=True,
+        restricted_substring=None,
+    ):
+        """Get waveform extents for a requested time window.
+
+        Parameters
+        ----------
+        network, station, channel : str, optional
+            Network, station, and channel patterns. Comma-separated values and
+            ``*``/``?`` wildcards are supported.
+        starttime, endtime : obspy.UTCDateTime
+            Required request bounds.
+        includerestricted : bool, optional
+            Include restricted data by default.
+        restricted_substring : str, optional
+            Substring used to identify restricted Site or Network metadata when
+            ``includerestricted=False``.
+        """
+        # TODO: support quality, merge, orderby, limit, format, and nodata.
+        if starttime is None or endtime is None:
+            raise ValueError("starttime and endtime are required")
+        try:
+            Wfdisc = self.tables["wfdisc"]
+            Affiliation = self.tables["affiliation"]
+        except KeyError:
+            raise ValueError("Wfdisc and Affiliation tables required.")
+
+        tables = [Wfdisc, Affiliation]
+        if not includerestricted:
+            try:
+                Site = self.tables["site"]
+                Network = self.tables["network"]
+            except KeyError:
+                raise ValueError(
+                    "Site and Network tables required when excluding restricted data."
+                )
+            tables.extend((Site, Network))
+
+        query = filter_waveforms(
+            self.session.query(*tables),
+            net=network,
+            sta=station,
+            chan=channel,
+            times=(starttime, endtime),
+            recordlength=None,
+        )
+        return extent(
+            query,
+            includerestricted=includerestricted,
+            restricted_substring=restricted_substring,
+        )
 
 
     def get_waveforms_bulk(self, bulk, quality=None, minimumlength=None,
