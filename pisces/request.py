@@ -4,6 +4,8 @@ Convenience functions for building common queries.
 """
 import warnings
 
+from pisces.util import deprecated
+
 import numpy as np
 import obspy.geodetics as geod
 from obspy.core import Stream, UTCDateTime
@@ -13,6 +15,7 @@ from pisces.fdsn import wfdisc2trace
 from pisces.query.util import make_wildcard_list
 
 
+@deprecated("Use pisces.query.filter_waveforms instead.")
 def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
                     wfids=None, daylong=False, asquery=False, verbose=False):
     """
@@ -78,6 +81,7 @@ def get_wfdisc_rows(session, wfdisc, sta=None, chan=None, t1=None, t2=None,
     return res
 
 
+@deprecated("Use pisces.query utilities instead.")
 def distaz_query(records, deg=None, km=None, swath=None):
     """
     Out-of-database subset based on distances and/or azimuths.
@@ -147,6 +151,7 @@ def distaz_query(records, deg=None, km=None, swath=None):
     return recs
 
 
+@deprecated("Use pisces.query utilities instead.")
 def geographic_query(q, table, region=None, depth=None, asquery=False):
     """
     Filter by region (W, E, S, N) [deg] and/or depth range (min, max) [km].
@@ -184,13 +189,8 @@ def geographic_query(q, table, region=None, depth=None, asquery=False):
 
     return res
 
-def netstachan_query(q, stations=None, channels=None, networks=None,
-        asquery=False):
-    pass
 
-def time_query(q, time=None, daylong=False, asquery=False):
-    pass
-
+@deprecated("Use pisces.query utilities instead.")
 def get_events(session, origin, event=None, region=None, deg=None, km=None,
         swath=None, mag=None, depth=None, etime=None, orids=None, evids=None,
         prefor=False, asquery=False):
@@ -294,6 +294,7 @@ def get_events(session, origin, event=None, region=None, deg=None, km=None,
     return res
 
 
+@deprecated("Use pisces.query utilities instead.")
 def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
         channels=None, nets=None, loc=None, region=None, deg=None, km=None,
         swath=None, time_span=None, asquery=False):
@@ -404,6 +405,7 @@ def get_stations(session, site, sitechan=None, affiliation=None, stations=None,
     return res
 
 
+@deprecated("Use pisces.query utilities instead.")
 def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
         atime=None, phases=None, arids=None, orids=None, auth=None,
         asquery=False):
@@ -487,6 +489,7 @@ def get_arrivals(session, arrival, assoc=None, stations=None, channels=None,
     return res
 
 
+@deprecated("Use pisces.query.filter_waveforms instead.")
 def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
                   endtime=None, wfids=None, tol=None, asquery=False):
     """
@@ -543,6 +546,7 @@ def get_waveforms(session, wfdisc, station=None, channel=None, starttime=None,
     return res
 
 
+@deprecated("Use pisces.fdsn.stream.stream and trim_stream instead.")
 def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     """
     Convert wfdisc rows to obspy stream, trim the data to starttime and endtime
@@ -603,6 +607,7 @@ def wfdisc_rows_to_stream(wf_rows, start_t, end_t, tol=None):
     return st
 
 
+@deprecated("Use the current Pisces query API instead.")
 def get_ids(session, lastid, ids, detach=False):
     """
     Get or create lastid rows.
@@ -641,6 +646,7 @@ def get_ids(session, lastid, ids, detach=False):
 
     return out
 
+@deprecated("Use pisces.query utilities instead.")
 def query_network(session, network, nets=None, affiliation=None, stas=None, time_=None, endtime=None, with_query = None):
     """
     Parameters
@@ -738,6 +744,7 @@ def query_network(session, network, nets=None, affiliation=None, stas=None, time
     return q
 
 
+@deprecated("Use pisces.query utilities instead.")
 def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, endtime=None, with_query = None):
     """
     Parameters
@@ -833,6 +840,7 @@ def query_site(session, site, sitechan=None, stas=None, chans=None, time_=None, 
 
     return q
 
+@deprecated("Use pisces.query utilities instead.")
 def query_responses(session, sensor, instrument = None, stas = None, chans = None, time_ = None, endtime = None, with_query = None):
     """
     Parameters
@@ -912,9 +920,3 @@ def query_responses(session, sensor, instrument = None, stas = None, chans = Non
 
 
     return q
-
-def assign_unique_net(q, network_name, affiliation_name, pref_nets = None, two_char_code = True, first_available = True, default_net = '__'):
-    return
-
-def check_orphan_stas():
-    return
