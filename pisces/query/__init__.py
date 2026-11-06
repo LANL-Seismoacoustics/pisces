@@ -6,4 +6,4 @@ Low-level SQLAlchemy query-building API
 from .builder import QueryBuilder
 from .events import *
 from .stations import *
-from .waveforms import *
+from .waveforms import filter_waveforms
