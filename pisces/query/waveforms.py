@@ -42,8 +42,11 @@ STATUS is the restricted status, one of: OPEN, RESTRICTED, or PARTIAL
 
 """
 
+import warnings
+from collections import namedtuple
+
 from obspy import UTCDateTime
-from sqlalchemy import and_, func, literal, or_
+from sqlalchemy import case, func, literal, or_
 from sqlalchemy.orm import Query
 
 from pisces.util import _get_entities
@@ -110,7 +113,7 @@ def filter_waveforms(
     stas = make_wildcard_list(sta) if sta is not None else []
     chans = make_wildcard_list(chan) if chan is not None else []
 
-    q = query.session.query(Wfdisc)
+    q = query
 
     if stas:
         q = q.filter(or_(*[Wfdisc.sta.like(pattern) for pattern in stas]))
@@ -142,72 +145,192 @@ def filter_waveforms(
 
 
 # this is like availability/query
-def availability(query, net, sta, chan, starttime, endtime):
-    """ Get the full-resolution contiguous time-series listings.
+def availability(
+    query,
+    mergegaps=0.0,
+    mergesamplerate=None,
+    show=None,
+    includerestricted=True,
+    restricted_substring=None,
+):
+    """Get availability spans for the rows represented by ``query``.
+
+    The query must already contain all waveform filters, typically through
+    :func:`filter_waveforms`, and must include Wfdisc and Affiliation entities.
+    Site and Network entities are additionally required when restricted rows
+    are excluded. Location is always returned as ``"--"`` because KB Core
+    Wfdisc has no location field.
 
     Parameters
     ----------
-    query : SQLAlchemy query object
-        Includes Affiliation, Wfdisc tables
-    net, sta, chan : str
-        Network, station, channel code pattern. Supports wildcards: * for any sequence,
-        ? for single character, comma-separated for multiple patterns
-    starttime : float
-        Start of time period (in epoch seconds)
-    endtime : float
-        End of time period (in epoch seconds)
+    query : sqlalchemy.orm.Query
+        Pre-filtered query containing Wfdisc and Affiliation.
+    mergegaps : float, optional
+        Merge spans separated by no more than this many seconds.
+    mergesamplerate : float, optional
+        Treat sample rates within this absolute tolerance as equivalent.
+    show : {None, "latestupdate"}, optional
+        Include ``updated`` with the latest contributing Wfdisc load date.
+    includerestricted : bool, optional
+        Include restricted rows (default) or exclude them.
+    restricted_substring : str, optional
+        Substring identifying restricted rows in Site.staname or
+        Network.netname. Required when ``includerestricted=False``.
 
     Returns
     -------
-    SQLAlchemy Query that returns result tuples:
-
-    The text format for the query method follows this pattern:
-    NET STA LOC CHAN QUAL SAMPRATE EARLIEST LATEST
-    NET STA LOC CHAN QUAL SAMPRATE EARLIEST LATEST
-
-    If the show parameter is set to latestupdate, the text format includes an additional column with
-    the latest update time:
-    NET STA LOC CHAN QUAL SAMPRATE EARLIEST LATEST UPDATED
-    NET STA LOC CHAN QUAL SAMPRATE EARLIEST LATEST UPDATED
-
-    If the merge parameter is set to samplerate,quality these respective fields are omitted:
-    NET STA LOC CHAN EARLIEST LATEST UPDATED
-    NET STA LOC CHAN EARLIEST LATEST UPDATED
-
-    Joins
-    -----
-    Affiliation.sta == Wfdisc.sta
-
+    iterable
+        Named result rows with FDSN-style attributes: ``network``,
+        ``station``, ``location``, ``channel``, ``samplerate``, ``earliest``,
+        and ``latest``; ``updated`` is included when requested.
     """
-    session = query.session
+    if show not in (None, "latestupdate"):
+        raise ValueError("show must be None or 'latestupdate'")
+    if mergegaps < 0:
+        raise ValueError("mergegaps must be non-negative")
+    if mergesamplerate is not None and mergesamplerate < 0:
+        raise ValueError("mergesamplerate must be non-negative")
+    if restricted_substring is not None and includerestricted:
+        warnings.warn(
+            "restricted_substring has no effect when includerestricted=True",
+            UserWarning,
+        )
+    if not includerestricted and not restricted_substring:
+        raise ValueError(
+            "restricted_substring is required when includerestricted=False"
+        )
+
     Affiliation, Wfdisc = _get_entities(query, "Affiliation", "Wfdisc")
+    Site, Network = _get_entities(query, "Site", "Network")
+    if not Affiliation or not Wfdisc:
+        raise ValueError("availability query must include Wfdisc and Affiliation")
+    if not includerestricted and (not Site or not Network):
+        raise ValueError(
+            "availability query must include Site and Network when excluding restricted data"
+        )
 
-    nets = make_wildcard_list(net)
-    stas = make_wildcard_list(sta)
-    chans = make_wildcard_list(chan)
+    q = query.filter(Affiliation.sta == Wfdisc.sta)
+    if not includerestricted:
+        restricted = or_(
+            Site.staname.contains(restricted_substring),
+            Network.netname.contains(restricted_substring),
+        )
+        q = q.filter(~restricted)
 
-    # XXX: need to consider affil.time, affil.endtime for stations
-    query = session.query(
-        Affiliation.net,
-        Wfdisc.sta,
-        Wfdisc.chan,
-        Wfdisc.time,
-        Wfdisc.samprate,
-        Wfdisc.endtime,
-        Wfdisc.wfid,
-        Wfdisc.lddate,
-    ).filter(
-        Affiliation.sta == Wfdisc.sta,
-    ).filter(
-        or_(*[Affiliation.net.like(net) for net in nets]),
-        or_(*[Wfdisc.sta.like(sta) for sta in stas]),
-        or_(*[Wfdisc.chan.like(chan) for chan in chans]),
-    ).filter(
-        and_(Wfdisc.time <= endtime, Wfdisc.endtime >= starttime)
+    base = q.with_entities(
+        Affiliation.net.label("network"),
+        Wfdisc.sta.label("station"),
+        Wfdisc.chan.label("channel"),
+        Wfdisc.samprate.label("samplerate"),
+        Wfdisc.time.label("earliest"),
+        Wfdisc.endtime.label("latest"),
+        Wfdisc.wfid.label("wfid"),
+        Wfdisc.lddate.label("updated"),
+    ).distinct().subquery()
+    partition = [
+        base.c.network, base.c.station, base.c.channel, base.c.samplerate
+    ]
+    ordering = [base.c.earliest, base.c.latest, base.c.wfid]
+    previous_latest = func.max(base.c.latest).over(
+        partition_by=partition,
+        order_by=ordering,
+        rows=(None, -1),
+    )
+    ordered = q.session.query(
+        base,
+        previous_latest.label("previous_latest"),
+    ).subquery()
+    starts_span = case(
+        (ordered.c.previous_latest.is_(None), 1),
+        (ordered.c.earliest > ordered.c.previous_latest + mergegaps, 1),
+        else_=0,
+    )
+    numbered = q.session.query(
+        ordered,
+        starts_span.label("starts_span"),
+    ).subquery()
+    numbered_partition = [
+        numbered.c.network,
+        numbered.c.station,
+        numbered.c.channel,
+        numbered.c.samplerate,
+    ]
+    numbered_ordering = [
+        numbered.c.earliest,
+        numbered.c.latest,
+        numbered.c.wfid,
+    ]
+    span_number = func.sum(numbered.c.starts_span).over(
+        partition_by=numbered_partition,
+        order_by=numbered_ordering,
+        rows=(None, 0),
+    )
+    numbered = q.session.query(
+        numbered,
+        span_number.label("span_number"),
+    ).subquery()
+    grouped_columns = [
+        numbered.c.network,
+        numbered.c.station,
+        literal("--").label("location"),
+        numbered.c.channel,
+        numbered.c.samplerate,
+        func.min(numbered.c.earliest).label("earliest"),
+        func.max(numbered.c.latest).label("latest"),
+    ]
+    if show == "latestupdate":
+        grouped_columns.append(func.max(numbered.c.updated).label("updated"))
+    grouped = q.session.query(*grouped_columns).group_by(
+        numbered.c.network,
+        numbered.c.station,
+        numbered.c.channel,
+        numbered.c.samplerate,
+        numbered.c.span_number,
+    ).order_by(
+        numbered.c.network,
+        numbered.c.station,
+        numbered.c.channel,
+        numbered.c.earliest,
+        numbered.c.samplerate,
     )
 
+    rows = grouped.all()
+    if mergesamplerate is None:
+        return rows
 
-    return query
+    # Exact-rate spans are assembled in SQL. Only the optional rate
+    # equivalence pass is materialized in Python.
+    fields = ["network", "station", "location", "channel", "samplerate",
+              "earliest", "latest"]
+    if show == "latestupdate":
+        fields.append("updated")
+    Result = namedtuple("Availability", fields)
+    merged = []
+    for row in rows:
+        group = next(
+            (item for item in merged
+             if item.network == row.network
+             and item.station == row.station
+             and item.channel == row.channel
+             and abs(item.samplerate - row.samplerate) <= mergesamplerate),
+            None,
+        )
+        if group is None:
+            merged.append(row)
+            continue
+        previous = group
+        if row.earliest <= previous.latest + mergegaps:
+            values = [previous.network, previous.station, previous.location,
+                      previous.channel, previous.samplerate,
+                      min(previous.earliest, row.earliest),
+                      max(previous.latest, row.latest)]
+            if show == "latestupdate":
+                values.append(max(previous.updated, row.updated))
+            merged[merged.index(group)] = Result(*values)
+        else:
+            merged.append(row)
+
+    return merged
 
 
 
