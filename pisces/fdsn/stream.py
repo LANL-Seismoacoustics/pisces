@@ -67,28 +67,34 @@ def wfdisc2trace(wf):
     return tr
 
 
-def stream(q):
+def stream(q, headonly=False):
     """Convert Wfdisc rows to an ObsPy Stream.
 
     Parameters
     ----------
     q : sqlalchemy.orm.Query
         Query containing a Wfdisc entity.
+    headonly : bool, optional
+        If true, return dataless traces built from Wfdisc headers without
+        reading waveform files. Default is false.
 
     Raises
     ------
     OSError
-        If a waveform file cannot be read.
+        If a waveform file cannot be read when ``headonly`` is false.
     """
     Wfdisc, = _get_entities(q, "Wfdisc")
     traces = []
     for row in q:
         wf = row if isinstance(row, Wfdisc) else getattr(row, Wfdisc.__name__)
-        try:
-            tr = wfdisc2trace(wf)
-        except OSError as exc:
-            raise OSError(f"Can't read {wf.dir}/{wf.dfile}.") from exc
-        if tr:
+        if headonly:
+            tr = Trace(header=wfdisc2obspyhdr(wf))
+        else:
+            try:
+                tr = wfdisc2trace(wf)
+            except OSError as exc:
+                raise OSError(f"Can't read {wf.dir}/{wf.dfile}.") from exc
+        if tr is not None:
             traces.append(tr)
 
     return Stream(traces)
