@@ -100,32 +100,35 @@ def stream(q, headonly=False):
     return Stream(traces)
 
 
-def trim_stream(st, starttime, endtime, tolerance=None):
-    """Trim an ObsPy Stream and optionally validate its time coverage.
+def spans_interval(st, starttime, endtime, tolerance=None):
+    """Return whether a stream spans a requested interval within tolerance.
 
     Parameters
     ----------
     st : obspy.Stream
-        Stream to trim in place.
+        Stream to validate.
     starttime, endtime : obspy.UTCDateTime
-        Requested trim interval.
+        Requested interval.
     tolerance : float, optional
-        Raise ``ValueError`` if the resulting stream does not cover the
-        requested interval within this many seconds.
+        Allowed difference between the requested and observed stream bounds.
+        ``None`` skips validation and returns ``True``.
 
     Returns
     -------
-    obspy.Stream
-        The trimmed input stream.
+    bool
+        ``True`` when the interval is valid, otherwise ``False``.
     """
-    st.trim(starttime, endtime)
-    if all((tolerance, starttime, endtime)) and st:
-        min_t = min(tr.stats.starttime for tr in st)
-        max_t = max(tr.stats.endtime for tr in st)
-        if abs(min_t - starttime) > tolerance or abs(max_t - endtime) > tolerance:
-            raise ValueError(f"Trace times are outside of tolerance: {tolerance} seconds")
+    if tolerance is None:
+        return True
+    if not st or starttime is None or endtime is None:
+        return False
 
-    return st
+    min_start = min(tr.stats.starttime for tr in st)
+    max_end = max(tr.stats.endtime for tr in st)
+    return (
+        abs(min_start - starttime) <= tolerance
+        and abs(max_end - endtime) <= tolerance
+    )
 
 
 # this is like availability/query
