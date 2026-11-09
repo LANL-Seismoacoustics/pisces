@@ -53,6 +53,20 @@ def test_wfdisc2obspyhdr_fields():
     assert hdr.starttime.timestamp == 0.0
 
 
+def test_stream_headonly_skips_waveform_file():
+    """stream headonly returns a dataless trace from the Wfdisc header."""
+    wf = make_wfdisc(dir='/missing', dfile='waveform', datatype='t4')
+    query = type('Query', (), {'__iter__': lambda self: iter([wf])})()
+    query.column_descriptions = [{'entity': Wfdisc}]
+
+    st = stream(query, headonly=True)
+
+    assert len(st) == 1
+    assert st[0].data.size == 0
+    assert st[0].stats.station == 'STA'
+    assert st[0].stats.npts == 10
+
+
 def test_stream_converts_wfdisc_rows():
     """stream converts Wfdisc rows without trimming their traces."""
     data = np.arange(10, dtype='>f4')
