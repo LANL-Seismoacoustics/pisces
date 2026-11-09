@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from pisces.query import filter_arrivals, filter_events, filter_magnitudes, filter_waveforms, util
 
-from .stream import availability, extent, stream, trim_stream
+from .stream import availability, extent, stream
 
 from .catalog import KBCORE_EVENT_TYPE, catalog
 
@@ -751,7 +751,8 @@ class Client:
         if asquery:
             out = q
         else:
-            out = trim_stream(stream(q), starttime, endtime)
+            out = stream(q)
+            out.trim(starttime, endtime)
         # log.debug(util.literal_sql(q))
 
         return out
