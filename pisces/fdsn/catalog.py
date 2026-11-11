@@ -524,10 +524,12 @@ def catalog(*queries,
 
             # QuakeML "magnitudes" are Netmag rows, stored at the Event level.
             qmagnitude = None
+            netmagkey = None
             if Netmag:
                 netmag = getattr(row, Netmag.__name__)
-                netmagkey = _key(netmag)
-                if not (qmagnitude := qmagnitudes.get(netmagkey)):
+                if netmag is not None:
+                    netmagkey = _key(netmag)
+                if netmag is not None and not (qmagnitude := qmagnitudes.get(netmagkey)):
                     # same as: qmagnitude = qmagnitudes[netmagkey] = qgen.magnitude(...)
                     qmagnitude = qgen.magnitude(netmag, origin_id=qorigin.resource_id)
                     qmagnitudes[netmagkey] = qmagnitude
