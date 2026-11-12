@@ -52,6 +52,7 @@ def range_filters(*restrictions):
 
     Examples
     --------
+
     >>> f = range_filters((Origin.lat, -10, 15), (Origin.depth, None, 80))
 
     Produces a list containing zero or one filter expressions.
@@ -194,11 +195,13 @@ def string_expression(selectable, string_filters):
 
     Examples
     --------
+
     >>> from pisces.tables.css3 import Wfdisc
     >>> channels = ['%Z', 'B_N', 'HHT']
     >>> chan_expr = string_expression(Wfdisc.chan, channels)
     >>> literal_sql(session.bind, chan_expr) # just shows the literal compiled SQL
     "wfdisc.chan LIKE '%Z' OR wfdisc.chan LIKE 'B_N' OR wfdisc.chan = 'HHT'"
+
     >>> wfdisc_rows = session.query(Wfdisc).filter(chan_expr).all()
 
     """

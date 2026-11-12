@@ -2,13 +2,11 @@
 Tests for the pisces.query.waveforms module.
 
 """
-import pytest
 from obspy import UTCDateTime
-from sqlalchemy import func, literal, or_
+from sqlalchemy import or_
 
-from pisces.fdsn.stream import availability, extent
 from pisces.query import filter_waveforms
-from pisces.tables.kbcore import Affiliation, Network, Site, Wfdisc
+from pisces.tables.kbcore import Affiliation, Wfdisc
 
 
 def waveform_query(session):

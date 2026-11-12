@@ -41,23 +41,32 @@ def filter_events(
     query: sqlalchemy.Query instance
         Includes the required tables for your query (e.g. query = session.query(Event, Origin)),
         otherwise they must be provided as keywords (see below).
-    region : tuple [Origin]
+    region : tuple
+        Geographic bounds applied to ``Origin`` rows.
         (W, E, S, N) inclusive lat/lon box containing int/float/None(unbounded) degrees
-    times : tuple [Origin]
+    times : tuple
+        Time range applied to ``Origin`` rows.
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps
-    depth : tuple [Origin]
+    depth : tuple
+        Depth range applied to ``Origin`` rows.
         (mindepth, maxdepth) inclusive range, in float/int kilometers
-    evid : list or tuple of int [Event]
+    evid : list or tuple of int
+        Event IDs from ``Event``.
         Event ID number.
-    orid : list or tuple of int [Origin]
+    orid : list or tuple of int
+        Origin IDs from ``Origin``.
         Origin ID number.
-    prefor : bool [Event, Origin]
+    prefor : bool
+        Use the preferred origin from ``Event`` and ``Origin``.
         Use only the preferred origin.
-    auth : str [Origin]
+    auth : str
+        Origin author.
         Produces an equality clause.
-    evname : str [Event]
+    evname : str
+        Event name from ``Event``.
         Produces a CONTAINS clause (looks for input as a substring).
-    etype : str or iterable of str [Origin]
+    etype : str or iterable of str
+        Event type from ``Origin``.
         Two-character KBCore event type(s).  Produces an == clause if it's a string, an "IN" clause
         if it's a list or tuple.
     **tables :
@@ -76,6 +85,7 @@ def filter_events(
     Examples
     --------
     Forgot to include a required table when building query:
+
     >>> q = session.query(Origin)
     >>> try:
     ... q = filter_events(q, region=(W, E, S, N), prefor=True)
@@ -85,6 +95,7 @@ def filter_events(
     >>> origins = q.all() # a list of preferred Origin instances
 
     Get a cartesian join of both origins and events
+
     >>> q = session.query(Origin, Event)
     >>> q = session.query(Origin).add_entity(Event) # equivalent to above
     >>> origins_and_events = filter_events(q, region=(W, E, S, N), prefor=True).all()
@@ -299,12 +310,17 @@ def filter_arrivals(query, sta=None, auth=None, times=None, orid=None, phase=Non
     ----------
     query : SQLAlchemy query object
         Includes any of Arrival, Assoc tables
-    sta : str or list [Assoc > Arrival]
-    auth : str or list or str [Arrival]
-    times : tuple of (starttime, endtime) [Arrival]
+    sta : str or list
+        Station code from ``Assoc`` or ``Arrival``.
+    auth : str or list
+        Arrival author.
+    times : tuple of (starttime, endtime)
+        Time range applied to ``Arrival``.
         Anything that obspy.UTCDateTime can consume is accepted.
-    orid : int or list of int [Assoc]
-    phase : str or list of str [Assoc.phase > Arrival.iphase]
+    orid : int or list of int
+        Origin IDs from ``Assoc``.
+    phase : str or list of str
+        Phase names matched between ``Assoc.phase`` and ``Arrival.iphase``.
 
     Joins:
 

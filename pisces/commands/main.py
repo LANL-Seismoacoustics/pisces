@@ -129,15 +129,15 @@ def sac2db_command(**kwargs):
 
     \b
         # use standard table names to local test.sqlite file
-        pisces sac2db sqlite:///test.sqlite datadir/\*.sac
+        pisces sac2db sqlite:///test.sqlite datadir/\\*.sac
 
     \b
         # prefix all tables in an oracle account with prefix my\\_, prompt for password
-        pisces sac2db --prefix my\\_ oracle://user@server.domain.com:port/dbname datadir/\*.sac
+        pisces sac2db --prefix my\\_ oracle://user@server.domain.com:port/dbname datadir/\\*.sac
 
     \b
         # if there are too many SAC files for the shell to handle, use a list:
-        find datadir -name "\*.sac" -print > saclist.txt
+        find datadir -name "\\*.sac" -print > saclist.txt
         sac2db.py sqlite:///test.sqlite saclist.txt
 
     """

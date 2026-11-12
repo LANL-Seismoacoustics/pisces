@@ -156,7 +156,8 @@ def availability(
         Merge spans separated by no more than this many seconds.
     mergesamplerate : float, optional
         Treat sample rates within this absolute tolerance as equivalent.
-    show : {None, "latestupdate"}, optional
+    show : str or None, optional
+        ``"latestupdate"`` or ``None``.
         Include ``updated`` with the latest contributing Wfdisc load date.
     includerestricted : bool, optional
         Include restricted rows (default) or exclude them.

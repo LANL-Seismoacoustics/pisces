@@ -21,11 +21,11 @@ from pisces.query import (
     filter_responses,
     filter_stations,
     filter_waveforms,
-    util,
 )
-from .stream import availability, extent, stream
+
 from .catalog import KBCORE_EVENT_TYPE, catalog
 from .inventory import build_inventory
+from .stream import availability, extent, stream
 
 log = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ def _evid_list(eventid):
 
     Raises
     ------
-    TypeError : input must be {int, str, list, tuple}
+    TypeError : input must be one of ``{int, str, list, tuple}``
 
     """
     # py3.10+
@@ -134,6 +134,7 @@ class Client:
 
         Examples
         --------
+
         >>> client = Client('sqlite:///local/path/to/mydb.sqlite')
         >>> client = Client('sqlite:////full/path/to/mydb.sqlite', site='mysite')
         >>> client = Client('oracle://scott:tiger@dbserver.somewhere.com:8080/mydb')
@@ -516,7 +517,8 @@ class Client:
             Comma-separated codes or ``*``/``?`` wildcard patterns.
         minlatitude, maxlatitude, minlongitude, maxlongitude : float, optional
             Rectangular geographic bounds applied to Site rows.
-        level : {"network", "station", "channel", "response"}, optional
+        level : str, optional
+            One of ``{"network", "station", "channel", "response"}``.
             Metadata detail level. Defaults to ``"station"``.
         asquery : bool, optional
             Return the SQLAlchemy query instead of building an ObsPy Inventory.
@@ -702,6 +704,7 @@ class Client:
 
         Examples
         --------
+
         >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
         >>> t2 = t1 + 5
         >>> st = client.get_waveforms("IU", "A*", "1?", "LHZ", t1, t2)
@@ -774,7 +777,8 @@ class Client:
             Merge spans separated by no more than this many seconds.
         mergesamplerate : float, optional
             Merge spans whose sample rates differ by no more than this amount.
-        show : {None, "latestupdate"}, optional
+        show : str or None, optional
+            ``"latestupdate"`` or ``None``.
             Include the latest contributing update time.
         includerestricted : bool, optional
             Include restricted data by default.
@@ -922,6 +926,7 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T06:30:00... | 20.0 Hz, 20 samples
         IU.ANMO.10.BHZ | 2010-02-27T06:30:00... | 40.0 Hz, 40 samples
+
         >>> bulk = '''quality=B
         ... longestonly=false
         ... IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02
@@ -936,6 +941,7 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+
         >>> st = client.get_waveforms_bulk("/tmp/request.txt") \
         ...     # doctest: +SKIP
         >>> print(st)  # doctest: +SKIP
@@ -945,6 +951,7 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+
         >>> t = UTCDateTime("2012-12-14T10:36:01.6Z")
         >>> t1 = t + 300
         >>> t2 = t + 400

@@ -86,6 +86,7 @@ def db_connect(*args, **kwargs):
 
     >>> meta, session = db_connect(conn='sqlite:///mydb.sqlite')
     #or
+
     >>> meta, session = db_connect(backend='sqlite', instance='mydb.sqlite')
 
     Notes
@@ -156,19 +157,24 @@ def url_connect(url):
     Examples
     --------
     SQLite database file, local:
+
     >>> url_connect('sqlite:///local/path/to/mydb.sqlite')
 
     SQLite database file, full path:
+
     >>> url_connect('sqlite:////full/path/to/mydb.sqlite')
 
     Remote Oracle, OS-authenticated (no user or password needs to be specified)
+
     >>> url_connect('oracle://dbserver.lanl.gov:8080/mydb')
 
     Remote Oracle, password-authenticated (specify user, prompted for password)
+
     >>> url_connect('oracle://scott@dbserver.lanl.gov:8080/mydb')
     Enter password for scott:
 
     Remote Oracle, password-authenticated (password specified)
+
     >>> url_connect('oracle://scott:tiger@dbserver.lanl.gov:8080/mydb')
 
     """
@@ -237,10 +243,12 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
     Examples
     --------
     # for unknown table
+
     >>> import pisces.schema.css3 as css
     >>> RandomTable = get_tables(engine, ['randomtable'])
 
     # for a known/prototype table
+
     >>> class Site(css.Site):
     ...     __tablename__ = 'myaccount.my_site_tablename'
 
@@ -367,10 +375,12 @@ def gen_id(i=0):
 
     Examples
     --------
+
     >>> lastorid = 7
     >>> orid = gen_id(lastorid)
     >>> orid.next()
     8
+
     >>> orid.next()
     9
 
@@ -420,8 +430,10 @@ def travel_times(ref, deg=None, km=None, depth=0.):
     --------
     Get relative P arrival and 2.7 km/sec surface wave arrival at 35 degrees
     distance.
+
     >>> times = travel_times(['P', 2.7], deg=35.0)
     To get absolute window, add the origin time like:
+
     >>> w1, w2 = times + epoch_origin_time
 
     Notes
@@ -534,21 +546,26 @@ def get_lastids(session, Lastid, keynames=None, expunge=True, create=False):
     Examples
     --------
     Get and set lastid values directly by name or by attribute.
+
     >>> last = get_lastids(session, Lastid, ['orid', 'arid'])
     >>> last.orid, last['orid']
     Lastid(keyname='orid'), Lastid(keyname='orid')
 
     Test for their existence by name.
+
     >>> 'orid' in last
     True
 
     Use the Lastid's 'next' generator behavior for readable code
+
     >>> next(last.orid)
     18
+
     >>> last.orid.keyvalue
     18
 
     Update your database when you're done.
+
     >>> session.add_all(ids.values())
     >>> session.commit()
 
@@ -691,6 +708,7 @@ def load_config(config):
                   'arrival': 'othermodule',
                   }
     # or
+
     >>> import configparser
     >>> config = configparser.ConfigParser()
     >>> config.read('pisces.cfg')
@@ -746,6 +764,7 @@ def _get_entities(query, *requested_classes):
     Examples
     --------
     # if the Sensor class wasn't part of the query.
+
     >>> get_preferred_entities(query, 'Site', 'Sitechan', 'Sensor')
     [Site , Sitechan, None]
 

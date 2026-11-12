@@ -40,7 +40,8 @@ def make_table_names(*tables, **kwargs):
     tables : str
         Desired table names.  If omitted, a schema must be specified, and all
         core tables for the schema are used.
-    schema : str  {'css3', 'kbcore'}
+    schema : str
+        One of ``{'css3', 'kbcore'}``.
         Which set of core tables are being used. If omitted, one or more tables
         must be specified.
     prefix : str
@@ -61,6 +62,7 @@ def make_table_names(*tables, **kwargs):
 
     Examples
     --------
+
     >>> make_table_names('site', 'origin', owner='global', prefix='TA_')
     {'site': 'global.TA_site', 'origin': 'global.TA_origin'}
 
@@ -106,7 +108,8 @@ def split_table_names(*tablenames, schema=None):
     Parameters
     ----------
     tablenames : str
-    schema : str {'css3', 'kbcore'}, optional
+    schema : str, optional
+        One of ``{'css3', 'kbcore'}``.
         If provided, the prefix is the part before a known canonical table name,
         otherwise the prefix is ''.
 
@@ -118,9 +121,11 @@ def split_table_names(*tablenames, schema=None):
 
     Examples
     --------
+
     >>> tablenames = ['global.site', 'different_acct.my_origin', 'TA_site')
     >>> split_table_names(*tablenames, schema='css3')
     [('global', '', 'site'), ('different_acct', 'my_', 'origin'), ('', 'TA_', 'site')
+
     >>> split_table_names(*tablenames)
     [('global', '', 'site'), ('different_acct', '', 'my_origin'), ('', '', 'TA_site')
 
@@ -193,6 +198,7 @@ def make_tables(*tables, prefix='', owner=None, schema='css3'):
 
     Examples
     --------
+
     >>> # makes a dict of CSS3.0 'TA_site' and 'TA_sitechan' mapped classes
     >>> tables = make_tables('site', 'sitechan', schema='css3', prefix='TA_')
 
@@ -258,7 +264,8 @@ def load_tables(session, *tables, **kwargs):
         Desired table names.  Names must be part of the schema. If omitted, a
         schema must be specified, and all core tables for the schema are
         returned.
-    schema : str  {'css3', 'kbcore'}  Default, 'css3'
+    schema : str, optional
+        One of ``{'css3', 'kbcore'}``; default is ``'css3'``.
         Which set of core tables are being used.  This is used to associate
         column names to known Pisces column definitions, so that text file I/O
         of tables can be supported for a loaded table.
@@ -284,20 +291,24 @@ def load_tables(session, *tables, **kwargs):
     Examples
     --------
     # load standard tables in ``myaccount`` table space
+
     >>> tables = load_tables(session, 'site', 'sitechan', 'wfisc',
     ...                      schema='kbcore', owner='myaccount')
 
     # load a standard table that has no primary key set
+
     >>> tables = load_tables(session, 'site', 
     ...                      primary_keys={'site', ['sta', 'ondate']})
 
     # load all standard css3 tables in the default account
+
     >>> tables = load_tables(session, schema='css3')
 
 
     # load a table that is outside of the schema
     # the table needs to have a primary key defined
     # this will try to use column info definitions known to Pisces
+
     >>> tables = load_tables(session, 'ccwfdisc', owner='myaccount')
 
     """
