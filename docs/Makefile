@@ -23,5 +23,6 @@ livehtml:
 	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 apidocs:
+	rm -rf $(SOURCEDIR)/apidocs
 	sphinx-apidoc -d 2 -Mef -t templates -o $(SOURCEDIR)/apidocs ../pisces
 	cat $(SOURCEDIR)/_cli.rst >> $(SOURCEDIR)/apidocs/pisces.commands.rst

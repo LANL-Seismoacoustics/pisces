@@ -342,13 +342,17 @@ def catalog(*queries,
     ----------
     queries : sqlalchemy.orm.Query instances
         One or more queries, output from filter_events, filter_arrivals, or filter_magnitudes,
-        with any of the following structures (tables in any order):
-        query = session.query(Event, Origin) # from filter_events
-        query = session.query(Event, Origin, Netmag) # from filter_magnitudes
-        # from filter_magnitudes
-        query = session.query(Event, Origin, Netmag, Stamag)
-        # from filter_arrivals
-        query = session.query(Event, Origin, Assoc, Arrival)
+        with any of the following structures (tables in any order)::
+
+            query = session.query(Event, Origin)  # from filter_events
+            query = session.query(Event, Origin, Netmag)  # from filter_magnitudes
+
+            # from filter_magnitudes
+            query = session.query(Event, Origin, Netmag, Stamag)
+
+            # from filter_arrivals
+            query = session.query(Event, Origin, Assoc, Arrival)
+
         Event and Origin must be present in every query.
     resource_prefix : str
         The prefix used when creating ResourceIndentifier ids.
@@ -374,41 +378,41 @@ def catalog(*queries,
     Notes
     -----
     Incoming rows look like the following, which is the redundancy this function collapses. Note how
-    parent values repeat down each block:
+    parent values repeat down each block::
 
-    event1, origin1
-    event1, origin2
-    event2, origin3
-    event2, origin4
-    ...
-    or
-    event1, origin1, netmag1
-    event1, origin1, netmag2
-    event1, origin1, netmag4
-    event1, origin2, netmag5
-    event2, origin3, netmag6
-    ...
-    or
-    event1, origin1, netmag1, stamag1
-    event1, origin1, netmag1, stamag2
-    event1, origin1, netmag1, stamag3
-    event1, origin1, netmag2, stamag4
-    event1, origin1, netmag2, stamag5
-    ...
-    or
-    event1, origin1, assoc1/arrival1
-    event1, origin1, assoc2/arrival2
-    event1, origin2, assoc3/arrival3
-    event1, origin2, assoc4/arrival4
-    event2, origin3, assoc5/arrival5
-    ...
-    or
-    event1, origin1, assoc1, arrival1
-    event1, origin1, assoc2, arrival2
-    event1, origin2, assoc3, arrival3
-    event1, origin2, assoc4, arrival4
-    event2, origin3, assoc5, arrival5
-    ...
+        event1, origin1
+        event1, origin2
+        event2, origin3
+        event2, origin4
+        ...
+        or
+        event1, origin1, netmag1
+        event1, origin1, netmag2
+        event1, origin1, netmag4
+        event1, origin2, netmag5
+        event2, origin3, netmag6
+        ...
+        or
+        event1, origin1, netmag1, stamag1
+        event1, origin1, netmag1, stamag2
+        event1, origin1, netmag1, stamag3
+        event1, origin1, netmag2, stamag4
+        event1, origin1, netmag2, stamag5
+        ...
+        or
+        event1, origin1, assoc1/arrival1
+        event1, origin1, assoc2/arrival2
+        event1, origin2, assoc3/arrival3
+        event1, origin2, assoc4/arrival4
+        event2, origin3, assoc5/arrival5
+        ...
+        or
+        event1, origin1, assoc1, arrival1
+        event1, origin1, assoc2, arrival2
+        event1, origin2, assoc3, arrival3
+        event1, origin2, assoc4, arrival4
+        event2, origin3, assoc5, arrival5
+        ...
 
     Stamag rows always create QuakeML StationMagnitudes. Their same-row Netmag receives a
     StationMagnitudeContribution only when ``magdef == 'd'``; it has ``weight=1.0`` and maps
@@ -524,10 +528,12 @@ def catalog(*queries,
 
             # QuakeML "magnitudes" are Netmag rows, stored at the Event level.
             qmagnitude = None
+            netmagkey = None
             if Netmag:
                 netmag = getattr(row, Netmag.__name__)
-                netmagkey = _key(netmag)
-                if not (qmagnitude := qmagnitudes.get(netmagkey)):
+                if netmag is not None:
+                    netmagkey = _key(netmag)
+                if netmag is not None and not (qmagnitude := qmagnitudes.get(netmagkey)):
                     # same as: qmagnitude = qmagnitudes[netmagkey] = qgen.magnitude(...)
                     qmagnitude = qgen.magnitude(netmag, origin_id=qorigin.resource_id)
                     qmagnitudes[netmagkey] = qmagnitude

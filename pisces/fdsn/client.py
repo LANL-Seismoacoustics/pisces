@@ -268,11 +268,12 @@ class Client:
             e.g., `"earthquake,quarry blast"`. Allowed values are from QuakeML.
             See `obspy.core.event.header.EventType` for a list of allowed event types.
         includeallorigins : bool, optional (Origin [, Event])
-            Specify if all origins for the event should be included. Default is False,
-            which returns the preferred origin only and requires the Origin and Event table.
+            Include all matching origins. Non-preferred origins are retained
+            even without Netmag rows, but then have no QuakeML magnitudes.
+            Default is True.
         includeallmagnitudes : bool, optional [Netmag]
-            Include all network magnitudes. Default is False, which returns only the preferred
-            network magnitude for each event.
+            Include all Netmag rows. When False (default), include only the
+            preferred magnitude for the event's preferred origin.
         preferred_magnitude : tuple of str, optional
             Network magnitude types in preferred order, case-insensitive. Defaults to
             ``("mb", "mw", "ms")``.
@@ -377,7 +378,9 @@ class Client:
         # build the query (finally)
 
         # geographic / categorical stuff
-        q = self.session.query(Event, Origin)
+        q = self.session.query(Event, Origin).select_from(Event).join(
+            Origin, Event.evid == Origin.evid
+        )
         q = filter_events(q,
                           region=region,
                           times=times,
@@ -392,11 +395,18 @@ class Client:
         if updatedafter:
             q = q.filter(Origin.lddate > updatedafter)
 
-        # Join Netmag even if magnitude filters are empty so the catalog can select a preferred
-        # magnitude. ``includeallmagnitudes=False`` ranks and retains one Netmag per event below.
-        q = q.add_entity(Netmag)
-        q = filter_magnitudes(q, **magnitudes)
-        if not includeallmagnitudes:
+        # Netmag is optional for unfiltered event requests. Origins remain in the
+        # Catalog without magnitudes when no corresponding Netmag row exists.
+        mag_filter_requested = bool(magnitudes)
+        if mag_filter_requested:
+            q = q.add_entity(Netmag)
+            q = filter_magnitudes(q, **magnitudes)
+        elif includeallmagnitudes:
+            q = q.outerjoin(
+                Netmag,
+                sa.and_(Netmag.evid == Event.evid, Netmag.orid == Origin.orid),
+            ).add_entity(Netmag)
+        else:
             preferred_types = tuple(magtype.casefold() for magtype in preferred_magnitude)
             priority = sa.case(
                 *[(sa.func.lower(Netmag.magtype) == magtype, rank)
@@ -404,19 +414,29 @@ class Client:
                 else_=len(preferred_types) + 1,
             )
             preferred = (
-                q.with_entities(
+                self.session.query(
+                    Event.evid.label("evid"),
+                    Netmag.orid.label("orid"),
                     Netmag.magid.label("magid"),
                     sa.func.row_number().over(
                         partition_by=Event.evid,
                         order_by=priority,
                     ).label("rank"),
                 )
+                .select_from(Netmag)
+                .join(Event, Netmag.evid == Event.evid)
                 .filter(Netmag.orid == Event.prefor)
                 .filter(sa.func.lower(Netmag.magtype).in_(preferred_types))
                 .subquery()
             )
-            q = q.filter(Netmag.magid == preferred.c.magid).filter(preferred.c.rank == 1)
-        # [(event, origin, netmag)] expected structure
+            preferred = self.session.query(
+                preferred.c.evid, preferred.c.orid, preferred.c.magid
+            ).filter(preferred.c.rank == 1).subquery()
+            q = q.outerjoin(
+                preferred, sa.and_(preferred.c.evid == Event.evid,
+                                   preferred.c.orid == Origin.orid)
+            ).outerjoin(Netmag, Netmag.magid == preferred.c.magid).add_entity(Netmag)
+        # [(event, origin, netmag or None)] expected structure
 
         # arrival stuff
         if includearrivals:
