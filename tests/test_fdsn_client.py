@@ -316,6 +316,43 @@ def test_get_events_magnitudes(session):
 
 
 
+def test_get_availability(session, availability_data):
+    """Client availability builds and evaluates a filtered request."""
+    client = Client(
+        session,
+        wfdisc=kb.Wfdisc,
+        affiliation=kb.Affiliation,
+    )
+
+    observed = client.get_availability(
+        network="IU", station="ANMO", channel="BHZ",
+        starttime=UTCDateTime(0), endtime=UTCDateTime(30),
+    )
+
+    assert [(row.network, row.station, row.channel, row.samplerate)
+            for row in observed] == [
+        ("IU", "ANMO", "BHZ", 20.0),
+        ("IU", "ANMO", "BHZ", 40.0),
+        ("IU", "ANMO", "BHZ", 40.0),
+    ]
+
+
+def test_get_extent(session, availability_data):
+    """Client extent returns grouped Wfdisc record counts."""
+    client = Client(session, wfdisc=kb.Wfdisc, affiliation=kb.Affiliation)
+
+    observed = client.get_extent(
+        network="IU", station="ANMO", channel="BHZ",
+        starttime=UTCDateTime(0), endtime=UTCDateTime(30),
+    ).all()
+
+    assert [(row.network, row.samplerate, row.timespans)
+            for row in observed] == [
+        ("IU", 20.0, 1),
+        ("IU", 40.0, 3),
+    ]
+
+
 def test_get_waveforms_defaults(dbsession):
     """ If only required parameters are supplied, a simple request returns a result.
     """
