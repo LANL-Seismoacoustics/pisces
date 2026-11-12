@@ -326,11 +326,11 @@ def _eq(self, other):
 
 
 def _update_docstring(cls):
-    s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.')
-                   for c in cls.__table__.columns])
-    s += f"\n\nFORMAT STRING:\n{cls._format_string}\n"
+    s = '\n\n'.join("{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.')
+                    for c in cls.__table__.columns)
+    s += f"\n\nFORMAT STRING\n-------------\n{cls._format_string}\n"
     try:
-        s += f"\n\nSQL CREATE STATEMENT:\n{sa.schema.CreateTable(cls.__table__)}\n"
+        s += f"\n\nSQL CREATE STATEMENT\n--------------------\n{sa.schema.CreateTable(cls.__table__)}\n"
     except sa.exc.CompileError:
         # One or more columns are of a type that doesn't render to strings.
         pass

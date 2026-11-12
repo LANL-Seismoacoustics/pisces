@@ -45,7 +45,7 @@ def make_table_names(*tables, **kwargs):
         must be specified.
     prefix : str
         All table names will have the provided prefix.
-        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
+        E.g. ``TA_`` for ``TA_origin``, ``TA_wfdisc``, etc.
     owner : str
         e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
 
@@ -181,7 +181,7 @@ def make_tables(*tables, prefix='', owner=None, schema='css3'):
         Which set of core tables are being used.  Required.
     prefix : str
         All table names will have the provided prefix.
-        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
+        E.g. ``TA_`` for ``TA_origin``, ``TA_wfdisc``, etc.
     owner : str
         e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.
 
@@ -264,7 +264,7 @@ def load_tables(session, *tables, **kwargs):
         of tables can be supported for a loaded table.
     prefix : str, optional
         All table names will have the provided prefix.
-        e.g. "TA_" for "TA_origin", "TA_wfdisc", etc.
+        E.g. ``TA_`` for ``TA_origin``, ``TA_wfdisc``, etc.
     owner : str, optional
         e.g. "myuser" for "myuser.origin", "myuser.wfdisc", etc.  If omitted, 
         the database default owner/account will be used.
@@ -283,7 +283,7 @@ def load_tables(session, *tables, **kwargs):
 
     Examples
     --------
-    # load standard tables in 'myaccount' table space
+    # load standard tables in ``myaccount`` table space
     >>> tables = load_tables(session, 'site', 'sitechan', 'wfisc',
     ...                      schema='kbcore', owner='myaccount')
 

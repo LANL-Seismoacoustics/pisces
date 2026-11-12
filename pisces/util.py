@@ -242,7 +242,7 @@ def get_tables(bind, fulltablenames, metadata=None, primary_keys=None,
 
     # for a known/prototype table
     >>> class Site(css.Site):
-            __tablename__ = 'myaccount.my_site_tablename'
+    ...     __tablename__ = 'myaccount.my_site_tablename'
 
     """
     if not metadata:

@@ -38,9 +38,9 @@ def get_pazfir_lines(path):
         as a string.  Elements are in the same order as lines in the file with
         commented lines not included.
 
-    Examples:
-    ---------
-    fileLines = get_pazfir_lines('response_file.pazfir')
+    Examples
+    --------
+    ``fileLines = get_pazfir_lines('response_file.pazfir')``
     """
     
     with open(path, 'r') as f:
@@ -106,9 +106,9 @@ def get_pazfir_metadata(fileLines):
         Either "theoretical" or "measured" for each stage from response stage initiation 
         lines in fileLines found at the index values in the variable stageStart
     
-    Examples:
-    ---------
-    stageStart, stageNums, stageType, sourceType, t_v_m = get_pazfir_metadata(fileLines)
+    Examples
+    --------
+    ``stageStart, stageNums, stageType, sourceType, t_v_m = get_pazfir_metadata(fileLines)``
     """
 
     #  Get all the stage info to perform checks prior to building stages
@@ -177,9 +177,9 @@ def get_pazfir_data(fileLines, stageStart, stageType):
         sensitivity for a corresponding paz stage, the sampling frequency 
         of a corresponding fir/iir stage, or None for a fap stage
     
-    Examples:
-    ---------
-    poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageType)
+    Examples
+    --------
+    ``poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageType)``
     """
 
     poles_nums = []
@@ -303,9 +303,9 @@ def a0_from_pz(poles, zeros, a0f):
     a0: float
         The value of the transfer function at the provided a0f
     
-    Examples:
-    ---------
-    a0 = a0_from_pz(poles, zeros, a0f)
+    Examples
+    --------
+    ``a0 = a0_from_pz(poles, zeros, a0f)``
     """
     
     s = 2*np.pi*1j*a0f
@@ -371,8 +371,8 @@ def read_pazfir(path, input_samp_rate, calib, calper, input_units, nm_to_m = Tru
     -------
     total_resp: obspy.core.inventory.response.Response object
     
-    Examples:
-    ---------
+    Examples
+    --------
 
     """
 
@@ -1361,8 +1361,8 @@ def write_pazfir(response, station, channel, starttime, out_freq = None, dir_pat
     fileName: string
         The name of the file the response was written to.
 
-    Examples:
-    ---------
+    Examples
+    --------
     
     """
     
@@ -2059,10 +2059,10 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
         specified by the input Schema. Inid is automatically assigned based on the response
         index within the object and will correspond to the correct chanid in the sensor table
 
-    Examples:
-    ---------
-    network, affiliation, site, sitechan, sensor, instrument  = sxml2pazfir('stationxml_path', write_tables = False)
-    sxml2db(InventoryObject, schema = 'CSS3.0', out_freq = 1.0, dir_path = 'path_to_directory')
+    Examples
+    --------
+    ``network, affiliation, site, sitechan, sensor, instrument = sxml2pazfir('stationxml_path', write_tables=False)``
+    ``sxml2db(InventoryObject, schema='CSS3.0', out_freq=1.0, dir_path='path_to_directory')``
 
     """
 

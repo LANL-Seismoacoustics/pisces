@@ -118,7 +118,7 @@ def main(**kwargs):
     tables : list
         Canonical names for desired database tables.
     prefix : str
-        Target core tables using 'account.prefix' naming.
+        Target core tables using ``account.prefix`` naming.
     absolute_paths : bool
     bbfk : bool
         Pull in deast & dnorth info from user7 & user8 header fields

@@ -33,7 +33,7 @@ def filter_events(
     """Filter an event query using Event, Origin tables.
 
     These filters are primarily geographic and catagorical.  For magnitude filtering,
-    Use the `filter_magnitudes` function for magnitude filtering, and filter_arrivals
+    Use the ``filter_magnitudes`` function for magnitude filtering, and filter_arrivals
     for arrivals and amplitudes.
 
     Parameters
@@ -66,10 +66,10 @@ def filter_events(
         but isn't included in the final result set (unless it was already in the SELECT).
         If you wish the table included in the result set, use the
         sqlalchemy.orm.Query.add_entity method prior to calling this function.
-        e.g. `q = q.add_entity(Event)`
+        E.g. ``q = q.add_entity(Event)``
 
-    Joins
-    -----
+    Joins:
+
     Event.evid == Origin.evid
     Event.prefor == Origin.orid
 
@@ -203,8 +203,8 @@ def filter_magnitudes(
         the range to every row-oriented magnitude type. Origin supports only ``mb``, ``ml``, and
         ``ms`` columns; wildcard magnitude types require Netmag or Stamag.
 
-    Joins
-    -----
+    Joins:
+
     Origin.orid == Netmag.orid
     Netmag.evid == Event.evid
     Netmag.magid == Stamag.magid
@@ -306,8 +306,8 @@ def filter_arrivals(query, sta=None, auth=None, times=None, orid=None, phase=Non
     orid : int or list of int [Assoc]
     phase : str or list of str [Assoc.phase > Arrival.iphase]
 
-    Joins
-    -----
+    Joins:
+
     Origin.orid == Assoc.orid
     Assoc.arid == Arrival.arid
 

@@ -29,15 +29,8 @@ cat = catalog(query, ...)
 q = filter_waveforms(...)
 # Availability and extent operate on filtered queries in pisces.fdsn.stream.
 
-* “D” or “R” or “Q” or “M” — Data header/quality indicator. Previously, this field was only allowed to be “D”
-and was only used to indicate that this is a data header. As of SEED version 2.4 the meaning of this field has been
-extended to also indicate the level of quality control that has been applied to the record.
-D — The state of quality control of the data is indeterminate.
-R — Raw Waveform Data with no Quality Control
-Q — Quality Controlled Data, some processes have been applied to the data.
-M — Data center modified, time-series values have not been changed.
-
-STATUS is the restricted status, one of: OPEN, RESTRICTED, or PARTIAL
+Data-header/quality indicators are ``D``, ``R``, ``Q``, and ``M``. ``STATUS`` is
+one of ``OPEN``, ``RESTRICTED``, or ``PARTIAL``.
 
 """
 

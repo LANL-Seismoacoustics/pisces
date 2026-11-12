@@ -885,25 +885,27 @@ class Client:
         """
         Query the dataselect service of the client. Bulk request.
 
-        Send a bulk request for waveforms to the server. `bulk` can either be
+        Send a bulk request for waveforms to the server. ``bulk`` can either be
         specified as a filename, a file-like object or a string (with
         information formatted according to the FDSN standard) or a list of
         lists (each specifying network, station, location, channel, starttime
         and endtime). See examples and parameter description for more
         details.
 
-        `bulk` can be provided in the following forms:
+        ``bulk`` can be provided in the following forms:
 
         (1) As a list of lists. Each list item has to be list of network,
             station, location, channel, starttime and endtime.
 
         (2) As a valid request string/file as defined in the
             `FDSNWS documentation <https://www.fdsn.org/webservices/>`_.
-            The request information can be provided as a..
+
+            The request information can be provided as:
 
             - a string containing the request information
             - a string with the path to a local file with the request
             - an open file handle (or file-like object) with the request
+
 
         >>> client = Client(session, origin=Origin, site=Site)
         >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
@@ -920,11 +922,12 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T06:30:00... | 20.0 Hz, 20 samples
         IU.ANMO.10.BHZ | 2010-02-27T06:30:00... | 40.0 Hz, 40 samples
-        >>> bulk = 'quality=B\n' + \
-        ...        'longestonly=false\n' + \
-        ...        'IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02\n' + \
-        ...        'IU AFI 1? BHE 2010-02-27 2010-02-27T00:00:04\n' + \
-        ...        'GR GRA1 * BH? 2010-02-27 2010-02-27T00:00:02\n'
+        >>> bulk = '''quality=B
+        ... longestonly=false
+        ... IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02
+        ... IU AFI 1? BHE 2010-02-27 2010-02-27T00:00:04
+        ... GR GRA1 * BH? 2010-02-27 2010-02-27T00:00:02
+        ... '''
         >>> st = client.get_waveforms_bulk(bulk)
         >>> print(st)  # doctest: +ELLIPSIS
         5 Trace(s) in Stream:
