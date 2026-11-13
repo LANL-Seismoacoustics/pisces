@@ -29,14 +29,15 @@ exclude_patterns = ['_cli.rst']
 
 extensions = [
         "sphinx.ext.autodoc",
-        "sphinx.ext.autosummary",
         "sphinx.ext.viewcode",
         "sphinx_click",
         "myst_parser",
         # "autodoc2",
         "numpydoc",
         ]
-autosummary_generate = False
+# Do not generate or render autosummary member stubs.
+# Numpydoc otherwise emits autosummary directives for class members.
+numpydoc_show_class_members = False
 suppress_warnings = ["myst.header"]
 # source_suffix = {
 #     '.rst': 'restructuredtext',

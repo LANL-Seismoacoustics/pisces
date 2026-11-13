@@ -49,8 +49,8 @@ def split_commas(ctx, param, value):
 
 
 # common help flags
-prefix_help = ("Target tables using 'account.prefix naming.  e.g. myaccount.test_ "
-               "will target tables like myaccount.test_origin, myaccount.test_sitechan.")
+prefix_help = ("Target tables using ``account.prefix`` naming.  E.g. ``myaccount.test_`` "
+               "will target tables like ``myaccount.test_origin`` and ``myaccount.test_sitechan``.")
 absolute_paths_help = ("If set, write database 'dir' directory entries as "
                        "absolute paths, not relative.")
 file_list_help = "A list file, one file name per line."
@@ -126,17 +126,19 @@ def sac2db_command(**kwargs):
     \b
     Examples
     --------
-    # use standard table names to local test.sqlite file
-    pisces sac2db sqlite:///test.sqlite datadir/*.sac
 
     \b
-    # prefix all tables in an oracle account with prefix my_, prompt for password
-    pisces sac2db --prefix my_ oracle://user@server.domain.com:port/dbname datadir/*.sac
+        # use standard table names to local test.sqlite file
+        pisces sac2db sqlite:///test.sqlite datadir/\\*.sac
 
     \b
-    # if there are too many SAC files for the shell to handle, use a list:
-    find datadir -name "*.sac" -print > saclist.txt
-    sac2db.py sqlite:///test.sqlite saclist.txt
+        # prefix all tables in an oracle account with prefix my\\_, prompt for password
+        pisces sac2db --prefix my\\_ oracle://user@server.domain.com:port/dbname datadir/\\*.sac
+
+    \b
+        # if there are too many SAC files for the shell to handle, use a list:
+        find datadir -name "\\*.sac" -print > saclist.txt
+        sac2db.py sqlite:///test.sqlite saclist.txt
 
     """
     # TODO: make this and mseed2db do more file handling here.  The main functions

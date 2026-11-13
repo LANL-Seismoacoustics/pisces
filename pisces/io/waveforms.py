@@ -86,7 +86,7 @@ def read_waveform(DATAFILE, DATATYPE, BYTEOFFSET, NUM):
         'sd', 'sc', and 'sy' are SEED/miniSEED, SAC, and SEGY (pisces
         conveniences, not official KB Core values -- see module docstring).
         'e1' requires installation of the "e1" python module.
-        Additional datatypes can be registered via `WAVEFORM_READERS`.
+        Additional datatypes can be registered via ``WAVEFORM_READERS``.
     BYTEOFFSET : int
         Number of bytes from beginning of file.
     NUM : int

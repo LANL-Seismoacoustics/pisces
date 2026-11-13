@@ -1,9 +1,0 @@
-name: pisces
-channels:
-- defaults # prioritize defaults
-- conda-forge
-dependencies:
-- python>=3.9
-- obspy>=1.4.1
-- sqlalchemy>1.4
-- click

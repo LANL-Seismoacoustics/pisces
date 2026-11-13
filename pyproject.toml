@@ -30,6 +30,17 @@ Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
 
 [project.optional-dependencies]
 e1 = ["e1"]
+dev = [
+    "e1",
+    "pytest<10",
+    "myst-parser<6",
+    "pydata-sphinx-theme<0.24",
+    "sphinx>=7,<9",
+    "sphinx-book-theme<2",
+    "sphinx-click<7",
+    "numpydoc<2",
+    "sphinx-autobuild<2026",
+]
 
 [project.scripts]
 pisces = "pisces.commands.main:cli"
@@ -48,6 +59,13 @@ packages = [
 [tool.setuptools.dynamic]
 version = { attr = "pisces.__version__" }
 
+[tool.ruff.lint]
+ignore = ["BLE001", "F841", "RUF059"]
+
+
 [tool.ruff.lint.extend-per-file-ignores]
 # Ignore `E402` (imported but not used) in all `__init__.py` files.
 "__init__.py" = ["F401"]
+
+[tool.pyright]
+typeCheckingMode = "basic"

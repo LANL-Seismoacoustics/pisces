@@ -54,10 +54,12 @@ def get_infovals(meta, structure, key):
 
     Examples
     --------
+
     >>> from pisces.schema.kbcore import Base
     >>> fields, defaults = get_infovals(Base.metadata, ['site'], 'default')
     >>> print(defaults)
     ['-', -1, 2286324, -999.0, -999.0, -999.0, '-', '-', '-', -99999, -99999, <built-in method now of type object at 0x100601060>]
+
     >>> print(fields)
     ['sta', 'ondate', 'offdate', 'lat', 'lon', 'elev', 'staname', 'statype', 'refsta', 'dnorth', 'deast', 'lddate']
 
@@ -109,6 +111,7 @@ def string_formatter(meta, structure):
 
     Examples
     --------
+
     >>> recs = session.query(Origin, sta.lat, sta.lon).limit(10).all()
     >>> fmt = string_formatter(meta.tables.values(), ['origin', 'lat', 'lon'])
     >>> with open('origin_lat_lon.txt', 'w') as f:
@@ -259,10 +262,12 @@ def from_string(cls, line, default_on_error=None):
 
     Examples
     --------
+
     >>> with open('TA.site','r') as ffsite:
             for line in ffsite:
                 isite = Site.from_string(line)
     or
+
     >>> with open('TA.site','r') as ffsite:
             for line in ffsite:
                 isite = Site.from_string(line, default_on_error=['lddate'])
@@ -326,11 +331,11 @@ def _eq(self, other):
 
 
 def _update_docstring(cls):
-    s = '\n'.join(["{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.')
-                   for c in cls.__table__.columns])
-    s += f"\n\nFORMAT STRING:\n{cls._format_string}\n"
+    s = '\n\n'.join("{} ({}) : {!r}\n    {}".format(c.name, c.key, c.type, c.doc or 'No docstring.')
+                    for c in cls.__table__.columns)
+    s += f"\n\nFORMAT STRING\n-------------\n{cls._format_string}\n"
     try:
-        s += f"\n\nSQL CREATE STATEMENT:\n{sa.schema.CreateTable(cls.__table__)}\n"
+        s += f"\n\nSQL CREATE STATEMENT\n--------------------\n{sa.schema.CreateTable(cls.__table__)}\n"
     except sa.exc.CompileError:
         # One or more columns are of a type that doesn't render to strings.
         pass

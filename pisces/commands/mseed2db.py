@@ -38,12 +38,18 @@ def make_atomic(last, **rows):
 
 def main(session, files=None, file_list=None, prefix=None, absolute_paths=False):
     """
-    session : SQLAlchemy.orm.Session instance
-    tables : list
-        Canonical names for desired database tables.
-    prefix : str
-        Target core tables using 'account.prefix' naming.
-    absolute_paths : bool
+    Parameters
+    ----------
+    session : SQLAlchemy.orm.Session
+        Database session.
+    files : iterable of path-like, optional
+        MiniSEED files to process.
+    file_list : path-like, optional
+        File containing a list of MiniSEED paths.
+    prefix : str, optional
+        Target core tables using ``account.prefix`` naming.
+    absolute_paths : bool, optional
+        Store absolute waveform paths when true.
 
     """
     if file_list:
