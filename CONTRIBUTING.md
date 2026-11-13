@@ -1,67 +1,105 @@
 # Contributing
 
-Please contribute! Every little bit helps, and credit will always be given. 
+## Python environment
 
-# Ways to Contribute
+Pisces can be developed with any Python environment, including `venv`, `conda`,
+or `pixi` (preferred, see final section). The commands below use a virtual
+environment and pip, and are the canonical development instructions. From the
+repository root:
 
-* Filing an Issue  
-    https://github.com/jkmacc-LANL/pisces/issues
-* Bug Reports
-    - Detailed steps to reproduce the bug.  
-    - Your operating system name and version.
-    - Any details about your local setup that might be helpful in troubleshooting.  
-* Feature Request
-    - Explain in detail how it would work.
-    - Keep the scope as narrow as possible, to make it easier to implement.
-    - Remember that this is a volunteer-driven project, and that contributions are welcome :)
-* Submit a Pull Request
-* Write Documentation  
-    https://jkmacc-lanl.github.io/pisces/
+```bash
+python -m venv .venv
+. .venv/bin/activate                 # Windows: .venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
 
-# How to Submit a Pull Request
+The project also works in a conda environment. For example, create an
+optional `environment-dev.yml` with:
 
-Here's how to set up `pisces` for local development and contributing changes.
-Please see the project Wiki for a description of the git branching model.
+```yaml
+name: pisces-dev
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - obspy>=1.4.1
+  - sqlalchemy>=2
+  - click>=8.5,<9
+  - oracledb>=26,<27
+  - pytest<10
+  - myst-parser<6
+  - pydata-sphinx-theme<0.24
+  - sphinx>=7,<9
+  - sphinx-book-theme<2
+  - sphinx-click<7
+  - numpydoc<2
+  - sphinx-autobuild<2026
+  - ipython<10
+  - e1
+  - pip
+  - pip:
+      - -e ".[dev]"
+```
 
-1. If you don't yet have collaborator permissions, fork the `pisces` repo on GitHub.
-2. Clone the repo locally.
-    * On a GitHub fork:
-    ```
-    $ git clone git@github.com:your_name_here/pisces.git
-    ```
-    * On a different remote, use the appropriate URL.
+Create it with `conda env create -f environment-dev.yml` and activate it with
+`conda activate pisces-dev`. The file is an example rather than a repository
+requirement; the repository does not maintain a second environment file.
 
-3. Install your local copy into an environment for isolated development.
-    * using `virtualenv` (assuming you have `virtualenvwrapper` installed):
-    ```
-    $ mkvirtualenv pisces
-    $ cd pisces/
-    $ pip install obspy lxml Click
-    $ pip install -e .
-    ```
-    * using `conda`
-    ```
-    $ conda create -n pisces -c conda-forge obspy lxml Click
-    $ cd pisces/
-    $ pip install -e .
-    ```
+## Tests
 
-4. Create a branch for local development.  
-**Note**: if you're an internal developer, start from the `next_internal` branch
-    * For new functionality:
-    ```
-    $ git checkout -b name-of-your-bugfix-or-feature origin/next
-    ```
-    * For fixes and reorganizations:
-    ```
-    $ git checkout -b name-of-your-bugfix-or-feature origin/main
-    ```
+Run the test suite with pytest:
 
-5. Commit your changes and push your branch to the remote.
-    ```
-    $ git add <the_file_you_changed> <other_files_you_changed>
-    $ git commit -m "Your detailed description of your changes."
-    $ git push origin name-of-your-bugfix-or-feature
-    ```
+```bash
+pytest -v
+```
 
-6. Submit a pull/merge request through the repository website.
+## Documentation
+
+From the repository root, change into `docs/` and generate API sources and
+build the HTML documentation with the Sphinx commands directly:
+
+```bash
+cd docs
+sphinx-build -M clean source build
+rm -rf source/apidocs
+sphinx-apidoc -d 2 -Mef -t templates -o source/apidocs ../pisces
+cat source/_cli.rst >> source/apidocs/pisces.commands.rst
+sphinx-build -M html source build
+```
+
+For a live-reloading documentation server, run this from `docs/`:
+
+```bash
+sphinx-autobuild source build
+```
+
+If Make is installed, the [`docs/Makefile`](docs/Makefile) provides equivalent
+shortcuts. Run these Make commands from inside `docs/`:
+
+```bash
+make clean
+make apidocs
+make html
+make livehtml
+```
+
+## Pixi (optional, preferred)
+
+Pixi is the preferred way to reproduce the project’s development and CI
+environments, but it is not required for contributors. After installing Pixi,
+set up the development environment with:
+
+```bash
+pixi install -e dev
+```
+
+The Pixi tasks run the same commands above without requiring Make:
+
+```bash
+pixi run -e dev pytest
+pixi run -e dev docs-clean
+pixi run -e dev docs-apidocs
+pixi run -e dev docs-html
+pixi run -e dev docs-serve
+```
