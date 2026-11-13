@@ -59,6 +59,13 @@ packages = [
 [tool.setuptools.dynamic]
 version = { attr = "pisces.__version__" }
 
+[tool.ruff.lint]
+ignore = ["BLE001", "F841", "RUF059"]
+
+
 [tool.ruff.lint.extend-per-file-ignores]
 # Ignore `E402` (imported but not used) in all `__init__.py` files.
 "__init__.py" = ["F401"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
