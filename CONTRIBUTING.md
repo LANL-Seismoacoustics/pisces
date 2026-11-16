@@ -35,7 +35,6 @@ dependencies:
   - sphinx-click<7
   - numpydoc<2
   - sphinx-autobuild<2026
-  - ipython<10
   - e1
   - pip
   - pip:
@@ -88,18 +87,30 @@ make livehtml
 
 Pixi is the preferred way to reproduce the project’s development and CI
 environments, but it is not required for contributors. After installing Pixi,
-set up the development environment with:
+set up the default development environment with:
 
 ```bash
-pixi install -e dev
+pixi install
 ```
 
 The Pixi tasks run the same commands above without requiring Make:
 
 ```bash
-pixi run -e dev pytest
-pixi run -e dev docs-clean
-pixi run -e dev docs-apidocs
-pixi run -e dev docs-html
-pixi run -e dev docs-serve
+pixi run pytest
+pixi run docs-clean
+pixi run docs-apidocs
+pixi run docs-html
+pixi run docs-serve
 ```
+
+The `py311`, `py312`, `py313`, and `py314` environments provide the same
+development environment with a fixed Python version for testing. For optional
+interactive development, the `jupyter` environment also provides IPython and
+JupyterLab:
+
+```bash
+pixi shell -e jupyter
+```
+
+These Pixi environments are for developing the checkout. To use a released
+Pisces package, install it with pip or add `pisces` to your own Pixi project.

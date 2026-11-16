@@ -38,13 +38,13 @@ jobs:
         uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
         with:
           pixi-version: 0.84.1
-          environments: dev
+          environments: default
 
       - name: Build the docs
         run: |
-          pixi run -e dev docs-clean
-          pixi run -e dev docs-apidocs
-          pixi run -e dev docs-html
+          pixi run docs-clean
+          pixi run docs-apidocs
+          pixi run docs-html
 
       - name: Upload Pages artifact
         if: github.event_name == 'release' || !inputs.preview
