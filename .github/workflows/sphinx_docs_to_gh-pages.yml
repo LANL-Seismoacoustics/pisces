@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Sphinx docs to gh-pages
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: Set up Pixi
-        uses: prefix-dev/setup-pixi@v0.8.1
+        uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
         with:
           pixi-version: latest
           environments: dev
@@ -25,7 +25,7 @@ jobs:
           pixi run -e dev docs-apidocs
           pixi run -e dev docs-html
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@4c82c7262fae7c69e985454e2c815482877cc12a # v3.9.3
         if: ${{ github.ref == 'refs/heads/main' }} # must be publishing main/main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
