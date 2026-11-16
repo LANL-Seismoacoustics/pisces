@@ -1,35 +1,38 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Install and Run Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  test:
+    if: >-
+      github.event_name == 'pull_request' ||
+      !contains(github.event.head_commit.message, '[no CI]')
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.11', '3.12', '3.13', '3.14']
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - { environment: py311, os: ubuntu-latest }
+          - { environment: py312, os: ubuntu-latest }
+          - { environment: py313, os: ubuntu-latest }
+          - { environment: py314, os: ubuntu-latest }
+          - { environment: py311, os: macos-latest }
+          - { environment: py314, os: macos-latest }
+          - { environment: py311, os: windows-latest }
+          - { environment: py314, os: windows-latest }
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+    - name: Set up Pixi
+      uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install numpy pytest
-    - name: Build
-      run: |
-        pip install .
+        pixi-version: v0.84.1
+        environments: ${{ matrix.environment }}
     - name: Test with pytest
-      run: |
-        pytest -v
+      run: pixi run -e ${{ matrix.environment }} pytest -v

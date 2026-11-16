@@ -14,7 +14,7 @@ def get_or_create_tables(session, prefix=None, create=True, **tables):
     ----------
     session : sqlalchemy.orm.Session
     prefix : str
-        Prefix for canonical table names, e.g. 'myaccount.' or 'TA_' (no owner/schema).
+        Prefix for canonical table names, e.g. ``myaccount.`` or ``TA_`` (no owner/schema).
         Canonical table names are used if no prefix is provided.
     create : bool
         If True, create tables that don't yet exist.

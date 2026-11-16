@@ -111,6 +111,7 @@ class Registry:
 
     Examples
     --------
+
     >>> register = Registry()
 
     >>> @register('miniseed')
@@ -119,6 +120,7 @@ class Registry:
 
     >>> 'miniseed' in register
     True
+
     >>> register['miniseed'] == read_miniseed
     True
 

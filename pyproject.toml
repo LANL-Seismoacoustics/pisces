@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 keywords = ["seismology", "geophysics", "database"]
-dependencies = ["numpy", "obspy>=1.4.1", "sqlalchemy>=1.4", "Click"]
+dependencies = ["numpy", "obspy>=1.4.1", "scipy", "sqlalchemy>=2", "click"]
 requires-python = ">=3.11"
 
 [project.urls]
@@ -30,6 +30,18 @@ Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
 
 [project.optional-dependencies]
 e1 = ["e1"]
+dev = [
+    "e1",
+    "oracledb",
+    "pytest",
+    "myst-parser",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-book-theme",
+    "sphinx-click",
+    "numpydoc",
+    "sphinx-autobuild",
+]
 
 [project.scripts]
 pisces = "pisces.commands.main:cli"
@@ -48,6 +60,13 @@ packages = [
 [tool.setuptools.dynamic]
 version = { attr = "pisces.__version__" }
 
+[tool.ruff.lint]
+ignore = ["BLE001", "F841", "RUF059"]
+
 [tool.ruff.lint.extend-per-file-ignores]
 # Ignore `E402` (imported but not used) in all `__init__.py` files.
 "__init__.py" = ["F401"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+

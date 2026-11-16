@@ -4,8 +4,6 @@ Convenience functions for building common queries.
 """
 import warnings
 
-from pisces.util import deprecated
-
 import numpy as np
 import obspy.geodetics as geod
 from obspy.core import Stream, UTCDateTime
@@ -13,6 +11,7 @@ from sqlalchemy import or_
 
 from pisces.fdsn import wfdisc2trace
 from pisces.query.util import make_wildcard_list
+from pisces.util import deprecated
 
 
 @deprecated("Use pisces.query.filter_waveforms instead.")

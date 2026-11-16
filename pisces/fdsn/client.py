@@ -21,11 +21,11 @@ from pisces.query import (
     filter_responses,
     filter_stations,
     filter_waveforms,
-    util,
 )
-from .stream import availability, extent, stream
+
 from .catalog import KBCORE_EVENT_TYPE, catalog
 from .inventory import build_inventory
+from .stream import availability, extent, stream
 
 log = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ def _evid_list(eventid):
 
     Raises
     ------
-    TypeError : input must be {int, str, list, tuple}
+    TypeError : input must be one of ``{int, str, list, tuple}``
 
     """
     # py3.10+
@@ -134,6 +134,7 @@ class Client:
 
         Examples
         --------
+
         >>> client = Client('sqlite:///local/path/to/mydb.sqlite')
         >>> client = Client('sqlite:////full/path/to/mydb.sqlite', site='mysite')
         >>> client = Client('oracle://scott:tiger@dbserver.somewhere.com:8080/mydb')
@@ -516,7 +517,8 @@ class Client:
             Comma-separated codes or ``*``/``?`` wildcard patterns.
         minlatitude, maxlatitude, minlongitude, maxlongitude : float, optional
             Rectangular geographic bounds applied to Site rows.
-        level : {"network", "station", "channel", "response"}, optional
+        level : str, optional
+            One of ``{"network", "station", "channel", "response"}``.
             Metadata detail level. Defaults to ``"station"``.
         asquery : bool, optional
             Return the SQLAlchemy query instead of building an ObsPy Inventory.
@@ -702,6 +704,7 @@ class Client:
 
         Examples
         --------
+
         >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
         >>> t2 = t1 + 5
         >>> st = client.get_waveforms("IU", "A*", "1?", "LHZ", t1, t2)
@@ -774,7 +777,8 @@ class Client:
             Merge spans separated by no more than this many seconds.
         mergesamplerate : float, optional
             Merge spans whose sample rates differ by no more than this amount.
-        show : {None, "latestupdate"}, optional
+        show : str or None, optional
+            ``"latestupdate"`` or ``None``.
             Include the latest contributing update time.
         includerestricted : bool, optional
             Include restricted data by default.
@@ -885,25 +889,27 @@ class Client:
         """
         Query the dataselect service of the client. Bulk request.
 
-        Send a bulk request for waveforms to the server. `bulk` can either be
+        Send a bulk request for waveforms to the server. ``bulk`` can either be
         specified as a filename, a file-like object or a string (with
         information formatted according to the FDSN standard) or a list of
         lists (each specifying network, station, location, channel, starttime
         and endtime). See examples and parameter description for more
         details.
 
-        `bulk` can be provided in the following forms:
+        ``bulk`` can be provided in the following forms:
 
         (1) As a list of lists. Each list item has to be list of network,
             station, location, channel, starttime and endtime.
 
         (2) As a valid request string/file as defined in the
             `FDSNWS documentation <https://www.fdsn.org/webservices/>`_.
-            The request information can be provided as a..
+
+            The request information can be provided as:
 
             - a string containing the request information
             - a string with the path to a local file with the request
             - an open file handle (or file-like object) with the request
+
 
         >>> client = Client(session, origin=Origin, site=Site)
         >>> t1 = UTCDateTime("2010-02-27T06:30:00.000")
@@ -920,11 +926,13 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T06:30:01... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T06:30:00... | 20.0 Hz, 20 samples
         IU.ANMO.10.BHZ | 2010-02-27T06:30:00... | 40.0 Hz, 40 samples
-        >>> bulk = 'quality=B\n' + \
-        ...        'longestonly=false\n' + \
-        ...        'IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02\n' + \
-        ...        'IU AFI 1? BHE 2010-02-27 2010-02-27T00:00:04\n' + \
-        ...        'GR GRA1 * BH? 2010-02-27 2010-02-27T00:00:02\n'
+
+        >>> bulk = '''quality=B
+        ... longestonly=false
+        ... IU ANMO * BHZ 2010-02-27 2010-02-27T00:00:02
+        ... IU AFI 1? BHE 2010-02-27 2010-02-27T00:00:04
+        ... GR GRA1 * BH? 2010-02-27 2010-02-27T00:00:02
+        ... '''
         >>> st = client.get_waveforms_bulk(bulk)
         >>> print(st)  # doctest: +ELLIPSIS
         5 Trace(s) in Stream:
@@ -933,6 +941,7 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+
         >>> st = client.get_waveforms_bulk("/tmp/request.txt") \
         ...     # doctest: +SKIP
         >>> print(st)  # doctest: +SKIP
@@ -942,6 +951,7 @@ class Client:
         GR.GRA1..BHZ   | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.00.BHZ | 2010-02-27T00:00:00... | 20.0 Hz, 40 samples
         IU.ANMO.10.BHZ | 2010-02-27T00:00:00... | 40.0 Hz, 80 samples
+
         >>> t = UTCDateTime("2012-12-14T10:36:01.6Z")
         >>> t1 = t + 300
         >>> t2 = t + 400

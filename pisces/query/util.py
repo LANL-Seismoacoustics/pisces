@@ -47,14 +47,20 @@ def range_filters(*restrictions):
     Returns
     -------
     list of SQLAlchemy filter conditions that can be unpacked into an SQLAlchemy
-    filter method, like query.filter(*filters) for AND clauses,
-    or query.filter(or_(*filters)) for OR clauses.
+    filter method, like ``query.filter(*filters)`` for AND clauses,
+    or ``query.filter(or_(*filters))`` for OR clauses.
 
-    # e.g.
+    Examples
+    --------
+
     >>> f = range_filters((Origin.lat, -10, 15), (Origin.depth, None, 80))
+
     Produces a list containing zero or one filter expressions.
-    It's supplied as a list so it can be applied to a query like:
-    >>> query.filter(*f)
+
+    It's supplied as a list so it can be applied to a query like::
+
+        query.filter(*f)
+
     which works even if the list is empty (all ranges are None).
 
     """
@@ -99,10 +105,10 @@ def distance_filter(
     Returns
     -------
     list or generator
-        If `yield_per` is provided, results are a generator that iterates to yield
+        If ``yield_per`` is provided, results are a generator that iterates to yield
         an unknown number list of joined result rows that pass the distance filter
-        per iteration, internally processing `yield_per` joined rows at a time.
-        If `yield_per` is None, a list of filtered results is returned directly.
+        per iteration, internally processing ``yield_per`` joined rows at a time.
+        If ``yield_per`` is None, a list of filtered results is returned directly.
 
     Notes
     -----
@@ -176,9 +182,9 @@ def string_expression(selectable, string_filters):
         This is simply an ORM Table string-type column, like Site.sta
     string_filters : list of str
         List of one or more strings for subsetting, which may include SQL LIKE
-        characters '_' and '%'.  e.g. ['BHZ'], ['%Z', 'BH_'].
+        characters ``_`` and ``%``.  E.g. ``['BHZ']`` or ``['%Z', 'BH_']``.
         The easiest way to get this for a string list that may be comma separated
-        (e.g. '%Z,B_N') is to always use '%Z,B_N'.split(',').
+        (e.g. ``'%Z,B_N'``) is to always use ``'%Z,B_N'.split(',')``.
 
     Returns
     -------
@@ -189,11 +195,13 @@ def string_expression(selectable, string_filters):
 
     Examples
     --------
+
     >>> from pisces.tables.css3 import Wfdisc
     >>> channels = ['%Z', 'B_N', 'HHT']
     >>> chan_expr = string_expression(Wfdisc.chan, channels)
     >>> literal_sql(session.bind, chan_expr) # just shows the literal compiled SQL
     "wfdisc.chan LIKE '%Z' OR wfdisc.chan LIKE 'B_N' OR wfdisc.chan = 'HHT'"
+
     >>> wfdisc_rows = session.query(Wfdisc).filter(chan_expr).all()
 
     """

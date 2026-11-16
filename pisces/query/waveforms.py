@@ -1,43 +1,38 @@
 """
 Query-building functions for getting waveforms.
 
-Based on the outputs of filter_stations
+Based on the outputs of :func:`filter_stations`.
 
+Example
+-------
 
-from obspy import UTCDateTime
-from .stations import filter_stations
-from pisces.fdsn import stream
+.. code-block:: python
 
-now = UTCDateTime.now().timestamp
+    from obspy import UTCDateTime
+    from .stations import filter_stations
+    from pisces.fdsn import stream
 
-query = session.query(Affiliation, Site, Sitechan, Wfdisc)
-query = filter_stations(query, net='IU', chan='BH[ENZ]', region=(W, E, S, N))
+    now = UTCDateTime.now().timestamp
 
-stquery = filter_waveforms(query, times=(now-86400, None))
-st = stream(stquery, tolerance=0.05, headonly=False)
+    query = session.query(Affiliation, Site, Sitechan, Wfdisc)
+    query = filter_stations(query, net='IU', chan='BH[ENZ]', region=(W, E, S, N))
 
-iquery = filter_responses(query, ...)
-inv = inventory(iquery, ...)
+    stquery = filter_waveforms(query, times=(now - 86400, None))
+    st = stream(stquery, tolerance=0.05, headonly=False)
 
-query = session.query(Event, Origin, Netmag)
-query = filter_events(query, region=(W, E, S, N), times=(lastweek, now), depth=(15, None))
-query = filter_magnitudes(query, mb=(None, 4.0))
-cat = catalog(query, ...)
+    iquery = filter_responses(query, ...)
+    inv = inventory(iquery, ...)
 
+    query = session.query(Event, Origin, Netmag)
+    query = filter_events(query, region=(W, E, S, N), times=(lastweek, now), depth=(15, None))
+    query = filter_magnitudes(query, mb=(None, 4.0))
+    cat = catalog(query, ...)
 
+    q = filter_waveforms(...)
+    # Availability and extent operate on filtered queries in pisces.fdsn.stream.
 
-q = filter_waveforms(...)
-# Availability and extent operate on filtered queries in pisces.fdsn.stream.
-
-* “D” or “R” or “Q” or “M” — Data header/quality indicator. Previously, this field was only allowed to be “D”
-and was only used to indicate that this is a data header. As of SEED version 2.4 the meaning of this field has been
-extended to also indicate the level of quality control that has been applied to the record.
-D — The state of quality control of the data is indeterminate.
-R — Raw Waveform Data with no Quality Control
-Q — Quality Controlled Data, some processes have been applied to the data.
-M — Data center modified, time-series values have not been changed.
-
-STATUS is the restricted status, one of: OPEN, RESTRICTED, or PARTIAL
+Data-header/quality indicators are ``D``, ``R``, ``Q``, and ``M``. ``STATUS`` is
+one of ``OPEN``, ``RESTRICTED``, or ``PARTIAL``.
 
 """
 
@@ -76,7 +71,8 @@ def filter_waveforms(
     recordlength : int, optional
         Typical Wfdisc record length in seconds (default: 86400). A falsey
         value disables the record-length buffer.
-    clip : {"c", "n"}, optional
+    clip : str, optional
+        One of ``{"c", "n"}``.
         Not implemented; Wfdisc clip flags are not filtered.
     affiliation : mapped table class, optional
         Affiliation table used for network and epoch-overlap filtering.

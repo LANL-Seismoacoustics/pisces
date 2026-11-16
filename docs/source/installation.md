@@ -4,9 +4,13 @@
 Requires:
 
 * NumPy
+* SciPy
 * ObsPy
-* SQLAlchemy>1.3
+* SQLAlchemy>=2
 * Click
+
+For Oracle database connections, install the appropriate SQLAlchemy DBAPI
+driver separately; the development environment includes `oracledb` for testing.
 
 There are multiple ways Pisces can be installed.
 

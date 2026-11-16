@@ -8,12 +8,11 @@ import tempfile
 import numpy as np
 import pytest
 from obspy import Stream, Trace, UTCDateTime
-from sqlalchemy import func, literal, or_
 
 import pisces.fdsn.stream as trace
-from pisces.fdsn.stream import availability, extent, spans_interval, stream, wfdisc2obspyhdr, wfdisc2trace
+from pisces.fdsn.stream import spans_interval, stream, wfdisc2obspyhdr, wfdisc2trace
 from pisces.query import filter_waveforms
-from pisces.tables.kbcore import Affiliation, Network, Site, Wfdisc
+from pisces.tables.kbcore import Affiliation, Wfdisc
 
 
 def waveform_query(session):

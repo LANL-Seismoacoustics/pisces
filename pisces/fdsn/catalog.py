@@ -298,6 +298,7 @@ class QMLGenerator:
 
         Examples
         --------
+
         >>> qgen = QMLGenerator(resource_prefix='smi:my.institute.edu')
         >>> cat = qgen.catalog(description="my catalog")
 
@@ -423,6 +424,7 @@ def catalog(*queries,
 
     Examples
     --------
+
     >>> cat = catalog(event_query, resource_prefix='smi:lanl.gov', description='my catalog')
     >>> cat = catalog(event_query, arrival_query)  # merged into one catalog
 

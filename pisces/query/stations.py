@@ -17,21 +17,26 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
     query: sqlalchemy.Query instance
         Includes the required tables for your query (e.g. query = session.query(Network, Affiliation)),
         otherwise they must be provided as keywords (see below).
-    net : str [Network, Affiliation]
+    net : str
+        Network code from ``Network`` or ``Affiliation``.
         Filter Network table on net column.  Wildcards accepted. Multiple nets can be
         included as a list, tuple, or comma separated string (no spaces).  If Network and Affiliation
-        tables are provided in query or **tables, the Affiliation table is automatically joined to the
+        tables are provided in query or ``**tables``, the Affiliation table is automatically joined to the
         Network table on the net column.
-    netname: str [Network]
+    netname: str
+        Network name from ``Network``.
         Filter Network table on netname column.  Wildcards accepted. Multiple netnames can be
         included as a list, tuple, or comma separated string (no spaces).
-    auth: str [Network]
+    auth: str
+        Network author from ``Network``.
         Filter Network table on auth column.  Wildcards accepted. Multiple authors can be
         included as a list, tuple, or comma separated string (no spaces).
-    sta : str [Affiliation]
+    sta : str
+        Station code from ``Affiliation``.
         Filter Affiliation table on sta column.  Wildcards accepted. Multiple stations can be
         included as a list, tuple, or comma separated string (no spaces).
-    times : tuple [Affiliation]
+    times : tuple
+        Time range applied to ``Affiliation``.
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps. Filters
         Affiliation table on the time and endtime columns.  If starttime or endtime are None,
         that column is not filtered.
@@ -41,10 +46,10 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
         but isn't included in the final result set (unless it was already in the SELECT).
         If you wish the table included in the result set, use the
         sqlalchemy.orm.Query.add_entity method prior to calling this function.
-        e.g. `q = q.add_entity(Site)`
+        E.g. ``q = q.add_entity(Site)``
 
-    Joins
-    -----
+    Joins:
+
     If Network and Affiliation:
         Network.net == Affiliation.net
 
@@ -60,9 +65,10 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
         The returned variable is a sqlalchemy query with the filters corresponding to the provided
         inputs applied.
 
-    Examples:
-    ---------
+    Examples
+    --------
     Forgot to include a required table when building query:
+
     >>> q = session.query(Network)
     >>> try:
     ... q = filter_networks(q, sta = 'ANMO')
@@ -72,22 +78,27 @@ def filter_networks(query, net=None, netname=None, auth=None, sta=None,  times=N
     >>> networks = q.all() # list of all networks affiliated with station ANMO
 
     Get a cartesian join of both networks and stations
+
     >>> q = session.query(Network, Affiliation)
     >>> q = session.query(Network).add_entity(Affiliation) # equivalent to above
     >>> nets_and_stas = filter_networks(q, sta = 'ANMO').all()
 
     Get a cartesian join of networks to sites
+
     >>> q = session.query(Network, Affiliation, Site)
     >>> q = session.query(Network, Affiliation).add_entity(Site) # equivalent to above
     >>> nets_and_sites = filter_networks(q, sta = 'ANMO').all()
 
     String handling.  The following queries will produce equivalent results
+
     >>> q = session.query(Network)
     >>> q = filter_networks(q, net = 'SR,IU')
     >>> q = filter_networks(q, net = ('SR','IU'))
     >>> q = filter_networks(q, net = ['SR',IU'])
 
-    String handling.  Wildcards * and ? are accepted as well as SQL wildcards % and _ .
+    String handling.  Wildcards ``*`` and ``?`` are accepted as well as SQL
+    wildcards ``%`` and ``_``.
+
     >>> q = session.query(Network, Affiliation)
     >>> q = filter_networks(q, net = 'SR', sta = ['*'])
 
@@ -164,26 +175,32 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
     query: sqlalchemy.Query instance
         Includes the required tables for your query (e.g. query = session.query(Site, Sitechan)),
         otherwise they must be provided as keywords (see below).
-    sta : str [Site, Sitechan]
+    sta : str
+        Station code from ``Site`` or ``Sitechan``.
         Filter Site or Sitechan table on sta column.  Wildcards accepted. Multiple stations can be
         included as a list, tuple, or comma separated string (no spaces). If Site and Sitechan tables
-        is provided in query or **tables, the Site table is automatically joined to the
+        is provided in query or ``**tables``, the Site table is automatically joined to the
         Sitechan table on the sta column.
-    chan : str [Sitechan]
+    chan : str
+        Channel code from ``Sitechan``.
         Filter Sitechan table on chan column.  Wildcards accepted. Multiple chans can be
         included as a list, tuple, or comma separated string (no spaces).
-    times : tuple [Site, Sitechan]
+    times : tuple
+        Time range applied to ``Site`` or ``Sitechan``.
         (starttime, endtime) inclusive range containing int following the format YYYYDDD for the
         4 character year and the 3 character julian day. Filters Site or Sitechan table on the time
         and endtime columns.  If starttime or endtime are None, that column is not filtered. If both
         Site and Sitechan are provided, Site will be further filtered by
         Sitechan.ondate.between(Site.ondate, Site.offdate)
-    region : tuple [Origin]
+    region : tuple
+        Geographic bounds applied to ``Site``.
         (W, E, S, N) inclusive lat/lon box containing int/float/None(unbounded) degrees
-    staname: str [Site]
+    staname: str
+        Station name from ``Site``.
         Filter Site table on staname column.  Wildcards accepted. Multiple stanames can be
         included as a list, tuple, or comma separated string (no spaces).
-    refsta: str [Site]
+    refsta: str
+        Reference station from ``Site``.
         Filter Site table on refsta column.  Wildcards accepted. Multiple refstas can be
         included as a list, tuple, or comma separated string (no spaces).
     **tables :
@@ -192,10 +209,10 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
         but isn't included in the final result set (unless it was already in the SELECT).
         If you wish the table included in the result set, use the
         sqlalchemy.orm.Query.add_entity method prior to calling this function.
-        e.g. `q = q.add_entity(Affiliation)`
+        E.g. ``q = q.add_entity(Affiliation)``
 
-    Joins
-    -----
+    Joins:
+
     If Site and Sitechan:
         Site.sta == Sitechan.sta
 
@@ -221,9 +238,10 @@ def filter_stations(query, sta=None, chan=None, times=None, region=None, staname
         The returned variable is a sqlalchemy query with the filters corresponding to the provided
         inputs applied.
 
-    Examples:
-    ---------
+    Examples
+    --------
     Region filtering on Site table
+
     >>> q = session.query(Site)
     >>> stations = filter_sites(q, region=(W, E, S, N)).all()
     >>> stations = filter_sites(q, region=(-107, -106, 34, 35)).all()
@@ -344,13 +362,16 @@ def filter_responses(query, sta = None, chan = None, times = None, **tables):
         Includes the required tables for your query (e.g. query = session.query(Sensor, Instrument)),
         otherwise they must be provided as keywords (see below).  Both Sensor and Instrument are required
         and are joined on the inid column,
-    sta : str [Sensor]
+    sta : str
+        Station code from ``Sensor``.
         Filter Sensor on sta column.  Wildcards accepted. Multiple stations can be
         included as a list, tuple, or comma separated string (no spaces).
-    chan : str [Sensor]
+    chan : str
+        Channel code from ``Sensor``.
         Filter Sensor table on chan column.  Wildcards accepted. Multiple chans can be
         included as a list, tuple, or comma separated string (no spaces).
-    times : tuple [Sensor]
+    times : tuple
+        Time range applied to ``Sensor``.
         (starttime, endtime) inclusive range containing int/float/None Unix timestamps. Filters
         Sensor table on the time and endtime columns.  If starttime or endtime are None,
         that column is not filtered.
@@ -360,10 +381,10 @@ def filter_responses(query, sta = None, chan = None, times = None, **tables):
         but isn't included in the final result set (unless it was already in the SELECT).
         If you wish the table included in the result set, use the
         sqlalchemy.orm.Query.add_entity method prior to calling this function.
-        e.g. `q = q.add_entity(Sitechan)`
+        E.g. ``q = q.add_entity(Sitechan)``
 
-    Joins
-    -----
+    Joins:
+
     Sensor.inid == Instrument.inid
 
     If Sitechan:
@@ -378,8 +399,8 @@ def filter_responses(query, sta = None, chan = None, times = None, **tables):
         The returned variable is a sqlalchemy query with the filters corresponding to the provided
         inputs applied.
 
-    Examples:
-    ---------
+    Examples
+    --------
     See filter_networks() docstring for usage examples.
 
     """
