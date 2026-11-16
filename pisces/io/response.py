@@ -40,7 +40,7 @@ def get_pazfir_lines(path):
 
     Examples
     --------
-    ``fileLines = get_pazfir_lines('response_file.pazfir')``
+    >>> fileLines = get_pazfir_lines('response_file.pazfir')
     """
     
     with open(path, 'r') as f:
@@ -108,7 +108,7 @@ def get_pazfir_metadata(fileLines):
     
     Examples
     --------
-    ``stageStart, stageNums, stageType, sourceType, t_v_m = get_pazfir_metadata(fileLines)``
+    >>> stageStart, stageNums, stageType, sourceType, t_v_m = get_pazfir_metadata(fileLines)
     """
 
     #  Get all the stage info to perform checks prior to building stages
@@ -179,7 +179,7 @@ def get_pazfir_data(fileLines, stageStart, stageType):
     
     Examples
     --------
-    ``poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageType)``
+    >>> poles_nums, zeros_denoms, sens_decim = get_pazfir_data(fileLines, stageStart, stageType)
     """
 
     poles_nums = []
@@ -305,7 +305,7 @@ def a0_from_pz(poles, zeros, a0f):
     
     Examples
     --------
-    ``a0 = a0_from_pz(poles, zeros, a0f)``
+    >>> a0 = a0_from_pz(poles, zeros, a0f)
     """
     
     s = 2*np.pi*1j*a0f
@@ -2061,8 +2061,8 @@ def sxml2db(input_xml, schema='kbcore', out_freq=None, dir_path = None, write_ta
 
     Examples
     --------
-    ``network, affiliation, site, sitechan, sensor, instrument = sxml2pazfir('stationxml_path', write_tables=False)``
-    ``sxml2db(InventoryObject, schema='CSS3.0', out_freq=1.0, dir_path='path_to_directory')``
+    >>> network, affiliation, site, sitechan, sensor, instrument = sxml2pazfir('stationxml_path', write_tables=False)
+    >>> sxml2db(InventoryObject, schema='CSS3.0', out_freq=1.0, dir_path='path_to_directory')
 
     """
 
