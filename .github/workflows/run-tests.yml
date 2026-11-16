@@ -6,20 +6,30 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        environment: [py311, py312, py313, py314]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - { environment: py311, os: ubuntu-latest }
+          - { environment: py312, os: ubuntu-latest }
+          - { environment: py313, os: ubuntu-latest }
+          - { environment: py314, os: ubuntu-latest }
+          - { environment: py311, os: macos-latest }
+          - { environment: py314, os: macos-latest }
+          - { environment: py311, os: windows-latest }
+          - { environment: py314, os: windows-latest }
 
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
     - name: Set up Pixi
       uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
       with:
-        pixi-version: latest
+        pixi-version: 0.84.1
         environments: ${{ matrix.environment }}
     - name: Test with pytest
       run: pixi run -e ${{ matrix.environment }} pytest -v
