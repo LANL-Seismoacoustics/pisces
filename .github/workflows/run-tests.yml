@@ -2,15 +2,18 @@ name: Install and Run Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   test:
+    if: >-
+      github.event_name == 'pull_request' ||
+      !contains(github.event.head_commit.message, '[no CI]')
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
