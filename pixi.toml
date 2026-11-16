@@ -3,7 +3,6 @@ authors = ["Jonathan MacCarthy <jkmacc@lanl.gov>"]
 channels = ["conda-forge"]
 name = "pisces"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
-version = "0.1.0"
 
 [tasks]
 docs-clean = { cmd = "sphinx-build -M clean source build", cwd = "docs" }
