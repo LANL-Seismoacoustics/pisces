@@ -14,8 +14,9 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-The project also works in a conda environment. For example, create an
-optional `environment-dev.yml` with:
+The project also works in a conda environment. To use the equivalent
+development environment, copy the following into a file such as
+`environment-dev.yml`:
 
 ```yaml
 name: pisces-dev
@@ -23,27 +24,29 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.11
+  - numpy
   - obspy>=1.4.1
+  - scipy
   - sqlalchemy>=2
-  - click>=8.5,<9
-  - oracledb>=26,<27
-  - pytest<10
-  - myst-parser<6
-  - pydata-sphinx-theme<0.24
-  - sphinx>=7,<9
-  - sphinx-book-theme<2
-  - sphinx-click<7
-  - numpydoc<2
-  - sphinx-autobuild<2026
+  - click
+  - oracledb
   - e1
+  - pytest
+  - myst-parser
+  - pydata-sphinx-theme
+  - sphinx
+  - sphinx-book-theme
+  - sphinx-click
+  - numpydoc
+  - sphinx-autobuild
   - pip
   - pip:
-      - -e ".[dev]"
+      - -e . --no-deps
 ```
 
 Create it with `conda env create -f environment-dev.yml` and activate it with
-`conda activate pisces-dev`. The file is an example rather than a repository
-requirement; the repository does not maintain a second environment file.
+`conda activate pisces-dev`. The Pixi environment is the primary development
+setup, but this example keeps Conda-based development equivalent.
 
 ## Tests
 

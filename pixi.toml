@@ -17,9 +17,11 @@ docs-serve = { cmd = "sphinx-autobuild source build", cwd = "docs" }
 
 [dependencies]
 python = ">=3.11"
+numpy = "*"
 obspy = ">=1.4.1"
+scipy = "*"
 sqlalchemy = ">=2"
-click = ">=8.5.0,<9"
+click = "*"
 oracledb = ">=26.0.1,<27"
 
 myst-parser = ">=5.1.0,<6"

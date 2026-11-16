@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 keywords = ["seismology", "geophysics", "database"]
-dependencies = ["numpy", "obspy>=1.4.1", "sqlalchemy>=1.4", "Click"]
+dependencies = ["numpy", "obspy>=1.4.1", "scipy", "sqlalchemy>=2", "click"]
 requires-python = ">=3.11"
 
 [project.urls]
@@ -32,14 +32,15 @@ Homepage = "https://github.com/LANL-Seismoacoustics/pisces"
 e1 = ["e1"]
 dev = [
     "e1",
-    "pytest<10",
-    "myst-parser<6",
-    "pydata-sphinx-theme<0.24",
-    "sphinx>=7,<9",
-    "sphinx-book-theme<2",
-    "sphinx-click<7",
-    "numpydoc<2",
-    "sphinx-autobuild<2026",
+    "oracledb",
+    "pytest",
+    "myst-parser",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-book-theme",
+    "sphinx-click",
+    "numpydoc",
+    "sphinx-autobuild",
 ]
 
 [project.scripts]
