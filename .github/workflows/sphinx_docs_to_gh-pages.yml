@@ -2,31 +2,77 @@ name: Sphinx docs to GitHub Pages
 
 on:
   release:
-    types:
-      - published
+    types: [published]
   workflow_dispatch:
+    inputs:
+      preview:
+        description: Build a downloadable PR preview instead of deploying to Pages
+        required: true
+        default: false
+        type: boolean
+      pr_number:
+        description: Pull request number for the preview
+        required: false
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
-  sphinx_docs_to_gh-pages:
+  build:
+    name: Build documentation
     runs-on: ubuntu-latest
-    name: Sphinx docs to gh-pages
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Check preview input
+        if: github.event_name == 'workflow_dispatch' && inputs.preview && !inputs.pr_number
+        run: |
+          echo 'pr_number is required for a preview.'
+          exit 1
+
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          fetch-depth: 0
+          ref: ${{ github.event_name == 'release' && github.ref || (inputs.preview && format('refs/pull/{0}/merge', inputs.pr_number) || 'main') }}
+
       - name: Set up Pixi
         uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
         with:
-          pixi-version: latest
+          pixi-version: 0.84.1
           environments: dev
+
       - name: Build the docs
         run: |
           pixi run -e dev docs-clean
           pixi run -e dev docs-apidocs
           pixi run -e dev docs-html
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@4c82c7262fae7c69e985454e2c815482877cc12a # v3.9.3
-        if: ${{ github.ref == 'refs/heads/main' }} # must be publishing main/main
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
+          path: docs/build/html
+
+      - name: Upload preview artifact
+        if: github.event_name == 'workflow_dispatch' && inputs.preview
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: docs-preview-${{ github.run_id }}
+          path: docs/build/html
+          retention-days: 14
+
+  deploy:
+    name: Deploy documentation to GitHub Pages
+    needs: build
+    if: >-
+      (github.event_name == 'release' && github.event.release.target_commitish == 'main') ||
+      (github.event_name == 'workflow_dispatch' && !inputs.preview)
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
