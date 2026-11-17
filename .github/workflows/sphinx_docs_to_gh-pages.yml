@@ -35,9 +35,8 @@ jobs:
           ref: ${{ github.event_name == 'release' && github.ref || (inputs.preview && format('refs/pull/{0}/merge', inputs.pr_number) || 'main') }}
 
       - name: Set up Pixi
-        uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143 # v0.8.14
+        uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
         with:
-          pixi-version: v0.84.1
           environments: default
 
       - name: Build the docs
