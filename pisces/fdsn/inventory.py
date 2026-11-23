@@ -178,22 +178,33 @@ def organize_data(results, use_network = True, schema = 'kbcore'):
 
 
 def extract_table(row, table_class):
-    """Extract specific table object from query row."""
-    # Try multiple methods to get the table
-    # Method 1: Direct attribute access
-    if hasattr(row, table_class.__name__.lower()):
-        return getattr(row, table_class.__name__.lower())
-    
-    # Method 2: Check if row is tuple-like
+    """Extract a mapped table instance from a query result row."""
+    name = table_class.__name__
+
+    # SQLAlchemy 2.x Row objects expose selected entities through _mapping.
+    mapping = getattr(row, "_mapping", None)
+    if mapping is not None:
+        value = mapping.get(name)
+        if value is not None:
+            return value
+
+    # Support row attributes using either the entity name or lowercase name.
+    value = getattr(row, name, None)
+    if value is not None:
+        return value
+    value = getattr(row, name.lower(), None)
+    if value is not None:
+        return value
+
+    # Fall back to scanning tuple-like rows and direct entity results.
     if isinstance(row, tuple):
         for item in row:
             if isinstance(item, table_class):
                 return item
-    
-    # Method 3: Check if row is the table itself
+
     if isinstance(row, table_class):
         return row
-    
+
     return None
 
 

@@ -93,6 +93,8 @@ environments, but it is not required for contributors. After installing Pixi,
 set up the default development environment with:
 
 ```bash
+# Keep Pixi's cache on local storage when the checkout is on NFS.
+export PIXI_CACHE_DIR=/tmp/$USER/pixi-cache
 pixi install
 ```
 
