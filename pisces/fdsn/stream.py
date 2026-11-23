@@ -257,7 +257,7 @@ def availability(
         numbered.c.network,
         numbered.c.station,
         numbered.c.channel,
-        numbered.c.earliest,
+        func.min(numbered.c.earliest),
         numbered.c.samplerate,
     )
 
